@@ -41,7 +41,7 @@ public class Server {
         sf.setResourceClasses(ApiEndpoint.class);
         sf.setResourceProvider(ApiEndpoint.class,
             new SingletonResourceProvider(new ApiEndpoint())); 	// http://localhost:9000/resources
-        sf.setAddress("http://pc1926.tis.local:9000/");
+        sf.setAddress("http://localhost:9000/");
 
         BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);
         JAXRSBindingFactory factory = new JAXRSBindingFactory();
