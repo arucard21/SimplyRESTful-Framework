@@ -55,7 +55,7 @@ public class ApiEndpoint extends ApiEndpointBase<ExampleResource> {
     }
 
     @Override
-	protected HalCollection<ExampleResource> createPagedCollection(int pageNumber, int pageSize, boolean compact) {
+	protected HalCollection<ExampleResource> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact) {
     	List<ExampleResource> exampleResources = new ArrayList<ExampleResource>();
     	for (StoredResource storedResource: dataStore.getData().values()){
     		exampleResources.add(convert(storedResource));
@@ -64,7 +64,7 @@ public class ApiEndpoint extends ApiEndpointBase<ExampleResource> {
     	if (searchCondition != null){
     		exampleResources = searchCondition.findAll(exampleResources);
     	}
-    	return new HalCollectionFactory<ExampleResource>().createPagedCollection(exampleResources, pageNumber, pageSize, uriInfo.getRequestUri(), compact);
+    	return new HalCollectionFactory<ExampleResource>().createPagedCollectionFromFullList(exampleResources, pageNumber, pageSize, uriInfo.getRequestUri(), compact);
 	}
 
 	@Override

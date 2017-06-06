@@ -48,7 +48,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
     		@ApiParam(value = "The page to be shown", required = false) @QueryParam(QUERY_PARAM_PAGE) @DefaultValue("1") int page,
     		@ApiParam(value = "The amount of resources shown on each page", required = false) @QueryParam(QUERY_PARAM_PAGE_SIZE) @DefaultValue("100") int pageSize,
     		@ApiParam(value = "Provide minimal information for each resource", required = false) @QueryParam(QUERY_PARAM_COMPACT) @DefaultValue("true") boolean compact) {
-    	return createPagedCollection(page, pageSize, compact);
+    	return retrieveResourcesFromDataStore(page, pageSize, compact);
     }
 
     @Produces({MEDIA_TYPE_HAL_JSON})
@@ -159,7 +159,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
      * @param compact determines whether only the self-link is shown (in _links) or the entire resource (in _embedded)
      * @return the requested HAL collection containing the resource (for that page)
      */
-	protected abstract HalCollection<T> createPagedCollection(int pageNumber, int pageSize, boolean compact);
+	protected abstract HalCollection<T> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact);
 
     /**
      * Add a resource to the data store.

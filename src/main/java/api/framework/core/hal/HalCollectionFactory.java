@@ -11,7 +11,21 @@ import dk.nykredit.jackson.dataformat.hal.HALLink;
 
 public class HalCollectionFactory<T extends HalResource> {
 
-	public HalCollection<T> createPagedCollection(List<T> allResources, int page, int pageSize, URI requestURI, boolean compact){
+	/**
+	 * Create a HalCollection object containing a single page of resources from the full list of those resources.
+	 *
+	 * You can provide the full list of resources that are available and this method will retrieve the correct resources
+	 * that should be shown on the page that is requested, with the given page size. You can also specify whether you
+	 * want the collection to show the full resource or just the resource ID of each resource.
+	 *
+	 * @param allResources is a List containing all resources for which a paged collection is requested.
+	 * @param page is the number of the page for which we want the resources to be shown.
+	 * @param pageSize is the size of each page.
+	 * @param requestURI is the URI on which the request is made, which is used to provide proper navigation links (like prev and next).
+	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
+	 * @return a HalCollection that contains the resources for the page that has been requested.
+	 */
+	public HalCollection<T> createPagedCollectionFromFullList(List<T> allResources, int page, int pageSize, URI requestURI, boolean compact){
 		int collectionSize = allResources.size();
 		HalCollection<T> collection = new HalCollection<T>();
 		collection.setPage(page);
@@ -24,6 +38,51 @@ public class HalCollectionFactory<T extends HalResource> {
 			pageEnd = collectionSize;
 		}
 		addResourcesToCollection(collection, allResources.subList(pageBegin, pageEnd), compact);
+
+		int firstPage = 1;
+		collection.setFirst(
+				createHalLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
+
+		int lastPage = (int) Math.ceil((double) collectionSize / (double) pageSize);
+		collection.setLast(
+				createHalLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
+
+		if (page > 1){
+			int prevPage = page - 1;
+			collection.setPrev(
+					createHalLinkFromURIWithModifiedPageNumber(requestURI, prevPage));
+		}
+
+		if (page < lastPage){
+			int nextPage = page + 1;
+			collection.setNext(
+					createHalLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
+		}
+		return collection;
+	}
+
+	/**
+	 * Create a HalCollection object containing a single page of resources from a list contain only the resources that
+	 * should be shown as that page.
+	 *
+	 * You can provide the resources that you want to be shown as a page. This method will create a paged collection
+	 * that contains all those resources as the page that will be shown. You can also specify whether you
+	 * want the collection to show the full resource or just the resource ID of each resource.
+	 *
+	 * @param resourcesForPage is a List containing only the resource that you wish to display on the page of your paged collection.
+	 * @param page is the number of the page that is represented by the provided list of resources.
+	 * @param collectionSize is the size of the full collection of resources.
+	 * @param requestURI is the URI on which the request is made, which is used to provide proper navigation links (like prev and next).
+	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
+	 * @return a HalCollection that contains the provided resources as the shown page.
+	 */
+	public HalCollection<T> createPagedCollectionFromPartialList(List<T> resourcesForPage, int page, int collectionSize, URI requestURI, boolean compact){
+		int pageSize = resourcesForPage.size();
+		HalCollection<T> collection = new HalCollection<T>();
+		collection.setPage(page);
+		collection.setPageSize(pageSize);
+		collection.setTotal(collectionSize);
+		addResourcesToCollection(collection, resourcesForPage, compact);
 
 		int firstPage = 1;
 		collection.setFirst(
