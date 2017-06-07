@@ -1,8 +1,9 @@
-package api.framework.core;
+package simplyrestful.api.framework.core;
 
 import java.net.URI;
 import java.util.UUID;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -21,11 +22,13 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 
-import api.framework.core.hal.HalCollection;
-import api.framework.core.hal.HalResource;
 import dk.nykredit.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
+import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
+import simplyrestful.api.framework.core.hal.HalCollection;
+import simplyrestful.api.framework.core.hal.HalResource;
 
 public abstract class ApiEndpointBase<T extends HalResource> {
 	@Context
@@ -80,7 +83,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
     		@ApiParam(value = "resource", required = true) final T resource) {
     	if (resource.getSelf() != null){
 			if (exists(resource.getSelf().getHref())){
-    			throw new ClientErrorException(Response.Status.CONFLICT);
+    			throw new ClientErrorException("A resource with the same ID already exists", Response.Status.CONFLICT);
     		}
     	}
     	addResourceToDataStore(resource);
@@ -95,15 +98,30 @@ public abstract class ApiEndpointBase<T extends HalResource> {
     @PUT
     @ApiOperation(
         value = "Create or update a resource",
-        notes = "Create a resource with a specified ID or update that resource. Returns the previous (now overridden) resource."
+        notes = "Create a resource with a specified ID or update that resource. Returns the previous (now overridden) resource or nothing if a new resource was created."
     )
     public T putHalResource(
     		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
-    		@ApiParam(value = "The resource to be updated", required = true) final T resource) {
+    		@ApiParam(value = "The resource to be updated", required = true) final T resource){
 		URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
 		resource.setSelf(createSelfLink(absoluteResourceIdentifier));
-		T existingResource = updateResourceInDataStore(resource);
-        return existingResource;
+		T existingResource;
+		try{
+			existingResource = updateResourceInDataStore(resource);
+		}
+		catch(InvalidResourceException invalidResource){
+			throw new BadRequestException("The provided resource is invalid, most likely due to an invalid or missing self-link");
+		}
+		if (existingResource == null){
+			// create the resource since it did not exist yet
+			if (addResourceToDataStore(resource)){
+				return null;
+			}
+			else{
+				throw new NotFoundException("The to-be-updated resource did not exist yet, but could also not be created");
+			}
+		}
+		return existingResource;
     }
 
 	@Path("/{id}")
@@ -165,9 +183,16 @@ public abstract class ApiEndpointBase<T extends HalResource> {
      * Add a resource to the data store.
      *
      * @param resource is the resource that will be added
+     * @return true iff the resource was successfully added, false otherwise.
      */
-	protected abstract void addResourceToDataStore(T resource);
+	protected abstract boolean addResourceToDataStore(T resource);
 
+	/**
+	 * Verify that a resource is known to the API.
+	 *
+	 * @param resourceURI is the URI that represents the resource
+	 * @return true iff the resource is known to the API, false otherwise
+	 */
 	protected abstract boolean exists(String resourceURI);
 
 	/**
@@ -182,15 +207,17 @@ public abstract class ApiEndpointBase<T extends HalResource> {
 	protected abstract T retrieveResourceFromDataStore(String resourceURI);
 
 	/**
-	 * Retrieve the resource from the data store where it is stored.
+	 * Update the resource in the data store where it is stored.
 	 *
-	 * The identifier does not necessarily have to be the same as the identifier used in the data store. You can map this API
-	 * identifier to the correct resource in any way you want.
+	 * The resource should contain a self-link in order to identify which resource needs to be updated.
 	 *
 	 * @param resource is the updated resource (which contains a self-link with which to identify the resource)
-	 * @return true if the resource was successfully updated
+	 * @return the previous value of the updated resource, or null no existing resource was found
+	 * @throws InvalidResourceException when the resource is not valid (most likely because it does not contain a self-link).
+	 * @throws InvalidSelfLinkException when the resource does not contain a valid self-link.
 	 */
-	protected abstract T updateResourceInDataStore(T resource);
+	protected abstract T updateResourceInDataStore(T resource) throws 	InvalidResourceException,
+																		InvalidSelfLinkException;
 
 	/**
      * Remove a resource from the data store.

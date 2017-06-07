@@ -1,4 +1,4 @@
-package api.framework.core.hal;
+package simplyrestful.api.framework.core.hal;
 
 import java.util.List;
 

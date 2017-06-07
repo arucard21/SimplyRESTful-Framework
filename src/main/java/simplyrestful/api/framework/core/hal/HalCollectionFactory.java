@@ -1,4 +1,4 @@
-package api.framework.core.hal;
+package simplyrestful.api.framework.core.hal;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -6,8 +6,8 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
-import api.framework.core.ApiEndpointBase;
 import dk.nykredit.jackson.dataformat.hal.HALLink;
+import simplyrestful.api.framework.core.ApiEndpointBase;
 
 public class HalCollectionFactory<T extends HalResource> {
 

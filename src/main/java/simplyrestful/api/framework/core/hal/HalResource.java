@@ -1,4 +1,4 @@
-package api.framework.core.hal;
+package simplyrestful.api.framework.core.hal;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
 import dk.nykredit.jackson.dataformat.hal.annotation.Link;

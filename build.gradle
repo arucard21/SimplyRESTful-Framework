@@ -1,5 +1,6 @@
 apply plugin: "java"
 apply plugin: "eclipse"
+apply plugin: "maven-publish"
 
 sourceSets {
 	main {
@@ -21,24 +22,21 @@ repositories {
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
+version = '0.1'
+group = 'github.arucard21.simplyrestful.api'
+description = 'A framework for creating a RESTful API'
+
 dependencies {
-	compile ("org.apache.cxf:cxf-rt-transports-http:3.1.10")
-	compile ("org.apache.cxf:cxf-rt-transports-http-jetty:3.1.10")
-	compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:3.1.10")
 	compile ("javax.ws.rs:javax.ws.rs-api:2.1-m04")
-	compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:3.1.10")
-	compile ("org.webjars:swagger-ui:2.2.6")
-//	compile ("org.eclipse.jetty:jetty-webapp:9.4.1.v20170120")
-	compile ("com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.6")
-	compile ("ch.qos.logback:logback-classic:1.2.1")
-	compile ("org.hibernate:hibernate-validator:5.4.0.Final")
-	compile ("javax.validation:validation-api:2.0.0.Alpha1")
-	compile ("javax.el:javax.el-api:3.0.1-b04")
-	compile ("org.glassfish:javax.el:3.0.1-b08")
+	compile ("io.swagger:swagger-annotations:1.5.12")
 	compile ("org.apache.cxf:cxf-rt-rs-extension-search:3.1.10")
 	compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
-	compile 'commons-httpclient:commons-httpclient:20020423'
-	compile ("org.eclipse.jetty:jetty-server:9.3.6.v20151106")
-	compile ("org.apache.commons:commons-collections4:4.1")
-//	compile ("org.apache.olingo:olingo-odata2-core:2.0.8")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
