@@ -152,6 +152,14 @@ public abstract class ApiEndpointBase<T extends HalResource> {
 	    return handleHateoasAction(absoluteResourceIdentifier.toString(), action);
 	}
 
+    /**
+     * Get the absolute URI for the resource on the endpoint.
+     *
+     * This will use the absolute URI to fill in specific resources
+     *
+     * @param id is the ID of the resource provided on the endpoint.
+     * @return the absolut URI for the resource on the endpoint.
+     */
 	protected URI getAbsoluteResourceURI(String id) {
 		return uriInfo.getBaseUriBuilder().path(getClass()).path(id).build();
 	}
