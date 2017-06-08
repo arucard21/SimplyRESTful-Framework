@@ -152,7 +152,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
 	    return handleHateoasAction(absoluteResourceIdentifier.toString(), action);
 	}
 
-	private URI getAbsoluteResourceURI(String id) {
+	protected URI getAbsoluteResourceURI(String id) {
 		return uriInfo.getBaseUriBuilder().path(getClass()).path(id).build();
 	}
 
