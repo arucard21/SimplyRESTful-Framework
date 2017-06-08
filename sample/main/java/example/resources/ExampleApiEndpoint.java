@@ -34,6 +34,8 @@ import example.datastore.DataStore;
 import example.datastore.StoredObject;
 import io.swagger.annotations.Api;
 import simplyrestful.api.framework.core.ApiEndpointBase;
+import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
+import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
 import simplyrestful.api.framework.core.hal.HalCollection;
 import simplyrestful.api.framework.core.hal.HalCollectionFactory;
 
@@ -97,14 +99,14 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
 	}
 
 	@Override
-	protected ExampleResource updateResourceInDataStore(ExampleResource resource) {
+	protected ExampleResource updateResourceInDataStore(ExampleResource resource) throws InvalidResourceException {
 		HALLink selfLink = resource.getSelf();
 		if (selfLink == null){
-			throw new IllegalArgumentException("The resource does not contain a self-link");
+			throw new InvalidSelfLinkException("The resource does not contain a self-link");
 		}
 		String resourceURI = selfLink.getHref();
 		if (resourceURI == null || resourceURI.isEmpty()){
-			throw new IllegalArgumentException("The resource contains an empty self-link");
+			throw new InvalidResourceException("The resource contains an empty self-link");
 		}
 		if (resourceMapping.get(resourceURI) == null){
 			// add this resource to the resource mapping
@@ -138,6 +140,12 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
 		return null;
 	}
 
+	@Override
+	protected boolean exists(String resourceURI) {
+		UUID dataID = resourceMapping.get(resourceURI);
+		return dataID == null ? false : true;
+	}
+
 	private StoredObject convert(ExampleResource exampleResource) {
 		StoredObject dataResource = new StoredObject();
 		dataResource.setDescription(exampleResource.getDescription());
@@ -159,11 +167,5 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
 			exampleResource.setSelf(createSelfLink(URI.create(resourceURI)));
 		}
 		return exampleResource;
-	}
-
-	@Override
-	protected boolean exists(String resourceURI) {
-		UUID dataID = resourceMapping.get(resourceURI);
-		return dataID == null ? false : true;
 	}
 }
