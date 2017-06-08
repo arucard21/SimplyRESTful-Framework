@@ -19,14 +19,14 @@
 
 package example.resources;
 
-import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.Path;
 
-import org.apache.commons.collections4.bidimap.TreeBidiMap;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
@@ -48,11 +48,11 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
 	 * UUID. In an actual implementation, this mapping should probably be
 	 * persistently stored, not kept in-memory.
 	 */
-	private TreeBidiMap<String, UUID> resourceMapping;
+	private Map<String, UUID> resourceMapping;
 	private DataStore dataStore;
 
     public ExampleApiEndpoint() {
-    	resourceMapping = new TreeBidiMap<String, UUID>();
+    	resourceMapping = new HashMap<String, UUID>();
     	dataStore = new DataStore();
     }
 
@@ -158,16 +158,9 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
 	private ExampleResource convert(StoredObject storedResource) {
 		ExampleResource exampleResource = new ExampleResource();
 		exampleResource.setDescription(storedResource.getDescription());
-		String resourceURI = resourceMapping.getKey(storedResource.getId());
-		if (resourceURI == null){
-			// create resource URI with new UUID and add it to the mapping
-			exampleResource.setSelf(createSelfLinkWithUUID(storedResource.getId()));
-			resourceMapping.put(exampleResource.getSelf().getHref(), storedResource.getId());
-		}
-		else{
-			// use the existing resource URI to create the self link
-			exampleResource.setSelf(createSelfLink(URI.create(resourceURI)));
-		}
+		// create resource URI with new UUID and add it to the mapping
+		exampleResource.setSelf(createSelfLinkWithUUID(storedResource.getId()));
+		resourceMapping.put(exampleResource.getSelf().getHref(), storedResource.getId());
 		return exampleResource;
 	}
 }
