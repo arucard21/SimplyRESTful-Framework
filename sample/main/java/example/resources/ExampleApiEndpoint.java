@@ -117,6 +117,8 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
 			throw new IllegalStateException("The to-be-updated resource does not exist yet.");
 		}
 		else{
+			dataStore.getData().remove(resourceMapping.get(resourceURI));
+			dataStore.getData().add(convert(resource));
 			return convert(previousData);
 		}
 	}
