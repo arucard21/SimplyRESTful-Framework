@@ -9,6 +9,7 @@ import simplyrestful.jetty.deploy.APIServer;
  */
 public class ExampleAPIServer {
 	public static void main(String[] args) {
-		APIServer.run(ExampleApiEndpoint.class);
+		// Make the example API available on all network interfaces on port 9000
+		APIServer.run("http://0.0.0.0:9000", ExampleApiEndpoint.class);
 	}
 }

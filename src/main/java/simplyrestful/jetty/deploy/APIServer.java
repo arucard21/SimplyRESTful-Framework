@@ -38,6 +38,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 
 import dk.nykredit.jackson.dataformat.hal.HALMapper;
+import simplyrestful.api.framework.core.ApiEndpointBase;
+import simplyrestful.api.framework.core.hal.HalResource;
 
 /**
  * Start the API server.
@@ -66,10 +68,11 @@ public class APIServer {
 	 * Start the server on a specific address.
 	 *
 	 * @param address is the address on which the server should run. If empty, the server will be started on random port on localhost
+	 * @param apiEndpoints is a list of the API endpoints that should served.
 	 * @throws IllegalAccessException if the APIEndpoint class is not accessible.
 	 * @throws InstantiationException if this APIEndpoint class could not be instantiated.
 	 */
-    protected APIServer(String address, Class<?>... apiEndpoints) throws InstantiationException, IllegalAccessException{
+    protected APIServer(String address, Class<? extends ApiEndpointBase<? extends HalResource>>... apiEndpoints) throws InstantiationException, IllegalAccessException{
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(apiEndpoints);
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
@@ -101,9 +104,9 @@ public class APIServer {
     /**
      * Run the provided JAX-RS API endpoints on http://localhost:9000
      *
-     * @throws Exception
+     * @param apiEndpoints is a list of the API endpoints that should served.
      */
-    public static void run(Class<?>... apiEndpoints) {
+    public static void run(Class<? extends ApiEndpointBase<? extends HalResource>>... apiEndpoints) {
     	run("http://localhost:9000", apiEndpoints);
     }
 
@@ -112,9 +115,8 @@ public class APIServer {
      *
      * @param address is the URI where the endpoints should be served. If empty, the endpoints will be served on a random port on localhost
      * @param apiEndpoints is a list of the API endpoints that should served.
-     * @throws Exception
      */
-	public static void run(String address, Class<?>... apiEndpoints){
+	public static void run(String address, Class<? extends ApiEndpointBase<? extends HalResource>>... apiEndpoints){
 	    try {
 			new APIServer(address, apiEndpoints);
 			LOGGER.info("Server ready...");
