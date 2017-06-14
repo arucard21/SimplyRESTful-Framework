@@ -43,7 +43,7 @@ public class HalCollectionFactory<T extends HalResource> {
 		collection.setFirst(
 				createHalLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
 
-		int lastPage = (int) Math.ceil((double) collectionSize / (double) pageSize);
+		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) pageSize);
 		collection.setLast(
 				createHalLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
 
@@ -88,7 +88,7 @@ public class HalCollectionFactory<T extends HalResource> {
 		collection.setFirst(
 				createHalLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
 
-		int lastPage = (int) Math.ceil((double) collectionSize / (double) pageSize);
+		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) pageSize);
 		collection.setLast(
 				createHalLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
 
