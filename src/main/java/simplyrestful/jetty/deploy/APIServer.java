@@ -74,7 +74,6 @@ public class APIServer {
 	 */
     private APIServer(String address, Class<? extends ApiEndpointBase<? extends HalResource>>... apiEndpoints) throws InstantiationException, IllegalAccessException{
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(apiEndpoints);
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
         for (Class<?> apiEndpoint: apiEndpoints){
 			resourceProviders.add(new SingletonResourceProvider(apiEndpoint.newInstance()));
