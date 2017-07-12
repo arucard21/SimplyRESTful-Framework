@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.core.hal;
 
+import java.net.URI;
 import java.util.List;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
@@ -8,7 +9,7 @@ import dk.nykredit.jackson.dataformat.hal.annotation.Link;
 import dk.nykredit.jackson.dataformat.hal.annotation.Resource;
 
 @Resource
-public class HalCollection<T extends HalResource> {
+public class HalCollection<T extends HalResource> extends HalResource {
 	private int page;
 	private int pageSize;
 	private int total;
@@ -96,5 +97,10 @@ public class HalCollection<T extends HalResource> {
 
 	public void setTotal(int total) {
 		this.total = total;
+	}
+
+	@Override
+	public URI getProfile() {
+		return URI.create("https://arucard21.github.io/SimplyRESTful/HalCollection/v1");
 	}
 }

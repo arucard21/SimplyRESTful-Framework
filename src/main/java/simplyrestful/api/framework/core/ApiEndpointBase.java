@@ -1,7 +1,6 @@
 package simplyrestful.api.framework.core;
 
 import java.net.URI;
-import java.util.UUID;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
@@ -17,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -36,12 +36,11 @@ public abstract class ApiEndpointBase<T extends HalResource> {
 	@Context
 	protected UriInfo uriInfo;
 
-	public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json";
 	public static final String QUERY_PARAM_PAGE = "page";
 	public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
 	public static final String QUERY_PARAM_COMPACT = "compact";
 
-    @Produces({MEDIA_TYPE_HAL_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @GET
     @ApiOperation(
         value = "Get a list of resources",
@@ -54,7 +53,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
     	return retrieveResourcesFromDataStore(page, pageSize, compact);
     }
 
-    @Produces({MEDIA_TYPE_HAL_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Path("/{id}")
     @GET
     @ApiOperation(
@@ -73,7 +72,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
     }
 
 
-	@Consumes({MEDIA_TYPE_HAL_JSON})
+	@Consumes({MediaType.APPLICATION_JSON})
     @POST
     @ApiOperation(
         value = "Create a new resource",
@@ -92,8 +91,8 @@ public abstract class ApiEndpointBase<T extends HalResource> {
             .build();
     }
 
-	@Consumes({MEDIA_TYPE_HAL_JSON})
-	@Produces({MEDIA_TYPE_HAL_JSON})
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
     @Path("/{id}")
     @PUT
     @ApiOperation(
@@ -104,7 +103,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
     		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
     		@ApiParam(value = "The resource to be updated", required = true) final T resource){
 		URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
-		resource.setSelf(createSelfLink(absoluteResourceIdentifier));
+		resource.setSelf(createLink(absoluteResourceIdentifier, resource.getProfile()));
 		T existingResource;
 		try{
 			existingResource = updateResourceInDataStore(resource);
@@ -138,7 +137,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
         return Response.noContent().build();
     }
 
-    @Produces({MEDIA_TYPE_HAL_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
 	@Path("/{id}/{action}")
 	@GET
 	@ApiOperation(
@@ -158,19 +157,25 @@ public abstract class ApiEndpointBase<T extends HalResource> {
      * This will use the absolute URI to fill in specific resources
      *
      * @param id is the ID of the resource provided on the endpoint.
-     * @return the absolut URI for the resource on the endpoint.
+     * @return the absolute URI for the resource on the endpoint.
      */
 	protected URI getAbsoluteResourceURI(String id) {
 		return uriInfo.getBaseUriBuilder().path(getClass()).path(id).build();
 	}
 
-	protected HALLink createSelfLinkWithUUID(UUID id) {
-		return createSelfLink(getAbsoluteResourceURI(id.toString()));
-	}
-
-	protected HALLink createSelfLink(URI resourceURI) {
+	/**
+	 * Create a {@link HALLink} that refers to the provided resource URI with the given profile.
+	 *
+	 * Note that the media type is always set to HAL+JSON.
+	 *
+	 * @param resourceURI is the URI of the resource to which this {@link HALLink} refers
+	 * @param resourceProfile is the URI of the profile describing the resource to which this {@link HALLink} refers
+	 * @return a {@link HALLink} that refers to the provided URI with the given profile
+	 */
+	protected HALLink createLink(URI resourceURI, URI resourceProfile) {
 		return new HALLink.Builder(resourceURI)
-									.type(MEDIA_TYPE_HAL_JSON)
+									.type(MediaType.APPLICATION_JSON)
+									.profile(resourceProfile)
 									.build();
 	}
 

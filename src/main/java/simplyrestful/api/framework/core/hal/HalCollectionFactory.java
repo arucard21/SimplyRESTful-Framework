@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
@@ -58,6 +59,7 @@ public class HalCollectionFactory<T extends HalResource> {
 			collection.setNext(
 					createHalLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
 		}
+		addSelfLink(collection, requestURI);
 		return collection;
 	}
 
@@ -72,7 +74,7 @@ public class HalCollectionFactory<T extends HalResource> {
 	 * @param resourcesForPage is a List containing only the resource that you wish to display on the page of your paged collection.
 	 * @param page is the number of the page that is represented by the provided list of resources.
 	 * @param collectionSize is the size of the full collection of resources.
-	 * @param requestURI is the URI on which the request is made, which is used to provide proper navigation links (like prev and next).
+	 * @param requestURI is the URI on which the request is made, which is used to provide proper absolute links (like self, prev and next).
 	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
 	 * @return a HalCollection that contains the provided resources as the shown page.
 	 */
@@ -103,6 +105,7 @@ public class HalCollectionFactory<T extends HalResource> {
 			collection.setNext(
 					createHalLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
 		}
+		addSelfLink(collection, requestURI);
 		return collection;
 	}
 
@@ -134,5 +137,12 @@ public class HalCollectionFactory<T extends HalResource> {
 
 		}
 		return resourcesOnPage;
+	}
+
+	private void addSelfLink(HalCollection<T> collection, URI collectionURI) {
+		collection.setSelf(new HALLink.Builder(collectionURI)
+										.type(MediaType.APPLICATION_JSON)
+										.profile(collection.getProfile())
+										.build());
 	}
 }

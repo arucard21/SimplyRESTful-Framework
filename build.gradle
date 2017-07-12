@@ -22,8 +22,8 @@ repositories {
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-version = '0.1'
-group = 'github.arucard21.simplyrestful.api'
+version = '0.1.2'
+group = 'com.github.arucard21.simplyrestful.api'
 description = 'A framework for creating a RESTful API'
 
 dependencies {
