@@ -1,4 +1,7 @@
 # SimplyRESTful-jetty
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?style=plastic)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/simplyrestful-jetty/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/simplyrestful-jetty)
+
 A quick way to deploy your SimplyRESTful API with Jetty
 
 Provides a quick way to deploy the API based on SimplyRESTful on a Jetty server. It includes generation of a swagger.json
