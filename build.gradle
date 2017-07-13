@@ -19,7 +19,7 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 group = 'com.github.arucard21.simplyrestful'
-version = '0.2'
+version = '0.3'
 
 dependencies {
 	compile ("org.apache.cxf:cxf-rt-transports-http-jetty:3.1.10")
