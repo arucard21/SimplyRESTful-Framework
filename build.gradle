@@ -1,0 +1,25 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ["src/main/java"]
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+group = 'com.github.arucard21.simplyrestful'
+version = '0.1'
+
+dependencies {
+	compile ("com.github.arucard21.simplyrestful:simplyrestful:0.2")
+	compile ("com.github.arucard21.simplyrestful:simplyrestful-jetty:0.2")
+}
