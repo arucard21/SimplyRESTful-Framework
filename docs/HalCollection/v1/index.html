@@ -1,4 +1,42 @@
+<!DOCTYPE html>
 <html>
-<h1>HALCollection/v1</h1>
-<p>This documents this resource</p>
+<head>
+	<title>HALCollection Specification</title>
+</head>
+<body>
+	<h1>HALCollection Specification</h1>
+	<ul>
+		<li>Media Type: <a href="https://tools.ietf.org/html/draft-kelly-json-hal"><code>application/hal+json</code></a></li>
+		<li>Profile: <code>https://arucard21.github.io/SimplyRESTful/HalCollection/v1</code></li>
+		<li>Version: <code>1</code></li>
+	</ul>
+	<h2>Attributes</h2>
+	<ul>
+		<li><code>page</code>: is the number of the page that's currently shown from the collection</li>
+		<li><code>pageSize</code>: is the maximum amount of resources that are being shown on a single page of the collection</li>
+		<li><code>total</code>: is the number of resources that are available in the entire collection</li>
+	</ul>
+	<h2>Embedded</h2>
+	<ul>
+		<li><a href="https://tools.ietf.org/html/rfc6573#section-2.1"><code>item</code></a>: is a list of the 
+		resources from this page, where the entire resource is shown for each. This is only visible when the 
+		<code>compact</code> query string parameter is set to false.</li>
+	</ul>
+	<h2>Links</h2>
+	<ul>
+		<li><a href="https://tools.ietf.org/html/rfc6573#section-2.1"><code>item</code></a>: is a list of links to the resources 
+		that are part of this page of the collection. This is only visible when the <code>compact</code> query string 
+		parameter is omitted or set to true.</li>
+		<li><a href="https://tools.ietf.org/html/rfc4287#section-4.2.7.2"><code>self</code></a>: is a link to the collection itself.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>first</code></a>: is a link to the first page of the collection.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>last</code></a>: is a link to the last page of the collection.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>prev</code></a>: is a link to the next page of the collection.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>next</code></a>: is a link to the next page of the collection.</li>
+	</ul>
+	<h2>Search</h2>
+	<p>Using the <code>_s</code> or <code>_search</code> query string parameter, you can search the resources in the collection. 
+		This can be done using the <a href="https://tools.ietf.org/html/draft-nottingham-atompub-fiql">Feed Item Query Language (FIQL)</a> 
+		where you can filter on any of the resource's attributes.
+	</p>
+</body>
 </html>

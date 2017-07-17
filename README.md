@@ -16,7 +16,7 @@ Using this framework you would mainly just need to implement a mapping between y
 
 ## Usage
 * Depend on the SimplyRESTful framework
-* Create your HAL resource objects (by extending HalResource)
+* Create your HAL resource objects (by extending HALResource)
 * Create the API endpoints that will serve that resource (by extending ApiEndpointBase<T> where T should be the HAL resource object you created)
 * Implement the required methods in the endpoint, mapping your data appropriately in order to provide them as HAL-based objects to the endpoint
 * Deploy the API endpoints

@@ -9,7 +9,7 @@ import dk.nykredit.jackson.dataformat.hal.annotation.Link;
 import dk.nykredit.jackson.dataformat.hal.annotation.Resource;
 
 @Resource
-public abstract class HalResource{
+public abstract class HALResource{
 	@Link
 	protected HALLink self;
 

@@ -27,10 +27,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
-import simplyrestful.api.framework.core.hal.HalCollection;
-import simplyrestful.api.framework.core.hal.HalResource;
+import simplyrestful.api.framework.core.hal.HALCollection;
+import simplyrestful.api.framework.core.hal.HALResource;
 
-public abstract class ApiEndpointBase<T extends HalResource> {
+public abstract class ApiEndpointBase<T extends HALResource> {
 	@Context
     protected SearchContext searchContext;
 	@Context
@@ -46,7 +46,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
         value = "Get a list of resources",
         notes = "Get a list of resources, which can optionally be filtered with <a href=\"https://cxf.apache.org/docs/jax-rs-search.html#JAX-RSSearch-FeedItemQueryLanguage\">FIQL</a>. The FIQL expression should be provided in the <code>_s</code> query parameter (not yet supported through Swagger UI) and allows <code>*</code> as wildcard character."
     )
-    public HalCollection<T> getHalResources(
+    public HALCollection<T> getHALResources(
     		@ApiParam(value = "The page to be shown", required = false) @QueryParam(QUERY_PARAM_PAGE) @DefaultValue("1") int page,
     		@ApiParam(value = "The amount of resources shown on each page", required = false) @QueryParam(QUERY_PARAM_PAGE_SIZE) @DefaultValue("100") int pageSize,
     		@ApiParam(value = "Provide minimal information for each resource", required = false) @QueryParam(QUERY_PARAM_COMPACT) @DefaultValue("true") boolean compact) {
@@ -60,7 +60,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
         value = "Get operation with type and headers",
         notes = "Get operation with type and headers"
     )
-    public T getHalResource(
+    public T getHALResource(
     		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
     	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
 		T resource = retrieveResourceFromDataStore(absoluteResourceIdentifier.toString());
@@ -78,7 +78,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
         value = "Create a new resource",
         notes = "Create a new resource which can already have a self-link containing an URI as identifier or one will be generated"
     )
-    public Response postHalResource(
+    public Response postHALResource(
     		@ApiParam(value = "resource", required = true) final T resource) {
     	if (resource.getSelf() != null){
 			if (exists(resource.getSelf().getHref())){
@@ -99,7 +99,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
         value = "Create or update a resource",
         notes = "Create a resource with a specified ID or update that resource. Returns the previous (now overridden) resource or nothing if a new resource was created."
     )
-    public T putHalResource(
+    public T putHALResource(
     		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
     		@ApiParam(value = "The resource to be updated", required = true) final T resource){
 		URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
@@ -129,7 +129,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
         value = "Delete operation with implicit header",
         notes = "Delete operation with implicit header"
     )
-    public Response deleteHalResource(@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
+    public Response deleteHALResource(@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
     	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
     	if(removeResourceFromDataStore(absoluteResourceIdentifier.toString()) == null){
     		throw new NotFoundException();
@@ -144,7 +144,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
 	    value = "Change the state of a resource using discoverable actions",
 	    notes = "Change the state of a resource using discoverable actions (HATEOAS) that are made available through that resource. This should not be called directly as it depends on the application state. If the action can be called it will be available on the resource."
 	)
-	public T changeStateForHalResource(
+	public T changeStateForHALResource(
 			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
 			@ApiParam(value = "Discoverable action that changes the application state", required = true) @PathParam("action") String action) {
     	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
@@ -182,7 +182,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
 	/**
      * Retrieve the paged collection of resources that have been requested.
      *
-     * For proper discoverability of the API, all links (href values in each HalLink object) should contain absolute URI's
+     * For proper discoverability of the API, all links (href values in each HALLink object) should contain absolute URI's
      * and a self-link must be available in each resource.
      *
      * @param pageNumber is the requested page number
@@ -190,7 +190,7 @@ public abstract class ApiEndpointBase<T extends HalResource> {
      * @param compact determines whether only the self-link is shown (in _links) or the entire resource (in _embedded)
      * @return the requested HAL collection containing the resource (for that page)
      */
-	protected abstract HalCollection<T> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact);
+	protected abstract HALCollection<T> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact);
 
     /**
      * Add a resource to the data store.

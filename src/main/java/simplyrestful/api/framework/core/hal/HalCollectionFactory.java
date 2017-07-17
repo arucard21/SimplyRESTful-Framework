@@ -10,10 +10,10 @@ import javax.ws.rs.core.UriBuilder;
 import dk.nykredit.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.ApiEndpointBase;
 
-public class HalCollectionFactory<T extends HalResource> {
+public class HALCollectionFactory<T extends HALResource> {
 
 	/**
-	 * Create a HalCollection object containing a single page of resources from the full list of those resources.
+	 * Create a HALCollection object containing a single page of resources from the full list of those resources.
 	 *
 	 * You can provide the full list of resources that are available and this method will retrieve the correct resources
 	 * that should be shown on the page that is requested, with the given page size. You can also specify whether you
@@ -24,11 +24,11 @@ public class HalCollectionFactory<T extends HalResource> {
 	 * @param pageSize is the size of each page.
 	 * @param requestURI is the URI on which the request is made, which is used to provide proper navigation links (like prev and next).
 	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
-	 * @return a HalCollection that contains the resources for the page that has been requested.
+	 * @return a HALCollection that contains the resources for the page that has been requested.
 	 */
-	public HalCollection<T> createPagedCollectionFromFullList(List<T> allResources, int page, int pageSize, URI requestURI, boolean compact){
+	public HALCollection<T> createPagedCollectionFromFullList(List<T> allResources, int page, int pageSize, URI requestURI, boolean compact){
 		int collectionSize = allResources.size();
-		HalCollection<T> collection = new HalCollection<T>();
+		HALCollection<T> collection = new HALCollection<T>();
 		collection.setPage(page);
 		collection.setPageSize(pageSize);
 		collection.setTotal(collectionSize);
@@ -42,29 +42,29 @@ public class HalCollectionFactory<T extends HalResource> {
 
 		int firstPage = 1;
 		collection.setFirst(
-				createHalLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
+				createHALLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
 
 		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) pageSize);
 		collection.setLast(
-				createHalLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
+				createHALLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
 
 		if (page > 1){
 			int prevPage = page - 1;
 			collection.setPrev(
-					createHalLinkFromURIWithModifiedPageNumber(requestURI, prevPage));
+					createHALLinkFromURIWithModifiedPageNumber(requestURI, prevPage));
 		}
 
 		if (page < lastPage){
 			int nextPage = page + 1;
 			collection.setNext(
-					createHalLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
+					createHALLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
 		}
 		addSelfLink(collection, requestURI);
 		return collection;
 	}
 
 	/**
-	 * Create a HalCollection object containing a single page of resources from a list contain only the resources that
+	 * Create a HALCollection object containing a single page of resources from a list contain only the resources that
 	 * should be shown as that page.
 	 *
 	 * You can provide the resources that you want to be shown as a page. This method will create a paged collection
@@ -76,11 +76,11 @@ public class HalCollectionFactory<T extends HalResource> {
 	 * @param collectionSize is the size of the full collection of resources.
 	 * @param requestURI is the URI on which the request is made, which is used to provide proper absolute links (like self, prev and next).
 	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
-	 * @return a HalCollection that contains the provided resources as the shown page.
+	 * @return a HALCollection that contains the provided resources as the shown page.
 	 */
-	public HalCollection<T> createPagedCollectionFromPartialList(List<T> resourcesForPage, int page, int collectionSize, URI requestURI, boolean compact){
+	public HALCollection<T> createPagedCollectionFromPartialList(List<T> resourcesForPage, int page, int collectionSize, URI requestURI, boolean compact){
 		int pageSize = resourcesForPage.size();
-		HalCollection<T> collection = new HalCollection<T>();
+		HALCollection<T> collection = new HALCollection<T>();
 		collection.setPage(page);
 		collection.setPageSize(pageSize);
 		collection.setTotal(collectionSize);
@@ -88,35 +88,35 @@ public class HalCollectionFactory<T extends HalResource> {
 
 		int firstPage = 1;
 		collection.setFirst(
-				createHalLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
+				createHALLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
 
 		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) pageSize);
 		collection.setLast(
-				createHalLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
+				createHALLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
 
 		if (page > 1){
 			int prevPage = page - 1;
 			collection.setPrev(
-					createHalLinkFromURIWithModifiedPageNumber(requestURI, prevPage));
+					createHALLinkFromURIWithModifiedPageNumber(requestURI, prevPage));
 		}
 
 		if (page < lastPage){
 			int nextPage = page + 1;
 			collection.setNext(
-					createHalLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
+					createHALLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
 		}
 		addSelfLink(collection, requestURI);
 		return collection;
 	}
 
-	private HALLink createHalLinkFromURIWithModifiedPageNumber(URI requestURI, int pageNumber){
+	private HALLink createHALLinkFromURIWithModifiedPageNumber(URI requestURI, int pageNumber){
 		UriBuilder hrefBuilder = UriBuilder.fromUri(requestURI);
 		hrefBuilder.replaceQueryParam(ApiEndpointBase.QUERY_PARAM_PAGE, pageNumber);
 		HALLink link = new HALLink.Builder(hrefBuilder.build()).build();
 		return link;
 	}
 
-	private void addResourcesToCollection(HalCollection<T> collection, List<T> pageResources, boolean compact) {
+	private void addResourcesToCollection(HALCollection<T> collection, List<T> pageResources, boolean compact) {
 		if(compact){
 			List<HALLink> resourcesOnPage = retrieveSelfLinks(pageResources);
 			collection.setItem(resourcesOnPage);
@@ -139,7 +139,7 @@ public class HalCollectionFactory<T extends HalResource> {
 		return resourcesOnPage;
 	}
 
-	private void addSelfLink(HalCollection<T> collection, URI collectionURI) {
+	private void addSelfLink(HALCollection<T> collection, URI collectionURI) {
 		collection.setSelf(new HALLink.Builder(collectionURI)
 										.type(MediaType.APPLICATION_JSON)
 										.profile(collection.getProfile())

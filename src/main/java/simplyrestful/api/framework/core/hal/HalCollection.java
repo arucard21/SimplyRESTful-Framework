@@ -9,7 +9,7 @@ import dk.nykredit.jackson.dataformat.hal.annotation.Link;
 import dk.nykredit.jackson.dataformat.hal.annotation.Resource;
 
 @Resource
-public class HalCollection<T extends HalResource> extends HalResource {
+public class HALCollection<T extends HALResource> extends HALResource {
 	private int page;
 	private int pageSize;
 	private int total;
