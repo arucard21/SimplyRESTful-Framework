@@ -91,7 +91,7 @@ public class HALCollectionFactoryTest {
 		int pageSize = 100;
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
-		Assert.assertEquals(HALCOLLECTION_PROFILE, actual.getProfile().toString());
+		Assert.assertEquals(URI.create(HALCOLLECTION_PROFILE), actual.getProfile());
 	}
 
 	@Test
