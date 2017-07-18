@@ -38,8 +38,8 @@ import io.swagger.annotations.Api;
 import simplyrestful.api.framework.core.ApiEndpointBase;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
-import simplyrestful.api.framework.core.hal.HalCollection;
-import simplyrestful.api.framework.core.hal.HalCollectionFactory;
+import simplyrestful.api.framework.core.hal.HALCollection;
+import simplyrestful.api.framework.core.hal.HALCollectionFactory;
 
 @Path("/resources")
 @Api(value = "Example Resources")
@@ -59,7 +59,7 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
     }
 
     @Override
-	protected HalCollection<ExampleResource> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact) {
+	protected HALCollection<ExampleResource> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact) {
     	List<ExampleResource> exampleResources = new ArrayList<ExampleResource>();
     	for (StoredObject storedResource: dataStore.getData()){
     		exampleResources.add(convert(storedResource));
@@ -68,7 +68,7 @@ public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
     	if (searchCondition != null){
     		exampleResources = searchCondition.findAll(exampleResources);
     	}
-    	return new HalCollectionFactory<ExampleResource>().createPagedCollectionFromFullList(exampleResources, pageNumber, pageSize, uriInfo.getRequestUri(), compact);
+    	return new HALCollectionFactory<ExampleResource>().createPagedCollectionFromFullList(exampleResources, pageNumber, pageSize, uriInfo.getRequestUri(), compact);
 	}
 
 	@Override

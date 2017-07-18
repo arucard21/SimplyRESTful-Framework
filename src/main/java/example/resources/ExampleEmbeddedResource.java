@@ -2,9 +2,9 @@ package example.resources;
 
 import java.net.URI;
 
-import simplyrestful.api.framework.core.hal.HalResource;
+import simplyrestful.api.framework.core.hal.HALResource;
 
-public class ExampleEmbeddedResource extends HalResource{
+public class ExampleEmbeddedResource extends HALResource{
 
 	private String name;
 
