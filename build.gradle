@@ -25,6 +25,8 @@ dependencies {
 	compile ("io.swagger:swagger-annotations:1.5.12")
 	compile ("org.apache.cxf:cxf-rt-rs-extension-search:3.1.10")
 	compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
+	
+	testCompile ("junit:junit:4.12")
 }
 
 task javadocJar(type: Jar) {

@@ -16,7 +16,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -40,7 +39,7 @@ public abstract class ApiEndpointBase<T extends HALResource> {
 	public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
 	public static final String QUERY_PARAM_COMPACT = "compact";
 
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_HAL_JSON})
     @GET
     @ApiOperation(
         value = "Get a list of resources",
@@ -53,7 +52,7 @@ public abstract class ApiEndpointBase<T extends HALResource> {
     	return retrieveResourcesFromDataStore(page, pageSize, compact);
     }
 
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_HAL_JSON})
     @Path("/{id}")
     @GET
     @ApiOperation(
@@ -72,7 +71,7 @@ public abstract class ApiEndpointBase<T extends HALResource> {
     }
 
 
-	@Consumes({MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.APPLICATION_HAL_JSON})
     @POST
     @ApiOperation(
         value = "Create a new resource",
@@ -91,8 +90,8 @@ public abstract class ApiEndpointBase<T extends HALResource> {
             .build();
     }
 
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.APPLICATION_HAL_JSON})
+	@Produces({MediaType.APPLICATION_HAL_JSON})
     @Path("/{id}")
     @PUT
     @ApiOperation(
@@ -137,7 +136,7 @@ public abstract class ApiEndpointBase<T extends HALResource> {
         return Response.noContent().build();
     }
 
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_HAL_JSON})
 	@Path("/{id}/{action}")
 	@GET
 	@ApiOperation(
@@ -174,7 +173,7 @@ public abstract class ApiEndpointBase<T extends HALResource> {
 	 */
 	protected HALLink createLink(URI resourceURI, URI resourceProfile) {
 		return new HALLink.Builder(resourceURI)
-									.type(MediaType.APPLICATION_JSON)
+									.type(MediaType.APPLICATION_HAL_JSON)
 									.profile(resourceProfile)
 									.build();
 	}
