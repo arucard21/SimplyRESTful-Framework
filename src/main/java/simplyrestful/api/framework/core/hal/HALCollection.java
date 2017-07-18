@@ -101,6 +101,6 @@ public class HALCollection<T extends HALResource> extends HALResource {
 
 	@Override
 	public URI getProfile() {
-		return URI.create("https://arucard21.github.io/SimplyRESTful/HalCollection/v1");
+		return URI.create("https://arucard21.github.io/SimplyRESTful/HALCollection/v1");
 	}
 }
