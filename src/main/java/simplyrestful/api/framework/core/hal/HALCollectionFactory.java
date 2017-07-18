@@ -4,11 +4,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.ApiEndpointBase;
+import simplyrestful.api.framework.core.MediaType;
 
 public class HALCollectionFactory<T extends HALResource> {
 
@@ -141,7 +141,7 @@ public class HALCollectionFactory<T extends HALResource> {
 
 	private void addSelfLink(HALCollection<T> collection, URI collectionURI) {
 		collection.setSelf(new HALLink.Builder(collectionURI)
-										.type(MediaType.APPLICATION_JSON)
+										.type(MediaType.APPLICATION_HAL_JSON)
 										.profile(collection.getProfile())
 										.build());
 	}
