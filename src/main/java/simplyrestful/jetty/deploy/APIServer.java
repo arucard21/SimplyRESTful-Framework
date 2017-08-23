@@ -22,9 +22,11 @@ package simplyrestful.jetty.deploy;
 import java.util.ArrayList;
 
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSBindingFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
+import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
@@ -61,20 +63,32 @@ import dk.nykredit.jackson.dataformat.hal.HALMapper;
  *
  */
 public class APIServer {
-	public static Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.APIServer");
-	/**
-	 * Start the server on a specific address.
-	 *
-	 * @param address is the address on which the server should run. If empty, the server will be started on random port on localhost
-	 * @param apiEndpoints is a list of the API endpoints that should served.
-	 * @throws IllegalAccessException if the APIEndpoint class is not accessible.
-	 * @throws InstantiationException if this APIEndpoint class could not be instantiated.
-	 */
-    private APIServer(String address, Class<?>... apiEndpoints) throws InstantiationException, IllegalAccessException{
+	private static final Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.APIServer");
+	private Server cxfServer;
+
+    /**
+     * Create a CXF-based API server with the provided JAX-RS API endpoints on the given address.
+     *
+     * The endpoints will have their lifecycle set to singleton. If this is not possible, e.g. if no
+     * instance can be created for the endpoint, it will fall back to a per-request lifecycle.
+     *
+     * @param address is the URI where the endpoints should be served. If empty, the endpoints will be served on a random port on localhost
+     * @param apiEndpoints is a list of the API endpoints that should served.
+     *
+     */
+    public APIServer(String address, Class<?>... apiEndpoints){
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setResourceClasses(apiEndpoints);
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
         for (Class<?> apiEndpoint: apiEndpoints){
-			resourceProviders.add(new SingletonResourceProvider(apiEndpoint.newInstance()));
+			try {
+				resourceProviders.add(new SingletonResourceProvider(apiEndpoint.newInstance()));
+			}
+			catch (InstantiationException | IllegalAccessException e) {
+				LOGGER.warn("Couldn't create an instance of this API endpoint for singleton lifecyce: " + apiEndpoint.getName());
+				LOGGER.warn("Using per-request lifecycle for this API endpoint instead");
+				resourceProviders.add(new PerRequestResourceProvider(apiEndpoint));
+			}
         }
         sf.setResourceProviders(resourceProviders);
         if (address != null && !address.isEmpty()){
@@ -95,40 +109,27 @@ public class APIServer {
         		new MultipartProvider(),
         		new JacksonJsonProvider(new HALMapper()),
         		new SearchContextProvider()));
-        sf.create();
+        cxfServer = sf.create();
+        LOGGER.info("Server ready...");
     }
 
     /**
-     * Run the provided JAX-RS API endpoints on http://localhost:9000
+     * Create a CXF-based API server with the provided JAX-RS API endpoints on http://localhost:9000
      *
      * @param apiEndpoints is a list of the API endpoints that should served.
+     * @return the CXF Server object
      */
-    public static void run(Class<?>... apiEndpoints) {
-    	run("http://localhost:9000", apiEndpoints);
+    public APIServer(Class<?>... apiEndpoints) {
+    	this("http://localhost:9000", apiEndpoints);
     }
 
     /**
-     * Run the provided JAX-RS API endpoints on the given address
+     * Retrieve the CXF server that was created for this API server.
      *
-     * @param address is the URI where the endpoints should be served. If empty, the endpoints will be served on a random port on localhost
-     * @param apiEndpoints is a list of the API endpoints that should served.
+     * @return the CXF-based server created for this API server.
      */
-	public static void run(String address, Class<?>... apiEndpoints){
-	    try {
-			new APIServer(address, apiEndpoints);
-			LOGGER.info("Server ready...");
-			Thread.sleep(5 * 6000 * 1000);
-			LOGGER.info("Server exiting");
-			System.exit(0);
-		}
-		catch (InstantiationException e) {
-			LOGGER.error("An API endpoint could not be instantiated", e);
-		}
-		catch (IllegalAccessException e){
-			LOGGER.error("An API endpoint could not be accessed", e);
-		}
-		catch (InterruptedException e){
-			LOGGER.debug("The API server has been interrupted", e);
-		}
-	}
+    public Server getCXFServer(){
+    	return cxfServer;
+    }
+
 }
