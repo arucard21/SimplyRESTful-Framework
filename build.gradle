@@ -20,5 +20,5 @@ group = 'com.github.arucard21.simplyrestful'
 version = '0.1'
 
 dependencies {
-	compile ("com.github.arucard21.simplyrestful:simplyrestful-jetty:0.2")
+	compile ("com.github.arucard21.simplyrestful:simplyrestful-jetty:0.3")
 }
