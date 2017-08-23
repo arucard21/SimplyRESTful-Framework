@@ -12,6 +12,6 @@ The configuration includes generation of an OpenAPI Specification file at `/swag
 To use it, in your project you have to: 
 * Depend on SimplyRESTful-jetty
 * [Implement your SimplyRESTful API](https://github.com/arucard21/SimplyRESTful#usage)
-* Create a class with a main method that calls `APIServer.run(JAXRSEndpoint.class)` where `JAXRSEndpoint.class` is the endpoint you implemented (which extends ApiEndpointBase). This will deploy your API endpoint on `http://localhost:9000/`.
+* Create a class with a main method that calls `Server myServer = new APIServer(JAXRSEndpoint.class)` where `JAXRSEndpoint.class` is the endpoint you implemented (which extends ApiEndpointBase). This will deploy your API endpoint on `http://localhost:9000/`. You can stop the running server with `myServer.destroy()`.
 
 See the [SimplyRESTful-example](https://github.com/arucard21/SimplyRESTful-example) project for a very simple example of a SimplyRESTful API implementation. It is also a good template project for creating a new API. 
