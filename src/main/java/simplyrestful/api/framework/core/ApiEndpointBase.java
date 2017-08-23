@@ -151,15 +151,24 @@ public abstract class ApiEndpointBase<T extends HALResource> {
 	}
 
     /**
-     * Get the absolute URI for the resource on the endpoint.
+     * Get the absolute URI for a resource on a different endpoint with the same base URI as this endpoint.
      *
-     * This will use the absolute URI to fill in specific resources
-     *
+     * @param resourceEndpoint is the class of the @Path-annotated endpoint class for the resource
      * @param id is the ID of the resource provided on the endpoint.
-     * @return the absolute URI for the resource on the endpoint.
+     * @return the absolute URI for the resource on the requested endpoint.
      */
+	protected URI getAbsoluteResourceURI(Class<?> resourceEndpoint, String id) {
+		return uriInfo.getBaseUriBuilder().path(resourceEndpoint).path(id).build();
+	}
+
+	/**
+	 * Get the absolute URI for a resource on this endpoint.
+	 *
+	 * @param id is the ID of the resource provided on the endpoint.
+	 * @return the absolute URI for the resource on the endpoint.
+	 */
 	protected URI getAbsoluteResourceURI(String id) {
-		return uriInfo.getBaseUriBuilder().path(getClass()).path(id).build();
+		return getAbsoluteResourceURI(this.getClass(), id);
 	}
 
 	/**
