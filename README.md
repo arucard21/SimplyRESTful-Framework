@@ -11,8 +11,6 @@ The configuration includes generation of an OpenAPI Specification file at `/swag
 ## Usage
 To use it, in your project you have to: 
 * Depend on SimplyRESTful-jetty
-* Depend on [SimplyRESTful](https://github.com/arucard21/SimplyRESTful)
-    * This is optional since you can serve any JAX-RS endpoint on Jetty with this library. Of course, it works best with a SimplyRESTful-based endpoint.
 * [Implement your SimplyRESTful API](https://github.com/arucard21/SimplyRESTful#usage)
 * Create a class with a main method that calls `APIServer.run(JAXRSEndpoint.class)` where `JAXRSEndpoint.class` is the endpoint you implemented (which extends ApiEndpointBase). This will deploy your API endpoint on `http://localhost:9000/`.
 
