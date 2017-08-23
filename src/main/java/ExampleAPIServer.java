@@ -10,6 +10,12 @@ import simplyrestful.jetty.deploy.APIServer;
 public class ExampleAPIServer {
 	public static void main(String[] args) {
 		// Make the example API available on all network interfaces on port 9000
-		APIServer.run("http://localhost:9000", ExampleApiEndpoint.class);
+		APIServer apiServer = new APIServer("http://localhost:9000", ExampleApiEndpoint.class);
+		try {
+			Thread.sleep(60 * 60 * 1000);
+		}
+		catch (InterruptedException e) {
+			apiServer.getCXFServer().destroy();
+		}
 	}
 }
