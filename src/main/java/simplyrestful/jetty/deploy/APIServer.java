@@ -74,7 +74,6 @@ public class APIServer {
      *
      * @param address is the URI where the endpoints should be served. If empty, the endpoints will be served on a random port on localhost
      * @param apiEndpoints is a list of the API endpoints that should served.
-     *
      */
     public APIServer(String address, Class<?>... apiEndpoints){
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -117,7 +116,6 @@ public class APIServer {
      * Create a CXF-based API server with the provided JAX-RS API endpoints on http://localhost:9000
      *
      * @param apiEndpoints is a list of the API endpoints that should served.
-     * @return the CXF Server object
      */
     public APIServer(Class<?>... apiEndpoints) {
     	this("http://localhost:9000", apiEndpoints);
