@@ -1,1 +1,3 @@
+include ':SimplyRESTful-spring-boot'
+project(':SimplyRESTful-spring-boot').projectDir = new File(settingsDir, '../SimplyRESTful-spring-boot')
 rootProject.name = "simplyrestful-example"

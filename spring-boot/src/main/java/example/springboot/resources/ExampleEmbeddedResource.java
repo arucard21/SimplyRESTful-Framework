@@ -1,4 +1,4 @@
-package example.resources;
+package example.springboot.resources;
 
 import java.net.URI;
 

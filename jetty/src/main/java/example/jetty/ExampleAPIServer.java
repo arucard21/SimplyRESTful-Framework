@@ -1,4 +1,6 @@
-import example.resources.ExampleApiEndpoint;
+package example.jetty;
+
+import example.springboot.resources.ExampleApiEndpoint;
 import simplyrestful.jetty.deploy.APIServer;
 
 /**

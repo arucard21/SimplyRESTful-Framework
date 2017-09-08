@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package example.resources;
+package example.springboot.resources;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Named;
 import javax.ws.rs.Path;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -34,16 +35,19 @@ import dk.nykredit.jackson.dataformat.hal.HALLink;
 import example.datastore.DataStore;
 import example.datastore.StoredEmbeddedObject;
 import example.datastore.StoredObject;
+import example.jetty.resources.ExampleEmbeddedResource;
+import example.jetty.resources.ExampleResource;
 import io.swagger.annotations.Api;
-import simplyrestful.api.framework.core.ApiEndpointBase;
+import simplyrestful.api.framework.core.WebResourceBase;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
 import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.hal.HALCollectionFactory;
 
+@Named
 @Path("/resources")
 @Api(value = "Example Resources")
-public class ExampleApiEndpoint extends ApiEndpointBase<ExampleResource> {
+public class ExampleApiEndpoint extends WebResourceBase<ExampleResource> {
 	/**
 	 * Contains the mapping between the API's HAL resources, identified by
 	 * the resource's URI, and the data store's resources, identified by a

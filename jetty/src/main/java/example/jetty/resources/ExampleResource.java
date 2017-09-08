@@ -1,4 +1,4 @@
-package example.resources;
+package example.jetty.resources;
 
 import java.net.URI;
 

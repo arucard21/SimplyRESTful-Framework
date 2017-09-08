@@ -2,9 +2,19 @@ apply plugin: "java"
 apply plugin: "eclipse"
 
 sourceSets {
-	main {
+	datastore {
 		java {
-			srcDirs = ["src/main/java"]
+			srcDirs = ["datastore/src/main/java"]
+		}
+	}
+	jetty {
+		java {
+			srcDirs = ["jetty/src/main/java"]
+		}
+	}
+	springboot {
+		java {
+			srcDirs = ["spring-boot/src/main/java"]
 		}
 	}
 }
@@ -21,4 +31,6 @@ version = '0.1'
 
 dependencies {
 	compile ("com.github.arucard21.simplyrestful:simplyrestful-jetty:0.3")
+	compile project(':SimplyRESTful-spring-boot')
+	compile ("javax.inject:javax.inject:1")
 }

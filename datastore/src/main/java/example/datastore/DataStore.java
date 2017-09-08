@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import example.datastore.StoredEmbeddedObject;
+import example.datastore.StoredObject;
+
 public class DataStore {
 	private List<StoredObject> data;
 
