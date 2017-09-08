@@ -15,11 +15,11 @@ import dk.nykredit.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.hal.HALResource;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApiEndpointBaseTest{
+public class WebResourceBaseTest{
 	private static final String TEST_RESOURCE_PROFILE = "local://docs/resources/testresource";
 	private static final String TEST_REQUEST_URI = "local://resources/testresources";
 	@Mock
-	ApiEndpointBase<HALResource> testEndpoint;
+	WebResourceBase<HALResource> testEndpoint;
 	private HALLink testLink;
 
 	@Before

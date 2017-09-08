@@ -29,7 +29,7 @@ import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
 import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.hal.HALResource;
 
-public abstract class ApiEndpointBase<T extends HALResource> {
+public abstract class WebResourceBase<T extends HALResource> {
 	@Context
     protected SearchContext searchContext;
 	@Context

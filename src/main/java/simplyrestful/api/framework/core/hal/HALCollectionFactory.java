@@ -7,7 +7,7 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.ApiEndpointBase;
+import simplyrestful.api.framework.core.WebResourceBase;
 import simplyrestful.api.framework.core.MediaType;
 
 public class HALCollectionFactory<T extends HALResource> {
@@ -111,7 +111,7 @@ public class HALCollectionFactory<T extends HALResource> {
 
 	private HALLink createHALLinkFromURIWithModifiedPageNumber(URI requestURI, int pageNumber){
 		UriBuilder hrefBuilder = UriBuilder.fromUri(requestURI);
-		hrefBuilder.replaceQueryParam(ApiEndpointBase.QUERY_PARAM_PAGE, pageNumber);
+		hrefBuilder.replaceQueryParam(WebResourceBase.QUERY_PARAM_PAGE, pageNumber);
 		HALLink link = new HALLink.Builder(hrefBuilder.build()).build();
 		return link;
 	}
