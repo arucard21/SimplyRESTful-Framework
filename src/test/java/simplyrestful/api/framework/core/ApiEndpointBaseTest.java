@@ -42,4 +42,31 @@ public class ApiEndpointBaseTest{
 	public void test_createLink_UsesCorrectRequestURI(){
 		Assert.assertEquals(TEST_REQUEST_URI, testLink.getHref());
 	}
+
+	/*
+	 * TODO: implement these tests
+	public void endpoint_shouldRetrieveResourceCollection_withGETonRoot(){
+
+	}
+
+	public void endpoint_shouldRetrieveResource_withGETonResource(){
+
+	}
+
+	public void endpoint_shouldCreateResource_withPOSTonResource(){
+
+	}
+
+	public void endpoint_shouldCreateResource_withPUTonResource(){
+
+	}
+
+	public void endpoint_shouldCreateResource_withDELETEonResource(){
+
+	}
+
+	public void endpoint_shouldChangeResourceStateUsingAbsoluteURI_whenActionTrigeredOnResource(){
+
+	}
+	*/
 }

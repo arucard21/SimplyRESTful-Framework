@@ -103,6 +103,10 @@ public class HALCollectionFactoryTest {
 		Assert.assertEquals(MediaType.APPLICATION_HAL_JSON, actual.getSelf().getType());
 	}
 
+	/*
+	 * TODO: Create tests for createPagedCollectionFromPartialList()
+	 */
+
 	private HALCollection<TestResource> createExpectedCollection(int page, int pageSize, int first, int last, int prev, int next, int sublistBegin, int sublistEnd, boolean compact) {
 		HALCollection<TestResource> expected = new HALCollection<TestResource>();
 		expected.setPage(page);
