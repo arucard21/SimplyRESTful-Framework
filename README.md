@@ -1,17 +1,17 @@
 # SimplyRESTful-jetty
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?style=plastic)](https://www.gnu.org/licenses/lgpl-3.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/simplyrestful-jetty/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/simplyrestful-jetty)
 
 A quick way to deploy your SimplyRESTful API on Jetty
 
-Provides the configuration required to deploy a SimplyRESTful API on a Jetty server with Apache CXF. While this gets your API working quickly, for better security and stability you may want to customize your configuration or use one of the other [deployment methods documented by Apache CXF](https://cwiki.apache.org/confluence/display/CXF20DOC/JAX-RS+Deployment).
+Provides the configuration required to deploy a SimplyRESTful API on a Jetty server with Apache CXF. This should provide a quick and easy way to get your API working, but it isn't likely to be suited for production environments. If you wish to use Jetty in your production environment, you can copy the code from this library and customize it as needed. 
 
-The configuration includes generation of an OpenAPI Specification file at `/swagger.json`. It enables Swagger-UI as well at `/api-docs`. You can access Swagger-UI with `/api-docs?url=../swagger.json` so it automatically loads the generated OpenAPI Specification file.
+The configuration makes all JAX-RS resources available under the root (e.g. `https://hostname/apiresource`)The configuration includes generation of an OpenAPI Specification file at `/swagger.json`. It enables Swagger-UI as well at `/api-docs`. You can access Swagger-UI with `/api-docs?url=../swagger.json` so it automatically loads the generated OpenAPI Specification file.
 
 ## Usage
 To use it, in your project you have to: 
 * Depend on SimplyRESTful-jetty
 * [Implement your SimplyRESTful API](https://github.com/arucard21/SimplyRESTful#usage)
-* Create a class with a main method that calls `Server myServer = new APIServer(JAXRSEndpoint.class)` where `JAXRSEndpoint.class` is the endpoint you implemented (which extends ApiEndpointBase). This will deploy your API endpoint on `http://localhost:9000/`. You can stop the running server with `myServer.destroy()`.
+* Create a class with a main method that calls `Server myServer = new APIServer(JAXRSWebResource.class)` where `JAXRSWebResource.class` is the JAX-RS Web Resource you implemented (which extends WebResourceBase). This will deploy your Web Resource on `http://localhost:9000/`, though this address can be customized. You can stop the running server with `myServer.destroy()`.
 
-See the [SimplyRESTful-example](https://github.com/arucard21/SimplyRESTful-example) project for a very simple example of a SimplyRESTful API implementation. It is also a good template project for creating a new API. 
+See the [SimplyRESTful-example](https://github.com/arucard21/SimplyRESTful-example) project for simple examples of different SimplyRESTful API deployment methods.
