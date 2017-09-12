@@ -42,22 +42,10 @@ import com.google.common.collect.Lists;
 import dk.nykredit.jackson.dataformat.hal.HALMapper;
 
 /**
- * Start the API server.
+ * This represents the API server that runs the SimplyRESTful API.
  *
- * This will launch a pre-configured Jetty instance that will run any endpoints you provide it with.This is intended
- * as a quick way to get your SimplyRESTful API endpoint running and uses manual configuration to deploy Apache CXF.
- *
- * The server is started at http://localhost:9000 (unless a different address is provided). The API endpoints are made
- * available relative to the root, where the relative path is defined by the @Path annotation on the endpoint itself.
- *
- * The server will automatically generate a swagger.json file which is made available directly at the root (e.g.
- * http://localhost:9000/swagger.json). The Swagger-UI tool is also included and can be found at the relative path,
- * from the root, "/api-docs". By default, you'll see the standard Petstore example for Swagger-UI, but you can use
- * the generated swagger.json right away by using the following URL "/api-docs?url=/swagger.json".
- *
- * You can deploy your SimplyRESTful API on many different application servers (e.g. Tomcat, Glassfish, JBoss) in many
- * different ways (including Spring Boot). Please refer to the JAX-RS Deployment documentation of Apache CXF for more
- * information on how to do this (available at https://cxf.apache.org/docs/jax-rs-deployment.html).
+ * This will create a pre-configured Jetty instance that will run any JAX-RS Web Resource you provide it with. This is
+ * intended as a quick way to get your SimplyRESTful API running and uses manual configuration to deploy Apache CXF.
  *
  * @author RiaasM
  *
@@ -67,26 +55,26 @@ public class APIServer {
 	private Server cxfServer;
 
     /**
-     * Create a CXF-based API server with the provided JAX-RS API endpoints on the given address.
+     * Create the API server with the provided JAX-RS API Web Resources on the given address.
      *
-     * The endpoints will have their lifecycle set to singleton. If this is not possible, e.g. if no
-     * instance can be created for the endpoint, it will fall back to a per-request lifecycle.
+     * The Web Resource will have its lifecycle set to singleton. If this is not possible, e.g. if no
+     * instance can be created for the Web Resource, it will fall back to a per-request lifecycle.
      *
-     * @param address is the URI where the endpoints should be served. If empty, the endpoints will be served on a random port on localhost
-     * @param apiEndpoints is a list of the API endpoints that should served.
+     * @param address is the URI where the Web Resource should be served. If empty, the Web Resource will be served on a random port on localhost
+     * @param webResources is a list of the JAX-RS Web Resources that should served.
      */
-    public APIServer(String address, Class<?>... apiEndpoints){
+    public APIServer(String address, Class<?>... webResources){
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(apiEndpoints);
+        sf.setResourceClasses(webResources);
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
-        for (Class<?> apiEndpoint: apiEndpoints){
+        for (Class<?> webResource: webResources){
 			try {
-				resourceProviders.add(new SingletonResourceProvider(apiEndpoint.newInstance()));
+				resourceProviders.add(new SingletonResourceProvider(webResource.newInstance()));
 			}
 			catch (InstantiationException | IllegalAccessException e) {
-				LOGGER.warn("Couldn't create an instance of this API endpoint for singleton lifecyce: " + apiEndpoint.getName());
-				LOGGER.warn("Using per-request lifecycle for this API endpoint instead");
-				resourceProviders.add(new PerRequestResourceProvider(apiEndpoint));
+				LOGGER.warn("Couldn't create an instance of this JAX-RS Web Resource for singleton lifecyce: " + webResource.getName());
+				LOGGER.warn("Using per-request lifecycle for this JAX-RS Web Resource instead");
+				resourceProviders.add(new PerRequestResourceProvider(webResource));
 			}
         }
         sf.setResourceProviders(resourceProviders);
@@ -113,12 +101,12 @@ public class APIServer {
     }
 
     /**
-     * Create a CXF-based API server with the provided JAX-RS API endpoints on http://localhost:9000
+     * Create a CXF-based API server with the provided JAX-RS Web Resources on http://localhost:9000
      *
-     * @param apiEndpoints is a list of the API endpoints that should served.
+     * @param webResources is a list of the JAX-RS Web Resources that should served.
      */
-    public APIServer(Class<?>... apiEndpoints) {
-    	this("http://localhost:9000", apiEndpoints);
+    public APIServer(Class<?>... webResources) {
+    	this("http://localhost:9000", webResources);
     }
 
     /**
