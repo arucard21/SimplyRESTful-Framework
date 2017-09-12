@@ -9,7 +9,7 @@ The configuration makes all JAX-RS resources available under the path `/services
 
 ## Usage
 To use it, in your project you have to: 
-* Depend on SimplyRESTful-spring-boot
+* Depend on SimplyRESTful and SimplyRESTful-spring-boot
 * [Implement your SimplyRESTful API](https://github.com/arucard21/SimplyRESTful#usage)
 * Make sure your web resource class (which extends WebResourceBase) is annotated with `@javax.inject.Named` so it is detected by Spring Boot's auto-scan.
 * Create a Spring Boot application class which scans the `simplyrestful.springboot` package as well as your own package(s), containing the web resource class(es).

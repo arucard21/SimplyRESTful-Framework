@@ -22,7 +22,6 @@ group = 'com.github.arucard21.simplyrestful'
 version = '0.2'
 
 dependencies {
-	compile ("com.github.arucard21.simplyrestful:simplyrestful:0.4")
 	compile ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:3.1.10")
 	compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:3.1.10")
 	compile ("org.webjars:swagger-ui:2.2.6")
