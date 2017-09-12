@@ -35,8 +35,6 @@ import dk.nykredit.jackson.dataformat.hal.HALLink;
 import example.datastore.DataStore;
 import example.datastore.StoredEmbeddedObject;
 import example.datastore.StoredObject;
-import example.jetty.resources.ExampleEmbeddedResource;
-import example.jetty.resources.ExampleResource;
 import io.swagger.annotations.Api;
 import simplyrestful.api.framework.core.WebResourceBase;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
