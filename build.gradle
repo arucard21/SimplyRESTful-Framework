@@ -19,7 +19,7 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 group = 'com.github.arucard21.simplyrestful'
-version = '0.1'
+version = '0.2'
 
 dependencies {
 	compile ("com.github.arucard21.simplyrestful:simplyrestful:0.4")
