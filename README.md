@@ -10,7 +10,7 @@ The configuration makes all JAX-RS resources available under the root (e.g. `htt
 
 ## Usage
 To use it, in your project you have to: 
-* Depend on SimplyRESTful-jetty
+* Depend on SimplyRESTful and SimplyRESTful-jetty
 * [Implement your SimplyRESTful API](https://github.com/arucard21/SimplyRESTful#usage)
 * Create a class with a main method that calls `Server myServer = new APIServer(JAXRSWebResource.class)` where `JAXRSWebResource.class` is the JAX-RS Web Resource you implemented (which extends WebResourceBase). This will deploy your Web Resource on `http://localhost:9000/`, though this address can be customized. You can stop the running server with `myServer.destroy()`.
 
