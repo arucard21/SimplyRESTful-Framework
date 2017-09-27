@@ -7,8 +7,8 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.WebResourceBase;
 import simplyrestful.api.framework.core.MediaType;
+import simplyrestful.api.framework.core.WebResourceBase;
 
 public class HALCollectionFactory<T extends HALResource> {
 
@@ -21,20 +21,20 @@ public class HALCollectionFactory<T extends HALResource> {
 	 *
 	 * @param allResources is a List containing all resources for which a paged collection is requested.
 	 * @param page is the number of the page for which we want the resources to be shown.
-	 * @param pageSize is the size of each page.
+	 * @param maxPageSize is the size of each page.
 	 * @param requestURI is the URI on which the request is made, which is used to provide proper navigation links (like prev and next).
 	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
 	 * @return a HALCollection that contains the resources for the page that has been requested.
 	 */
-	public HALCollection<T> createPagedCollectionFromFullList(List<T> allResources, int page, int pageSize, URI requestURI, boolean compact){
+	public HALCollection<T> createPagedCollectionFromFullList(List<T> allResources, int page, int maxPageSize, URI requestURI, boolean compact){
 		int collectionSize = allResources.size();
 		HALCollection<T> collection = new HALCollection<T>();
 		collection.setPage(page);
-		collection.setPageSize(pageSize);
+		collection.setMaxPageSize(maxPageSize);
 		collection.setTotal(collectionSize);
 
-		int pageBegin = ((page - 1) * pageSize);
-		int pageEnd = pageBegin + pageSize;
+		int pageBegin = ((page - 1) * maxPageSize);
+		int pageEnd = pageBegin + maxPageSize;
 		if (pageEnd >= collectionSize){
 			pageEnd = collectionSize;
 		}
@@ -44,7 +44,7 @@ public class HALCollectionFactory<T extends HALResource> {
 		collection.setFirst(
 				createHALLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
 
-		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) pageSize);
+		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) maxPageSize);
 		collection.setLast(
 				createHALLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
 
@@ -78,11 +78,10 @@ public class HALCollectionFactory<T extends HALResource> {
 	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
 	 * @return a HALCollection that contains the provided resources as the shown page.
 	 */
-	public HALCollection<T> createPagedCollectionFromPartialList(List<T> resourcesForPage, int page, int collectionSize, URI requestURI, boolean compact){
-		int pageSize = resourcesForPage.size();
+	public HALCollection<T> createPagedCollectionFromPartialList(List<T> resourcesForPage, int page, int maxPageSize, int collectionSize, URI requestURI, boolean compact){
 		HALCollection<T> collection = new HALCollection<T>();
 		collection.setPage(page);
-		collection.setPageSize(pageSize);
+		collection.setMaxPageSize(maxPageSize);
 		collection.setTotal(collectionSize);
 		addResourcesToCollection(collection, resourcesForPage, compact);
 
@@ -90,7 +89,7 @@ public class HALCollectionFactory<T extends HALResource> {
 		collection.setFirst(
 				createHALLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
 
-		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) pageSize);
+		int lastPage = collectionSize == 0 ? 1 : (int) Math.ceil((double) collectionSize / (double) maxPageSize);
 		collection.setLast(
 				createHALLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
 

@@ -85,11 +85,11 @@ public class HALCollection<T extends HALResource> extends HALResource {
 		this.page = page;
 	}
 
-	public int getPageSize() {
+	public int getMaxPageSize() {
 		return pageSize;
 	}
 
-	public void setPageSize(int pageSize) {
+	public void setMaxPageSize(int pageSize) {
 		this.pageSize = pageSize;
 	}
 
@@ -131,7 +131,7 @@ public class HALCollection<T extends HALResource> extends HALResource {
 				(next != null && otherCollection.getNext() != null && next.getHref().equals(otherCollection.getNext().getHref()));
 		return
 				page == otherCollection.getPage() &&
-				pageSize == otherCollection.getPageSize() &&
+				pageSize == otherCollection.getMaxPageSize() &&
 				total == otherCollection.getTotal() &&
 				firstEquals &&
 				lastEquals &&
