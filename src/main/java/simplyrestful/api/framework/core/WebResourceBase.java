@@ -101,8 +101,13 @@ public abstract class WebResourceBase<T extends HALResource> {
     public T putHALResource(
     		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
     		@ApiParam(value = "The resource to be updated", required = true) final T resource){
-		URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
-		resource.setSelf(createLink(absoluteResourceIdentifier, resource.getProfile()));
+		if(resource.getSelf() != null && !resource.getSelf().getHref().contains(id)){
+			throw new BadRequestException("The provided resource contains an self-link that does not match the ID used in the request");
+		}
+		if(resource.getSelf() == null){
+			URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
+			resource.setSelf(createLink(absoluteResourceIdentifier, resource.getProfile()));
+		}
 		T existingResource;
 		try{
 			existingResource = updateResourceInDataStore(resource);
@@ -233,7 +238,7 @@ public abstract class WebResourceBase<T extends HALResource> {
 	 * The resource should contain a self-link in order to identify which resource needs to be updated.
 	 *
 	 * @param resource is the updated resource (which contains a self-link with which to identify the resource)
-	 * @return the previous value of the updated resource, or null no existing resource was found
+	 * @return the previous value of the updated resource, or null if no existing resource was found
 	 * @throws InvalidResourceException when the resource is not valid (most likely because it does not contain a self-link).
 	 * @throws InvalidSelfLinkException when the resource does not contain a valid self-link.
 	 */
