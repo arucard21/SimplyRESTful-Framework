@@ -14,6 +14,6 @@ version = '0.2'
 dependencies {
 	compile project(':datastore')
 	
-	compile ("com.github.arucard21.simplyrestful:simplyrestful:0.4")
+	compile ("com.github.arucard21.simplyrestful:simplyrestful:0.5")
 	compile ("com.github.arucard21.simplyrestful:simplyrestful-jetty:0.4")
 }
