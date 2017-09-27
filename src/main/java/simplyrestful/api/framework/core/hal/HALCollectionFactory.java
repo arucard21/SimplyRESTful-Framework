@@ -21,7 +21,7 @@ public class HALCollectionFactory<T extends HALResource> {
 	 *
 	 * @param allResources is a List containing all resources for which a paged collection is requested.
 	 * @param page is the number of the page for which we want the resources to be shown.
-	 * @param maxPageSize is the size of each page.
+	 * @param maxPageSize is the maximum size of each page.
 	 * @param requestURI is the URI on which the request is made, which is used to provide proper navigation links (like prev and next).
 	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
 	 * @return a HALCollection that contains the resources for the page that has been requested.
@@ -73,6 +73,7 @@ public class HALCollectionFactory<T extends HALResource> {
 	 *
 	 * @param resourcesForPage is a List containing only the resource that you wish to display on the page of your paged collection.
 	 * @param page is the number of the page that is represented by the provided list of resources.
+	 * @param maxPageSize is the maximum number of items that a single page can contain.
 	 * @param collectionSize is the size of the full collection of resources.
 	 * @param requestURI is the URI on which the request is made, which is used to provide proper absolute links (like self, prev and next).
 	 * @param compact determines whether the collection shows a list containing the entire resource or just the resource ID.
