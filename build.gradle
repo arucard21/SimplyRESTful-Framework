@@ -23,7 +23,7 @@ version = '0.6'
 
 dependencies {
 	compile ("io.swagger:swagger-annotations:1.5.12")
-	compile ("org.apache.cxf:cxf-rt-rs-extension-search:3.1.10")
+	compile ("javax.ws.rs:javax.ws.rs-api:2.1")
 	compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
 	
 	testCompile ("org.mockito:mockito-core:2.8.47")

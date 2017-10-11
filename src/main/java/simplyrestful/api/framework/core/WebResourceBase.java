@@ -19,8 +19,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.jaxrs.ext.search.SearchContext;
-
 import dk.nykredit.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,8 +28,6 @@ import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.hal.HALResource;
 
 public abstract class WebResourceBase<T extends HALResource> {
-	@Context
-    protected SearchContext searchContext;
 	@Context
 	protected UriInfo uriInfo;
 
