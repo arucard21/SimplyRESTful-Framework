@@ -22,14 +22,14 @@ group = 'com.github.arucard21.simplyrestful'
 version = '0.5'
 
 dependencies {
-	compile ("org.apache.cxf:cxf-rt-transports-http-jetty:3.1.10")
-	compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:3.1.10")
-	compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:3.1.10")
+	compile ("org.apache.cxf:cxf-rt-transports-http-jetty:3.2.0")
+	compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:3.2.0")
+	compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:3.2.0")
+	compile ("org.apache.cxf:cxf-rt-rs-extension-search:3.2.0")
 	compile ("org.webjars:swagger-ui:2.2.6")
 	compile ("ch.qos.logback:logback-classic:1.2.1")
 	compile ("org.hibernate:hibernate-validator:5.4.0.Final")
 	compile ("org.glassfish:javax.el:3.0.1-b08")
-	compile ("org.apache.cxf:cxf-rt-rs-extension-search:3.1.10")
 	compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
 }
 
