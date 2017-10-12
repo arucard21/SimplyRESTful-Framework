@@ -28,8 +28,10 @@ import java.util.UUID;
 
 import javax.inject.Named;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 
 import dk.nykredit.jackson.dataformat.hal.HALLink;
 import example.datastore.DataStore;
@@ -46,6 +48,8 @@ import simplyrestful.api.framework.core.hal.HALCollectionFactory;
 @Path("/resources")
 @Api(value = "Example Resources")
 public class ExampleApiEndpoint extends WebResourceBase<ExampleResource> {
+	@Context
+	protected SearchContext searchContext;
 	/**
 	 * Contains the mapping between the API's HAL resources, identified by
 	 * the resource's URI, and the data store's resources, identified by a
