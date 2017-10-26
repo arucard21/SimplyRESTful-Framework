@@ -39,7 +39,7 @@ public abstract class WebResourceBase<T extends HALResource> {
     @GET
     @ApiOperation(
         value = "Get a list of resources",
-        notes = "Get a list of resources, which can optionally be filtered with <a href=\"https://cxf.apache.org/docs/jax-rs-search.html#JAX-RSSearch-FeedItemQueryLanguage\">FIQL</a>. The FIQL expression should be provided in the <code>_s</code> query parameter (not yet supported through Swagger UI) and allows <code>*</code> as wildcard character."
+        notes = "Get a list of resources"
     )
     public HALCollection<T> getHALResources(
     		@ApiParam(value = "The page to be shown", required = false) @QueryParam(QUERY_PARAM_PAGE) @DefaultValue("1") int page,
