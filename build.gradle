@@ -24,7 +24,7 @@ version = '0.7'
 dependencies {
 	compile ("io.swagger:swagger-annotations:1.5.12")
 	compile ("javax.ws.rs:javax.ws.rs-api:2.1")
-	compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
+	compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
 	
 	testCompile ("org.mockito:mockito-core:2.8.47")
 	testCompile ("junit:junit:4.12")

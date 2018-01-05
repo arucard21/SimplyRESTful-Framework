@@ -10,15 +10,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import dk.nykredit.jackson.dataformat.hal.HALLink;
+import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.MediaType;
 
 public class HALCollectionFactoryTest {
 
 	private static final String HALCOLLECTION_PROFILE = "https://arucard21.github.io/SimplyRESTful/HALCollection/v1";
 	private static final int TEST_RESOURCES_SIZE = 1000;
+	private static final URI requestURI = URI.create("local://resources/testresources/");
 	private List<TestResource> testResourcesList;
-	private URI requestURI = URI.create("local://resources/testresources/");
 	private HALCollectionFactory<TestResource> collectionFactory;
 
 	@Before
@@ -33,7 +33,6 @@ public class HALCollectionFactoryTest {
 			testResource.setSelf(new HALLink.Builder(selfLink).build());
 			testResourcesList.add(testResource);
 		}
-
 	}
 
 	@Test
@@ -179,6 +178,7 @@ public class HALCollectionFactoryTest {
 
 	private HALCollection<TestResource> createExpectedCollection(int page, int pageSize, int first, int last, int prev, int next, int sublistBegin, int sublistEnd, boolean compact) {
 		HALCollection<TestResource> expected = new HALCollection<TestResource>();
+		expected.setSelf(new HALLink.Builder(requestURI).type(MediaType.APPLICATION_HAL_JSON).profile(expected.getProfile()).build());
 		expected.setPage(page);
 		expected.setMaxPageSize(pageSize);
 		expected.setTotal(TEST_RESOURCES_SIZE);

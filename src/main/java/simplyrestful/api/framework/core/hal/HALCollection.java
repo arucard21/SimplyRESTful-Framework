@@ -4,10 +4,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
-import dk.nykredit.jackson.dataformat.hal.HALLink;
-import dk.nykredit.jackson.dataformat.hal.annotation.EmbeddedResource;
-import dk.nykredit.jackson.dataformat.hal.annotation.Link;
-import dk.nykredit.jackson.dataformat.hal.annotation.Resource;
+import io.openapitools.jackson.dataformat.hal.HALLink;
+import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
+import io.openapitools.jackson.dataformat.hal.annotation.Link;
+import io.openapitools.jackson.dataformat.hal.annotation.Resource;
 import simplyrestful.api.framework.core.MediaType;
 
 @Resource
@@ -108,35 +108,25 @@ public class HALCollection<T extends HALResource> extends HALResource {
 
 	@Override
 	public int hashCode() {
-		return page + pageSize + total + (item == null ? 0 : item.hashCode()) + (itemEmbedded == null ? 0 : itemEmbedded.hashCode());
+		return Objects.hash(self, getProfile(), page, pageSize, total, first, last, prev, next, item, itemEmbedded);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof HALCollection<?>)){
+		if (obj == null || !(obj instanceof HALCollection<?>)){
 			return false;
 		}
 		HALCollection<?> otherCollection = (HALCollection<?>) obj;
-
-		/**
-		 * This section of booleans can be removed once HALLink has its own equals() method
-		 */
-		boolean firstEquals = (first == null && otherCollection.getFirst() == null) ||
-				(first != null && otherCollection.getFirst() != null && first.getHref().equals(otherCollection.getFirst().getHref()));
-		boolean lastEquals = (last == null && otherCollection.getLast() == null) ||
-				(last != null && otherCollection.getLast() != null && last.getHref().equals(otherCollection.getLast().getHref()));
-		boolean prevEquals = (prev == null && otherCollection.getPrev() == null) ||
-				(prev != null && otherCollection.getPrev() != null && prev.getHref().equals(otherCollection.getPrev().getHref()));
-		boolean nextEquals = (next == null && otherCollection.getNext() == null) ||
-				(next != null && otherCollection.getNext() != null && next.getHref().equals(otherCollection.getNext().getHref()));
 		return
+				Objects.equals(self, otherCollection.getSelf()) &&
+				Objects.equals(getProfile(), otherCollection.getProfile()) &&
 				page == otherCollection.getPage() &&
 				pageSize == otherCollection.getMaxPageSize() &&
 				total == otherCollection.getTotal() &&
-				firstEquals &&
-				lastEquals &&
-				prevEquals &&
-				nextEquals &&
+				Objects.equals(first, otherCollection.getFirst())&&
+				Objects.equals(last, otherCollection.getLast()) &&
+				Objects.equals(prev, otherCollection.getPrev()) &&
+				Objects.equals(next, otherCollection.getNext()) &&
 				Objects.equals(item, otherCollection.getItem()) &&
 				Objects.equals(itemEmbedded, otherCollection.getItemEmbedded());
 	}

@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
-import dk.nykredit.jackson.dataformat.hal.HALLink;
+import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.core.WebResourceBase;
 

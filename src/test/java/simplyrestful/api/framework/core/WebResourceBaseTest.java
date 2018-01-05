@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import dk.nykredit.jackson.dataformat.hal.HALLink;
+import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
 import simplyrestful.api.framework.core.hal.HALResource;

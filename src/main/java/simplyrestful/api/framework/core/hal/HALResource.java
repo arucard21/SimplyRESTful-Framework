@@ -1,12 +1,13 @@
 package simplyrestful.api.framework.core.hal;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import dk.nykredit.jackson.dataformat.hal.HALLink;
-import dk.nykredit.jackson.dataformat.hal.annotation.Link;
-import dk.nykredit.jackson.dataformat.hal.annotation.Resource;
+import io.openapitools.jackson.dataformat.hal.HALLink;
+import io.openapitools.jackson.dataformat.hal.annotation.Link;
+import io.openapitools.jackson.dataformat.hal.annotation.Resource;
 
 @Resource
 public abstract class HALResource{
@@ -31,4 +32,20 @@ public abstract class HALResource{
 	 */
 	@JsonIgnore
 	public abstract URI getProfile();
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(self, getProfile());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof HALResource)){
+			return false;
+		}
+		HALResource otherCollection = (HALResource) obj;
+		return
+				Objects.equals(self, otherCollection.getSelf()) &&
+				Objects.equals(getProfile(), otherCollection.getProfile());
+	}
 }
