@@ -15,7 +15,8 @@ Using this framework you would mainly just need to implement a mapping between y
 ## Usage
 * Depend on the SimplyRESTful framework
 * Create at least one HAL-based resource objects (by extending HALResource) to represent your API resource
+* Create at least one Data Access Object (by implementing the HALResourceAccess interface), mapping your data appropriately in order to provide them as HAL-based resource objects
 * Create at least one (`@Path`-annotated) JAX-RS Web Resource that will provide access to your API resource (by extending WebResourceBase<T> where T should be the HAL-based resource object you created)
-* Implement the required methods in the Web Resource, mapping your data appropriately in order to provide them as HAL-based resource objects
+* Implement the required method in the Web Resource to provide the Data Access Object you created
 * Deploy the JAX-RS Web Resource
     * You can use [SimplyRESTful-jetty](https://github.com/arucard21/SimplyRESTful-jetty) to quickly deploy your API, or [SimplyRESTful-spring-boot](https://github.com/arucard21/SimplyRESTful-spring-boot) for a more customizable deployment. 

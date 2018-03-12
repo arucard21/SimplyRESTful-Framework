@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
@@ -31,9 +32,11 @@ public class WebResourceBaseTest{
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	@Mock
-	WebResourceBase<HALResource> testEndpoint;
-	@Mock
 	private HALResource testResource;
+	@Mock
+	HALResourceAccess<HALResource> mockDAO;
+	@Spy
+	WebResourceBase<HALResource> testEndpoint;
 	@Mock
 	private HALResource existingResource;
 	private HALLink testLink;
@@ -42,14 +45,8 @@ public class WebResourceBaseTest{
 
 	@Before
 	public void configureMocks(){
-		Mockito.when(testEndpoint.getHALResources(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyBoolean())).thenCallRealMethod();
-		Mockito.when(testEndpoint.getHALResource(ArgumentMatchers.anyString())).thenCallRealMethod();
-		Mockito.when(testEndpoint.postHALResource(ArgumentMatchers.any(HALResource.class))).thenCallRealMethod();
-		Mockito.when(testEndpoint.putHALResource(ArgumentMatchers.anyString(), ArgumentMatchers.any(HALResource.class))).thenCallRealMethod();
-		Mockito.when(testEndpoint.deleteHALResource(ArgumentMatchers.anyString())).thenCallRealMethod();
-		Mockito.when(testEndpoint.getAbsoluteResourceURI(ArgumentMatchers.anyString())).thenCallRealMethod();
-		Mockito.when(testEndpoint.getAbsoluteResourceURI(ArgumentMatchers.any(Class.class), ArgumentMatchers.eq(resourceID))).thenReturn(URI.create(absoluteResourceURI));
-		Mockito.when(testEndpoint.createLink(ArgumentMatchers.any(URI.class), ArgumentMatchers.any(URI.class))).thenCallRealMethod();
+		Mockito.doReturn(URI.create(absoluteResourceURI)).when(testEndpoint).getAbsoluteResourceURI(ArgumentMatchers.any(Class.class), ArgumentMatchers.eq(resourceID));
+		Mockito.doReturn(mockDAO).when(testEndpoint).getDataAccessObject();
 
 		testLink = new HALLink.Builder(absoluteResourceURI)
 				.type(MediaType.APPLICATION_HAL_JSON)
@@ -85,28 +82,28 @@ public class WebResourceBaseTest{
 		int pageSize = 100;
 		boolean compact = true;
 		testEndpoint.getHALResources(page, pageSize, compact);
-		Mockito.verify(testEndpoint).retrieveResourcesFromDataStore(page, pageSize, compact);
+		Mockito.verify(mockDAO).retrieveResourcesFromDataStore(page, pageSize, compact);
 	}
 
 	@Test
 	public void endpoint_shouldRetrieveResource_withGETonResource(){
-		Mockito.when(testEndpoint.retrieveResourceFromDataStore(absoluteResourceURI)).thenReturn(testResource);
+		Mockito.when(mockDAO.retrieveResourceFromDataStore(absoluteResourceURI)).thenReturn(testResource);
 		testEndpoint.getHALResource(resourceID);
-		Mockito.verify(testEndpoint).retrieveResourceFromDataStore(absoluteResourceURI);
+		Mockito.verify(mockDAO).retrieveResourceFromDataStore(absoluteResourceURI);
 	}
 
 	@Test
 	public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource(){
 		thrown.expect(NotFoundException.class);
-		Mockito.when(testEndpoint.retrieveResourceFromDataStore(absoluteResourceURI)).thenReturn(null);
+		Mockito.when(mockDAO.retrieveResourceFromDataStore(absoluteResourceURI)).thenReturn(null);
 		testEndpoint.getHALResource(resourceID);
 	}
 
 	@Test
 	public void endpoint_shouldCreateResource_withPOSTonResource(){
-		Mockito.when(testEndpoint.exists(absoluteResourceURI)).thenReturn(false);
+		Mockito.when(mockDAO.exists(absoluteResourceURI)).thenReturn(false);
 		Response postResponse = testEndpoint.postHALResource(testResource);
-		Mockito.verify(testEndpoint).addResourceToDataStore(testResource);
+		Mockito.verify(mockDAO).addResourceToDataStore(testResource);
 		Assert.assertEquals(Status.CREATED.getStatusCode(), postResponse.getStatus());
 		Assert.assertEquals(URI.create(absoluteResourceURI), postResponse.getLocation());
 	}
@@ -114,15 +111,15 @@ public class WebResourceBaseTest{
 	@Test
 	public void endpoint_shouldThrowClientErrorExceptionWhenResourceAlreadyExists_withPOSTonResource(){
 		thrown.expect(ClientErrorException.class);
-		Mockito.when(testEndpoint.exists(absoluteResourceURI)).thenReturn(true);
+		Mockito.when(mockDAO.exists(absoluteResourceURI)).thenReturn(true);
 		testEndpoint.postHALResource(testResource);
 	}
 
 	@Test
 	public void endpoint_shouldUpdateResource_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
-		Mockito.when(testEndpoint.updateResourceInDataStore(testResource)).thenReturn(existingResource);
+		Mockito.when(mockDAO.updateResourceInDataStore(testResource)).thenReturn(existingResource);
 		testEndpoint.putHALResource(resourceID, testResource);
-		Mockito.verify(testEndpoint).updateResourceInDataStore(testResource);
+		Mockito.verify(mockDAO).updateResourceInDataStore(testResource);
 	}
 
 	@Test
@@ -134,39 +131,39 @@ public class WebResourceBaseTest{
 	@Test
 	public void endpoint_shouldUpdateResourceEvenWhenSelfLinkMissing_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
 		Mockito.when(testResource.getSelf()).thenReturn(null);
-		Mockito.when(testEndpoint.updateResourceInDataStore(testResource)).thenReturn(existingResource);
+		Mockito.when(mockDAO.updateResourceInDataStore(testResource)).thenReturn(existingResource);
 		testEndpoint.putHALResource(resourceID, testResource);
-		Mockito.verify(testEndpoint).updateResourceInDataStore(testResource);
+		Mockito.verify(mockDAO).updateResourceInDataStore(testResource);
 	}
 
 	@Test
 	public void endpoint_shouldThrowBadRequestWhenResourceInvalid_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
 		thrown.expect(BadRequestException.class);
-		Mockito.when(testEndpoint.updateResourceInDataStore(testResource)).thenThrow(InvalidResourceException.class);
+		Mockito.when(mockDAO.updateResourceInDataStore(testResource)).thenThrow(InvalidResourceException.class);
 		testEndpoint.putHALResource(resourceID, testResource);
 	}
 
 	@Test
 	public void endpoint_shouldCreateNewResourceWhenNonexisting_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
-		Mockito.when(testEndpoint.updateResourceInDataStore(testResource)).thenReturn(null);
-		Mockito.when(testEndpoint.addResourceToDataStore(testResource)).thenReturn(true);
+		Mockito.when(mockDAO.updateResourceInDataStore(testResource)).thenReturn(null);
+		Mockito.when(mockDAO.addResourceToDataStore(testResource)).thenReturn(true);
 		HALResource previousResource = testEndpoint.putHALResource(resourceID, testResource);
-		Mockito.verify(testEndpoint).updateResourceInDataStore(testResource);
-		Mockito.verify(testEndpoint).addResourceToDataStore(testResource);
+		Mockito.verify(mockDAO).updateResourceInDataStore(testResource);
+		Mockito.verify(mockDAO).addResourceToDataStore(testResource);
 		Assert.assertEquals(null, previousResource);
 	}
 
 	@Test
 	public void endpoint_shouldThrowNotFoundWhenNonexistingResourceCanNotBeCreated_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
 		thrown.expect(NotFoundException.class);
-		Mockito.when(testEndpoint.updateResourceInDataStore(testResource)).thenReturn(null);
-		Mockito.when(testEndpoint.addResourceToDataStore(testResource)).thenReturn(false);
+		Mockito.when(mockDAO.updateResourceInDataStore(testResource)).thenReturn(null);
+		Mockito.when(mockDAO.addResourceToDataStore(testResource)).thenReturn(false);
 		testEndpoint.putHALResource(resourceID, testResource);
 	}
 
 	@Test
 	public void endpoint_shouldRemoveResource_withDELETEonResource(){
-		Mockito.when(testEndpoint.removeResourceFromDataStore(absoluteResourceURI)).thenReturn(testResource);
+		Mockito.when(mockDAO.removeResourceFromDataStore(absoluteResourceURI)).thenReturn(testResource);
 		Response deleteResponse = testEndpoint.deleteHALResource(resourceID);
 		Mockito.verify(testEndpoint).getAbsoluteResourceURI(resourceID);
 		Assert.assertEquals(Status.NO_CONTENT.getStatusCode(), deleteResponse.getStatus());
@@ -175,7 +172,7 @@ public class WebResourceBaseTest{
 	@Test
 	public void endpoint_shouldThrowNotFoundWhenResourceNonexisting_withDELETEonResource(){
 		thrown.expect(NotFoundException.class);
-		Mockito.when(testEndpoint.removeResourceFromDataStore(absoluteResourceURI)).thenReturn(null);
+		Mockito.when(mockDAO.removeResourceFromDataStore(absoluteResourceURI)).thenReturn(null);
 		testEndpoint.deleteHALResource(resourceID);
 	}
 }

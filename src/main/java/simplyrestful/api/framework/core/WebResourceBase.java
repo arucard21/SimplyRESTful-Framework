@@ -23,17 +23,16 @@ import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
-import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
 import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.hal.HALResource;
 
 public abstract class WebResourceBase<T extends HALResource> {
-	@Context
-	protected UriInfo uriInfo;
-
 	public static final String QUERY_PARAM_PAGE = "page";
 	public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
 	public static final String QUERY_PARAM_COMPACT = "compact";
+
+	@Context
+	protected UriInfo uriInfo;
 
     @Produces({MediaType.APPLICATION_HAL_JSON})
     @GET
@@ -45,7 +44,7 @@ public abstract class WebResourceBase<T extends HALResource> {
     		@ApiParam(value = "The page to be shown", required = false) @QueryParam(QUERY_PARAM_PAGE) @DefaultValue("1") int page,
     		@ApiParam(value = "The amount of resources shown on each page", required = false) @QueryParam(QUERY_PARAM_PAGE_SIZE) @DefaultValue("100") int pageSize,
     		@ApiParam(value = "Provide minimal information for each resource", required = false) @QueryParam(QUERY_PARAM_COMPACT) @DefaultValue("true") boolean compact) {
-    	return retrieveResourcesFromDataStore(page, pageSize, compact);
+    	return getDataAccessObject().retrieveResourcesFromDataStore(page, pageSize, compact);
     }
 
     @Produces({MediaType.APPLICATION_HAL_JSON})
@@ -58,14 +57,13 @@ public abstract class WebResourceBase<T extends HALResource> {
     public T getHALResource(
     		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
     	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
-		T resource = retrieveResourceFromDataStore(absoluteResourceIdentifier.toString());
+		T resource = getDataAccessObject().retrieveResourceFromDataStore(absoluteResourceIdentifier.toString());
         if (resource == null){
         	throw new NotFoundException();
         }
         return resource;
 
     }
-
 
 	@Consumes({MediaType.APPLICATION_HAL_JSON})
     @POST
@@ -76,11 +74,11 @@ public abstract class WebResourceBase<T extends HALResource> {
     public Response postHALResource(
     		@ApiParam(value = "resource", required = true) final T resource) {
     	if (resource.getSelf() != null){
-			if (exists(resource.getSelf().getHref())){
+			if (getDataAccessObject().exists(resource.getSelf().getHref())){
     			throw new ClientErrorException("A resource with the same ID already exists", Response.Status.CONFLICT);
     		}
     	}
-    	addResourceToDataStore(resource);
+    	getDataAccessObject().addResourceToDataStore(resource);
         return Response
             .created(URI.create(resource.getSelf().getHref()))
             .build();
@@ -106,14 +104,14 @@ public abstract class WebResourceBase<T extends HALResource> {
 		}
 		T existingResource;
 		try{
-			existingResource = updateResourceInDataStore(resource);
+			existingResource = getDataAccessObject().updateResourceInDataStore(resource);
 		}
 		catch(InvalidResourceException invalidResource){
 			throw new BadRequestException("The provided resource is invalid, most likely due to an invalid or missing self-link");
 		}
 		if (existingResource == null){
 			// create the resource since it did not exist yet
-			if (addResourceToDataStore(resource)){
+			if (getDataAccessObject().addResourceToDataStore(resource)){
 				return null;
 			}
 			else{
@@ -131,7 +129,7 @@ public abstract class WebResourceBase<T extends HALResource> {
     )
     public Response deleteHALResource(@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
     	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
-    	if(removeResourceFromDataStore(absoluteResourceIdentifier.toString()) == null){
+    	if(getDataAccessObject().removeResourceFromDataStore(absoluteResourceIdentifier.toString()) == null){
     		throw new NotFoundException();
     	}
         return Response.noContent().build();
@@ -174,64 +172,5 @@ public abstract class WebResourceBase<T extends HALResource> {
 									.build();
 	}
 
-	/**
-     * Retrieve the paged collection of resources that have been requested.
-     *
-     * For proper discoverability of the API, all links (href values in each HALLink object) should contain absolute URI's
-     * and a self-link must be available in each resource.
-     *
-     * @param pageNumber is the requested page number
-     * @param pageSize is the requested size of each page
-     * @param compact determines whether only the self-link is shown (in _links) or the entire resource (in _embedded)
-     * @return the requested HAL collection containing the resource (for that page)
-     */
-	protected abstract HALCollection<T> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact);
-
-    /**
-     * Add a resource to the data store.
-     *
-     * @param resource is the resource that will be added
-     * @return true iff the resource was successfully added, false otherwise.
-     */
-	protected abstract boolean addResourceToDataStore(T resource);
-
-	/**
-	 * Verify that a resource is known to the API.
-	 *
-	 * @param resourceURI is the URI that represents the resource
-	 * @return true iff the resource is known to the API, false otherwise
-	 */
-	protected abstract boolean exists(String resourceURI);
-
-	/**
-	 * Retrieve the resource from the data store where it is stored.
-	 *
-	 * The identifier does not necessarily have to be the same as the identifier used in the data store. You can map this API
-	 * identifier to the correct resource in any way you want.
-	 *
-	 * @param resourceURI is the identifier (from API perspective) for the resource
-	 * @return the resource that was requested or null if it doesn't exist
-	 */
-	protected abstract T retrieveResourceFromDataStore(String resourceURI);
-
-	/**
-	 * Update the resource in the data store where it is stored.
-	 *
-	 * The resource should contain a self-link in order to identify which resource needs to be updated.
-	 *
-	 * @param resource is the updated resource (which contains a self-link with which to identify the resource)
-	 * @return the previous value of the updated resource, or null if no existing resource was found
-	 * @throws InvalidResourceException when the resource is not valid (most likely because it does not contain a self-link).
-	 * @throws InvalidSelfLinkException when the resource does not contain a valid self-link.
-	 */
-	protected abstract T updateResourceInDataStore(T resource) throws 	InvalidResourceException,
-																		InvalidSelfLinkException;
-
-	/**
-     * Remove a resource from the data store.
-     *
-     * @param resourceURI is the identifier of the resource that should be removed
-     * @return the removed resource, or null if it did not exist
-     */
-	protected abstract T removeResourceFromDataStore(String resourceURI);
+	protected abstract HALResourceAccess<T> getDataAccessObject();
 }
