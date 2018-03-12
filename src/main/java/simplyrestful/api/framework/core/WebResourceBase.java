@@ -137,20 +137,6 @@ public abstract class WebResourceBase<T extends HALResource> {
         return Response.noContent().build();
     }
 
-    @Produces({MediaType.APPLICATION_HAL_JSON})
-	@Path("/{id}/{action}")
-	@GET
-	@ApiOperation(
-	    value = "Change the state of a resource using discoverable actions",
-	    notes = "Change the state of a resource using discoverable actions (HATEOAS) that are made available through that resource. This should not be called directly as it depends on the application state. If the action can be called it will be available on the resource."
-	)
-	public T changeStateForHALResource(
-			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
-			@ApiParam(value = "Discoverable action that changes the application state", required = true) @PathParam("action") String action) {
-    	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
-	    return handleHateoasAction(absoluteResourceIdentifier.toString(), action);
-	}
-
     /**
      * Get the absolute URI for a resource on a different endpoint with the same base URI as this endpoint.
      *
@@ -248,13 +234,4 @@ public abstract class WebResourceBase<T extends HALResource> {
      * @return the removed resource, or null if it did not exist
      */
 	protected abstract T removeResourceFromDataStore(String resourceURI);
-
-	/**
-	 * Process the resource and update its state according to the requested action.
-	 *
-	 * @param resourceURI is the identifier of the resource that should be changed
-	 * @param action specifies what type of state change is requested
-	 * @return the resource that has been processed and is (possibly) in a different state
-	 */
-	protected abstract T handleHateoasAction(String resourceURI, String action);
 }

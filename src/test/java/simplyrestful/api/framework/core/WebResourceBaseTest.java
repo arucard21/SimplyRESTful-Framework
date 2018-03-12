@@ -47,7 +47,6 @@ public class WebResourceBaseTest{
 		Mockito.when(testEndpoint.postHALResource(ArgumentMatchers.any(HALResource.class))).thenCallRealMethod();
 		Mockito.when(testEndpoint.putHALResource(ArgumentMatchers.anyString(), ArgumentMatchers.any(HALResource.class))).thenCallRealMethod();
 		Mockito.when(testEndpoint.deleteHALResource(ArgumentMatchers.anyString())).thenCallRealMethod();
-		Mockito.when(testEndpoint.changeStateForHALResource(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenCallRealMethod();
 		Mockito.when(testEndpoint.getAbsoluteResourceURI(ArgumentMatchers.anyString())).thenCallRealMethod();
 		Mockito.when(testEndpoint.getAbsoluteResourceURI(ArgumentMatchers.any(Class.class), ArgumentMatchers.eq(resourceID))).thenReturn(URI.create(absoluteResourceURI));
 		Mockito.when(testEndpoint.createLink(ArgumentMatchers.any(URI.class), ArgumentMatchers.any(URI.class))).thenCallRealMethod();
@@ -178,12 +177,5 @@ public class WebResourceBaseTest{
 		thrown.expect(NotFoundException.class);
 		Mockito.when(testEndpoint.removeResourceFromDataStore(absoluteResourceURI)).thenReturn(null);
 		testEndpoint.deleteHALResource(resourceID);
-	}
-
-	@Test
-	public void endpoint_shouldChangeResourceStateUsingAbsoluteURI_whenActionTrigeredOnResource(){
-		String action = "testAction";
-		testEndpoint.changeStateForHALResource(resourceID, action);
-		Mockito.verify(testEndpoint).handleHateoasAction(absoluteResourceURI, action);
 	}
 }
