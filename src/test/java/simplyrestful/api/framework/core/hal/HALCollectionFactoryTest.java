@@ -6,22 +6,21 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.MediaType;
 
 public class HALCollectionFactoryTest {
-
 	private static final String HALCOLLECTION_PROFILE = "https://arucard21.github.io/SimplyRESTful/HALCollection/v1";
 	private static final int TEST_RESOURCES_SIZE = 1000;
 	private static final URI requestURI = URI.create("local://resources/testresources/");
 	private List<TestResource> testResourcesList;
 	private HALCollectionFactory<TestResource> collectionFactory;
 
-	@Before
+	@BeforeEach
 	public void createSourceData() {
 		collectionFactory = new HALCollectionFactory<TestResource>();
 
@@ -42,7 +41,7 @@ public class HALCollectionFactoryTest {
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, pageSize, 1, 10, -1, 2, 0, 100, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -52,7 +51,7 @@ public class HALCollectionFactoryTest {
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, pageSize, 1, 10, 2, 4, 200, 300, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -62,7 +61,7 @@ public class HALCollectionFactoryTest {
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, pageSize, 1, 10, 9, -1, 900, 1000, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -72,7 +71,7 @@ public class HALCollectionFactoryTest {
 		boolean compact = false;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, pageSize, 1, 10, 9, -1, 900, 1000, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -81,8 +80,8 @@ public class HALCollectionFactoryTest {
 		int pageSize = 300;
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
-		Assert.assertEquals(100, actual.getItem().size());
-		Assert.assertEquals(300, actual.getMaxPageSize());
+		Assertions.assertEquals(100, actual.getItem().size());
+		Assertions.assertEquals(300, actual.getMaxPageSize());
 	}
 
 	@Test
@@ -91,7 +90,7 @@ public class HALCollectionFactoryTest {
 		int pageSize = 100;
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
-		Assert.assertEquals(URI.create(HALCOLLECTION_PROFILE), actual.getProfile());
+		Assertions.assertEquals(URI.create(HALCOLLECTION_PROFILE), actual.getProfile());
 	}
 
 	@Test
@@ -100,7 +99,7 @@ public class HALCollectionFactoryTest {
 		int pageSize = 100;
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromFullList(testResourcesList, page, pageSize, requestURI, compact);
-		Assert.assertEquals(MediaType.APPLICATION_HAL_JSON, actual.getSelf().getType());
+		Assertions.assertEquals(MediaType.APPLICATION_HAL_JSON, actual.getSelf().getType());
 	}
 
 	@Test
@@ -111,7 +110,7 @@ public class HALCollectionFactoryTest {
 		List<TestResource> partialList = testResourcesList.subList(0, 100);
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromPartialList(partialList, page, maxPageSize, TEST_RESOURCES_SIZE, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, maxPageSize, 1, 10, -1, 2, 0, 100, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -122,7 +121,7 @@ public class HALCollectionFactoryTest {
 		List<TestResource> partialList = testResourcesList.subList(200, 300);
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromPartialList(partialList, page, maxPageSize, TEST_RESOURCES_SIZE, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, 100, 1, 10, 2, 4, 200, 300, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -133,7 +132,7 @@ public class HALCollectionFactoryTest {
 		List<TestResource> partialList = testResourcesList.subList(900, 1000);
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromPartialList(partialList, page, maxPageSize, TEST_RESOURCES_SIZE, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, 100, 1, 10, 9, -1, 900, 1000, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -144,7 +143,7 @@ public class HALCollectionFactoryTest {
 		List<TestResource> partialList = testResourcesList.subList(900, 1000);
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromPartialList(partialList, page, maxPageSize, TEST_RESOURCES_SIZE, requestURI, compact);
 		HALCollection<TestResource> expected = createExpectedCollection(page, 100, 1, 10, 9, -1, 900, 1000, compact);
-		Assert.assertEquals(expected, actual);
+		Assertions.assertEquals(expected, actual);
 	}
 
 	@Test
@@ -154,8 +153,8 @@ public class HALCollectionFactoryTest {
 		boolean compact = true;
 		List<TestResource> partialList = testResourcesList.subList(900, 1000);
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromPartialList(partialList, page, maxPageSize, TEST_RESOURCES_SIZE, requestURI, compact);
-		Assert.assertEquals(100, actual.getItem().size());
-		Assert.assertEquals(300, actual.getMaxPageSize());
+		Assertions.assertEquals(100, actual.getItem().size());
+		Assertions.assertEquals(300, actual.getMaxPageSize());
 	}
 
 	@Test
@@ -164,7 +163,7 @@ public class HALCollectionFactoryTest {
 		int maxPageSize = 100;
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromPartialList(testResourcesList, page, maxPageSize, TEST_RESOURCES_SIZE, requestURI, compact);
-		Assert.assertEquals(URI.create(HALCOLLECTION_PROFILE), actual.getProfile());
+		Assertions.assertEquals(URI.create(HALCOLLECTION_PROFILE), actual.getProfile());
 	}
 
 	@Test
@@ -173,7 +172,7 @@ public class HALCollectionFactoryTest {
 		int maxPageSize = 100;
 		boolean compact = true;
 		HALCollection<TestResource> actual = collectionFactory.createPagedCollectionFromPartialList(testResourcesList, page, maxPageSize, TEST_RESOURCES_SIZE, requestURI, compact);
-		Assert.assertEquals(MediaType.APPLICATION_HAL_JSON, actual.getSelf().getType());
+		Assertions.assertEquals(MediaType.APPLICATION_HAL_JSON, actual.getSelf().getType());
 	}
 
 	private HALCollection<TestResource> createExpectedCollection(int page, int pageSize, int first, int last, int prev, int next, int sublistBegin, int sublistEnd, boolean compact) {

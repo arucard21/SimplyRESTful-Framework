@@ -6,9 +6,9 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 
@@ -24,7 +24,7 @@ public class HALCollectionTest {
 	private HALCollection<TestResource> testCollectionDifferent;
 	private List<TestResource> testResourcesList;
 
-	@Before
+	@BeforeEach
 	public void createTestResources(){
 		testResourcesList = new ArrayList<TestResource>();
 		for (int i = 0; i < 100; i++){
@@ -67,22 +67,22 @@ public class HALCollectionTest {
 
 	@Test
 	public void halCollection_shouldHaveSameHashcode_whenObjectsAreEqual() throws Exception {
-		Assert.assertEquals(testCollection.hashCode(), testCollectionSame.hashCode());
+		Assertions.assertEquals(testCollection.hashCode(), testCollectionSame.hashCode());
 	}
 
 	@Test
 	public void halCollection_shouldBeEqual_whenContainingSameValues() throws Exception {
-		Assert.assertEquals(testCollection, testCollectionSame);
+		Assertions.assertEquals(testCollection, testCollectionSame);
 	}
 
 	@Test
 	public void halCollection_shouldBeEqual_whenSameInstance() throws Exception {
-		Assert.assertEquals(testCollection, testCollection);
+		Assertions.assertEquals(testCollection, testCollection);
 	}
 
 	@Test
 	public void halCollection_shouldNotBeEqual_whenContainingDifferentValues() throws Exception {
-		Assert.assertNotEquals(testCollection, testCollectionDifferent);
+		Assertions.assertNotEquals(testCollection, testCollectionDifferent);
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class HALCollectionTest {
 		HALCollection<TestResource> onlySelfLink2 = new HALCollection<>();
 		onlySelfLink2.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_2).profile(onlySelfLink2.getProfile()).build());
 
-		Assert.assertNotEquals(onlySelfLink1, onlySelfLink2);
+		Assertions.assertNotEquals(onlySelfLink1, onlySelfLink2);
 	}
 
 	private class TestResource extends HALResource {

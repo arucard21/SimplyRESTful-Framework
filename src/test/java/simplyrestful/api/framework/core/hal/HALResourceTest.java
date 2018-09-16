@@ -2,9 +2,9 @@ package simplyrestful.api.framework.core.hal;
 
 import java.net.URI;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 
@@ -17,7 +17,7 @@ public class HALResourceTest{
 	private HALResource testResourceSame;
 	private HALResource testResourceDifferent;
 
-	@Before
+	@BeforeEach
 	public void createTestResources(){
 		testResource = new TestResource();
 		testResource.setSelf(new HALLink.Builder(TEST_RESOURCE_HREF_1).profile(testResource.getProfile()).build());
@@ -31,22 +31,22 @@ public class HALResourceTest{
 
 	@Test
 	public void halResource_shouldHaveSameHashcode_whenObjectsAreEqual() throws Exception {
-		Assert.assertEquals(testResource.hashCode(), testResourceSame.hashCode());
+		Assertions.assertEquals(testResource.hashCode(), testResourceSame.hashCode());
 	}
 
 	@Test
 	public void halResource_shouldBeEqual_whenContainingSameValues() throws Exception {
-		Assert.assertEquals(testResource, testResourceSame);
+		Assertions.assertEquals(testResource, testResourceSame);
 	}
 
 	@Test
 	public void halResource_shouldBeEqual_whenSameInstance() throws Exception {
-		Assert.assertEquals(testResource, testResource);
+		Assertions.assertEquals(testResource, testResource);
 	}
 
 	@Test
 	public void halResource_shouldNotBeEqual_whenContainingDifferentValues() throws Exception {
-		Assert.assertNotEquals(testResource, testResourceDifferent);
+		Assertions.assertNotEquals(testResource, testResourceDifferent);
 	}
 
 	private class TestResource extends HALResource {

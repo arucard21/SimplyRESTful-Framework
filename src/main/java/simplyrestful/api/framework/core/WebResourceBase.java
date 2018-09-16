@@ -2,6 +2,7 @@ package simplyrestful.api.framework.core;
 
 import java.net.URI;
 
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
@@ -26,75 +27,82 @@ import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.hal.HALResource;
 
-public abstract class WebResourceBase<T extends HALResource> {
+public class WebResourceBase<T extends HALResource> {
+	private HALResourceAccess<T> resourceAccess;
+
 	public static final String QUERY_PARAM_PAGE = "page";
 	public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
 	public static final String QUERY_PARAM_COMPACT = "compact";
 
 	@Context
 	protected UriInfo uriInfo;
+	
+	@Inject
+	public WebResourceBase(HALResourceAccess<T> resourceAccess) {
+		this.resourceAccess = resourceAccess;
+	}
 
-    @Produces({MediaType.APPLICATION_HAL_JSON})
-    @GET
-    @ApiOperation(
-        value = "Get a list of resources",
-        notes = "Get a list of resources"
-    )
-    public HALCollection<T> getHALResources(
-    		@ApiParam(value = "The page to be shown", required = false) @QueryParam(QUERY_PARAM_PAGE) @DefaultValue("1") int page,
-    		@ApiParam(value = "The amount of resources shown on each page", required = false) @QueryParam(QUERY_PARAM_PAGE_SIZE) @DefaultValue("100") int pageSize,
-    		@ApiParam(value = "Provide minimal information for each resource", required = false) @QueryParam(QUERY_PARAM_COMPACT) @DefaultValue("true") boolean compact) {
-    	return getDataAccessObject().retrieveResourcesFromDataStore(page, pageSize, compact);
-    }
+	@Produces({MediaType.APPLICATION_HAL_JSON})
+	@GET 
+	@ApiOperation(
+		value = "Get a list of resources",
+		notes = "Get a list of resources"
+	)
+	public HALCollection<T> getHALResources(
+			@ApiParam(value = "The page to be shown", required = false) @QueryParam(QUERY_PARAM_PAGE) @DefaultValue("1") int page,
+			@ApiParam(value = "The amount of resources shown on each page", required = false) @QueryParam(QUERY_PARAM_PAGE_SIZE) @DefaultValue("100") int pageSize,
+			@ApiParam(value = "Provide minimal information for each resource", required = false) @QueryParam(QUERY_PARAM_COMPACT) @DefaultValue("true") boolean compact) {
+			return resourceAccess.retrieveResourcesFromDataStore(page, pageSize, compact);
+	}
 
-    @Produces({MediaType.APPLICATION_HAL_JSON})
-    @Path("/{id}")
-    @GET
-    @ApiOperation(
-        value = "Get operation with type and headers",
-        notes = "Get operation with type and headers"
-    )
-    public T getHALResource(
-    		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
-    	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
-		T resource = getDataAccessObject().retrieveResourceFromDataStore(absoluteResourceIdentifier.toString());
-        if (resource == null){
-        	throw new NotFoundException();
-        }
-        return resource;
+	@Produces({MediaType.APPLICATION_HAL_JSON})
+	@Path("/{id}")
+	@GET
+	@ApiOperation(
+		value = "Get operation with type and headers",
+		notes = "Get operation with type and headers"
+	)
+	public T getHALResource(
+			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
+		URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
+		T resource = resourceAccess.retrieveResourceFromDataStore(absoluteResourceIdentifier);
+		if (resource == null){
+			throw new NotFoundException();
+		}
+		return resource;
 
-    }
+	}
 
 	@Consumes({MediaType.APPLICATION_HAL_JSON})
-    @POST
-    @ApiOperation(
-        value = "Create a new resource",
-        notes = "Create a new resource which can already have a self-link containing an URI as identifier or one will be generated"
-    )
-    public Response postHALResource(
-    		@ApiParam(value = "resource", required = true) final T resource) {
-    	if (resource.getSelf() != null){
-			if (getDataAccessObject().exists(resource.getSelf().getHref())){
-    			throw new ClientErrorException("A resource with the same ID already exists", Response.Status.CONFLICT);
-    		}
-    	}
-    	getDataAccessObject().addResourceToDataStore(resource);
-        return Response
-            .created(URI.create(resource.getSelf().getHref()))
-            .build();
-    }
+	@POST
+	@ApiOperation(
+		value = "Create a new resource",
+		notes = "Create a new resource which can already have a self-link containing an URI as identifier or one will be generated"
+	)
+	public Response postHALResource(
+			@ApiParam(value = "resource", required = true) final T resource) {
+		if (resource.getSelf() != null){
+			if (resourceAccess.exists(URI.create(resource.getSelf().getHref()))){
+				throw new ClientErrorException("A resource with the same ID already exists", Response.Status.CONFLICT);
+			}
+		}
+		resourceAccess.addResourceToDataStore(resource);
+		return Response
+			.created(URI.create(resource.getSelf().getHref()))
+			.build();
+	}
 
 	@Consumes({MediaType.APPLICATION_HAL_JSON})
 	@Produces({MediaType.APPLICATION_HAL_JSON})
-    @Path("/{id}")
-    @PUT
-    @ApiOperation(
-        value = "Create or update a resource",
-        notes = "Create a resource with a specified ID or update that resource. Returns the previous (now overridden) resource or nothing if a new resource was created."
-    )
-    public T putHALResource(
-    		@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
-    		@ApiParam(value = "The resource to be updated", required = true) final T resource){
+	@Path("/{id}")
+	@PUT
+	@ApiOperation(
+		value = "Create or update a resource",
+		notes = "Create a resource with a specified ID or update that resource. Returns the previous (now overridden) resource or nothing if a new resource was created."
+	)
+	public T putHALResource(
+			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id,
+			@ApiParam(value = "The resource to be updated", required = true) final T resource){
 		if(resource.getSelf() != null && !resource.getSelf().getHref().contains(id)){
 			throw new BadRequestException("The provided resource contains an self-link that does not match the ID used in the request");
 		}
@@ -104,14 +112,14 @@ public abstract class WebResourceBase<T extends HALResource> {
 		}
 		T existingResource;
 		try{
-			existingResource = getDataAccessObject().updateResourceInDataStore(resource);
+			existingResource = resourceAccess.updateResourceInDataStore(resource);
 		}
 		catch(InvalidResourceException invalidResource){
 			throw new BadRequestException("The provided resource is invalid, most likely due to an invalid or missing self-link");
 		}
 		if (existingResource == null){
 			// create the resource since it did not exist yet
-			if (getDataAccessObject().addResourceToDataStore(resource)){
+			if (resourceAccess.addResourceToDataStore(resource)){
 				return null;
 			}
 			else{
@@ -119,29 +127,29 @@ public abstract class WebResourceBase<T extends HALResource> {
 			}
 		}
 		return existingResource;
-    }
+	}
 
 	@Path("/{id}")
-    @DELETE
-    @ApiOperation(
-        value = "Delete operation with implicit header",
-        notes = "Delete operation with implicit header"
-    )
-    public Response deleteHALResource(@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
-    	URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
-    	if(getDataAccessObject().removeResourceFromDataStore(absoluteResourceIdentifier.toString()) == null){
-    		throw new NotFoundException();
-    	}
-        return Response.noContent().build();
-    }
+	@DELETE
+	@ApiOperation(
+		value = "Delete operation with implicit header",
+		notes = "Delete operation with implicit header"
+	)
+	public Response deleteHALResource(@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
+		URI absoluteResourceIdentifier = getAbsoluteResourceURI(id);
+		if(resourceAccess.removeResourceFromDataStore(absoluteResourceIdentifier) == null){
+			throw new NotFoundException();
+		}
+		return Response.noContent().build();
+	}
 
-    /**
-     * Get the absolute URI for a resource on a different endpoint with the same base URI as this endpoint.
-     *
-     * @param resourceEndpoint is the class of the @Path-annotated endpoint class for the resource
-     * @param id is the ID of the resource provided on the endpoint.
-     * @return the absolute URI for the resource on the requested endpoint.
-     */
+	/**
+	 * Get the absolute URI for a resource on a different endpoint with the same base URI as this endpoint.
+	 *
+	 * @param resourceEndpoint is the class of the @Path-annotated endpoint class for the resource
+	 * @param id is the ID of the resource provided on the endpoint.
+	 * @return the absolute URI for the resource on the requested endpoint.
+	 */
 	protected URI getAbsoluteResourceURI(Class<?> resourceEndpoint, String id) {
 		return uriInfo.getBaseUriBuilder().path(resourceEndpoint).path(id).build();
 	}
@@ -171,6 +179,4 @@ public abstract class WebResourceBase<T extends HALResource> {
 									.profile(resourceProfile)
 									.build();
 	}
-
-	protected abstract HALResourceAccess<T> getDataAccessObject();
 }
