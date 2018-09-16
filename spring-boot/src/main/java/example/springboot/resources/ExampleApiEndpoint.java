@@ -124,11 +124,9 @@ public class ExampleApiEndpoint extends WebResourceBase<ExampleResource> {
 		if (previousData == null){
 			throw new IllegalStateException("The to-be-updated resource does not exist yet.");
 		}
-		else{
-			dataStore.getData().remove(resourceMapping.get(resourceURI));
-			dataStore.getData().add(convert(resource));
-			return convert(previousData);
-		}
+		dataStore.getData().remove(dataStore.getObject(resourceMapping.get(resourceURI)));
+		dataStore.getData().add(convert(resource));
+		return convert(previousData);
 	}
 
 	@Override
@@ -138,7 +136,7 @@ public class ExampleApiEndpoint extends WebResourceBase<ExampleResource> {
 			return null;
 		}
 		StoredObject previousData = dataStore.getObject(dataID);
-		dataStore.getData().remove(dataID);
+		dataStore.getData().remove(previousData);
 		return previousData == null ? null : convert(previousData);
 	}
 
