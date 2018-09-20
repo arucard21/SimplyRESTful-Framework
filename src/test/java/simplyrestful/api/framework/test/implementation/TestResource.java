@@ -3,13 +3,14 @@ package simplyrestful.api.framework.test.implementation;
 import java.net.URI;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import simplyrestful.api.framework.core.AbstractWebResourceTest;
 import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.core.hal.HALResource;
 
 public class TestResource extends HALResource{
 	public static final URI TEST_RESOURCE_PROFILE_URI = URI.create("local://docs/resources/testresource");
 	public static final String TEST_RESOURCE_ID = "123456789";
-	public static final URI TEST_RESOURCE_URI = TestWebResource.TEST_REQUEST_URI.resolve(TEST_RESOURCE_ID);
+	public static final URI TEST_RESOURCE_URI = AbstractWebResourceTest.TEST_REQUEST_URI.resolve(TEST_RESOURCE_ID);
 	
 	public TestResource() {
 		super();

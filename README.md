@@ -15,7 +15,7 @@ Using this framework, you would mainly just need to implement a mapping between 
 ## Usage
 * Depend on the SimplyRESTful framework
 * Create at least one HAL-based resource objects (by extending [HALResource](/src/main/java/simplyrestful/api/framework/core/hal/HALResource.java)) to represent your API resource
-* Create at least one Data Access Object (by implementing the [HALResourceAccess](/src/main/java/simplyrestful/api/framework/core/HALResourceAccess.java) interface), mapping your data appropriately in order to provide them as HAL-based resource objects. Make sure this object can be found by your dependency injection framework of choice.
-* Create at least one JAX-RS Web Resource that will provide access to your API resource (by extending [WebResourceBase\<T\>](/src/main/java/simplyrestful/api/framework/core/WebResourceBase.java) where T should be the HAL-based resource object you created). Provide it with the `@Path` annotation to define the resource name.
+* Create at least one Data Access Object (by implementing the [ResourceDAO](/src/main/java/simplyrestful/api/framework/core/ResourceDAO.java) interface), mapping your data appropriately in order to provide them as HAL-based resource objects. Make sure this object can be found by your dependency injection framework of choice.
+* Create at least one JAX-RS Web Resource that will provide access to your API resource (by implementing [AbstractWebResource\<T\>](/src/main/java/simplyrestful/api/framework/core/AbstractWebResource.java) where T should be the HAL-based resource object you created). Provide it with the `@Path` annotation to define the resource name.
 * Deploy the JAX-RS Web Resource
     * You can use [SimplyRESTful-jetty](https://github.com/arucard21/SimplyRESTful-jetty) to quickly deploy your API, or [SimplyRESTful-spring-boot](https://github.com/arucard21/SimplyRESTful-spring-boot) for a more customizable deployment.

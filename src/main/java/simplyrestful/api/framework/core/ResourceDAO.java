@@ -1,24 +1,34 @@
 package simplyrestful.api.framework.core;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.inject.Named;
 
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
-import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.hal.HALResource;
 
 /**
- * This interface allows access to backend data in terms of the API's Web Resources.
+ * This interface allows access to stored data in terms of the API's Web Resources which are identified by a URI.
  *
- * Any implementation of this interface would need to map the data in the backend to the type of HALResource
- * object that the API makes available and vice versa.
+ * An implementation of this interface could access stored data directly from the data store or it could map the 
+ * API resource to a different entity more suitable for the type of storage used. Depending on the type of storage, 
+ * a different DAO may be needed to provide access to the stored data for that mapped entity. 
+ * 
+ * IMPORTANT: Knowledge of these underlying mechanisms, like the mapping or use of additional DAOs, should not be 
+ * needed to use this interface. 
  *
  * @param <T> is the type of HALResource object that is used in the API.
  */
 @Named
-public interface HALResourceAccess<T extends HALResource> {
+public interface ResourceDAO<T extends HALResource> {
+	
+	/**
+	 * @return the total amount of resources that are available
+	 */
+	public long count();
+	
 	/**
 	 * Retrieve the paged collection of resources that have been requested.
 	 *
@@ -27,10 +37,9 @@ public interface HALResourceAccess<T extends HALResource> {
 	 *
 	 * @param pageNumber is the requested page number
 	 * @param pageSize is the requested size of each page
-	 * @param compact determines whether only the self-link is shown (in _links) or the entire resource (in _embedded)
-	 * @return the requested HAL collection containing the resource (for that page)
+	 * @return the requested HAL collection containing the resources for the requested page
 	 */
-	public HALCollection<T> retrieveResourcesFromDataStore(int pageNumber, int pageSize, boolean compact);
+	public List<T> findAllForPage(int pageNumber, int pageSize);
 
 	/**
 	 * Retrieve the resource from the data store where it is stored.
@@ -41,15 +50,7 @@ public interface HALResourceAccess<T extends HALResource> {
 	 * @param resourceURI is the identifier (from API perspective) for the resource
 	 * @return the resource that was requested or null if it doesn't exist
 	 */
-	public T retrieveResourceFromDataStore(URI resourceURI);
-
-	/**
-	 * Add a resource to the data store.
-	 *
-	 * @param resource is the resource that will be added
-	 * @return true iff the resource was successfully added, false otherwise.
-	 */
-	public boolean addResourceToDataStore(T resource);
+	public T findById(URI resourceURI);
 
 	/**
 	 * Update the resource in the data store where it is stored.
@@ -57,11 +58,11 @@ public interface HALResourceAccess<T extends HALResource> {
 	 * The resource should contain a self-link in order to identify which resource needs to be updated.
 	 *
 	 * @param resource is the updated resource (which contains a self-link with which to identify the resource)
-	 * @return the previous value of the updated resource, or null if no existing resource was found
+	 * @return the previous value of the updated resource, or null if no existing resource was found and the resource was created
 	 * @throws InvalidResourceException when the resource is not valid (most likely because it does not contain a self-link).
-	 * @throws InvalidSelfLinkException when the resource does not contain a valid self-link.
+	 * @throws InvalidSelfLinkException when the resource contains a self-link which is not valid.
 	 */
-	public T updateResourceInDataStore(T resource) throws InvalidResourceException, InvalidSelfLinkException;
+	public T persist(T resource) throws InvalidResourceException, InvalidSelfLinkException;
 
 	/**
 	 * Remove a resource from the data store.
@@ -69,13 +70,5 @@ public interface HALResourceAccess<T extends HALResource> {
 	 * @param resourceURI is the identifier of the resource that should be removed
 	 * @return the removed resource, or null if it did not exist
 	 */
-	public T removeResourceFromDataStore(URI resourceURI);
-
-	/**
-	 * Verify that a resource is known to the API.
-	 *
-	 * @param resourceURI is the URI that represents the resource
-	 * @return true iff the resource is known to the API, false otherwise
-	 */
-	public boolean exists(URI resourceURI);
+	public T remove(URI resourceURI);
 }
