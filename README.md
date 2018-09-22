@@ -19,10 +19,10 @@ Using this framework, you would mainly just need to implement a mapping between 
 * Create at least one Data Access Object (by implementing the [ResourceDAO](/src/main/java/simplyrestful/api/framework/core/ResourceDAO.java) interface), mapping your data appropriately in order to provide them as HAL-based resource objects. Make sure this object can be found by your dependency injection framework of choice.
 * Create at least one JAX-RS Web Resource that will provide access to your API resource (by implementing [AbstractWebResource\<T\>](/src/main/java/simplyrestful/api/framework/core/AbstractWebResource.java) where T should be the HAL-based resource object you created). Provide it with the `@Path` annotation to define the resource name
 * Deploy the JAX-RS Web Resource
-    * You can use [SimplyRESTful-jetty](https://github.com/arucard21/SimplyRESTful-jetty) to quickly deploy your API, or [SimplyRESTful-spring-boot](https://github.com/arucard21/SimplyRESTful-spring-boot) for a more customizable deployment.
+    * You can use [SimplyRESTful-cxf](/SimplyRESTful-cxf) to quickly deploy your API using the default Jetty server, or [SimplyRESTful-cxf-spring-boot](/SimplyRESTful-cxf-spring-boot) for a more customizable deployment.
 
 ## Process for SimplyRESTful API clients
-The process that clients using a SimplyRESTful API would have to follow is based heavily on the following [rule for RESTful APIs](http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven):
+The process for clients to use a SimplyRESTful API adheres to the following [rule for RESTful APIs](http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven):
 
 > A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API).
 
