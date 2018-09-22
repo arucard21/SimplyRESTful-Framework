@@ -1,0 +1,20 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+
+repositories {
+	mavenCentral()
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+group = 'com.github.arucard21.simplyrestful'
+version = '0.2'
+
+dependencies {
+	compile project(':datastore')
+	
+	compile ("com.github.arucard21.simplyrestful:simplyrestful:0.6")
+	compile ("com.github.arucard21.simplyrestful:simplyrestful-spring-boot:0.2")
+	compile ("javax.inject:javax.inject:1")
+}
