@@ -8,8 +8,8 @@ allprojects{
 		mavenCentral()
 	}
 
-	sourceCompatibility = JavaVersion.VERSION_1_10
-	targetCompatibility = JavaVersion.VERSION_1_10
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 
 	group = 'com.github.arucard21.simplyrestful'
 	version = '0.7'
@@ -95,18 +95,6 @@ ext {
 	mockito = "2.22.0"
 }
 
-compileJava {
-	options.compilerArgs += ["--add-modules", "java.se.ee"]
-}
-
-compileTestJava {
-	options.compilerArgs += ["--add-modules", "java.se.ee"]
-}
-
-test {
-	jvmArgs += ["--add-modules", "java.se.ee"]
-}
-
 dependencies {
 	compile ("javax.ws.rs:javax.ws.rs-api:"+jaxrs)
 	compile ("javax.validation:validation-api:2.0.1.Final")
@@ -123,17 +111,6 @@ dependencies {
 }
 
 project(":SimplyRESTful-cxf-spring-boot"){
-	compileJava {
-		options.compilerArgs += ["--add-modules", "java.se.ee"]
-	}
-	
-	compileTestJava {
-		options.compilerArgs += ["--add-modules", "java.se.ee"]
-	}
-	
-	test {
-		jvmArgs += ["--add-modules", "java.se.ee"]
-	}
 	dependencies {
 		compile ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:"+cxf)
 		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:"+cxf)
@@ -144,18 +121,6 @@ project(":SimplyRESTful-cxf-spring-boot"){
 }
 
 project(":SimplyRESTful-cxf"){
-	compileJava {
-		options.compilerArgs += ["--add-modules", "java.se.ee"]
-	}
-	
-	compileTestJava {
-		options.compilerArgs += ["--add-modules", "java.se.ee"]
-	}
-	
-	test {
-		jvmArgs += ["--add-modules", "java.se.ee"]
-	}
-
 	dependencies {
 		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:"+cxf)
 		compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:"+cxf)
@@ -169,15 +134,7 @@ project(":SimplyRESTful-cxf"){
 	}
 }
 
-project(":SimplyRESTful-example:datastore"){
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 project(":SimplyRESTful-example:spring-boot"){
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-
 	dependencies {
 		compile project(':SimplyRESTful-example:datastore')
 		
@@ -188,9 +145,6 @@ project(":SimplyRESTful-example:spring-boot"){
 }
 
 project(":SimplyRESTful-example:jetty"){
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-
 	dependencies {
 		compile project(':SimplyRESTful-example:datastore')
 		
