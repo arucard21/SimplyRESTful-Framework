@@ -1,2 +1,0 @@
-include "datastore", "jetty", "spring-boot"
-rootProject.name = "SimplyRESTful-example"
