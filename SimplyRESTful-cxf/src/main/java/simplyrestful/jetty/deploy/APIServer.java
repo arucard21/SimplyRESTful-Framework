@@ -19,6 +19,7 @@
 
 package simplyrestful.jetty.deploy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import org.apache.cxf.binding.BindingFactoryManager;
@@ -26,7 +27,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSBindingFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
-import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
@@ -62,20 +62,19 @@ public class APIServer {
      *
      * @param address is the URI where the Web Resource should be served. If empty, the Web Resource will be served on a random port on localhost
      * @param webResources is a list of the JAX-RS Web Resources that should served.
+     * @throws SecurityException 
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalArgumentException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
-    public APIServer(String address, Class<?>... webResources){
+    public APIServer(String address, Class<?>... webResources) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException{
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(webResources);
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
         for (Class<?> webResource: webResources){
-			try {
-				resourceProviders.add(new SingletonResourceProvider(webResource.newInstance()));
-			}
-			catch (InstantiationException | IllegalAccessException e) {
-				LOGGER.warn("Couldn't create an instance of this JAX-RS Web Resource for singleton lifecyce: " + webResource.getName());
-				LOGGER.warn("Using per-request lifecycle for this JAX-RS Web Resource instead");
-				resourceProviders.add(new PerRequestResourceProvider(webResource));
-			}
+			resourceProviders.add(new SingletonResourceProvider(webResource.getDeclaredConstructor().newInstance()));
         }
         sf.setResourceProviders(resourceProviders);
         if (address != null && !address.isEmpty()){
@@ -90,7 +89,7 @@ public class APIServer {
         sf.setInvoker(new JAXRSBeanValidationInvoker());
         Swagger2Feature swagger = new Swagger2Feature();
         swagger.setPrettyPrint(true);
-        sf.getFeatures().add(swagger);
+        sf.getFeatures().add(swagger);	
         sf.getFeatures().add(new JAXRSBeanValidationFeature());
         sf.setProviders(Lists.newArrayList(
         		new MultipartProvider(),
@@ -104,8 +103,14 @@ public class APIServer {
      * Create a CXF-based API server with the provided JAX-RS Web Resources on http://localhost:9000
      *
      * @param webResources is a list of the JAX-RS Web Resources that should served.
+     * @throws SecurityException 
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalArgumentException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
-    public APIServer(Class<?>... webResources) {
+    public APIServer(Class<?>... webResources) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
     	this("http://localhost:9000", webResources);
     }
 

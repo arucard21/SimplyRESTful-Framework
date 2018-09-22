@@ -1,8 +1,0 @@
-apply plugin: "java"
-apply plugin: "eclipse"
-
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-
-group = 'com.github.arucard21.simplyrestful'
-version = '0.1'

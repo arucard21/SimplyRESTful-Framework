@@ -1,1 +1,2 @@
+include "SimplyRESTful-cxf-spring-boot", "SimplyRESTful-cxf", "SimplyRESTful-example:datastore", "SimplyRESTful-example:jetty", "SimplyRESTful-example:spring-boot"
 rootProject.name = "SimplyRESTful"

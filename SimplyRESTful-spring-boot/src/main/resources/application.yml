@@ -1,4 +1,0 @@
-cxf:
- jaxrs:
-   component-scan: true
-   classes-scan-packages: org.apache.cxf.jaxrs.swagger, org.apache.cxf.jaxrs.ext.search, com.fasterxml.jackson.jaxrs.json
