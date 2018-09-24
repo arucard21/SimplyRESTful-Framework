@@ -14,12 +14,88 @@ allprojects{
 	group = 'com.github.arucard21.simplyrestful'
 	version = '0.7'
 
-	javadoc {
-		options.addBooleanOption('html5', true)
-	}
-
 	test {
 		useJUnitPlatform()
+	}
+}
+
+project.description = "A framework for creating a RESTful API"
+
+ext {
+	jaxrs = "2.1.1"
+	cxf = "3.2.6"
+	junit = "5.3.1"
+	mockito = "2.22.0"
+}
+
+dependencies {
+	compile ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
+	compile ("javax.validation:validation-api:2.0.1.Final")
+	compile ("javax.inject:javax.inject:1")
+	compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
+	compile ("io.swagger:swagger-annotations:1.5.21")
+
+	testCompile ("org.mockito:mockito-core:${mockito}")
+	testCompile ("org.mockito:mockito-junit-jupiter:${mockito}")
+	testCompile ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
+	testCompile ("org.junit.jupiter:junit-jupiter-api:${junit}")
+	testCompile ("org.junit.jupiter:junit-jupiter-engine:${junit}")
+	testCompile ("org.junit.platform:junit-platform-launcher:1.3.1")
+}
+
+project(":SimplyRESTful-cxf-spring-boot"){
+	project.description = "Easily deploy your SimplyRESTful API using Apache CXF with Spring Boot"
+	dependencies {
+		compile ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:${cxf}")
+		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
+		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
+		compile ("org.webjars:swagger-ui:2.2.6")
+		compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
+	}
+}
+
+project(":SimplyRESTful-cxf"){
+	project.description = "Easily deploy your SimplyRESTful API using Apache CXF without Spring Boot"
+	dependencies {
+		compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
+		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
+		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
+		compile ("org.webjars:swagger-ui:2.2.6")
+		compile ("ch.qos.logback:logback-classic:1.2.1")
+		compile ("org.hibernate:hibernate-validator:5.4.0.Final")
+		compile ("org.glassfish:javax.el:3.0.1-b08")
+		compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
+	}
+}
+
+project(":SimplyRESTful-example:spring-boot"){
+	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
+
+	dependencies {
+		compile project(':SimplyRESTful-example:datastore')
+
+		compile ("com.github.arucard21.simplyrestful:simplyrestful:0.6")
+		compile ("com.github.arucard21.simplyrestful:simplyrestful-spring-boot:0.2")
+		compile ("javax.inject:javax.inject:1")
+	}
+}
+
+project(":SimplyRESTful-example:jetty"){
+	project.description = "Example project for a SimplyRESTful API using Apache CXF without Spring Boot on Jetty"
+
+	dependencies {
+		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
+		compile project(':SimplyRESTful-example:datastore')
+
+		compile ("com.github.arucard21.simplyrestful:simplyrestful:0.6")
+		compile ("com.github.arucard21.simplyrestful:simplyrestful-jetty:0.5")
+	}
+}
+
+// Provide tasks to publish projects to Maven Central
+configure(allprojects - project(":SimplyRESTful-example").allprojects){
+	javadoc {
+		options.addBooleanOption('html5', true)
 	}
 
 	task javadocJar(type: Jar) {
@@ -56,16 +132,16 @@ allprojects{
 				}
 
 				pom.project {
-					name 'SimplyRESTful'
+					name project.name
 					packaging 'jar'
 
-					description 'A framework for creating a RESTful API'
+					description project.description
 					url = 'https://github.com/arucard21/SimplyRESTful'
 
 					scm {
 						connection 'scm:git:git://github.com:arucard21/SimplyRESTful.git'
 						developerConnection 'scm:git:ssh://github.com:arucard21/SimplyRESTful.git'
-						url 'https://github.com/arucard21/SimplyRESTful/tree/master'
+						url 'https://github.com/arucard21/SimplyRESTful'
 					}
 
 					licenses {
@@ -85,70 +161,5 @@ allprojects{
 				}
 			}
 		}
-	}
-}
-
-ext {
-	jaxrs = "2.1.1"
-	cxf = "3.2.6"
-	junit = "5.3.1"
-	mockito = "2.22.0"
-}
-
-dependencies {
-	compile ("javax.ws.rs:javax.ws.rs-api:"+jaxrs)
-	compile ("javax.validation:validation-api:2.0.1.Final")
-	compile ("javax.inject:javax.inject:1")
-	compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
-	compile ("io.swagger:swagger-annotations:1.5.21")
-	
-	testCompile ("org.mockito:mockito-core:"+mockito)
-	testCompile ("org.mockito:mockito-junit-jupiter:"+mockito)
-	testCompile ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
-	testCompile ("org.junit.jupiter:junit-jupiter-api:"+junit)
-	testCompile ("org.junit.jupiter:junit-jupiter-engine:"+junit)
-	testCompile ("org.junit.platform:junit-platform-launcher:1.3.1")
-}
-
-project(":SimplyRESTful-cxf-spring-boot"){
-	dependencies {
-		compile ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:"+cxf)
-		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:"+cxf)
-		compile ("org.apache.cxf:cxf-rt-rs-extension-search:"+cxf)
-		compile ("org.webjars:swagger-ui:2.2.6")
-		compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
-	}
-}
-
-project(":SimplyRESTful-cxf"){
-	dependencies {
-		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:"+cxf)
-		compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:"+cxf)
-		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:"+cxf)
-		compile ("org.apache.cxf:cxf-rt-rs-extension-search:"+cxf)
-		compile ("org.webjars:swagger-ui:2.2.6")
-		compile ("ch.qos.logback:logback-classic:1.2.1")
-		compile ("org.hibernate:hibernate-validator:5.4.0.Final")
-		compile ("org.glassfish:javax.el:3.0.1-b08")
-		compile ("dk.nykredit.jackson.dataformat:jackson-dataformat-hal:1.0.1")
-	}
-}
-
-project(":SimplyRESTful-example:spring-boot"){
-	dependencies {
-		compile project(':SimplyRESTful-example:datastore')
-		
-		compile ("com.github.arucard21.simplyrestful:simplyrestful:0.6")
-		compile ("com.github.arucard21.simplyrestful:simplyrestful-spring-boot:0.2")
-		compile ("javax.inject:javax.inject:1")
-	}
-}
-
-project(":SimplyRESTful-example:jetty"){
-	dependencies {
-		compile project(':SimplyRESTful-example:datastore')
-		
-		compile ("com.github.arucard21.simplyrestful:simplyrestful:0.6")
-		compile ("com.github.arucard21.simplyrestful:simplyrestful-jetty:0.5")
 	}
 }
