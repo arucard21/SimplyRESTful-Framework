@@ -5,5 +5,6 @@ public class MediaType {
 
 	public static class Profile {
 		public static final String HALCOLLECTION = "https://arucard21.github.io/SimplyRESTful/HALCollection/v1";
+		public static final String SERVICE_DOCUMENT = "https://arucard21.github.io/SimplyRESTful/ServiceDocument/v1";
 	}
 }
