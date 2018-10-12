@@ -106,7 +106,7 @@ project(":SimplyRESTful-cxf"){
 	}
 }
 
-project(":SimplyRESTful-example:spring-boot"){
+project(":SimplyRESTful-example:cxf-spring-boot"){
 	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
 		compile project(':SimplyRESTful')
@@ -123,6 +123,13 @@ project(":SimplyRESTful-example:jetty"){
 		compile project(':SimplyRESTful-cxf')
 		compile project(':SimplyRESTful-example:datastore')
 		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
+	}
+}
+
+project(":SimplyRESTful-example:jersey-spring-boot"){
+	project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
+	dependencies {
+		compile ("org.springframework.boot:spring-boot-starter-jersey:2.0.5.RELEASE")
 	}
 }
 
