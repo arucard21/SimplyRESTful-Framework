@@ -24,7 +24,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dk.nykredit.jackson.dataformat.hal.HALMapper;
+import io.openapitools.jackson.dataformat.hal.HALMapper;
+
 
 @Configuration
 public class APIServerConfiguration {

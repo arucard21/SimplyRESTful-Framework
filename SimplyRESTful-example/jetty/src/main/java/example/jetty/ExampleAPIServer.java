@@ -1,5 +1,7 @@
 package example.jetty;
 
+import java.lang.reflect.InvocationTargetException;
+
 import example.jetty.resources.ExampleApiEndpoint;
 import simplyrestful.jetty.deploy.APIServer;
 
@@ -10,7 +12,7 @@ import simplyrestful.jetty.deploy.APIServer;
  *
  */
 public class ExampleAPIServer {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
 		// Make the example API available on all network interfaces on port 9000
 		APIServer apiServer = new APIServer("http://localhost:9000", ExampleApiEndpoint.class);
 		try {

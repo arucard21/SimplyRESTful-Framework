@@ -39,7 +39,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 
-import dk.nykredit.jackson.dataformat.hal.HALMapper;
+import io.openapitools.jackson.dataformat.hal.HALMapper;
+
 
 /**
  * This represents the API server that runs the SimplyRESTful API.
