@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author RiaasM
  *
  */
-@SpringBootApplication(scanBasePackages="simplyrestful,example.springboot")
+@SpringBootApplication
 public class ExampleAPIApplication{
 	public static void main(String[] args) {
 		SpringApplication.run(ExampleAPIApplication.class, args);

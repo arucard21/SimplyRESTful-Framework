@@ -62,6 +62,7 @@ subprojects{
 project(":SimplyRESTful"){
 	project.description = "A framework for creating a RESTful API"
 	dependencies {
+		compile ("javax.inject:javax.inject:1")
 		compile ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
 		compile ("javax.validation:validation-api:2.0.1.Final")
 		compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
@@ -80,14 +81,23 @@ project(":SimplyRESTful"){
 	}
 }
 
+project(":SimplyRESTful-spring-boot"){
+	project.description = "Easily deploy your SimplyRESTful API with Spring Boot and a JAX-RS framework of your choice"
+	dependencies {
+		compileOnly ("org.springframework.boot:spring-boot:2.0.5.RELEASE")
+		compile ("org.webjars:swagger-ui:2.2.6")
+		compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
+	}
+}
+
+
 project(":SimplyRESTful-cxf-spring-boot"){
 	project.description = "Easily deploy your SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
+		compile project(':SimplyRESTful-spring-boot')
 		compile ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:${cxf}")
 		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
 		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
-		compile ("org.webjars:swagger-ui:2.2.6")
-		compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
 	}
 }
 
@@ -112,7 +122,6 @@ project(":SimplyRESTful-example:cxf-spring-boot"){
 		compile project(':SimplyRESTful')
 		compile project(':SimplyRESTful-cxf-spring-boot')
 		compile project(':SimplyRESTful-example:datastore')
-		compile ("javax.inject:javax.inject:1")
 	}
 }
 
@@ -129,7 +138,12 @@ project(":SimplyRESTful-example:jetty"){
 project(":SimplyRESTful-example:jersey-spring-boot"){
 	project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
 	dependencies {
-		compile ("org.springframework.boot:spring-boot-starter-jersey:2.0.5.RELEASE")
+		compile project(':SimplyRESTful')
+		compile project(':SimplyRESTful-example:datastore')
+		compile ("org.springframework.boot:spring-boot-starter-jersey:2.0.5.RELEASE"){
+			exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
+		}
+		compile "io.swagger:swagger-jersey2-jaxrs:1.5.21"
 	}
 }
 

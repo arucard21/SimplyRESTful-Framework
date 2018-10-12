@@ -19,6 +19,7 @@
 
 package example.springboot.resources;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Path;
 
@@ -30,6 +31,7 @@ import simplyrestful.api.framework.core.ResourceDAO;
 @Path("/resources")
 @Api(value = "Example Resources")
 public class ExampleWebResource extends AbstractWebResource<ExampleResource> {
+	@Inject
 	public ExampleWebResource(ResourceDAO<ExampleResource> resourceDao) {
 		super(resourceDao);
 	}

@@ -2,11 +2,12 @@ package example.jetty.resources;
 
 import java.net.URI;
 
+import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
 import simplyrestful.api.framework.core.hal.HALResource;
 
 public class ExampleResource extends HALResource{
-
 	private String description;
+	@EmbeddedResource
 	private ExampleEmbeddedResource embeddedResource;
 
 	public String getDescription() {

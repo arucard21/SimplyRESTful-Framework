@@ -2,7 +2,6 @@ package simplyrestful.api.framework.core;
 
 import java.net.URI;
 
-import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
@@ -41,7 +40,6 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	@Context
 	protected UriInfo uriInfo;
 	
-	@Inject
 	public AbstractWebResource(ResourceDAO<T> resourceDao) {
 		this.resourceDao = resourceDao;
 	}

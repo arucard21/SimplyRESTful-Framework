@@ -27,6 +27,8 @@ public class WebResourceRoot{
 		HALServiceDocument serviceDocument = new HALServiceDocument();
 		HALLink descriptionLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().path("swagger.json").build()).build();
 		serviceDocument.setDescribedby(descriptionLink);
+		HALLink selfLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().build()).build();
+		serviceDocument.setSelf(selfLink);
 		return serviceDocument;
 	}
 }

@@ -20,17 +20,24 @@
 package simplyrestful.springboot;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALMapper;
 
 
 @Configuration
-public class APIServerConfiguration {
+@ComponentScan(basePackages="simplyrestful.api.framework.core")
+public class SimplyRESTfulSpringBootConfiguration {
 	@Bean
-	public ObjectMapper halMapper(){
+	public HALMapper halMapper(){
 		return new HALMapper();
+	}
+
+	@Bean
+	public JacksonJsonProvider halJsonProvider(HALMapper halMapper){
+		return new JacksonJsonProvider(halMapper);
 	}
 }
