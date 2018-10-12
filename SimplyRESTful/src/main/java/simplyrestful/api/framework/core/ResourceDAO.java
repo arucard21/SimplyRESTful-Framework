@@ -23,7 +23,6 @@ import simplyrestful.api.framework.core.hal.HALResource;
  */
 @Named
 public interface ResourceDAO<T extends HALResource> {
-	
 	/**
 	 * @return the total amount of resources that are available
 	 */
@@ -37,6 +36,7 @@ public interface ResourceDAO<T extends HALResource> {
 	 *
 	 * @param pageNumber is the requested page number
 	 * @param pageSize is the requested size of each page
+	 * @param absoluteBaseURI is the absolute base URI, as received by the API for a specific request
 	 * @return the requested HAL collection containing the resources for the requested page
 	 */
 	public List<T> findAllForPage(int pageNumber, int pageSize);
@@ -44,13 +44,14 @@ public interface ResourceDAO<T extends HALResource> {
 	/**
 	 * Retrieve the resource from the data store where it is stored.
 	 *
-	 * The identifier does not necessarily have to be the same as the identifier used in the data store. You can map this API
-	 * identifier to the correct resource in any way you want.
+	 * The identifier provided by the API is the URI of the resource. This does not have to be the
+	 * identifier used in the data store (UUID is more commonly used) but each entity in the data
+	 * store must be uniquely identifiable by the information provided in the URI. 
 	 *
 	 * @param resourceURI is the identifier (from API perspective) for the resource
 	 * @return the resource that was requested or null if it doesn't exist
 	 */
-	public T findById(URI resourceURI);
+	public T findByURI(URI resourceURI);
 
 	/**
 	 * Update the resource in the data store where it is stored.

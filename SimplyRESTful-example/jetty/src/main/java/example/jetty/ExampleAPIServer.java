@@ -2,8 +2,12 @@ package example.jetty;
 
 import java.lang.reflect.InvocationTargetException;
 
-import example.jetty.resources.ExampleApiEndpoint;
-import simplyrestful.jetty.deploy.APIServer;
+import org.apache.cxf.endpoint.Server;
+
+import example.jetty.resources.CustomRequestPropertiesFilter;
+import example.jetty.resources.ExampleResourceDAO;
+import example.jetty.resources.ExampleWebResource;
+import simplyrestful.jetty.deploy.ServerBuilder;
 
 /**
  * Run the API server with the example endpoint and resource.
@@ -13,13 +17,16 @@ import simplyrestful.jetty.deploy.APIServer;
  */
 public class ExampleAPIServer {
 	public static void main(String[] args) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
-		// Make the example API available on all network interfaces on port 9000
-		APIServer apiServer = new APIServer("http://localhost:9000", ExampleApiEndpoint.class);
+		Server apiServer = new ServerBuilder()
+				.withAddress("http://localhost:9000")
+				.withWebResource(ExampleWebResource.class, ExampleResourceDAO.class)
+				.withProvider(CustomRequestPropertiesFilter.class)
+				.build();
 		try {
 			Thread.sleep(60 * 60 * 1000);
 		}
 		catch (InterruptedException e) {
-			apiServer.getCXFServer().destroy();
+			apiServer.destroy();
 		}
 	}
 }

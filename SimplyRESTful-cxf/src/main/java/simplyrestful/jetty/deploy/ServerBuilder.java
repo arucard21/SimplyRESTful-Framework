@@ -21,6 +21,11 @@ package simplyrestful.jetty.deploy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.endpoint.Server;
@@ -37,9 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.google.common.collect.Lists;
 
 import io.openapitools.jackson.dataformat.hal.HALMapper;
+import simplyrestful.api.framework.core.AbstractWebResource;
+import simplyrestful.api.framework.core.ResourceDAO;
+import simplyrestful.api.framework.core.hal.HALResource;
+import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 
 
 /**
@@ -51,12 +59,41 @@ import io.openapitools.jackson.dataformat.hal.HALMapper;
  * @author RiaasM
  *
  */
-public class APIServer {
+public class ServerBuilder {
 	private static final Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.APIServer");
-	private Server cxfServer;
+	private String address = "http://localhost:9000";
+	private Map<Class<? extends AbstractWebResource<? extends HALResource>>, Class<? extends ResourceDAO<? extends HALResource>>> webResources = new HashMap<>();
+	private List<Object> providers = new ArrayList<>();
+	
+	/**
+	 * Configure the address used by the server
+	 * 
+	 */
+	public ServerBuilder withAddress(String address) {
+		this.address = address;
+		return this;
+	}
+	
+	/**
+	 * Add a JAX-RS web resource to the server
+	 * 
+	 */
+	public ServerBuilder withWebResource(Class<? extends AbstractWebResource<? extends HALResource>> webResource, Class<? extends ResourceDAO<? extends HALResource>> resourceDao) {
+		webResources.put(webResource, resourceDao);
+		return this;
+	}
+	
+	/**
+	 * Add a JAX-RS provider to the server
+	 * 
+	 */
+	public ServerBuilder withProvider(Object provider) {
+		providers.add(provider);
+		return this;
+	}
 
     /**
-     * Create the API server with the provided JAX-RS API Web Resources on the given address.
+     * Create the API server with the JAX-RS API Web Resources and address specified in the builder.
      *
      * The Web Resource will have its lifecycle set to singleton. If this is not possible, e.g. if no
      * instance can be created for the Web Resource, it will fall back to a per-request lifecycle.
@@ -70,12 +107,14 @@ public class APIServer {
      * @throws IllegalAccessException 
      * @throws InstantiationException 
      */
-    public APIServer(String address, Class<?>... webResources) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException{
+    public Server build() throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(webResources);
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
-        for (Class<?> webResource: webResources){
-			resourceProviders.add(new SingletonResourceProvider(webResource.getDeclaredConstructor().newInstance()));
+        resourceProviders.add(new SingletonResourceProvider(new WebResourceRoot()));
+        for (Entry<Class<? extends AbstractWebResource<? extends HALResource>>, Class<? extends ResourceDAO<? extends HALResource>>> webResource: webResources.entrySet()){
+        	Class<? extends AbstractWebResource<? extends HALResource>> webResourceClass = webResource.getKey();
+			Class<? extends ResourceDAO<? extends HALResource>> resourceDaoClass = webResource.getValue();
+			resourceProviders.add(new SingletonResourceProvider(webResourceClass.getDeclaredConstructor(ResourceDAO.class).newInstance(resourceDaoClass.newInstance())));
         }
         sf.setResourceProviders(resourceProviders);
         if (address != null && !address.isEmpty()){
@@ -92,36 +131,12 @@ public class APIServer {
         swagger.setPrettyPrint(true);
         sf.getFeatures().add(swagger);	
         sf.getFeatures().add(new JAXRSBeanValidationFeature());
-        sf.setProviders(Lists.newArrayList(
+        providers.addAll(Arrays.asList(
         		new MultipartProvider(),
         		new JacksonJsonProvider(new HALMapper()),
         		new SearchContextProvider()));
-        cxfServer = sf.create();
+        sf.setProviders(providers);
         LOGGER.info("Server ready...");
+        return sf.create();
     }
-
-    /**
-     * Create a CXF-based API server with the provided JAX-RS Web Resources on http://localhost:9000
-     *
-     * @param webResources is a list of the JAX-RS Web Resources that should served.
-     * @throws SecurityException 
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalArgumentException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
-     */
-    public APIServer(Class<?>... webResources) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
-    	this("http://localhost:9000", webResources);
-    }
-
-    /**
-     * Retrieve the CXF server that was created for this API server.
-     *
-     * @return the CXF-based server created for this API server.
-     */
-    public Server getCXFServer(){
-    	return cxfServer;
-    }
-
 }

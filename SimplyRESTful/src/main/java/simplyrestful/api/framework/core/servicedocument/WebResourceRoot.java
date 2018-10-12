@@ -1,11 +1,11 @@
 package simplyrestful.api.framework.core.servicedocument;
 
-import java.net.URI;
-
 import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +14,9 @@ import simplyrestful.api.framework.core.MediaType;
 @Named
 @Path("")
 public class WebResourceRoot{
+	@Context
+	private UriInfo uriInfo;
+	
 	@Produces({MediaType.APPLICATION_HAL_JSON})
 	@GET
 	@ApiOperation(
@@ -22,7 +25,7 @@ public class WebResourceRoot{
 	)
 	public HALServiceDocument getServiceDocument() {
 		HALServiceDocument serviceDocument = new HALServiceDocument();
-		HALLink descriptionLink = new HALLink.Builder(URI.create("/swagger.json")).build();
+		HALLink descriptionLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().path("swagger.json").build()).build();
 		serviceDocument.setDescribedby(descriptionLink);
 		return serviceDocument;
 	}

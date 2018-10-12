@@ -67,7 +67,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 			boolean compact) {
 		return new HALCollectionBuilderFromPartialList<T>(
 				resourceDao.findAllForPage(page, pageSize),
-				getAbsoluteBaseURI(),
+				uriInfo.getRequestUri(),
 				resourceDao.count())
 						.page(page)
 						.maxPageSize(pageSize)
@@ -85,7 +85,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	public T getHALResource(
 			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
 		URI absoluteResourceIdentifier = getAbsoluteURI(id);
-		T resource = resourceDao.findById(absoluteResourceIdentifier);
+		T resource = resourceDao.findByURI(absoluteResourceIdentifier);
 		if (resource == null){
 			throw new NotFoundException();
 		}
@@ -104,7 +104,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 			@NotNull 
 			final T resource
 			) throws InvalidSelfLinkException, InvalidResourceException {
-		if (resource.getSelf() != null && resourceDao.findById(URI.create(resource.getSelf().getHref())) != null){
+		if (resource.getSelf() != null && resourceDao.findByURI(URI.create(resource.getSelf().getHref())) != null){
 			throw new ClientErrorException("A resource with the same ID already exists. Try to update the resource with a PUT request.", Response.Status.CONFLICT);
 		}
 		T previousResource = resourceDao.persist(resource);

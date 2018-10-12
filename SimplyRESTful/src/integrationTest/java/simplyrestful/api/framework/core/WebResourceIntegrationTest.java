@@ -106,7 +106,7 @@ public class WebResourceIntegrationTest{
 	@Test
 	public void webResource_shouldReturnSingleResource_whenGETReceivedWithID(){
 		TestResource expectedResource = new TestResource();
-		Mockito.when(mockDAO.findById(ArgumentMatchers.any())).thenReturn(expectedResource);
+		Mockito.when(mockDAO.findByURI(ArgumentMatchers.any())).thenReturn(expectedResource);
 		TestResource testResource = client.path(WEB_RESOURCE_PATH).path(TestResource.TEST_RESOURCE_ID).get(TestResource.class);
 		Assertions.assertEquals(expectedResource, testResource);
 	}

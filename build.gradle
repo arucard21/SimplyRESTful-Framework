@@ -94,6 +94,7 @@ project(":SimplyRESTful-cxf-spring-boot"){
 project(":SimplyRESTful-cxf"){
 	project.description = "Easily deploy your SimplyRESTful API using Apache CXF"
 	dependencies {
+		compile project(':SimplyRESTful')
 		compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
 		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
 		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
@@ -111,6 +112,7 @@ project(":SimplyRESTful-example:spring-boot"){
 		compile project(':SimplyRESTful')
 		compile project(':SimplyRESTful-cxf-spring-boot')
 		compile project(':SimplyRESTful-example:datastore')
+		compile ("javax.inject:javax.inject:1")
 	}
 }
 

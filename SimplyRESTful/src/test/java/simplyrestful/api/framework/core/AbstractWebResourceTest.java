@@ -7,6 +7,7 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,21 +64,21 @@ public class AbstractWebResourceTest{
 
 	@Test
 	public void endpoint_shouldRetrieveResource_withGETonResource(){
-		Mockito.when(mockDAO.findById(TestResource.TEST_RESOURCE_URI)).thenReturn(testResource);
+		Mockito.when(mockDAO.findByURI(TestResource.TEST_RESOURCE_URI)).thenReturn(testResource);
 		testEndpoint.getHALResource(TestResource.TEST_RESOURCE_ID);
-		Mockito.verify(mockDAO).findById(TestResource.TEST_RESOURCE_URI);
+		Mockito.verify(mockDAO).findByURI(TestResource.TEST_RESOURCE_URI);
 	}
 
 	@Test
 	public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource(){
-		Mockito.when(mockDAO.findById(TestResource.TEST_RESOURCE_URI)).thenReturn(null);
+		Mockito.when(mockDAO.findByURI(TestResource.TEST_RESOURCE_URI)).thenReturn(null);
 		Assertions.assertThrows(NotFoundException.class, 
 				() -> testEndpoint.getHALResource(TestResource.TEST_RESOURCE_ID));
 	}
 
 	@Test
 	public void endpoint_shouldCreateResource_withPOSTonResource(){
-		Mockito.when(mockDAO.findById(TestResource.TEST_RESOURCE_URI)).thenReturn(null);
+		Mockito.when(mockDAO.findByURI(TestResource.TEST_RESOURCE_URI)).thenReturn(null);
 		Response postResponse = testEndpoint.postHALResource(testResource);
 		Mockito.verify(mockDAO).persist(testResource);
 		Assertions.assertEquals(Status.CREATED.getStatusCode(), postResponse.getStatus());
@@ -86,7 +87,7 @@ public class AbstractWebResourceTest{
 
 	@Test
 	public void endpoint_shouldThrowClientErrorExceptionWhenResourceAlreadyExists_withPOSTonResource(){
-		Mockito.when(mockDAO.findById(TestResource.TEST_RESOURCE_URI)).thenReturn(testResource);
+		Mockito.when(mockDAO.findByURI(TestResource.TEST_RESOURCE_URI)).thenReturn(testResource);
 		Assertions.assertThrows(ClientErrorException.class, 
 				() -> testEndpoint.postHALResource(testResource));
 	}
