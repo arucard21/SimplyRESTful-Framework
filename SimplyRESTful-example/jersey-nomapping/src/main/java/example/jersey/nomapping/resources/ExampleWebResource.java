@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package example.springboot.resources;
+package example.jersey.nomapping.resources;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,14 +25,13 @@ import javax.ws.rs.Path;
 
 import io.swagger.annotations.Api;
 import simplyrestful.api.framework.core.AbstractWebResource;
-import simplyrestful.api.framework.core.ResourceDAO;
 
 @Named
 @Path("/resources")
 @Api(value = "Example Resources")
 public class ExampleWebResource extends AbstractWebResource<ExampleResource> {
 	@Inject
-	public ExampleWebResource(ResourceDAO<ExampleResource> resourceDao) {
+	public ExampleWebResource(ExampleResourceDAO resourceDao) {
 		super(resourceDao);
 	}
 }

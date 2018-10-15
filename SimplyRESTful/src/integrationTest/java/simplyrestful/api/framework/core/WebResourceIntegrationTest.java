@@ -24,10 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.HALMapper;
 import simplyrestful.api.framework.core.hal.HALCollection;
-import simplyrestful.api.framework.core.servicedocument.HALServiceDocument;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
@@ -71,17 +69,11 @@ public class WebResourceIntegrationTest{
 		server.stop();
 		server.destroy();
 	}
-	
-	@Test
-	public void webResource_shouldReturnServiceDocument_whenGETReceivedOnRootURI(){
-		HALServiceDocument serviceDocument = client.get(HALServiceDocument.class);
-		Assertions.assertEquals(new HALLink.Builder(URI.create("/swagger.json")).build(), serviceDocument.getDescribedby());
-	}
 
 	@Test
 	public void webResource_shouldReturnAllResources_whenGETReceivedOnWebResourcePath(){
 		TestResource expectedResource = new TestResource();
-		Mockito.when(mockDAO.findAllForPage(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt())).thenReturn(Arrays.asList(expectedResource, expectedResource));
+		Mockito.when(mockDAO.findAllForPage(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.any(URI.class))).thenReturn(Arrays.asList(expectedResource, expectedResource));
 		Mockito.when(mockDAO.count()).thenReturn(2L);
 		HALCollection<TestResource> collection = (HALCollection<TestResource>) client.path(WEB_RESOURCE_PATH).get(new GenericType<Object>(new TypeReference<HALCollection<TestResource>>() {}.getType()));
 		Assertions.assertEquals(2, collection.getTotal());
@@ -92,7 +84,7 @@ public class WebResourceIntegrationTest{
 	@Test
 	public void webResource_shouldReturnAllResourcesEmbedded_whenGETReceivedOnWebResourcePathAndCompactIsFalse(){
 		TestResource expectedResource = new TestResource();
-		Mockito.when(mockDAO.findAllForPage(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt())).thenReturn(Arrays.asList(expectedResource, expectedResource));
+		Mockito.when(mockDAO.findAllForPage(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.any(URI.class))).thenReturn(Arrays.asList(expectedResource, expectedResource));
 		Mockito.when(mockDAO.count()).thenReturn(2L);
 		HALCollection<TestResource> collection = (HALCollection<TestResource>) client
 				.path(WEB_RESOURCE_PATH)
@@ -106,7 +98,7 @@ public class WebResourceIntegrationTest{
 	@Test
 	public void webResource_shouldReturnSingleResource_whenGETReceivedWithID(){
 		TestResource expectedResource = new TestResource();
-		Mockito.when(mockDAO.findByURI(ArgumentMatchers.any())).thenReturn(expectedResource);
+		Mockito.when(mockDAO.findByURI(ArgumentMatchers.any(), ArgumentMatchers.any(URI.class))).thenReturn(expectedResource);
 		TestResource testResource = client.path(WEB_RESOURCE_PATH).path(TestResource.TEST_RESOURCE_ID).get(TestResource.class);
 		Assertions.assertEquals(expectedResource, testResource);
 	}
@@ -115,13 +107,13 @@ public class WebResourceIntegrationTest{
 	public void webResource_shouldCreateResource_whenPOSTReceivedWithNewResource(){
 		TestResource expectedResource = new TestResource();
 		client.path(WEB_RESOURCE_PATH).post(expectedResource);
-		Mockito.verify(mockDAO).persist(expectedResource);
+		Mockito.verify(mockDAO).persist(ArgumentMatchers.eq(expectedResource), ArgumentMatchers.any(URI.class));
 	}
 	
 	@Test
 	public void webResource_shouldRemoveResource_whenDELETEReceived(){
 		TestResource expectedResource = new TestResource();
 		client.path(WEB_RESOURCE_PATH).path(TestResource.TEST_RESOURCE_ID).delete();
-		Mockito.verify(mockDAO).remove(URI.create(expectedResource.getSelf().getHref()));
+		Mockito.verify(mockDAO).remove(ArgumentMatchers.eq(URI.create(expectedResource.getSelf().getHref())), ArgumentMatchers.any(URI.class));
 	}
 }

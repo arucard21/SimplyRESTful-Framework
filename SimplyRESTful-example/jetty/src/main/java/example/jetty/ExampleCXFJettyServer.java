@@ -15,7 +15,7 @@ import simplyrestful.jetty.deploy.ServerBuilder;
  * @author RiaasM
  *
  */
-public class ExampleAPIServer {
+public class ExampleCXFJettyServer {
 	public static void main(String[] args) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
 		Server apiServer = new ServerBuilder()
 				.withAddress("http://localhost:9000")

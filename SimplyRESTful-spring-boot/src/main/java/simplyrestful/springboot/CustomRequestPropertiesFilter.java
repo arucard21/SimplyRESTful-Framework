@@ -1,4 +1,4 @@
-package example.springboot.resources;
+package simplyrestful.springboot;
 
 import java.io.IOException;
 
@@ -9,6 +9,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
+import simplyrestful.api.framework.core.ResourceDAO;
+
 @Named
 @Provider
 public class CustomRequestPropertiesFilter implements ContainerRequestFilter{
@@ -17,7 +19,6 @@ public class CustomRequestPropertiesFilter implements ContainerRequestFilter{
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
-		ExampleResourceDAO.ABSOLUTE_BASE_URI.set(uriInfo.getBaseUriBuilder().replaceQuery(null).build());
+		ResourceDAO.ABSOLUTE_BASE_URI.set(uriInfo.getAbsolutePath());
 	}
-
 }

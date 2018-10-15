@@ -1,13 +1,18 @@
-package example.springboot.resources;
+package example.jersey.nomapping.resources;
 
 import java.net.URI;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+
 import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
-import simplyrestful.api.framework.core.hal.HALResource;
+import simplyrestful.springdata.repository.nomapping.NoMappingHALResource;
 
-public class ExampleResource extends HALResource{
-
+@Entity
+public class ExampleResource extends NoMappingHALResource{
 	private String description;
+	@OneToOne(cascade=CascadeType.ALL)
 	@EmbeddedResource
 	private ExampleEmbeddedResource embeddedResource;
 

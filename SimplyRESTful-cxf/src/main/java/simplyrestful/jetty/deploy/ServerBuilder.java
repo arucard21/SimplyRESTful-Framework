@@ -68,6 +68,8 @@ public class ServerBuilder {
 	/**
 	 * Configure the address used by the server
 	 * 
+	 * @param address is the address which should be used by the server
+	 * @return the builder object
 	 */
 	public ServerBuilder withAddress(String address) {
 		this.address = address;
@@ -75,8 +77,11 @@ public class ServerBuilder {
 	}
 	
 	/**
-	 * Add a JAX-RS web resource to the server
+	 * Add a SimplyRESTful JAX-RS web resource to the server
 	 * 
+	 * @param webResource is the SimplyRESTful JAX-RS web resource to add to the server
+	 * @param resourceDao is the DAO class for the provided web resource
+	 * @return the builder object
 	 */
 	public ServerBuilder withWebResource(Class<? extends AbstractWebResource<? extends HALResource>> webResource, Class<? extends ResourceDAO<? extends HALResource>> resourceDao) {
 		webResources.put(webResource, resourceDao);
@@ -86,6 +91,8 @@ public class ServerBuilder {
 	/**
 	 * Add a JAX-RS provider to the server
 	 * 
+	 * @param provider is the JAX-RS provider that should be added to the server
+	 * @return the builder object
 	 */
 	public ServerBuilder withProvider(Object provider) {
 		providers.add(provider);
@@ -98,14 +105,13 @@ public class ServerBuilder {
      * The Web Resource will have its lifecycle set to singleton. If this is not possible, e.g. if no
      * instance can be created for the Web Resource, it will fall back to a per-request lifecycle.
      *
-     * @param address is the URI where the Web Resource should be served. If empty, the Web Resource will be served on a random port on localhost
-     * @param webResources is a list of the JAX-RS Web Resources that should served.
-     * @throws SecurityException 
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalArgumentException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
+     * @throws SecurityException when the constructor of the web resource class can not be used
+     * @throws NoSuchMethodException when the constructor of the web resource class does not exist
+     * @throws InvocationTargetException when the new instance of the web resource class can not be created 
+     * @throws IllegalArgumentException when the new instance of the web resource class can not be created
+     * @throws IllegalAccessException when the new instance of the web resource class can not be created
+     * @throws InstantiationException when the new instance of the web resource class can not be created
+     * @return the CXF server, as configured in the builder
      */
     public Server build() throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();

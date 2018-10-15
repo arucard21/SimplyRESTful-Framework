@@ -10,8 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-public class ExampleAPIApplication{
+public class ExampleCXFApplication{
 	public static void main(String[] args) {
-		SpringApplication.run(ExampleAPIApplication.class, args);
+		SpringApplication.run(ExampleCXFApplication.class, args);
 	}
 }

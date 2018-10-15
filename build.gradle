@@ -8,14 +8,17 @@ repositories {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-group = 'com.github.arucard21.simplyrestful'
-version = '0.7'
-
 ext {
 	jaxrs = "2.1.1"
 	cxf = "3.2.6"
 	junit = "5.3.1"
 	mockito = "2.22.0"
+	spring = "2.0.5.RELEASE"
+}
+
+allprojects{
+	group = 'com.github.arucard21.simplyrestful'
+	version = '0.7'
 }
 
 subprojects{
@@ -84,7 +87,8 @@ project(":SimplyRESTful"){
 project(":SimplyRESTful-spring-boot"){
 	project.description = "Easily deploy your SimplyRESTful API with Spring Boot and a JAX-RS framework of your choice"
 	dependencies {
-		compileOnly ("org.springframework.boot:spring-boot:2.0.5.RELEASE")
+		compile project(":SimplyRESTful")
+		compileOnly ("org.springframework.boot:spring-boot:${spring}")
 		compile ("org.webjars:swagger-ui:2.2.6")
 		compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
 	}
@@ -98,6 +102,26 @@ project(":SimplyRESTful-cxf-spring-boot"){
 		compile ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:${cxf}")
 		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
 		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
+	}
+}
+
+project(":SimplyRESTful-jersey-spring-boot"){
+	project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
+	dependencies {
+		compile project(':SimplyRESTful')
+		compile project(':SimplyRESTful-spring-boot')
+		compile ("org.springframework.boot:spring-boot-starter-jersey:${spring}"){
+			exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
+		}
+		compile ("io.swagger:swagger-jersey2-jaxrs:1.5.21")
+	}
+}
+
+project(":SimplyRESTful-spring-data"){
+	project.description = "Easily persist your SimplyRESTful API using Spring Data"
+	dependencies {
+		compile project(':SimplyRESTful')
+		compile ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
 	}
 }
 
@@ -135,24 +159,18 @@ project(":SimplyRESTful-example:jetty"){
 	}
 }
 
-project(":SimplyRESTful-example:jersey-spring-boot"){
-	project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
+project(":SimplyRESTful-example:jersey-nomapping"){
+	project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
 	dependencies {
-		compile project(':SimplyRESTful')
+		compile project(':SimplyRESTful-jersey-spring-boot')
+		compile project(':SimplyRESTful-spring-data')
 		compile project(':SimplyRESTful-example:datastore')
-		compile ("org.springframework.boot:spring-boot-starter-jersey:2.0.5.RELEASE"){
-			exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
-		}
-		compile "io.swagger:swagger-jersey2-jaxrs:1.5.21"
+		compile ("com.h2database:h2:1.4.197")
 	}
 }
 
 // Provide tasks to publish projects to Maven Central
 configure(subprojects - project(":SimplyRESTful-example").allprojects){
-	javadoc {
-		options.addBooleanOption('html5', true)
-	}
-
 	task javadocJar(type: Jar) {
 		classifier = 'javadoc'
 		from javadoc

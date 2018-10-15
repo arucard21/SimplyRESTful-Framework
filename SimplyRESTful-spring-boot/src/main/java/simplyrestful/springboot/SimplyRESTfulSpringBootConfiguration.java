@@ -29,7 +29,7 @@ import io.openapitools.jackson.dataformat.hal.HALMapper;
 
 
 @Configuration
-@ComponentScan(basePackages="simplyrestful.api.framework.core")
+@ComponentScan(basePackages="simplyrestful")
 public class SimplyRESTfulSpringBootConfiguration {
 	@Bean
 	public HALMapper halMapper(){

@@ -64,8 +64,8 @@ public abstract class AbstractWebResource<T extends HALResource> {
 			@DefaultValue(HALCollectionBuilder.DEFAULT_COMPACT_VALUE_STRING)
 			boolean compact) {
 		return new HALCollectionBuilderFromPartialList<T>(
-				resourceDao.findAllForPage(page, pageSize),
-				uriInfo.getRequestUri(),
+				resourceDao.findAllForPage(page, pageSize, getAbsoluteWebResourceURI()),
+				getRequestURI(),
 				resourceDao.count())
 						.page(page)
 						.maxPageSize(pageSize)
@@ -82,8 +82,8 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	)
 	public T getHALResource(
 			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
-		URI absoluteResourceIdentifier = getAbsoluteURI(id);
-		T resource = resourceDao.findByURI(absoluteResourceIdentifier);
+		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
+		T resource = resourceDao.findByURI(absoluteResourceIdentifier, getAbsoluteWebResourceURI());
 		if (resource == null){
 			throw new NotFoundException();
 		}
@@ -102,20 +102,21 @@ public abstract class AbstractWebResource<T extends HALResource> {
 			@NotNull 
 			final T resource
 			) throws InvalidSelfLinkException, InvalidResourceException {
-		if (resource.getSelf() != null && resourceDao.findByURI(URI.create(resource.getSelf().getHref())) != null){
-			throw new ClientErrorException("A resource with the same ID already exists. Try to update the resource with a PUT request.", Response.Status.CONFLICT);
-		}
-		T previousResource = resourceDao.persist(resource);
-		if(previousResource == null) {
+		if (resource.getSelf() == null) {
+			T updatedResource = resourceDao.persist(resource, getAbsoluteWebResourceURI());
 			return Response
-					.created(URI.create(resource.getSelf().getHref()))
+					.created(URI.create(updatedResource.getSelf().getHref()))
 					.build();
 		}
-		T currentResource = resourceDao.persist(previousResource);
-		if (resource.equals(currentResource)) {
-			throw new ClientErrorException("A resource with the same ID already exists, the persisted resource was rolled back. Try to update the resource with a PUT request.", Response.Status.CONFLICT);
+		URI resourceSelfURI = URI.create(resource.getSelf().getHref());
+		T previousResource = resourceDao.findByURI(resourceSelfURI, getAbsoluteWebResourceURI());
+		if (previousResource != null){
+			throw new ClientErrorException("A resource with the same ID already exists. Try to update the resource with a PUT request.", Response.Status.CONFLICT);
 		}
-		throw new ClientErrorException("A resource with the same ID already exists, a rollback was attempted but failed. This resource may now be in an invalid state. Try to update the resource with a PUT request.", Response.Status.CONFLICT);
+		T updatedResource = resourceDao.persist(resource, getAbsoluteWebResourceURI());
+		return Response
+				.created(URI.create(updatedResource.getSelf().getHref()))
+				.build();
 	}
 
 	@Consumes({MediaType.APPLICATION_HAL_JSON})
@@ -133,10 +134,10 @@ public abstract class AbstractWebResource<T extends HALResource> {
 			throw new BadRequestException("The provided resource contains an self-link that does not match the ID used in the request");
 		}
 		if(resource.getSelf() == null){
-			URI absoluteResourceIdentifier = getAbsoluteURI(id);
+			URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
 			resource.setSelf(createLink(absoluteResourceIdentifier, resource.getProfile()));
 		}
-		return resourceDao.persist(resource);
+		return resourceDao.persist(resource, getAbsoluteWebResourceURI());
 	}
 
 	@Path("/{id}")
@@ -146,8 +147,8 @@ public abstract class AbstractWebResource<T extends HALResource> {
 		notes = "Delete operation with implicit header"
 	)
 	public Response deleteHALResource(@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") @NotNull String id) {
-		URI absoluteResourceIdentifier = getAbsoluteURI(id);
-		if(resourceDao.remove(absoluteResourceIdentifier) == null){
+		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
+		if(resourceDao.remove(absoluteResourceIdentifier, getAbsoluteWebResourceURI()) == null){
 			throw new NotFoundException();
 		}
 		return Response.noContent().build();
@@ -163,7 +164,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	 * @param id is the ID of the resource, which can be null if the base URI is requested.
 	 * @return the absolute URI for the resource on the requested endpoint.
 	 */
-	protected URI getAbsoluteURI(Class<?> webResource, String id) {
+	protected URI getAbsoluteWebResourceURI(Class<?> webResource, String id) {
 		if (id == null) {
 			return uriInfo.getBaseUriBuilder().path(webResource).build();
 		}
@@ -178,8 +179,8 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	 * @param id is the ID of the resource provided on the endpoint.
 	 * @return the absolute URI for the resource on the endpoint.
 	 */
-	protected URI getAbsoluteURI(String id) {
-		return getAbsoluteURI(this.getClass(), id);
+	protected URI getAbsoluteWebResourceURI(String id) {
+		return getAbsoluteWebResourceURI(this.getClass(), id);
 	}
 	
 	/**
@@ -189,8 +190,12 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	 * 
 	 * @return the absolute base URI for this resource
 	 */
-	protected URI getAbsoluteBaseURI() {
-		return getAbsoluteURI(null);
+	protected URI getAbsoluteWebResourceURI() {
+		return getAbsoluteWebResourceURI(null);
+	}
+
+	protected URI getRequestURI() {
+		return uriInfo.getRequestUri();
 	}
 
 	/**

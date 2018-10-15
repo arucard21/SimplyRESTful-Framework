@@ -23,6 +23,8 @@ import simplyrestful.api.framework.core.hal.HALResource;
  */
 @Named
 public interface ResourceDAO<T extends HALResource> {
+	public static final ThreadLocal<URI> ABSOLUTE_BASE_URI = new ThreadLocal<>();
+
 	/**
 	 * @return the total amount of resources that are available
 	 */
@@ -36,10 +38,10 @@ public interface ResourceDAO<T extends HALResource> {
 	 *
 	 * @param pageNumber is the requested page number
 	 * @param pageSize is the requested size of each page
-	 * @param absoluteBaseURI is the absolute base URI, as received by the API for a specific request
+	 * @param absoluteWebResourceURI is the absolute URI to the web resource (without UUID)
 	 * @return the requested HAL collection containing the resources for the requested page
 	 */
-	public List<T> findAllForPage(int pageNumber, int pageSize);
+	public List<T> findAllForPage(int pageNumber, int pageSize, URI absoluteWebResourceURI);
 
 	/**
 	 * Retrieve the resource from the data store where it is stored.
@@ -49,9 +51,10 @@ public interface ResourceDAO<T extends HALResource> {
 	 * store must be uniquely identifiable by the information provided in the URI. 
 	 *
 	 * @param resourceURI is the identifier (from API perspective) for the resource
+	 * @param absoluteWebResourceURI is the absolute URI to the web resource (without UUID)
 	 * @return the resource that was requested or null if it doesn't exist
 	 */
-	public T findByURI(URI resourceURI);
+	public T findByURI(URI resourceURI, URI absoluteWebResourceURI);
 
 	/**
 	 * Update the resource in the data store where it is stored.
@@ -59,17 +62,19 @@ public interface ResourceDAO<T extends HALResource> {
 	 * The resource should contain a self-link in order to identify which resource needs to be updated.
 	 *
 	 * @param resource is the updated resource (which contains a self-link with which to identify the resource)
-	 * @return the previous value of the updated resource, or null if no existing resource was found and the resource was created
+	 * @param absoluteWebResourceURI is the absolute URI to the web resource (without UUID)
+	 * @return the updated resource as persisted
 	 * @throws InvalidResourceException when the resource is not valid (most likely because it does not contain a self-link).
 	 * @throws InvalidSelfLinkException when the resource contains a self-link which is not valid.
 	 */
-	public T persist(T resource) throws InvalidResourceException, InvalidSelfLinkException;
+	public T persist(T resource, URI absoluteWebResourceURI) throws InvalidResourceException, InvalidSelfLinkException;
 
 	/**
 	 * Remove a resource from the data store.
 	 *
 	 * @param resourceURI is the identifier of the resource that should be removed
+	 * @param absoluteWebResourceURI is the absolute URI to the web resource (without UUID)
 	 * @return the removed resource, or null if it did not exist
 	 */
-	public T remove(URI resourceURI);
+	public T remove(URI resourceURI, URI absoluteWebResourceURI);
 }

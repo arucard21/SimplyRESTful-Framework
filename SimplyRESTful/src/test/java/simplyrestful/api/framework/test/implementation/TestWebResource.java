@@ -9,10 +9,10 @@ import simplyrestful.api.framework.core.ResourceDAO;
 
 @Path("testresources")
 public class TestWebResource extends AbstractWebResource<TestResource>{
-	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/");
+	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/testresources");
 
 	@Override
-	protected URI getAbsoluteURI(Class<?> resourceEndpoint, String id) {
+	protected URI getAbsoluteWebResourceURI(Class<?> resourceEndpoint, String id) {
 		if (id == null) {
 			return TEST_REQUEST_BASE_URI;
 		}
@@ -20,6 +20,11 @@ public class TestWebResource extends AbstractWebResource<TestResource>{
 			return TestResource.TEST_RESOURCE_URI;
 		}
 		return null;
+	}
+	
+	@Override
+	protected URI getRequestURI() {
+		return TEST_REQUEST_BASE_URI;
 	}
 
 	public TestWebResource(ResourceDAO<TestResource> resourceDao) {

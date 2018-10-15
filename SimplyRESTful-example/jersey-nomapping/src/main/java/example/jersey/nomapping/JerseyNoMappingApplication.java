@@ -1,4 +1,4 @@
-package example.springboot;
+package example.jersey.nomapping;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,8 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-public class ExampleAPIApplication {
+public class JerseyNoMappingApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(ExampleAPIApplication.class, args);
+		SpringApplication.run(JerseyNoMappingApplication.class, args);
 	}
 }

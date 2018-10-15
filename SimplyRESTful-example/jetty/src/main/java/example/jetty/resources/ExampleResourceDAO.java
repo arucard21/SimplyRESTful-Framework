@@ -50,7 +50,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> findAllForPage(int pageNumber, int pageSize) {
+	public List<ExampleResource> findAllForPage(int pageNumber, int pageSize, URI absoluteWebResourceURI) {
 		int startElement = ((pageNumber-1)*pageSize);
 		int endElement = ((pageNumber)*pageSize);
 		List<StoredObject> data = dataStore.getData();
@@ -78,7 +78,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 	}
 
 	@Override
-	public ExampleResource findByURI(URI resourceURI) {
+	public ExampleResource findByURI(URI resourceURI, URI absoluteWebResourceURI) {
 		UUID dataID = resourceMapping.get(resourceURI.getPath());
 		if (dataID == null){
 			return null;
@@ -88,7 +88,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 	}
 
 	@Override
-	public ExampleResource persist(ExampleResource resource) throws InvalidResourceException, InvalidSelfLinkException {
+	public ExampleResource persist(ExampleResource resource, URI absoluteWebResourceURI) throws InvalidResourceException, InvalidSelfLinkException {
 		HALLink selfLink = resource.getSelf();
 		if (selfLink == null){
 			throw new InvalidSelfLinkException("The resource does not contain a self-link");
@@ -111,7 +111,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 	}
 
 	@Override
-	public ExampleResource remove(URI resourceURI) {
+	public ExampleResource remove(URI resourceURI, URI absoluteWebResourceURI) {
 		UUID dataID = resourceMapping.get(resourceURI.getPath());
 		if (dataID == null){
 			return null;
