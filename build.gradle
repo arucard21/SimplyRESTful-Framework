@@ -18,7 +18,7 @@ allprojects{
 	targetCompatibility = JavaVersion.VERSION_1_8
 
 	group = 'com.github.arucard21.simplyrestful'
-	version = '0.8'
+	version = '0.7.1'
 }
 
 subprojects{
