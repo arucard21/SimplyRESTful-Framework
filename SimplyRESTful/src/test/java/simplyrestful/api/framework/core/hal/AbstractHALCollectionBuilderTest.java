@@ -11,7 +11,7 @@ import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.MediaType;
 
 public abstract class AbstractHALCollectionBuilderTest {
-	protected static final String HALCOLLECTION_PROFILE = "https://arucard21.github.io/SimplyRESTful/HALCollection/v1";
+	protected static final String HALCOLLECTION_PROFILE = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1";
 	protected static final int TEST_RESOURCES_SIZE = 1000;
 	protected static final URI requestURI = URI.create("local://resources/testresources/");
 	protected List<TestResource> testResourcesList;
