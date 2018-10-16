@@ -9,14 +9,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.hal.HALResource;
 
 @Entity
 public abstract class NoMappingHALResource extends HALResource {
+	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	long id;
+	@JsonIgnore
 	@Column(unique=true)
 	UUID uuid;
 
