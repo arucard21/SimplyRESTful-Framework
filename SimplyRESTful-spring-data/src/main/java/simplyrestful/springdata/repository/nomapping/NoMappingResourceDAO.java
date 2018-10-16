@@ -10,6 +10,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.springframework.data.domain.PageRequest;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.core.ResourceDAO;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
@@ -70,6 +71,9 @@ public abstract class NoMappingResourceDAO<T extends NoMappingHALResource> imple
 	}
 
 	private void addSelfLink(T persistedResource, URI absoluteWebResourceURI) {
-		persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(absoluteWebResourceURI).path(persistedResource.getUUID().toString()).build()).build());
+		persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(absoluteWebResourceURI).path(persistedResource.getUUID().toString()).build())
+				.type(MediaType.APPLICATION_HAL_JSON)
+				.profile(persistedResource.getProfile())
+				.build());
 	}
 }
