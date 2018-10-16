@@ -1,13 +1,3 @@
-apply plugin: "java"
-apply plugin: "eclipse"
-
-repositories {
-	mavenCentral()
-}
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 ext {
 	jaxrs = "2.1.1"
 	cxf = "3.2.6"
@@ -17,19 +7,23 @@ ext {
 }
 
 allprojects{
+	apply plugin: "java"
+	apply plugin: "eclipse"
+
+	repositories {
+		mavenCentral()
+	}
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+
 	group = 'com.github.arucard21.simplyrestful'
 	version = '0.7'
 }
 
 subprojects{
-	apply plugin: "java"
-	apply plugin: "eclipse"
 	apply plugin: 'maven'
 	apply plugin: 'signing'
-	
-	repositories {
-		mavenCentral()
-	}
 
 	test {
 		useJUnitPlatform()
