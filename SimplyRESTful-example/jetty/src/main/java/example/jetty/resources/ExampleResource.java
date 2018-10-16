@@ -28,7 +28,7 @@ public class ExampleResource extends HALResource{
 
 	@Override
 	public URI getProfile() {
-		return URI.create("https://arucard21.github.io/SimplyRESTful/ExampleResource/v1");
+		return URI.create("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1");
 	}
 
 }

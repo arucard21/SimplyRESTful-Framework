@@ -7,7 +7,7 @@
 	<h1>HALCollection Specification</h1>
 	<ul>
 		<li>Media Type: <a href="https://tools.ietf.org/html/draft-kelly-json-hal"><code>application/hal+json</code></a></li>
-		<li>Profile: <code>https://arucard21.github.io/SimplyRESTful/HALCollection/v1</code></li>
+		<li>Profile: <code>https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1</code></li>
 		<li>Version: <code>1</code></li>
 	</ul>
 	<h2>Attributes</h2>
@@ -24,10 +24,10 @@
 	</ul>
 	<h2>Links</h2>
 	<ul>
+		<li><a href="https://tools.ietf.org/html/rfc4287#section-4.2.7.2"><code>self</code></a>: is a link to the collection itself.</li>
 		<li><a href="https://tools.ietf.org/html/rfc6573#section-2.1"><code>item</code></a>: is a list of links to the resources 
 		that are part of this page of the collection. This is only visible when the <code>compact</code> query string 
 		parameter is omitted or set to true.</li>
-		<li><a href="https://tools.ietf.org/html/rfc4287#section-4.2.7.2"><code>self</code></a>: is a link to the collection itself.</li>
 		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>first</code></a>: is a link to the first page of the collection.</li>
 		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>last</code></a>: is a link to the last page of the collection.</li>
 		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>prev</code></a>: is a link to the next page of the collection.</li>
