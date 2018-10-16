@@ -6,15 +6,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
-import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
 import simplyrestful.springdata.repository.nomapping.NoMappingHALResource;
 
 @Entity
 public class ExampleResource extends NoMappingHALResource{
 	private String description;
 	@OneToOne(cascade=CascadeType.ALL)
-	@EmbeddedResource
-	private ExampleEmbeddedResource embeddedResource;
+	private ExampleComplexAttribute complexAttribute;
 
 	public String getDescription() {
 		return description;
@@ -24,12 +22,12 @@ public class ExampleResource extends NoMappingHALResource{
 		this.description = description;
 	}
 
-	public ExampleEmbeddedResource getEmbeddedResource(){
-		return embeddedResource;
+	public ExampleComplexAttribute getComplexAttribute(){
+		return complexAttribute;
 	}
 
-	public void setEmbeddedResource(ExampleEmbeddedResource embedded) {
-		this.embeddedResource = embedded;
+	public void setComplexAttribute(ExampleComplexAttribute complexAttribute) {
+		this.complexAttribute = complexAttribute;
 	}
 
 	@Override
