@@ -1,6 +1,6 @@
 include "SimplyRESTful"
+include "SimplyRESTful-resources"
 include "SimplyRESTful-cxf-spring-boot"
-include "SimplyRESTful-spring-boot"
 include "SimplyRESTful-cxf"
 include "SimplyRESTful-jersey-spring-boot"
 include "SimplyRESTful-example:datastore"

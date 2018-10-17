@@ -10,6 +10,8 @@ import simplyrestful.springdata.repository.nomapping.NoMappingHALResource;
 
 @Entity
 public class ExampleResource extends NoMappingHALResource{
+	public static final String EXAMPLE_PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1";
+
 	private String description;
 	@OneToOne(cascade=CascadeType.ALL)
 	private ExampleComplexAttribute complexAttribute;
@@ -32,7 +34,7 @@ public class ExampleResource extends NoMappingHALResource{
 
 	@Override
 	public URI getProfile() {
-		return URI.create("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1");
+		return URI.create(EXAMPLE_PROFILE_STRING);
 	}
 
 }

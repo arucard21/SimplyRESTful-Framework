@@ -9,6 +9,8 @@ import javax.ws.rs.core.UriBuilder;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.AbstractWebResource;
 import simplyrestful.api.framework.core.MediaType;
+import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALResource;
 
 public abstract class HALCollectionBuilder<T extends HALResource> {
 	public static final String DEFAULT_PAGE_NUMBER_STRING = "1";

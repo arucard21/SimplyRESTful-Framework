@@ -1,4 +1,4 @@
-package simplyrestful.springboot;
+package simplyrestful.api.framework.core.hal;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;

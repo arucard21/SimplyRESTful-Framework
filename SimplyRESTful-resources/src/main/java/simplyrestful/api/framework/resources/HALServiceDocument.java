@@ -1,19 +1,19 @@
-package simplyrestful.api.framework.core.servicedocument;
+package simplyrestful.api.framework.resources;
 
 import java.net.URI;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.annotation.Link;
-import simplyrestful.api.framework.core.MediaType;
-import simplyrestful.api.framework.core.hal.HALResource;
 
 public class HALServiceDocument extends HALResource {
+	public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ServiceDocument/v1";
+	
 	@Link
 	private HALLink describedby;
 
 	@Override
 	public URI getProfile() {
-		return URI.create(MediaType.Profile.SERVICE_DOCUMENT);
+		return URI.create(PROFILE_STRING);
 	}
 
 	public HALLink getDescribedby() {

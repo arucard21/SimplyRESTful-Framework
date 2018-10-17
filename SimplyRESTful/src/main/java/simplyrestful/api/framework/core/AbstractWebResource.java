@@ -25,11 +25,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
-import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.hal.HALCollectionBuilder;
 import simplyrestful.api.framework.core.hal.HALCollectionBuilderFromPartialList;
-import simplyrestful.api.framework.core.hal.HALResource;
+import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALResource;
 
+@Produces({MediaType.APPLICATION_HAL_JSON})
+@Consumes({MediaType.APPLICATION_HAL_JSON})
 public abstract class AbstractWebResource<T extends HALResource> {
 	private ResourceDAO<T> resourceDao;
 
@@ -44,8 +46,8 @@ public abstract class AbstractWebResource<T extends HALResource> {
 		this.resourceDao = resourceDao;
 	}
 
-	@Produces({MediaType.APPLICATION_HAL_JSON})
-	@GET 
+	@GET
+	@Produces(MediaType.APPLICATION_HAL_JSON + "; profile=\"" + HALCollection.PROFILE_STRING + "\"")
 	@ApiOperation(
 		value = "Get a list of resources",
 		notes = "Get a list of resources"
@@ -73,25 +75,6 @@ public abstract class AbstractWebResource<T extends HALResource> {
 						.build();
 	}
 
-	@Produces({MediaType.APPLICATION_HAL_JSON})
-	@Path("/{id}")
-	@GET
-	@ApiOperation(
-		value = "Get operation with type and headers",
-		notes = "Get operation with type and headers"
-	)
-	public T getHALResource(
-			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
-		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
-		T resource = resourceDao.findByURI(absoluteResourceIdentifier, getAbsoluteWebResourceURI());
-		if (resource == null){
-			throw new NotFoundException();
-		}
-		return resource;
-
-	}
-
-	@Consumes({MediaType.APPLICATION_HAL_JSON})
 	@POST
 	@ApiOperation(
 		value = "Create a new resource",
@@ -119,8 +102,22 @@ public abstract class AbstractWebResource<T extends HALResource> {
 				.build();
 	}
 
-	@Consumes({MediaType.APPLICATION_HAL_JSON})
-	@Produces({MediaType.APPLICATION_HAL_JSON})
+	@Path("/{id}")
+	@GET
+	@ApiOperation(
+		value = "Get operation with type and headers",
+		notes = "Get operation with type and headers"
+	)
+	public T getHALResource(
+			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
+		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
+		T resource = resourceDao.findByURI(absoluteResourceIdentifier, getAbsoluteWebResourceURI());
+		if (resource == null){
+			throw new NotFoundException();
+		}
+		return resource;
+	}
+
 	@Path("/{id}")
 	@PUT
 	@ApiOperation(

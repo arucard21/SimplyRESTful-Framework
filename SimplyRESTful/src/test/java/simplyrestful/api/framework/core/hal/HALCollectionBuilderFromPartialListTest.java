@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import simplyrestful.api.framework.core.MediaType;
+import simplyrestful.api.framework.resources.HALCollection;
 
 public class HALCollectionBuilderFromPartialListTest extends AbstractHALCollectionBuilderTest{
 	@Test

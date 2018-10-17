@@ -3,9 +3,11 @@ package example.jetty.resources;
 import java.net.URI;
 
 import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
-import simplyrestful.api.framework.core.hal.HALResource;
+import simplyrestful.api.framework.resources.HALResource;
 
 public class ExampleResource extends HALResource{
+	public static final String EXAMPLE_PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1";
+
 	private String description;
 	@EmbeddedResource
 	private ExampleEmbeddedResource embeddedResource;
@@ -28,7 +30,7 @@ public class ExampleResource extends HALResource{
 
 	@Override
 	public URI getProfile() {
-		return URI.create("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1");
+		return URI.create(EXAMPLE_PROFILE_STRING);
 	}
 
 }

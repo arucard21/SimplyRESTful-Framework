@@ -23,8 +23,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.HALMapper;
-import simplyrestful.api.framework.core.servicedocument.HALServiceDocument;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
+import simplyrestful.api.framework.resources.HALServiceDocument;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 

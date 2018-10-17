@@ -41,13 +41,11 @@ import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
-import io.openapitools.jackson.dataformat.hal.HALMapper;
 import simplyrestful.api.framework.core.AbstractWebResource;
 import simplyrestful.api.framework.core.ResourceDAO;
-import simplyrestful.api.framework.core.hal.HALResource;
+import simplyrestful.api.framework.core.hal.HALJacksonJsonProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
+import simplyrestful.api.framework.resources.HALResource;
 
 
 /**
@@ -139,7 +137,7 @@ public class ServerBuilder {
         sf.getFeatures().add(new JAXRSBeanValidationFeature());
         providers.addAll(Arrays.asList(
         		new MultipartProvider(),
-        		new JacksonJsonProvider(new HALMapper()),
+        		new HALJacksonJsonProvider(),
         		new SearchContextProvider()));
         sf.setProviders(providers);
         LOGGER.info("Server ready...");

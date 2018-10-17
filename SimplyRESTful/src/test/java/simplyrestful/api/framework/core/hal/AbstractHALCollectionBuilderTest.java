@@ -9,6 +9,8 @@ import javax.ws.rs.core.UriBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.MediaType;
+import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALResource;
 
 public abstract class AbstractHALCollectionBuilderTest {
 	protected static final String HALCOLLECTION_PROFILE = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1";

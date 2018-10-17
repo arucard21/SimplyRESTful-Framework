@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -25,8 +26,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALMapper;
-import simplyrestful.api.framework.core.hal.HALCollection;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
+import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
@@ -104,10 +105,13 @@ public class WebResourceIntegrationTest{
 	}
 	
 	@Test
-	public void webResource_shouldCreateResource_whenPOSTReceivedWithNewResource(){
+	public void webResource_shouldCreateResourceAndReturnLocationURI_whenPOSTReceivedWithNewResource(){
 		TestResource expectedResource = new TestResource();
-		client.path(WEB_RESOURCE_PATH).post(expectedResource);
+		Mockito.when(mockDAO.persist(ArgumentMatchers.any(TestResource.class), ArgumentMatchers.any(URI.class))).thenReturn(expectedResource);
+		Response response = client.path(WEB_RESOURCE_PATH).post(expectedResource);
+
 		Mockito.verify(mockDAO).persist(ArgumentMatchers.eq(expectedResource), ArgumentMatchers.any(URI.class));
+		Assertions.assertEquals(TestResource.TEST_RESOURCE_URI, response.getLocation());
 	}
 	
 	@Test

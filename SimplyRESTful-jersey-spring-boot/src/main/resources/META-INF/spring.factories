@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=simplyrestful.jersey.springboot.configuration.JerseySpringBootConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=simplyrestful.springboot.configuration.jersey.JerseySpringBootConfiguration

@@ -7,7 +7,7 @@ import javax.inject.Named;
 
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
-import simplyrestful.api.framework.core.hal.HALResource;
+import simplyrestful.api.framework.resources.HALResource;
 
 /**
  * This interface allows access to stored data in terms of the API's Web Resources which are identified by a URI.
@@ -23,8 +23,6 @@ import simplyrestful.api.framework.core.hal.HALResource;
  */
 @Named
 public interface ResourceDAO<T extends HALResource> {
-	public static final ThreadLocal<URI> ABSOLUTE_BASE_URI = new ThreadLocal<>();
-
 	/**
 	 * @return the total amount of resources that are available
 	 */

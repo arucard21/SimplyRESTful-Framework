@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.hal;
+package simplyrestful.api.framework.resources;
 
 import java.net.URI;
 import java.util.Objects;

@@ -21,14 +21,19 @@ package example.jersey.nomapping.resources;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
 import io.swagger.annotations.Api;
 import simplyrestful.api.framework.core.AbstractWebResource;
+import simplyrestful.api.framework.core.MediaType;
 
 @Named
 @Path("/resources")
 @Api(value = "Example Resources")
+@Produces(MediaType.APPLICATION_HAL_JSON + "; profile=\""+ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
+@Consumes(MediaType.APPLICATION_HAL_JSON + "; profile=\""+ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 public class ExampleWebResource extends AbstractWebResource<ExampleResource> {
 	@Inject
 	public ExampleWebResource(ExampleResourceDAO resourceDao) {

@@ -3,6 +3,9 @@ package simplyrestful.api.framework.core.hal;
 import java.net.URI;
 import java.util.List;
 
+import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALResource;
+
 /**
  * Build a HALCollection object containing a single page of resources from the full list of those resources.
  * You can provide the full list of resources that are available and this method will retrieve the correct resources

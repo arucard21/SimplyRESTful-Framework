@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import simplyrestful.api.framework.resources.HALResource;
 
 public class HALResourceTest{
 	private static final String TEST_RESOURCE_PROFILE_URI = "local://docs/resources/testresource";

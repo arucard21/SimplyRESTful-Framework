@@ -1,4 +1,4 @@
-package simplyrestful.jersey.springboot.configuration;
+package simplyrestful.springboot.configuration.jersey;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.boot.autoconfigure.jersey.ResourceConfigCustomizer;

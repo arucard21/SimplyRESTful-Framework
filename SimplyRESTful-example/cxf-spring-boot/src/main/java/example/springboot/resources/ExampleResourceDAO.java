@@ -65,7 +65,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 		}
 		List<ExampleResource> resources = data.subList(startElement, endElement)
 				.stream()
-				.map((entity) -> convertToResource(entity))
+				.map((entity) -> convertToResource(entity, absoluteWebResourceURI))
 				.collect(Collectors.toList());
 		SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
 		if (searchContext == null) {
@@ -85,7 +85,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 			return null;
 		}
 		StoredObject resourceFromDataStore = dataStore.getObject(dataID);
-		return resourceFromDataStore == null ? null : convertToResource(resourceFromDataStore);
+		return resourceFromDataStore == null ? null : convertToResource(resourceFromDataStore, absoluteWebResourceURI);
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 		}
 		dataStore.getData().remove(dataStore.getObject(resourceMapping.get(resourceURI)));
 		dataStore.getData().add(convertToEntity(resource));
-		return convertToResource(previousData);
+		return convertToResource(previousData, absoluteWebResourceURI);
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 		}
 		StoredObject previousData = dataStore.getObject(dataID);
 		dataStore.getData().remove(previousData);
-		return previousData == null ? null : convertToResource(previousData);
+		return previousData == null ? null : convertToResource(previousData, absoluteWebResourceURI);
 	}
 
 	private StoredObject convertToEntity(ExampleResource exampleResource) {
@@ -136,31 +136,27 @@ public class ExampleResourceDAO implements ResourceDAO<ExampleResource> {
 		return embObj;
 	}
 
-	private ExampleResource convertToResource(StoredObject storedResource) {
+	private ExampleResource convertToResource(StoredObject storedResource, URI absoluteWebResourceURI) {
 		ExampleResource exampleResource = new ExampleResource();
 		exampleResource.setDescription(storedResource.getDescription());
 		// create resource URI with new UUID and add it to the mapping
-		exampleResource.setSelf(createSelfLinkWithUUID(storedResource.getId(), exampleResource.getProfile()));
-		exampleResource.setEmbeddedResource(convertEmbeddedToResource(storedResource.getEmbedded()));
-		resourceMapping.put(createResourceURI(storedResource.getId()).getPath(), storedResource.getId());
+		exampleResource.setSelf(createSelfLinkWithUUID(storedResource.getId(), exampleResource.getProfile(), absoluteWebResourceURI));
+		exampleResource.setEmbeddedResource(convertEmbeddedToResource(storedResource.getEmbedded(), absoluteWebResourceURI));
+		resourceMapping.put(absoluteWebResourceURI.getPath(), storedResource.getId());
 		return exampleResource;
 	}
 
-	private ExampleEmbeddedResource convertEmbeddedToResource(StoredEmbeddedObject embedded) {
+	private ExampleEmbeddedResource convertEmbeddedToResource(StoredEmbeddedObject embedded, URI absoluteWebResourceURI) {
 		ExampleEmbeddedResource embRes = new ExampleEmbeddedResource();
 		embRes.setName(embedded.getName());
-		resourceMapping.put(createResourceURI(embedded.getId()).getPath(), embedded.getId());
+		resourceMapping.put(absoluteWebResourceURI.getPath(), embedded.getId());
 		return embRes;
 	}
 
-	private HALLink createSelfLinkWithUUID(UUID id, URI resourceProfile) {
-		return new HALLink.Builder(createResourceURI(id))
+	private HALLink createSelfLinkWithUUID(UUID id, URI resourceProfile, URI absoluteWebResourceURI) {
+		return new HALLink.Builder(absoluteWebResourceURI)
 			.type(MediaType.APPLICATION_HAL_JSON)
 			.profile(resourceProfile)
 			.build();
-	}
-
-	private URI createResourceURI(UUID id) {
-		return UriBuilder.fromUri(ABSOLUTE_BASE_URI.get()).path(ExampleWebResource.class).path(id.toString()).build();
 	}
 }

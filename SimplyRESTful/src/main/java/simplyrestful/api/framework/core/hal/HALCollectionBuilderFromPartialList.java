@@ -3,6 +3,9 @@ package simplyrestful.api.framework.core.hal;
 import java.net.URI;
 import java.util.List;
 
+import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALResource;
+
 /**
  * Create a HALCollection object containing a single page of resources from a list contain only the resources that should 
  * be shown as that page.

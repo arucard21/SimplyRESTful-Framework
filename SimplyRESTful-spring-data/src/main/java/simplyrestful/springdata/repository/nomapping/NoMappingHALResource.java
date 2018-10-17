@@ -13,7 +13,7 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.hal.HALResource;
+import simplyrestful.api.framework.resources.HALResource;
 
 @MappedSuperclass
 @Inheritance
