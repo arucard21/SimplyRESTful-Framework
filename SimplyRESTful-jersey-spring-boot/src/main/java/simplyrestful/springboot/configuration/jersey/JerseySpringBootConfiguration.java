@@ -6,12 +6,17 @@ import org.springframework.context.annotation.Configuration;
 
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
+import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
+import simplyrestful.springboot.CustomRequestPropertiesFilter;
+import simplyrestful.springboot.HALJacksonJsonProvider;
 
 @Configuration
 public class JerseySpringBootConfiguration implements ResourceConfigCustomizer{
 	@Override
 	public void customize(ResourceConfig config) {
-		config.packages("simplyrestful");
+		config.register(WebResourceRoot.class);
+		config.register(CustomRequestPropertiesFilter.class);
+		config.register(HALJacksonJsonProvider.class);
 		config.register(ApiListingResource.class);
 		config.register(SwaggerSerializers.class);
 	}
