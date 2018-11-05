@@ -1,3 +1,14 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE"
+  }
+}
+
 ext {
 	jaxrs = "2.1.1"
 	cxf = "3.2.6"
@@ -18,7 +29,7 @@ allprojects{
 	targetCompatibility = JavaVersion.VERSION_1_8
 
 	group = 'com.github.arucard21.simplyrestful'
-	version = '0.8'
+	version = '0.7.2'
 }
 
 subprojects{
@@ -132,6 +143,7 @@ project(":SimplyRESTful-cxf"){
 }
 
 project(":SimplyRESTful-example:cxf-spring-boot"){
+	apply plugin: "org.springframework.boot"
 	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
 		compile project(':SimplyRESTful')
@@ -151,6 +163,7 @@ project(":SimplyRESTful-example:jetty"){
 }
 
 project(":SimplyRESTful-example:jersey-nomapping"){
+	apply plugin: "org.springframework.boot"
 	project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
 	dependencies {
 		compile project(':SimplyRESTful-jersey-spring-boot')
