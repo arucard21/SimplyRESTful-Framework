@@ -124,17 +124,23 @@ public abstract class AbstractWebResource<T extends HALResource> {
 		value = "Create or update a resource",
 		notes = "Create a resource with a specified ID or update that resource. Returns the previous (now overridden) resource or nothing if a new resource was created."
 	)
-	public T putHALResource(
+	public Response putHALResource(
 			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") @NotNull String id,
 			@ApiParam(value = "The resource to be updated", required = true) @NotNull final T resource){
 		if(resource.getSelf() != null && !resource.getSelf().getHref().contains(id)){
 			throw new BadRequestException("The provided resource contains an self-link that does not match the ID used in the request");
 		}
+		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
 		if(resource.getSelf() == null){
-			URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
 			resource.setSelf(createLink(absoluteResourceIdentifier, resource.getProfile()));
 		}
-		return resourceDao.persist(resource, getAbsoluteWebResourceURI());
+		URI absoluteWebResourceURI = getAbsoluteWebResourceURI();
+		T previousResource = resourceDao.findByURI(absoluteResourceIdentifier, absoluteWebResourceURI);
+		resourceDao.persist(resource, absoluteWebResourceURI);
+		if (previousResource == null) {
+			return Response.created(absoluteResourceIdentifier).build();
+		}
+		return Response.ok().build();
 	}
 
 	@Path("/{id}")
