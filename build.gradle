@@ -29,7 +29,7 @@ allprojects{
 	targetCompatibility = JavaVersion.VERSION_1_8
 
 	group = 'com.github.arucard21.simplyrestful'
-	version = '0.8.0'
+	version = '0.9.0'
 }
 
 subprojects{
@@ -93,6 +93,15 @@ project(":SimplyRESTful"){
 		integrationTestCompile ("org.apache.cxf:cxf-rt-transports-local:${cxf}")
 		integrationTestCompile ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
 		integrationTestCompile ("org.apache.cxf:cxf-rt-rs-client:${cxf}")
+	}
+}
+
+project(":client"){
+	project.description = "A generic client that can be used with any SimplyRESTful API"
+	dependencies {
+		compile project(":SimplyRESTful-resources")
+		compile ("org.glassfish.jersey.core:jersey-client:2.27")
+		compile ("io.swagger:swagger-models:1.5.21")
 	}
 }
 
