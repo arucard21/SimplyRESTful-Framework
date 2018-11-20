@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
 import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
-import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
@@ -127,9 +126,9 @@ public class AbstractWebResourceTest{
 	@Test
 	public void endpoint_shouldCreateNewResourceWhenNonexisting_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
 		Mockito.when(mockDAO.persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any())).thenReturn(null);
-		HALResource previousResource = testEndpoint.putHALResource(TestResource.TEST_RESOURCE_ID, testResource);
+		Response response = testEndpoint.putHALResource(TestResource.TEST_RESOURCE_ID, testResource);
 		Mockito.verify(mockDAO).persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any());
-		Assertions.assertEquals(null, previousResource);
+		Assertions.assertEquals(201, response.getStatus());
 	}
 
 	@Test
