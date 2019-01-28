@@ -1,4 +1,5 @@
 # SimplyRESTful Client
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?style=plastic)](https://www.gnu.org/licenses/lgpl-3.0)
 
 A generic client for accessing APIs created with the SimplyRESTful suite of libraries and frameworks.
 
