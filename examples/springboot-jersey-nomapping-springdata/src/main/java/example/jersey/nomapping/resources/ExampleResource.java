@@ -1,6 +1,7 @@
 package example.jersey.nomapping.resources;
 
 import java.net.URI;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -21,6 +22,8 @@ public class ExampleResource extends HALResource{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	long id;
+	//FIXME: need to figure out how to make the uuid from HALResource visible without declaring it here again 
+	public UUID uuid;
 
 	private String description;
 	@OneToOne(cascade=CascadeType.ALL)
