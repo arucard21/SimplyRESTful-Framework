@@ -1,6 +1,7 @@
 package simplyrestful.api.framework.core;
 
 import java.net.URI;
+import java.util.UUID;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
@@ -26,7 +27,7 @@ import simplyrestful.api.framework.test.implementation.TestWebResource;
 @ExtendWith(MockitoExtension.class)
 public class AbstractWebResourceTest{
 	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/");
-	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources");
+	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources/");
 	private TestResource testResource = new TestResource();
 	@Mock
 	private ResourceDAO<TestResource> mockDAO;
@@ -106,7 +107,7 @@ public class AbstractWebResourceTest{
 	@Test
 	public void endpoint_shouldThrowBadRequestWhenIDDoesNotMatchResource_withPUTonResource(){
 		Assertions.assertThrows(BadRequestException.class, 
-				() -> testEndpoint.putHALResource("fakeID", testResource));
+				() -> testEndpoint.putHALResource(UUID.randomUUID(), testResource));
 	}
 
 	@Test

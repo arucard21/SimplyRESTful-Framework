@@ -1,6 +1,7 @@
 package simplyrestful.api.framework.test.implementation;
 
 import java.net.URI;
+import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
@@ -14,10 +15,10 @@ import simplyrestful.api.framework.core.ResourceDAO;
 @Produces(MediaType.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 @Consumes(MediaType.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 public class TestWebResource extends AbstractWebResource<TestResource>{
-	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/testresources");
+	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/testresources/");
 
 	@Override
-	protected URI getAbsoluteWebResourceURI(Class<?> resourceEndpoint, String id) {
+	protected URI getAbsoluteWebResourceURI(Class<?> resourceEndpoint, UUID id) {
 		if (id == null) {
 			return TEST_REQUEST_BASE_URI;
 		}

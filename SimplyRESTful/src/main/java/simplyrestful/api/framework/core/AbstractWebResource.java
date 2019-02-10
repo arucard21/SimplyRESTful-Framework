@@ -1,6 +1,7 @@
 package simplyrestful.api.framework.core;
 
 import java.net.URI;
+import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
@@ -78,7 +79,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	@POST
 	@ApiOperation(
 		value = "Create a new resource",
-		notes = "Create a new resource which can already have a self-link containing an URI as identifier or one will be generated"
+		notes = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated"
 	)
 	public Response postHALResource(
 			@ApiParam(value = "resource", required = true) 
@@ -92,6 +93,9 @@ public abstract class AbstractWebResource<T extends HALResource> {
 					.build();
 		}
 		URI resourceSelfURI = URI.create(resource.getSelf().getHref());
+		if(getAbsoluteWebResourceURI().relativize(resourceSelfURI).equals(resourceSelfURI)) {
+			throw new BadRequestException("The identifier of the resource does not correspond to the URI of this Web Resource");
+		}
 		T previousResource = resourceDao.findByURI(resourceSelfURI, getAbsoluteWebResourceURI());
 		if (previousResource != null){
 			throw new ClientErrorException("A resource with the same ID already exists. Try to update the resource with a PUT request.", Response.Status.CONFLICT);
@@ -105,11 +109,13 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	@Path("/{id}")
 	@GET
 	@ApiOperation(
-		value = "Get operation with type and headers",
-		notes = "Get operation with type and headers"
+		value = "Retrieve a single resource",
+		notes = "Retrieve a single resource"
 	)
 	public T getHALResource(
-			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") String id) {
+			@ApiParam(value = "The identifier for the resource", required = true)
+			@PathParam("id")
+			UUID id) {
 		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
 		T resource = resourceDao.findByURI(absoluteResourceIdentifier, getAbsoluteWebResourceURI());
 		if (resource == null){
@@ -122,12 +128,17 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	@PUT
 	@ApiOperation(
 		value = "Create or update a resource",
-		notes = "Create a resource with a specified ID or update that resource. Returns the previous (now overridden) resource or nothing if a new resource was created."
+		notes = "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK."
 	)
 	public Response putHALResource(
-			@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") @NotNull String id,
-			@ApiParam(value = "The resource to be updated", required = true) @NotNull final T resource){
-		if(resource.getSelf() != null && !resource.getSelf().getHref().contains(id)){
+			@ApiParam(value = "The UUID part of the identifier for the resource", required = true)
+			@PathParam("id")
+			@NotNull
+			UUID id,
+			@ApiParam(value = "The resource to be updated", required = true)
+			@NotNull
+			final T resource){
+		if(resource.getSelf() != null && !resource.getSelf().getHref().contains(id.toString())){
 			throw new BadRequestException("The provided resource contains an self-link that does not match the ID used in the request");
 		}
 		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
@@ -146,10 +157,14 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	@Path("/{id}")
 	@DELETE
 	@ApiOperation(
-		value = "Delete operation with implicit header",
-		notes = "Delete operation with implicit header"
+		value = "Delete a single resource",
+		notes = "Delete a single resource"
 	)
-	public Response deleteHALResource(@ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") @NotNull String id) {
+	public Response deleteHALResource(
+			@ApiParam(value = "The UUID part of the identifier for the resource", required = true)
+			@PathParam("id")
+			@NotNull
+			UUID id) {
 		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
 		if(resourceDao.remove(absoluteResourceIdentifier, getAbsoluteWebResourceURI()) == null){
 			throw new NotFoundException();
@@ -164,14 +179,14 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	 * This will likely already be the case when you have access to the Class object of that web resource
 	 *
 	 * @param webResource is the class of the @Path-annotated endpoint class for the resource
-	 * @param id is the ID of the resource, which can be null if the base URI is requested.
+	 * @param id is the UUID of the resource, which can be null if the base URI is requested.
 	 * @return the absolute URI for the resource on the requested endpoint.
 	 */
-	protected URI getAbsoluteWebResourceURI(Class<?> webResource, String id) {
+	protected URI getAbsoluteWebResourceURI(Class<?> webResource, UUID id) {
 		if (id == null) {
 			return uriInfo.getBaseUriBuilder().path(webResource).build();
 		}
-		return uriInfo.getBaseUriBuilder().path(webResource).path(id).build();
+		return uriInfo.getBaseUriBuilder().path(webResource).path(id.toString()).build();
 	}
 
 	/**
@@ -182,7 +197,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	 * @param id is the ID of the resource provided on the endpoint.
 	 * @return the absolute URI for the resource on the endpoint.
 	 */
-	protected URI getAbsoluteWebResourceURI(String id) {
+	protected URI getAbsoluteWebResourceURI(UUID id) {
 		return getAbsoluteWebResourceURI(this.getClass(), id);
 	}
 	

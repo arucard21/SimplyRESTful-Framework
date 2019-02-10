@@ -22,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALMapper;
@@ -31,7 +30,6 @@ import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
-@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 public class WebResourceIntegrationTest{
 	private static final String WEB_RESOURCE_PATH = "testresources";
@@ -76,7 +74,9 @@ public class WebResourceIntegrationTest{
 		TestResource expectedResource = new TestResource();
 		Mockito.when(mockDAO.findAllForPage(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.any(URI.class))).thenReturn(Arrays.asList(expectedResource, expectedResource));
 		Mockito.when(mockDAO.count()).thenReturn(2L);
-		HALCollection<TestResource> collection = (HALCollection<TestResource>) client.path(WEB_RESOURCE_PATH).get(new GenericType<Object>(new TypeReference<HALCollection<TestResource>>() {}.getType()));
+		HALCollection<TestResource> collection = (HALCollection<TestResource>) client
+				.path(WEB_RESOURCE_PATH)
+				.get(new GenericType<HALCollection<TestResource>>() {});
 		Assertions.assertEquals(2, collection.getTotal());
 		Assertions.assertEquals(expectedResource.getSelf(), collection.getItem().get(0));
 		Assertions.assertEquals(expectedResource.getSelf(), collection.getItem().get(1));
@@ -90,7 +90,7 @@ public class WebResourceIntegrationTest{
 		HALCollection<TestResource> collection = (HALCollection<TestResource>) client
 				.path(WEB_RESOURCE_PATH)
 				.query(QUERY_PARAM_COMPACT, new Boolean(false).toString())
-				.get(new GenericType<Object>(new TypeReference<HALCollection<TestResource>>() {}.getType()));
+				.get(new GenericType<HALCollection<TestResource>>() {});
 		Assertions.assertEquals(2, collection.getTotal());
 		Assertions.assertEquals(expectedResource, collection.getItemEmbedded().get(0));
 		Assertions.assertEquals(expectedResource, collection.getItemEmbedded().get(1));
