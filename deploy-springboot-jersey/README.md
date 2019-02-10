@@ -1,6 +1,6 @@
-# SimplyRESTful-jersey-spring-boot
+# deploy-springboot-jersey
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/SimplyRESTful-jersey-spring-boot/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/SimplyRESTful-jersey-spring-boot)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-springboot-jersey/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-springboot-jersey)
 
 Deploy your SimplyRESTful API using Jersey with Spring Boot.
 
@@ -15,4 +15,4 @@ To use it, in your project you have to:
 * Make sure your web resource class (which extends WebResourceBase) is registered in a class that extends Jersey's `ResourceConfig` annotated with `@Configuration` (additional JAX-RS resources should registered here as well, as required by Jersey)
 * Create a Spring Boot application class
 
-See the [SimplyRESTful-example](/SimplyRESTful-example/jersey-nomapping) project for a simple example of this deployment method.
+See the [SimplyRESTful-example](/examples/springboot-jersey-nomapping-springdata) project for a simple example of this deployment method.

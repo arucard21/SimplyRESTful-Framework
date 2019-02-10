@@ -1,6 +1,6 @@
-# SimplyRESTful-cxf-spring-boot
+# deploy-springboot-cxf
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/SimplyRESTful-cxf-spring-boot/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/SimplyRESTful-cxf-spring-boot)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-springboot-cxf/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-springboot-cxf)
 
 Deploy your SimplyRESTful API using Apache CXF with Spring Boot.
 
@@ -15,4 +15,4 @@ To use it, in your project you have to:
 * Make sure your web resource class (which extends WebResourceBase) is annotated with `@javax.inject.Named` so it is detected by Spring Boot's auto-scan.
 * Create a Spring Boot application class which scans the `simplyrestful.springboot` package as well as your own package(s), containing the web resource class(es).
 
-See the [SimplyRESTful-example](/SimplyRESTful-example/cxf-spring-boot) project for a simple example of this deployment method.
+See the [SimplyRESTful-example](/examples/springboot-cxf) project for a simple example of this deployment method.

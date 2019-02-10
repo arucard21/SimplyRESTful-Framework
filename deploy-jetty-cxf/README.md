@@ -1,6 +1,6 @@
-# SimplyRESTful-cxf
+# deploy-jetty-cxf
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/SimplyRESTful-cxf/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/SimplyRESTful-cxf)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-jetty-cxf/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-jetty-cxf)
 
 A quick way to deploy your SimplyRESTful API using Apache CXF
 
@@ -14,4 +14,4 @@ To use it, in your project you have to:
 * [Implement your SimplyRESTful API](/SimplyRESTful#usage)
 * Star the server in your code with a call like `Server myServer = new APIServer(JAXRSWebResource.class)` where `JAXRSWebResource.class` is the JAX-RS Web Resource you implemented (which extends WebResourceBase). This will deploy your Web Resource on `http://localhost:9000/`, though this address can be customized. You can stop the running server with `myServer.destroy()`.
 
-See the [SimplyRESTful-example](/SimplyRESTful-example/jetty) project for a simple example of this deployment method.
+See the [SimplyRESTful-example](/examples/jetty-cxf) project for a simple example of this deployment method.
