@@ -19,8 +19,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
-import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
@@ -30,7 +28,7 @@ public class AbstractWebResourceTest{
 	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources/");
 	private TestResource testResource = new TestResource();
 	@Mock
-	private ResourceDAO<TestResource> mockDAO;
+	private ResourceDAO<TestResource, TestResource> mockDAO;
 	@Mock
 	private UriInfo uriInfo;
 	@InjectMocks
@@ -98,7 +96,7 @@ public class AbstractWebResourceTest{
 	}
 
 	@Test
-	public void endpoint_shouldUpdateResource_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
+	public void endpoint_shouldUpdateResource_withPUTonResource() {
 		Mockito.when(mockDAO.persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any(URI.class))).thenReturn(new TestResource());
 		testEndpoint.putHALResource(TestResource.TEST_RESOURCE_ID, testResource);
 		Mockito.verify(mockDAO).persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any());
@@ -111,21 +109,21 @@ public class AbstractWebResourceTest{
 	}
 
 	@Test
-	public void endpoint_shouldUpdateResourceEvenWhenSelfLinkMissing_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
+	public void endpoint_shouldUpdateResourceEvenWhenSelfLinkMissing_withPUTonResource() {
 		Mockito.when(mockDAO.persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any())).thenReturn(new TestResource());
 		testEndpoint.putHALResource(TestResource.TEST_RESOURCE_ID, testResource);
 		Mockito.verify(mockDAO).persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any());
 	}
 
 	@Test
-	public void endpoint_shouldThrowBadRequestWhenResourceInvalid_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
-		Mockito.when(mockDAO.persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any())).thenThrow(InvalidResourceException.class);
+	public void endpoint_shouldThrowBadRequestWhenResourceInvalid_withPUTonResource() {
+		Mockito.when(mockDAO.persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any())).thenThrow(BadRequestException.class);
 		Assertions.assertThrows(BadRequestException.class, 
 				() -> testEndpoint.putHALResource(TestResource.TEST_RESOURCE_ID, testResource));
 	}
 
 	@Test
-	public void endpoint_shouldCreateNewResourceWhenNonexisting_withPUTonResource() throws InvalidSelfLinkException, InvalidResourceException{
+	public void endpoint_shouldCreateNewResourceWhenNonexisting_withPUTonResource() {
 		Mockito.when(mockDAO.persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any())).thenReturn(null);
 		Response response = testEndpoint.putHALResource(TestResource.TEST_RESOURCE_ID, testResource);
 		Mockito.verify(mockDAO).persist(ArgumentMatchers.eq(testResource), ArgumentMatchers.any());

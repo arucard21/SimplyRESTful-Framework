@@ -71,6 +71,7 @@ project(":SimplyRESTful-resources"){
 	project.description = "The core API resources used in SimplyRESTful APIs"
 	dependencies {
 		compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
+		compile ("io.openapitools.hal:swagger-hal:1.0.4")
 	}
 }
 
@@ -105,7 +106,7 @@ project(":client"){
 	}
 }
 
-project(":SimplyRESTful-cxf-spring-boot"){
+project(":deploy-springboot-cxf"){
 	project.description = "Easily deploy your SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
 		compile project(":SimplyRESTful")
@@ -116,7 +117,7 @@ project(":SimplyRESTful-cxf-spring-boot"){
 	}
 }
 
-project(":SimplyRESTful-jersey-spring-boot"){
+project(":deploy-springboot-jersey"){
 	project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
 	dependencies {
 		compile project(':SimplyRESTful')
@@ -129,7 +130,7 @@ project(":SimplyRESTful-jersey-spring-boot"){
 	}
 }
 
-project(":SimplyRESTful-spring-data"){
+project(":persist-springdata"){
 	project.description = "Easily persist your SimplyRESTful API using Spring Data"
 	dependencies {
 		compile project(':SimplyRESTful')
@@ -137,7 +138,7 @@ project(":SimplyRESTful-spring-data"){
 	}
 }
 
-project(":SimplyRESTful-cxf"){
+project(":deploy-jetty-cxf"){
 	project.description = "Easily deploy your SimplyRESTful API using Apache CXF"
 	dependencies {
 		compile project(':SimplyRESTful')
@@ -151,39 +152,39 @@ project(":SimplyRESTful-cxf"){
 	}
 }
 
-project(":SimplyRESTful-example:cxf-spring-boot"){
+project(":examples:springboot-cxf"){
 	apply plugin: "org.springframework.boot"
 	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
 		compile project(':SimplyRESTful')
-		compile project(':SimplyRESTful-cxf-spring-boot')
-		compile project(':SimplyRESTful-example:datastore')
+		compile project(':deploy-springboot-cxf')
+		compile project(':examples:datastore')
 	}
 }
 
-project(":SimplyRESTful-example:jetty"){
+project(":examples:jetty-cxf"){
 	project.description = "Example project for a SimplyRESTful API using Apache CXF on Jetty"
 	dependencies {
 		compile project(':SimplyRESTful')
-		compile project(':SimplyRESTful-cxf')
-		compile project(':SimplyRESTful-example:datastore')
+		compile project(':deploy-jetty-cxf')
+		compile project(':examples:datastore')
 		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
 	}
 }
 
-project(":SimplyRESTful-example:jersey-nomapping"){
+project(":examples:springboot-jersey-nomapping-springdata"){
 	apply plugin: "org.springframework.boot"
 	project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
 	dependencies {
-		compile project(':SimplyRESTful-jersey-spring-boot')
-		compile project(':SimplyRESTful-spring-data')
-		compile project(':SimplyRESTful-example:datastore')
+		compile project(':deploy-springboot-jersey')
+		compile project(':persist-springdata')
+		compile project(':examples:datastore')
 		compile ("com.h2database:h2:1.4.197")
 	}
 }
 
 // Provide tasks to publish projects to Maven Central
-configure(subprojects - project(":SimplyRESTful-example").allprojects){
+configure(subprojects - project(":examples").allprojects){
 	task javadocJar(type: Jar) {
 		classifier = 'javadoc'
 		from javadoc
@@ -222,12 +223,12 @@ configure(subprojects - project(":SimplyRESTful-example").allprojects){
 					packaging 'jar'
 
 					description project.description
-					url = 'https://github.com/arucard21/SimplyRESTful'
+					url = 'https://github.com/arucard21/SimplyRESTful-Framework'
 
 					scm {
-						connection 'scm:git:git://github.com:arucard21/SimplyRESTful.git'
-						developerConnection 'scm:git:ssh://github.com:arucard21/SimplyRESTful.git'
-						url 'https://github.com/arucard21/SimplyRESTful'
+						connection 'scm:git:git://github.com:arucard21/SimplyRESTful-Framework.git'
+						developerConnection 'scm:git:ssh://github.com:arucard21/SimplyRESTful-Framework.git'
+						url 'https://github.com/arucard21/SimplyRESTful-Framework'
 					}
 
 					licenses {

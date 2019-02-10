@@ -2,6 +2,7 @@ package simplyrestful.api.framework.resources;
 
 import java.net.URI;
 import java.util.Objects;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -11,8 +12,18 @@ import io.openapitools.jackson.dataformat.hal.annotation.Resource;
 
 @Resource
 public abstract class HALResource{
+	@JsonIgnore
+	public UUID uuid;
 	@Link
 	protected HALLink self;
+	
+	public UUID getUUID() {
+		return uuid;
+	}
+
+	public void setUUID(UUID uuid) {
+		this.uuid = uuid;
+	}
 
 	public void setSelf(HALLink selfLink){
 		this.self = selfLink;

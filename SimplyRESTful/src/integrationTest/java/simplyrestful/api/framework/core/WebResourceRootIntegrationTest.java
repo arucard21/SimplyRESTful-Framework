@@ -33,7 +33,7 @@ public class WebResourceRootIntegrationTest{
 	private Server server;
 	private WebClient client; 
 	@Mock
-	private ResourceDAO<TestResource> mockDAO;
+	private ResourceDAO<TestResource, TestResource> mockDAO;
 	@InjectMocks
 	private TestWebResource webResource;
 	

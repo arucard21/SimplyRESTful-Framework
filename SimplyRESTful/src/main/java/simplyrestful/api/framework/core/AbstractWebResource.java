@@ -24,8 +24,6 @@ import javax.ws.rs.core.UriInfo;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import simplyrestful.api.framework.core.exceptions.InvalidResourceException;
-import simplyrestful.api.framework.core.exceptions.InvalidSelfLinkException;
 import simplyrestful.api.framework.core.hal.HALCollectionBuilder;
 import simplyrestful.api.framework.core.hal.HALCollectionBuilderFromPartialList;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -33,8 +31,8 @@ import simplyrestful.api.framework.resources.HALResource;
 
 @Produces({MediaType.APPLICATION_HAL_JSON})
 @Consumes({MediaType.APPLICATION_HAL_JSON})
-public abstract class AbstractWebResource<T extends HALResource> {
-	private ResourceDAO<T> resourceDao;
+public abstract class AbstractWebResource<T extends HALResource, E> {
+	private ResourceDAO<T, E> resourceDao;
 
 	public static final String QUERY_PARAM_PAGE = "page";
 	public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
@@ -43,7 +41,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 	@Context
 	protected UriInfo uriInfo;
 	
-	public AbstractWebResource(ResourceDAO<T> resourceDao) {
+	public AbstractWebResource(ResourceDAO<T, E> resourceDao) {
 		this.resourceDao = resourceDao;
 	}
 
@@ -85,7 +83,7 @@ public abstract class AbstractWebResource<T extends HALResource> {
 			@ApiParam(value = "resource", required = true) 
 			@NotNull 
 			final T resource
-			) throws InvalidSelfLinkException, InvalidResourceException {
+			) {
 		if (resource.getSelf() == null) {
 			T updatedResource = resourceDao.persist(resource, getAbsoluteWebResourceURI());
 			return Response

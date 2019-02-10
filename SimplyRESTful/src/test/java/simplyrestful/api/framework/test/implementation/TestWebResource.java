@@ -14,7 +14,7 @@ import simplyrestful.api.framework.core.ResourceDAO;
 @Path("testresources")
 @Produces(MediaType.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 @Consumes(MediaType.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
-public class TestWebResource extends AbstractWebResource<TestResource>{
+public class TestWebResource extends AbstractWebResource<TestResource, TestResource>{
 	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/testresources/");
 
 	@Override
@@ -33,7 +33,7 @@ public class TestWebResource extends AbstractWebResource<TestResource>{
 		return TEST_REQUEST_BASE_URI;
 	}
 
-	public TestWebResource(ResourceDAO<TestResource> resourceDao) {
+	public TestWebResource(ResourceDAO<TestResource, TestResource> resourceDao) {
 		super(resourceDao);
 	}	
 }
