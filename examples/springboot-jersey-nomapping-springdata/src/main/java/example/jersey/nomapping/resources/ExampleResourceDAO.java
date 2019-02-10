@@ -9,7 +9,7 @@ import simplyrestful.api.framework.core.ResourceDAO;
 @Named
 public class ExampleResourceDAO extends ResourceDAO<ExampleResource, ExampleResource> {
 	@Inject
-	public ExampleResourceDAO(ExampleRepository repo) {
-		super(new ExampleEntityDAO(repo));
+	public ExampleResourceDAO(ExampleEntityDAO entityDao) {
+		super(entityDao);
 	}
 }
