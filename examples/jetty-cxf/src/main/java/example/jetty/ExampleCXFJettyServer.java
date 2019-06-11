@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.cxf.endpoint.Server;
 
-import example.jetty.resources.CustomRequestPropertiesFilter;
 import example.jetty.resources.ExampleResourceDAO;
 import example.jetty.resources.ExampleWebResource;
 import simplyrestful.jetty.deploy.ServerBuilder;
@@ -20,7 +19,6 @@ public class ExampleCXFJettyServer {
 		Server apiServer = new ServerBuilder()
 				.withAddress("http://localhost:9000")
 				.withWebResource(ExampleWebResource.class, ExampleResourceDAO.class)
-				.withProvider(CustomRequestPropertiesFilter.class)
 				.build();
 		try {
 			Thread.sleep(60 * 60 * 1000);
