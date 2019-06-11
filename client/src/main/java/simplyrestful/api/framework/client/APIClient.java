@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,9 @@ import simplyrestful.api.framework.resources.HALServiceDocument;
 public class APIClient<T extends HALResource> {
 	private static final String MEDIATYPE_HAL_JSON = "application/hal+json";
 	private static final String PATH_PARAMETER_ID = "{id}";
+	private static final String QUERY_PARAM_PAGE = "page";
+	private static final String QUERY_PARAM_PAGESIZE = "pageSize";
+	private static final String QUERY_PARAM_COMPACT = "compact";
 	private Class<T> resourceClass;
 	private URI baseApiUri;
 	private URI resourceUri;
@@ -40,6 +44,18 @@ public class APIClient<T extends HALResource> {
 		this.resourceUri = discoverResourceURI();
 	}
 
+	/**
+	 * Discover the resource URI for the HAL resource T for the API at baseApiUri.
+	 * 
+	 * This discovery is done by accessing the OpenAPI Specification document which is linked in the
+	 * HAL Service Document located at the root of the API (baseApiUri). Here, we find the GET path for 
+	 * the media type matching that of the HAL resource T, which is the resource URI.
+	 * 
+	 * The limitation is that the GET operation on the resource must be available in order for that
+	 * resource's URI to be discoverable. 
+	 * 
+	 * @return the discovered resource URI.
+	 */
 	private URI discoverResourceURI() {
 		HALServiceDocument serviceDocument = client.target(baseApiUri).request().get(HALServiceDocument.class);
 		URI openApiJson = URI.create(serviceDocument.getDescribedby().getHref());
@@ -87,34 +103,35 @@ public class APIClient<T extends HALResource> {
 	 * @return the page of resources corresponding to the provided parameters.
 	 */
 	public List<T> retrievePageOfResources(int page, int pageSize){
-		return client.target(resourceUri).request().get(new GenericType<HALCollection<T>>() {}).getItemEmbedded();
+		return client
+				.target(resourceUri)
+				.queryParam(QUERY_PARAM_PAGE, page)
+				.queryParam(QUERY_PARAM_PAGESIZE, pageSize)
+				.queryParam(QUERY_PARAM_COMPACT, false)
+				.request()
+				.get(new APICollection()).getItemEmbedded();
 	}
-	
+
 	/**
-	 * Retrieve a page of API resource identifiers.
+	 * Retrieve a list of API resource identifiers for a page of API resources.
 	 * 
 	 * The parameters may be null, in which case they will not be included in the request. This will
 	 * cause the API to use its default value for these parameters. 
 	 * 
 	 * @param page is the number of the page.
 	 * @param pageSize is the size of each page.
-	 * @return the page of resource identifiers corresponding to the provided parameters.
+	 * @return a list of resource identifiers from the page corresponding to the provided parameters.
 	 */
 	public List<UUID> retrievePageOfResourceIdentifiers(int page, int pageSize){
-		List<HALLink> selfLinks = client.target(resourceUri).request().get(new GenericType<HALCollection<T>>() {}).getItem();
+		List<HALLink> selfLinks = client
+				.target(resourceUri)
+				.queryParam(QUERY_PARAM_PAGE, page)
+				.queryParam(QUERY_PARAM_PAGESIZE, pageSize)
+				.queryParam(QUERY_PARAM_COMPACT, false)
+				.request()
+				.get(new APICollection()).getItem();
 		return selfLinks.stream()
-				.filter(selfLink -> {
-					if (selfLink.getTemplated() != null && selfLink.getTemplated() == true) {
-						System.err.printf(
-								"%s has a templated self link which is invalid for a self link. "
-								+ "It was removed from the results as it indicates that something is wrong with this resource.", 
-								selfLink.getHref());
-						return false;
-					}
-					else {
-						return true;
-					}
-				})
+				.filter(selfLink -> Objects.isNull(selfLink.getTemplated()) || !selfLink.getTemplated())
 				.map(selfLink -> {
 					URI resourceInstanceUri = URI.create(selfLink.getHref());
 					URI relativizedURI = resourceUri.relativize(resourceInstanceUri);
@@ -183,4 +200,6 @@ public class APIClient<T extends HALResource> {
 		StatusType statusCode = client.target(resourceInstanceURI).request().delete().getStatusInfo();
 		return statusCode == Status.NO_CONTENT ? true : false;
 	}
+
+	private final class APICollection extends GenericType<HALCollection<T>> { /** Class representing the collection of API resources **/ }
 }
