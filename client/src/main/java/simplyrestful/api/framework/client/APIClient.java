@@ -26,7 +26,10 @@ import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class APIClient<T extends HALResource> {
-	private static final String MEDIATYPE_HAL_JSON = "application/hal+json";
+	private static final String HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE = "profile";
+	private static final String MEDIA_TYPE_HAL_JSON_TYPE = "application/hal+json";
+	private static final String MEDIA_TYPE_HAL_JSON_SUBTYPE = "application/hal+json";
+	private static final String MEDIA_TYPE_HAL_JSON = MEDIA_TYPE_HAL_JSON_TYPE + "/" + MEDIA_TYPE_HAL_JSON_SUBTYPE;
 	private static final String PATH_PARAMETER_ID = "{id}";
 	private static final String QUERY_PARAM_PAGE = "page";
 	private static final String QUERY_PARAM_PAGESIZE = "pageSize";
@@ -36,11 +39,11 @@ public class APIClient<T extends HALResource> {
 	private URI resourceUri;
 	private Client client;
 	
-
-	public APIClient(URI baseApiUri, Class<T> resourceClass) {
+	@SuppressWarnings("unchecked")
+	public APIClient(URI baseApiUri) {
 		this.baseApiUri = baseApiUri;
 		this.client = ClientBuilder.newClient();
-		this.resourceClass = resourceClass;
+		this.resourceClass = (Class<T>) new APIResource().getRawType();
 		this.resourceUri = discoverResourceURI();
 	}
 
@@ -57,13 +60,19 @@ public class APIClient<T extends HALResource> {
 	 * @return the discovered resource URI.
 	 */
 	private URI discoverResourceURI() {
-		HALServiceDocument serviceDocument = client.target(baseApiUri).request().get(HALServiceDocument.class);
+		HALServiceDocument serviceDocument = client
+				.target(baseApiUri)
+				.request()
+				.get(HALServiceDocument.class);
 		URI openApiJson = URI.create(serviceDocument.getDescribedby().getHref());
-		Swagger openApiSpecification = client.target(openApiJson).request().get(Swagger.class);
+		Swagger openApiSpecification = client
+				.target(openApiJson)
+				.request()
+				.get(Swagger.class);
 		HashMap<String, String> parameters = new HashMap<>();
 		try {
 			String resourceProfile = resourceClass.newInstance().getProfile().toString();
-			parameters.put("profile", resourceProfile);
+			parameters.put(HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE, resourceProfile);
 			MediaType resourceMediaType = new MediaType("application", "hal+json", parameters);
 			for(Entry<String, Path> pathEntry : openApiSpecification.getPaths().entrySet()) {
 				if(pathEntry.getKey().contains(PATH_PARAMETER_ID)) {
@@ -161,8 +170,7 @@ public class APIClient<T extends HALResource> {
 		String location = client
 				.target(resourceUri)
 				.request()
-				.post(Entity.entity(resource, MEDIATYPE_HAL_JSON))
-				.getHeaderString(HttpHeaders.LOCATION);
+				.post(Entity.entity(resource, MEDIA_TYPE_HAL_JSON)).getHeaderString(HttpHeaders.LOCATION);
 		URI relativizedURI = resourceUri.relativize(URI.create(location));
 		return UUID.fromString(relativizedURI.getPath());
 	}
@@ -184,9 +192,8 @@ public class APIClient<T extends HALResource> {
 		StatusType statusCode = client
 				.target(resourceInstanceURI)
 				.request()
-				.put(Entity.entity(resource, MEDIATYPE_HAL_JSON))
-				.getStatusInfo();
-		return statusCode == Status.CREATED ? true : false;
+				.put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON)).getStatusInfo();
+		return statusCode == Status.CREATED;
 	}
 	
 	/**
@@ -197,9 +204,13 @@ public class APIClient<T extends HALResource> {
 	 */
 	public boolean remove(UUID resourceId) {
 		URI resourceInstanceURI = UriBuilder.fromUri(resourceUri).path(resourceId.toString()).build();
-		StatusType statusCode = client.target(resourceInstanceURI).request().delete().getStatusInfo();
-		return statusCode == Status.NO_CONTENT ? true : false;
+		StatusType statusCode = client
+				.target(resourceInstanceURI)
+				.request()
+				.delete().getStatusInfo();
+		return statusCode == Status.NO_CONTENT;
 	}
 
 	private final class APICollection extends GenericType<HALCollection<T>> { /** Class representing the collection of API resources **/ }
+	private final class APIResource extends GenericType<T> { /** Class representing the API resource **/ }
 }
