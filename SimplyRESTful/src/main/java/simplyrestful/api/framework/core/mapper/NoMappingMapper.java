@@ -23,11 +23,11 @@ public class NoMappingMapper<T extends HALResource> implements ResourceMapper<T,
 
 	@Override
 	public T map(T entity, URI resourceURI) {
-		addSelfLink(entity, resourceURI);
+		ensureSelfLinkPresent(entity, resourceURI);
 		return entity;
 	}
 
-	private void addSelfLink(T persistedResource, URI absoluteWebResourceURI) {
+	private void ensureSelfLinkPresent(T persistedResource, URI absoluteWebResourceURI) {
 		persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(absoluteWebResourceURI).path(persistedResource.getUUID().toString()).build())
 				.type(MediaType.APPLICATION_HAL_JSON)
 				.profile(persistedResource.getProfile())
