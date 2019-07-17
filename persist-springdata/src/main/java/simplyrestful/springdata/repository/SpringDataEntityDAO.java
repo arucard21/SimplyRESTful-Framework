@@ -45,4 +45,8 @@ public abstract class SpringDataEntityDAO<E> extends EntityDAO<E>{
 		repo.delete(previousValue);
 		return previousValue;
 	}
+
+	protected SpringDataRepository<E> getRepo() {
+		return repo;
+	}
 }

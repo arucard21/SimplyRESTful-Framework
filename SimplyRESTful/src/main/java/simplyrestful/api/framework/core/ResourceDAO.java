@@ -124,4 +124,12 @@ public abstract class ResourceDAO<T extends HALResource, E> {
 		}
 		return mapper.map(entity, absoluteWebResourceURI);
 	}
+
+	protected ResourceMapper<T, E> getMapper() {
+		return mapper;
+	}
+
+	protected EntityDAO<E> getEntityDao() {
+		return entityDao;
+	}
 }
