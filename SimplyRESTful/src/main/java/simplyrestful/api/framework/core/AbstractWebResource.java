@@ -32,7 +32,7 @@ import simplyrestful.api.framework.resources.HALResource;
 @Produces({MediaType.APPLICATION_HAL_JSON})
 @Consumes({MediaType.APPLICATION_HAL_JSON})
 public abstract class AbstractWebResource<T extends HALResource, E> {
-	private ResourceDAO<T, E> resourceDao;
+	private final ResourceDAO<T, E> resourceDao;
 
 	public static final String QUERY_PARAM_PAGE = "page";
 	public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
@@ -228,5 +228,9 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 									.type(MediaType.APPLICATION_HAL_JSON)
 									.profile(resourceProfile)
 									.build();
+	}
+
+	protected ResourceDAO<T, E> getResourceDao() {
+		return resourceDao;
 	}
 }
