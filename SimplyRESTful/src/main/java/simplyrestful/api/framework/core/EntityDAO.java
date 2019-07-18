@@ -17,11 +17,11 @@ import javax.inject.Named;
  * @param <E> is the type of object that will be persisted
  */
 @Named
-public abstract class EntityDAO<E> {
+public interface EntityDAO<E> {
 	/**
 	 * @return the total amount of entities that are available
 	 */
-	public abstract long count();
+	public long count();
 	
 	/**
 	 * Retrieve a subset of entities, corresponding to then give page number and size.
@@ -30,7 +30,7 @@ public abstract class EntityDAO<E> {
 	 * @param pageSize is the requested size of each page
 	 * @return the requested collection containing the entities for the requested page
 	 */
-	public abstract List<E> findAllForPage(int pageNumber, int pageSize);
+	public List<E> findAllForPage(int pageNumber, int pageSize);
 
 	/**
 	 * Retrieve the entity from the data store.
@@ -38,7 +38,7 @@ public abstract class EntityDAO<E> {
 	 * @param entityID is the identifier for the entity
 	 * @return the entity that was requested or null if it doesn't exist
 	 */
-	public abstract E findByUUID(UUID entityID);
+	public E findByUUID(UUID entityID);
 
 	/**
 	 * Update the entity in the data store.
@@ -46,7 +46,7 @@ public abstract class EntityDAO<E> {
 	 * @param entity is the entity that should be persisted
 	 * @return the updated entity as persisted
 	 */
-	public abstract E persist(E entity);
+	public E persist(E entity);
 
 	/**
 	 * Remove an entity from the data store.
@@ -54,5 +54,5 @@ public abstract class EntityDAO<E> {
 	 * @param entityID is the identifier of the entity that should be removed
 	 * @return the removed entity, or null if it did not exist
 	 */
-	public abstract E remove(UUID entityID);
+	public E remove(UUID entityID);
 }

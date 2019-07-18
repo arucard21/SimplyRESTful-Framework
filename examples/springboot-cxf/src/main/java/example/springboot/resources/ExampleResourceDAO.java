@@ -18,11 +18,11 @@ import example.datastore.DataStore;
 import example.datastore.StoredEmbeddedObject;
 import example.datastore.StoredObject;
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import simplyrestful.api.framework.core.DefaultResourceDAO;
 import simplyrestful.api.framework.core.MediaType;
-import simplyrestful.api.framework.core.ResourceDAO;
 
 @Named
-public class ExampleResourceDAO extends ResourceDAO<ExampleResource, StoredObject> {
+public class ExampleResourceDAO extends DefaultResourceDAO<ExampleResource, StoredObject> {
 	public static final ThreadLocal<SearchContext> REQUEST_SEARCHCONTEXT = new ThreadLocal<>();
 
 	/**
@@ -36,7 +36,7 @@ public class ExampleResourceDAO extends ResourceDAO<ExampleResource, StoredObjec
 
 	public ExampleResourceDAO() {
 		// FIXME: example currently does not use the mapper and entityDAO yet
-		super(new ExampleResourceMapper(), new ExampleEntityDAO());
+		super(new ExampleEntityDAO());
 		dataStore = new DataStore();
 		resourceMapping = new HashMap<>();
 		for(StoredObject entity : dataStore.getData()) {
@@ -159,5 +159,17 @@ public class ExampleResourceDAO extends ResourceDAO<ExampleResource, StoredObjec
 			.type(MediaType.APPLICATION_HAL_JSON)
 			.profile(resourceProfile)
 			.build();
+	}
+
+	@Override
+	public StoredObject map(ExampleResource resource) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ExampleResource map(StoredObject entity, URI resourceURI) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

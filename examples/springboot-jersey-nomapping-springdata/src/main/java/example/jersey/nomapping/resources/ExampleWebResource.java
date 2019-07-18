@@ -26,7 +26,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import io.swagger.annotations.Api;
-import simplyrestful.api.framework.core.AbstractWebResource;
+import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaType;
 
 @Named
@@ -34,7 +34,7 @@ import simplyrestful.api.framework.core.MediaType;
 @Api(value = "Example Resources")
 @Produces(MediaType.APPLICATION_HAL_JSON + "; profile=\""+ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 @Consumes(MediaType.APPLICATION_HAL_JSON + "; profile=\""+ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
-public class ExampleWebResource extends AbstractWebResource<ExampleResource, ExampleResource> {
+public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	@Inject
 	public ExampleWebResource(ExampleResourceDAO resourceDao) {
 		super(resourceDao);

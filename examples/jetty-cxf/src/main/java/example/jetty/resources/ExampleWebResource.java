@@ -23,9 +23,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import example.datastore.StoredObject;
 import io.swagger.annotations.Api;
-import simplyrestful.api.framework.core.AbstractWebResource;
+import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.core.ResourceDAO;
 
@@ -33,8 +32,8 @@ import simplyrestful.api.framework.core.ResourceDAO;
 @Api(value = "Example Resources")
 @Produces(MediaType.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 @Consumes(MediaType.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
-public class ExampleWebResource extends AbstractWebResource<ExampleResource, StoredObject> {
-	public ExampleWebResource(ResourceDAO<ExampleResource, StoredObject> resourceDao) {
+public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
+	public ExampleWebResource(ResourceDAO<ExampleResource> resourceDao) {
 		super(resourceDao);
 	}
 }

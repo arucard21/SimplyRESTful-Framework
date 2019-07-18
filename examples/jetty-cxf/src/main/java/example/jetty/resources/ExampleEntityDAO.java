@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import simplyrestful.api.framework.core.EntityDAO;
 
-public class ExampleEntityDAO extends EntityDAO<ExampleResource> {
+public class ExampleEntityDAO implements EntityDAO<ExampleResource> {
 	private List<ExampleResource> unmappedDatastore;
 
 	public ExampleEntityDAO() {

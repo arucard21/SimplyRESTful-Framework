@@ -7,7 +7,7 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.AbstractWebResource;
+import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALResource;
@@ -50,7 +50,7 @@ public abstract class HALCollectionBuilder<T extends HALResource> {
 
 	protected HALLink createHALLinkFromURIWithModifiedPageNumber(URI requestURI, int pageNumber){
 		UriBuilder hrefBuilder = UriBuilder.fromUri(requestURI);
-		hrefBuilder.replaceQueryParam(AbstractWebResource.QUERY_PARAM_PAGE, pageNumber);
+		hrefBuilder.replaceQueryParam(DefaultWebResource.QUERY_PARAM_PAGE, pageNumber);
 		HALLink link = new HALLink.Builder(hrefBuilder.build()).build();
 		return link;
 	}

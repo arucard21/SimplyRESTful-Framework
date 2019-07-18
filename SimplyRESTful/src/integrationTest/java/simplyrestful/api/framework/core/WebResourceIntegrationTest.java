@@ -37,7 +37,7 @@ public class WebResourceIntegrationTest{
 	private Server server;
 	private WebClient client; 
 	@Mock
-	private ResourceDAO<TestResource, TestResource> mockDAO;
+	private ResourceDAO<TestResource> mockDAO;
 	@InjectMocks
 	private TestWebResource webResource;
 	
@@ -53,12 +53,12 @@ public class WebResourceIntegrationTest{
 		sf.setProvider(new JacksonJsonProvider(new HALMapper()));
 		sf.setResourceProvider(TestWebResource.class, new SingletonResourceProvider(webResource, true));
 		sf.setResourceProvider(WebResourceRoot.class, new SingletonResourceProvider(new WebResourceRoot(), true));
-		sf.setAddress(AbstractWebResourceTest.TEST_REQUEST_BASE_URI.toString());
+		sf.setAddress(DefaultWebResourceTest.TEST_REQUEST_BASE_URI.toString());
 		server = sf.create();
 	}
 
 	private void createClient() {
-		client = WebClient.create(AbstractWebResourceTest.TEST_REQUEST_BASE_URI.toString(), Arrays.asList(new JacksonJsonProvider(new HALMapper())));
+		client = WebClient.create(DefaultWebResourceTest.TEST_REQUEST_BASE_URI.toString(), Arrays.asList(new JacksonJsonProvider(new HALMapper())));
 		client.accept(MediaType.APPLICATION_HAL_JSON);
 		client.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_HAL_JSON);
 	}

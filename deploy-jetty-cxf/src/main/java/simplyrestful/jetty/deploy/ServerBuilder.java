@@ -41,7 +41,7 @@ import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import simplyrestful.api.framework.core.AbstractWebResource;
+import simplyrestful.api.framework.core.BaseWebResource;
 import simplyrestful.api.framework.core.ResourceDAO;
 import simplyrestful.api.framework.core.hal.HALJacksonJsonProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
@@ -60,7 +60,7 @@ import simplyrestful.api.framework.resources.HALResource;
 public class ServerBuilder {
 	private static final Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.APIServer");
 	private String address = "http://localhost:9000";
-	private Map<Class<? extends AbstractWebResource<? extends HALResource, ?>>, Class<? extends ResourceDAO<? extends HALResource, ?>>> webResources = new HashMap<>();
+	private Map<Class<? extends BaseWebResource<? extends HALResource>>, Class<? extends ResourceDAO<? extends HALResource>>> webResources = new HashMap<>();
 	private List<Object> providers = new ArrayList<>();
 	
 	/**
@@ -81,9 +81,9 @@ public class ServerBuilder {
 	 * @param resourceDao is the DAO class for the provided web resource
 	 * @return the builder object
 	 */
-	public ServerBuilder withWebResource(
-			Class<? extends AbstractWebResource<? extends HALResource, ?>> webResource,
-			Class<? extends ResourceDAO<? extends HALResource, ?>> resourceDao) {
+	public <T extends HALResource> ServerBuilder withWebResource(
+			Class<? extends BaseWebResource<T>> webResource,
+			Class<? extends ResourceDAO<T>> resourceDao) {
 		webResources.put(webResource, resourceDao);
 		return this;
 	}
@@ -117,9 +117,9 @@ public class ServerBuilder {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
         resourceProviders.add(new SingletonResourceProvider(new WebResourceRoot()));
-        for (Entry<Class<? extends AbstractWebResource<? extends HALResource, ?>>, Class<? extends ResourceDAO<? extends HALResource, ?>>> webResource: webResources.entrySet()){
-        	Class<? extends AbstractWebResource<? extends HALResource, ?>> webResourceClass = webResource.getKey();
-			Class<? extends ResourceDAO<? extends HALResource, ?>> resourceDaoClass = webResource.getValue();
+        for (Entry<Class<? extends BaseWebResource<? extends HALResource>>, Class<? extends ResourceDAO<? extends HALResource>>> webResource: webResources.entrySet()){
+        	Class<? extends BaseWebResource<? extends HALResource>> webResourceClass = webResource.getKey();
+			Class<? extends ResourceDAO<? extends HALResource>> resourceDaoClass = webResource.getValue();
 			resourceProviders.add(new SingletonResourceProvider(webResourceClass.getDeclaredConstructor(ResourceDAO.class).newInstance(resourceDaoClass.newInstance())));
         }
         sf.setResourceProviders(resourceProviders);

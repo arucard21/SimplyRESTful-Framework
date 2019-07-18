@@ -23,12 +23,12 @@ import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
-public class AbstractWebResourceTest{
+public class DefaultWebResourceTest{
 	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/");
 	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources/");
 	private TestResource testResource = new TestResource();
 	@Mock
-	private ResourceDAO<TestResource, TestResource> mockDAO;
+	private ResourceDAO<TestResource> mockDAO;
 	@Mock
 	private UriInfo uriInfo;
 	@InjectMocks

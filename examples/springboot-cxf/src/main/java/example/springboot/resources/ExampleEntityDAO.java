@@ -6,7 +6,7 @@ import java.util.UUID;
 import example.datastore.StoredObject;
 import simplyrestful.api.framework.core.EntityDAO;
 
-public class ExampleEntityDAO extends EntityDAO<StoredObject> {
+public class ExampleEntityDAO implements EntityDAO<StoredObject> {
 
 	@Override
 	public long count() {

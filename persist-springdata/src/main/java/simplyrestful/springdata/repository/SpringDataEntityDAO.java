@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 
 import simplyrestful.api.framework.core.EntityDAO;
 
-public abstract class SpringDataEntityDAO<E> extends EntityDAO<E>{
+public abstract class SpringDataEntityDAO<E> implements EntityDAO<E>{
 	private final SpringDataRepository<E> repo;
 	
 	public SpringDataEntityDAO(SpringDataRepository<E> repo) {

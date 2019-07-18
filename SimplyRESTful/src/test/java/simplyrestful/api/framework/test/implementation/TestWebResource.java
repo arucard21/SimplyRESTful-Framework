@@ -7,14 +7,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import simplyrestful.api.framework.core.AbstractWebResource;
+import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.core.ResourceDAO;
 
 @Path("testresources")
 @Produces(MediaType.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 @Consumes(MediaType.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
-public class TestWebResource extends AbstractWebResource<TestResource, TestResource>{
+public class TestWebResource extends DefaultWebResource<TestResource>{
 	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/testresources/");
 
 	@Override
@@ -33,7 +33,7 @@ public class TestWebResource extends AbstractWebResource<TestResource, TestResou
 		return TEST_REQUEST_BASE_URI;
 	}
 
-	public TestWebResource(ResourceDAO<TestResource, TestResource> resourceDao) {
+	public TestWebResource(ResourceDAO<TestResource> resourceDao) {
 		super(resourceDao);
 	}	
 }

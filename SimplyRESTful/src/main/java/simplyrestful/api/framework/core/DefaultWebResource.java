@@ -31,9 +31,7 @@ import simplyrestful.api.framework.resources.HALResource;
 
 @Produces({MediaType.APPLICATION_HAL_JSON})
 @Consumes({MediaType.APPLICATION_HAL_JSON})
-public abstract class AbstractWebResource<T extends HALResource, E> {
-	private final ResourceDAO<T, E> resourceDao;
-
+public abstract class DefaultWebResource<T extends HALResource> extends BaseWebResource<T>{
 	public static final String QUERY_PARAM_PAGE = "page";
 	public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
 	public static final String QUERY_PARAM_COMPACT = "compact";
@@ -41,8 +39,8 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 	@Context
 	protected UriInfo uriInfo;
 	
-	public AbstractWebResource(ResourceDAO<T, E> resourceDao) {
-		this.resourceDao = resourceDao;
+	public DefaultWebResource(ResourceDAO<T> resourceDao) {
+		super(resourceDao);
 	}
 
 	@GET
@@ -65,9 +63,9 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 			@DefaultValue(HALCollectionBuilder.DEFAULT_COMPACT_VALUE_STRING)
 			boolean compact) {
 		return new HALCollectionBuilderFromPartialList<T>(
-				resourceDao.findAllForPage(page, pageSize, getAbsoluteWebResourceURI()),
+				getResourceDao().findAllForPage(page, pageSize, getAbsoluteWebResourceURI()),
 				getRequestURI(),
-				resourceDao.count())
+				getResourceDao().count())
 						.page(page)
 						.maxPageSize(pageSize)
 						.compact(compact)
@@ -85,7 +83,7 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 			final T resource
 			) {
 		if (resource.getSelf() == null) {
-			T updatedResource = resourceDao.persist(resource, getAbsoluteWebResourceURI());
+			T updatedResource = getResourceDao().persist(resource, getAbsoluteWebResourceURI());
 			return Response
 					.created(URI.create(updatedResource.getSelf().getHref()))
 					.build();
@@ -94,11 +92,11 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 		if(getAbsoluteWebResourceURI().relativize(resourceSelfURI).equals(resourceSelfURI)) {
 			throw new BadRequestException("The identifier of the resource does not correspond to the URI of this Web Resource");
 		}
-		T previousResource = resourceDao.findByURI(resourceSelfURI, getAbsoluteWebResourceURI());
+		T previousResource = getResourceDao().findByURI(resourceSelfURI, getAbsoluteWebResourceURI());
 		if (previousResource != null){
 			throw new ClientErrorException("A resource with the same ID already exists. Try to update the resource with a PUT request.", Response.Status.CONFLICT);
 		}
-		T updatedResource = resourceDao.persist(resource, getAbsoluteWebResourceURI());
+		T updatedResource = getResourceDao().persist(resource, getAbsoluteWebResourceURI());
 		return Response
 				.created(URI.create(updatedResource.getSelf().getHref()))
 				.build();
@@ -115,7 +113,7 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 			@PathParam("id")
 			UUID id) {
 		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
-		T resource = resourceDao.findByURI(absoluteResourceIdentifier, getAbsoluteWebResourceURI());
+		T resource = getResourceDao().findByURI(absoluteResourceIdentifier, getAbsoluteWebResourceURI());
 		if (resource == null){
 			throw new NotFoundException();
 		}
@@ -144,8 +142,8 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 			resource.setSelf(createLink(absoluteResourceIdentifier, resource.getProfile()));
 		}
 		URI absoluteWebResourceURI = getAbsoluteWebResourceURI();
-		T previousResource = resourceDao.findByURI(absoluteResourceIdentifier, absoluteWebResourceURI);
-		resourceDao.persist(resource, absoluteWebResourceURI);
+		T previousResource = getResourceDao().findByURI(absoluteResourceIdentifier, absoluteWebResourceURI);
+		getResourceDao().persist(resource, absoluteWebResourceURI);
 		if (previousResource == null) {
 			return Response.created(absoluteResourceIdentifier).build();
 		}
@@ -164,7 +162,7 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 			@NotNull
 			UUID id) {
 		URI absoluteResourceIdentifier = getAbsoluteWebResourceURI(id);
-		if(resourceDao.remove(absoluteResourceIdentifier, getAbsoluteWebResourceURI()) == null){
+		if(getResourceDao().remove(absoluteResourceIdentifier, getAbsoluteWebResourceURI()) == null){
 			throw new NotFoundException();
 		}
 		return Response.noContent().build();
@@ -228,9 +226,5 @@ public abstract class AbstractWebResource<T extends HALResource, E> {
 									.type(MediaType.APPLICATION_HAL_JSON)
 									.profile(resourceProfile)
 									.build();
-	}
-
-	protected ResourceDAO<T, E> getResourceDao() {
-		return resourceDao;
 	}
 }
