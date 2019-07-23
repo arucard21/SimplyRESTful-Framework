@@ -152,6 +152,10 @@ project(":persist-springdata"){
 	}
 }
 
+project(":examples:datastore"){
+	uploadArchives.enabled = false;
+}
+
 project(":examples:springboot-cxf"){
 	apply plugin: "org.springframework.boot"
 	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
@@ -160,6 +164,7 @@ project(":examples:springboot-cxf"){
 		compile project(':deploy-springboot-cxf')
 		compile project(':examples:datastore')
 	}
+	uploadArchives.enabled = false;
 }
 
 project(":examples:jetty-cxf"){
@@ -170,6 +175,7 @@ project(":examples:jetty-cxf"){
 		compile project(':examples:datastore')
 		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
 	}
+	uploadArchives.enabled = false;
 }
 
 project(":examples:springboot-jersey-nomapping-springdata"){
@@ -180,6 +186,7 @@ project(":examples:springboot-jersey-nomapping-springdata"){
 		compile project(':persist-springdata')
 		compile ("com.h2database:h2:1.4.197")
 	}
+	uploadArchives.enabled = false;
 }
 
 // Provide tasks to publish projects to Maven Central
