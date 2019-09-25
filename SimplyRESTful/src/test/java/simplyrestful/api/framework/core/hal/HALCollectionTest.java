@@ -11,11 +11,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.test.implementation.TestResource;
 
 public class HALCollectionTest {
-	private static final String TEST_COLLECTION_PROFILE_URI = "local://docs/resources/testcollection";
 	private static final String TEST_COLLECTION_HREF_1 = "local://docs/resources/testcollection/1";
 	private static final String TEST_COLLECTION_HREF_2 = "local://docs/resources/testcollection/2";
 	private static final String TEST_COLLECTION_PAGE_BASE = "local://docs/resources/testcollection/2?page=";
@@ -66,6 +67,14 @@ public class HALCollectionTest {
 		testCollectionDifferent.setPrev(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"2").profile(testCollectionDifferent.getProfile()).build());
 		testCollectionDifferent.setNext(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"4").profile(testCollectionDifferent.getProfile()).build());
 	}
+	
+	@Test
+	public void equalsContract() {
+	    EqualsVerifier.forClass(HALCollection.class)
+	    		.withRedefinedSuperclass()
+	    		.suppress(Warning.NONFINAL_FIELDS)
+	    		.verify();
+	}
 
 	@Test
 	public void halCollection_shouldHaveSameHashcode_whenObjectsAreEqual() throws Exception {
@@ -96,12 +105,5 @@ public class HALCollectionTest {
 		onlySelfLink2.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_2).profile(onlySelfLink2.getProfile()).build());
 
 		Assertions.assertNotEquals(onlySelfLink1, onlySelfLink2);
-	}
-
-	private class TestResource extends HALResource {
-		@Override
-		public URI getProfile() {
-			return URI.create(TEST_COLLECTION_PROFILE_URI);
-		}
 	}
 }

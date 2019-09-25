@@ -10,18 +10,18 @@ import javax.ws.rs.core.UriInfo;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
-import simplyrestful.api.framework.core.MediaType;
+import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 @Named
 @Path("")
-@Produces(MediaType.APPLICATION_HAL_JSON + "; profile=\""+HALServiceDocument.PROFILE_STRING + "\"")
-@Consumes(MediaType.APPLICATION_HAL_JSON + "; profile=\""+HALServiceDocument.PROFILE_STRING + "\"")
+@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\""+HALServiceDocument.PROFILE_STRING + "\"")
+@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\""+HALServiceDocument.PROFILE_STRING + "\"")
 public class WebResourceRoot{
 	@Context
 	private UriInfo uriInfo;
 	
-	@Produces({MediaType.APPLICATION_HAL_JSON})
+	@Produces({AdditionalMediaTypes.APPLICATION_HAL_JSON})
 	@GET
 	@ApiOperation(
 		value = "Provide a service document that describes the service and links to the OpenAPI Specification",
@@ -32,7 +32,7 @@ public class WebResourceRoot{
 		HALLink descriptionLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().path("swagger.json").build()).build();
 		serviceDocument.setDescribedby(descriptionLink);
 		HALLink selfLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().build())
-				.type(MediaType.APPLICATION_HAL_JSON)
+				.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 				.profile(serviceDocument.getProfile())
 				.build();
 		serviceDocument.setSelf(selfLink);

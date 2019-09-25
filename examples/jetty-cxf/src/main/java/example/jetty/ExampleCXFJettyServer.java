@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.cxf.endpoint.Server;
 
-import example.jetty.resources.ExampleResourceDAO;
 import example.jetty.resources.ExampleWebResource;
 import simplyrestful.jetty.deploy.ServerBuilder;
 
@@ -17,8 +16,8 @@ import simplyrestful.jetty.deploy.ServerBuilder;
 public class ExampleCXFJettyServer {
 	public static void main(String[] args) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
 		Server apiServer = new ServerBuilder()
-				.withAddress("http://localhost:9000")
-				.withWebResource(ExampleWebResource.class, ExampleResourceDAO.class)
+				.withAddress("http://localhost:8080")
+				.withWebResource(ExampleWebResource.class)
 				.build();
 		try {
 			Thread.sleep(60 * 60 * 1000);

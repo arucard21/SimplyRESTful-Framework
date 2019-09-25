@@ -6,9 +6,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
 
-import simplyrestful.api.framework.core.EntityDAO;
-
-public abstract class SpringDataEntityDAO<E> implements EntityDAO<E>{
+public abstract class SpringDataEntityDAO<E>{
 	private final SpringDataRepository<E> repo;
 	
 	public SpringDataEntityDAO(SpringDataRepository<E> repo) {
@@ -19,8 +17,10 @@ public abstract class SpringDataEntityDAO<E> implements EntityDAO<E>{
 		return repo.count();
 	}
 
-	public List<E> findAllForPage(int pageNumber, int pageSize) {
-		return repo.findAll(PageRequest.of(pageNumber-1, pageSize)).getContent();
+	public List<E> findAllForPage(long pageNumber, long pageSize) {
+		int pageZeroIndexed = Math.toIntExact(pageNumber) - 1;
+		int integerPageSize = (pageSize > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageSize);
+		return repo.findAll(PageRequest.of(pageZeroIndexed, integerPageSize)).getContent();
 		
 	}
 

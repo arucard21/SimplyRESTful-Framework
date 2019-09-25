@@ -13,8 +13,8 @@ import io.openapitools.jackson.dataformat.hal.annotation.Resource;
 public class HALCollection<T extends HALResource> extends HALResource {
 	public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1";
 
-	private int page;
-	private int pageSize;
+	private long page;
+	private long pageSize;
 	private long total;
 
 	@Link
@@ -78,19 +78,19 @@ public class HALCollection<T extends HALResource> extends HALResource {
 		this.itemEmbedded = itemEmbedded;
 	}
 
-	public int getPage() {
+	public long getPage() {
 		return page;
 	}
 
-	public void setPage(int page) {
+	public void setPage(long page) {
 		this.page = page;
 	}
 
-	public int getMaxPageSize() {
+	public long getMaxPageSize() {
 		return pageSize;
 	}
 
-	public void setMaxPageSize(int pageSize) {
+	public void setMaxPageSize(long pageSize) {
 		this.pageSize = pageSize;
 	}
 
@@ -108,27 +108,31 @@ public class HALCollection<T extends HALResource> extends HALResource {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(self, getProfile(), page, pageSize, total, first, last, prev, next, item, itemEmbedded);
+	public final int hashCode() {
+		return Objects.hash(getSelf(), getProfile(), page, pageSize, total, first, last, prev, next, item, itemEmbedded);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof HALCollection<?>)){
-			return false;
+	public final boolean equals(Object obj) {
+		if (obj instanceof HALCollection<?>){
+			HALCollection<?> otherCollection = (HALCollection<?>) obj;
+			return otherCollection.canEqual(this) &&
+					Objects.equals(getSelf(), otherCollection.getSelf()) &&
+					Objects.equals(getProfile(), otherCollection.getProfile()) &&
+					Objects.equals(page, otherCollection.getPage()) &&
+					Objects.equals(pageSize, otherCollection.getMaxPageSize()) &&
+					Objects.equals(total, otherCollection.getTotal()) &&
+					Objects.equals(first, otherCollection.getFirst())&&
+					Objects.equals(last, otherCollection.getLast()) &&
+					Objects.equals(prev, otherCollection.getPrev()) &&
+					Objects.equals(next, otherCollection.getNext()) &&
+					Objects.equals(item, otherCollection.getItem()) &&
+					Objects.equals(itemEmbedded, otherCollection.getItemEmbedded());
 		}
-		HALCollection<?> otherCollection = (HALCollection<?>) obj;
-		return
-				Objects.equals(self, otherCollection.getSelf()) &&
-				Objects.equals(getProfile(), otherCollection.getProfile()) &&
-				page == otherCollection.getPage() &&
-				pageSize == otherCollection.getMaxPageSize() &&
-				total == otherCollection.getTotal() &&
-				Objects.equals(first, otherCollection.getFirst())&&
-				Objects.equals(last, otherCollection.getLast()) &&
-				Objects.equals(prev, otherCollection.getPrev()) &&
-				Objects.equals(next, otherCollection.getNext()) &&
-				Objects.equals(item, otherCollection.getItem()) &&
-				Objects.equals(itemEmbedded, otherCollection.getItemEmbedded());
+		return false;
+	}
+	
+	public boolean canEqual(Object obj) {
+		return (obj instanceof HALCollection<?>);
 	}
 }

@@ -1,16 +1,16 @@
 package simplyrestful.api.framework.core.hal;
 
-import java.net.URI;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.test.implementation.TestResource;
 
 public class HALResourceTest{
-	private static final String TEST_RESOURCE_PROFILE_URI = "local://docs/resources/testresource";
 	private static final String TEST_RESOURCE_HREF_1 = "local://docs/resources/testresource/1";
 	private static final String TEST_RESOURCE_HREF_2 = "local://docs/resources/testresource/2";
 
@@ -28,6 +28,14 @@ public class HALResourceTest{
 
 		testResourceDifferent = new TestResource();
 		testResourceDifferent.setSelf(new HALLink.Builder(TEST_RESOURCE_HREF_2).profile(testResourceDifferent.getProfile()).build());
+	}
+	
+	@Test
+	public void equalsContract() {
+	    EqualsVerifier.forClass(HALResource.class)
+	    		.withRedefinedSubclass(TestResource.class)
+	    		.suppress(Warning.NONFINAL_FIELDS)
+	    		.verify();
 	}
 
 	@Test
@@ -48,12 +56,5 @@ public class HALResourceTest{
 	@Test
 	public void halResource_shouldNotBeEqual_whenContainingDifferentValues() throws Exception {
 		Assertions.assertNotEquals(testResource, testResourceDifferent);
-	}
-
-	private class TestResource extends HALResource {
-		@Override
-		public URI getProfile() {
-			return URI.create(TEST_RESOURCE_PROFILE_URI);
-		}
 	}
 }

@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,8 +23,9 @@ public class ExampleResource extends HALResource{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	long id;
-	//FIXME: need to figure out how to make the uuid from HALResource visible without declaring it here again 
-	public UUID uuid;
+	@JsonIgnore
+	@NotNull
+	UUID uuid;
 
 	private String description;
 	@OneToOne(cascade=CascadeType.ALL)
@@ -54,4 +56,11 @@ public class ExampleResource extends HALResource{
 		return URI.create(EXAMPLE_PROFILE_STRING);
 	}
 
+	public UUID getUUID() {
+		return uuid;
+	}
+
+	public void setUUID(UUID uuid) {
+		this.uuid = uuid;
+	}
 }

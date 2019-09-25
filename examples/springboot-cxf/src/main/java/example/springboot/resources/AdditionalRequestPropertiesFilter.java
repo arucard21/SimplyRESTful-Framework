@@ -18,7 +18,7 @@ public class AdditionalRequestPropertiesFilter implements ContainerRequestFilter
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
-		ExampleResourceDAO.REQUEST_SEARCHCONTEXT.set(searchContext);
+		ExampleWebResource.REQUEST_SEARCHCONTEXT.set(searchContext);
 	}
 
 }

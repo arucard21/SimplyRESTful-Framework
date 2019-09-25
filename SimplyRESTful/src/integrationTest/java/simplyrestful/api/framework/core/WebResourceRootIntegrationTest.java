@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -25,15 +24,12 @@ import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.HALMapper;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALServiceDocument;
-import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
 public class WebResourceRootIntegrationTest{
 	private Server server;
-	private WebClient client; 
-	@Mock
-	private ResourceDAO<TestResource> mockDAO;
+	private WebClient client;
 	@InjectMocks
 	private TestWebResource webResource;
 	
@@ -55,8 +51,8 @@ public class WebResourceRootIntegrationTest{
 
 	private void createClient() {
 		client = WebClient.create(DefaultWebResourceTest.TEST_REQUEST_BASE_URI.toString(), Arrays.asList(new JacksonJsonProvider(new HALMapper())));
-		client.accept(MediaType.APPLICATION_HAL_JSON);
-		client.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_HAL_JSON);
+		client.accept(AdditionalMediaTypes.APPLICATION_HAL_JSON);
+		client.header(HttpHeaders.CONTENT_TYPE, AdditionalMediaTypes.APPLICATION_HAL_JSON);
 	}
 
 	@AfterEach

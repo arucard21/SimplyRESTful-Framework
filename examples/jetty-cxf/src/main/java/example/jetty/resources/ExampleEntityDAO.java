@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import simplyrestful.api.framework.core.EntityDAO;
-
-public class ExampleEntityDAO implements EntityDAO<ExampleResource> {
+public class ExampleEntityDAO {
 	private List<ExampleResource> unmappedDatastore;
 
 	public ExampleEntityDAO() {
@@ -33,23 +31,22 @@ public class ExampleEntityDAO implements EntityDAO<ExampleResource> {
         this.unmappedDatastore = datastore;
 	}
 
-	@Override
 	public long count() {
 		return unmappedDatastore.size();
 	}
 
-	@Override
-	public List<ExampleResource> findAllForPage(int pageNumber, int pageSize) {
+	public List<ExampleResource> findAllForPage(long pageNumber, long pageSize) {
 		if(pageNumber - 1 < 0) {
 			pageNumber = 0;
 		}
 		if(pageSize > count()) {
 			pageSize = unmappedDatastore.size();
 		}
-		return unmappedDatastore.subList((pageNumber - 1) * pageSize, pageSize);
+		int start = Math.toIntExact((pageNumber - 1) * pageSize);
+		int end = Math.toIntExact(pageSize);
+		return unmappedDatastore.subList(start, end);
 	}
 
-	@Override
 	public ExampleResource findByUUID(UUID entityID) {
 		return unmappedDatastore.stream()
 				.filter(resource -> resource.getUUID().equals(entityID))
@@ -57,7 +54,6 @@ public class ExampleEntityDAO implements EntityDAO<ExampleResource> {
 				.orElseGet(() -> null);
 	}
 
-	@Override
 	public ExampleResource persist(ExampleResource entity) {
 		int index = 0;
 		while(index < count()) {
@@ -75,7 +71,6 @@ public class ExampleEntityDAO implements EntityDAO<ExampleResource> {
 		return findByUUID(entity.getUUID());
 	}
 
-	@Override
 	public ExampleResource remove(UUID entityID) {
 		int index = 0;
 		while(index < count()) {
@@ -91,5 +86,4 @@ public class ExampleEntityDAO implements EntityDAO<ExampleResource> {
 			return unmappedDatastore.remove(index);
 		}
 	}
-
 }

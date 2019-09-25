@@ -1,29 +1,58 @@
 package simplyrestful.api.framework.test.implementation;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.UUID;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResourceTest;
-import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class TestResource extends HALResource{
 	public static final String PROFILE_STRING = "local://docs/resources/testresource";
+	public static final UUID TEST_RESOURCE_ID = UUID.fromString("bb2adabf-effe-4fb4-900b-d3b32cd9eed3");
 	public static final URI TEST_RESOURCE_PROFILE_URI = URI.create(PROFILE_STRING);
-	public static final UUID TEST_RESOURCE_ID = UUID.randomUUID();
 	public static final URI TEST_RESOURCE_URI = DefaultWebResourceTest.TEST_REQUEST_URI.resolve(TEST_RESOURCE_ID.toString());
 	
-	public TestResource() {
+	private TestResource(URI resourceUri) {
 		super();
-		this.setSelf(new HALLink.Builder(TEST_RESOURCE_URI)
-				.type(MediaType.APPLICATION_HAL_JSON)
+		this.setSelf(new HALLink.Builder(resourceUri)
+				.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 				.profile(TEST_RESOURCE_PROFILE_URI)
 				.build());
+	}
+	
+	public TestResource() {
+		this(TEST_RESOURCE_URI);
+	}
+	
+	public static TestResource random() {
+		return new TestResource(DefaultWebResourceTest.TEST_REQUEST_URI.resolve(UUID.randomUUID().toString()));
 	}
 	
 	@Override
 	public URI getProfile() {
 		return TEST_RESOURCE_PROFILE_URI;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getProfile()) + super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof TestResource) {
+			TestResource resource = (TestResource) obj;
+			return super.equals(obj) && 
+					Objects.equals(this.getProfile(), resource.getProfile());
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean canEqual(Object obj) {
+		return (obj instanceof TestResource);
 	}
 }

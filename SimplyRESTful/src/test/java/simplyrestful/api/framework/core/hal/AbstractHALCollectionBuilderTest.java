@@ -8,7 +8,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.junit.jupiter.api.BeforeEach;
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.MediaType;
+import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALResource;
 
@@ -33,7 +33,7 @@ public abstract class AbstractHALCollectionBuilderTest {
 
 	protected HALCollection<TestResource> createExpectedCollection(int page, int pageSize, int first, int last, int prev, int next, int sublistBegin, int sublistEnd, boolean compact) {
 		HALCollection<TestResource> expected = new HALCollection<TestResource>();
-		expected.setSelf(new HALLink.Builder(requestURI).type(MediaType.APPLICATION_HAL_JSON).profile(expected.getProfile()).build());
+		expected.setSelf(new HALLink.Builder(requestURI).type(AdditionalMediaTypes.APPLICATION_HAL_JSON).profile(expected.getProfile()).build());
 		expected.setPage(page);
 		expected.setMaxPageSize(pageSize);
 		expected.setTotal(TEST_RESOURCES_SIZE);

@@ -7,12 +7,13 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
+import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
-import simplyrestful.api.framework.core.MediaType;
 import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALResource;
 
-public abstract class HALCollectionBuilder<T extends HALResource> {
+public class HALCollectionBuilder<T extends HALResource> {
+	private static final String ERROR_MORE_RESOURCES_PROVIDED_THAN_ALLOWED = "More resources were provided than the max page size. You may want to try using HALCollectionBuilder.fromFullList.";
 	public static final String DEFAULT_PAGE_NUMBER_STRING = "1";
 	public static final int DEFAULT_PAGE_NUMBER = Integer.parseInt(DEFAULT_PAGE_NUMBER_STRING);
 	public static final String DEFAULT_MAX_PAGESIZE_STRING = "100";
@@ -22,21 +23,33 @@ public abstract class HALCollectionBuilder<T extends HALResource> {
 	
 	protected final List<T> resources;
 	protected final URI requestURI;
-	protected int page = DEFAULT_PAGE_NUMBER;
-	protected int maxPageSize = DEFAULT_MAX_PAGESIZE; 
+	protected final boolean fromFull;
+	protected final long collectionSize; 
+	protected long page = DEFAULT_PAGE_NUMBER;
+	protected long maxPageSize = DEFAULT_MAX_PAGESIZE; 
 	protected boolean compact = DEFAULT_COMPACT_VALUE;
 	
-	public HALCollectionBuilder(List<T> resources, URI requestURI){
-		this.resources = resources;
-		this.requestURI = requestURI;
+	public static <T extends HALResource> HALCollectionBuilder<T> fromFull(List<T> resources, URI requestURI) {
+		return new HALCollectionBuilder<T>(resources, requestURI, resources.size(), true);
 	}
 	
-	public HALCollectionBuilder<T> page(int page) {
+	public static <T extends HALResource> HALCollectionBuilder<T> fromPartial(List<T> resources, URI requestURI, long collectionSize) {
+		return new HALCollectionBuilder<T>(resources, requestURI, collectionSize, false).maxPageSize(resources.size());
+	}
+	
+	private HALCollectionBuilder(List<T> resources, URI requestURI, long collectionSize, boolean fromFull){
+		this.resources = resources;
+		this.requestURI = requestURI;
+		this.fromFull = fromFull;
+		this.collectionSize = collectionSize;
+	}
+	
+	public HALCollectionBuilder<T> page(long page) {
 		this.page = page;
 		return this;
 	}
 	
-	public HALCollectionBuilder<T> maxPageSize(int maxPageSize) {
+	public HALCollectionBuilder<T> maxPageSize(long maxPageSize) {
 		this.maxPageSize = maxPageSize;
 		return this;
 	}
@@ -46,7 +59,50 @@ public abstract class HALCollectionBuilder<T extends HALResource> {
 		return this;
 	}
 	
-	public abstract HALCollection<T> build();
+	public HALCollection<T> build(){
+		HALCollection<T> collection = new HALCollection<T>();
+		collection.setPage(page);
+		collection.setMaxPageSize(maxPageSize);
+		collection.setTotal(collectionSize);
+		if(fromFull) {
+			int pageBegin = Math.toIntExact((page - 1) * maxPageSize);
+			int pageEnd = Math.toIntExact(pageBegin + maxPageSize);
+			
+			if (pageEnd >= collectionSize){
+				pageEnd = Math.toIntExact(collectionSize);
+			}
+			addResourcesToCollection(collection, resources.subList(pageBegin, pageEnd), compact);
+		}
+		else {
+			if (resources.size() > maxPageSize) {
+				throw new IllegalStateException(ERROR_MORE_RESOURCES_PROVIDED_THAN_ALLOWED);
+			}
+			addResourcesToCollection(collection, resources, compact);
+		}
+
+		int firstPage = 1;
+		collection.setFirst(
+				createHALLinkFromURIWithModifiedPageNumber(requestURI, firstPage));
+
+		int lastPage = collectionSize == 0 ? 1 : Double.valueOf(Math.ceil(Long.valueOf(collectionSize).doubleValue() / Long.valueOf(maxPageSize).doubleValue())).intValue();
+		collection.setLast(
+				createHALLinkFromURIWithModifiedPageNumber(requestURI, lastPage));
+
+		int currentPage = Math.toIntExact(page);
+		if (currentPage > 1){
+			int prevPage = currentPage - 1;
+			collection.setPrev(
+					createHALLinkFromURIWithModifiedPageNumber(requestURI, prevPage));
+		}
+
+		if (currentPage < lastPage){
+			int nextPage = currentPage + 1;
+			collection.setNext(
+					createHALLinkFromURIWithModifiedPageNumber(requestURI, nextPage));
+		}
+		addSelfLink(collection, requestURI);
+		return collection;
+	}
 
 	protected HALLink createHALLinkFromURIWithModifiedPageNumber(URI requestURI, int pageNumber){
 		UriBuilder hrefBuilder = UriBuilder.fromUri(requestURI);
@@ -80,7 +136,7 @@ public abstract class HALCollectionBuilder<T extends HALResource> {
 
 	protected void addSelfLink(HALCollection<T> collection, URI collectionURI) {
 		collection.setSelf(new HALLink.Builder(collectionURI)
-										.type(MediaType.APPLICATION_HAL_JSON)
+										.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 										.profile(collection.getProfile())
 										.build());
 	}

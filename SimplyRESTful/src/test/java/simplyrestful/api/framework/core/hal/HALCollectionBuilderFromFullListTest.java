@@ -1,17 +1,18 @@
 package simplyrestful.api.framework.core.hal;
 
 import java.net.URI;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import simplyrestful.api.framework.core.MediaType;
+import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.resources.HALCollection;
 
 public class HALCollectionBuilderFromFullListTest extends AbstractHALCollectionBuilderTest {
 	@BeforeEach
 	public void initializeBuilder() {
-		builder = new HALCollectionBuilderFromFullList<TestResource>(testResourcesList, requestURI);
+		builder = HALCollectionBuilder.fromFull(testResourcesList, requestURI);
 	}
 	
 	@Test
@@ -79,6 +80,6 @@ public class HALCollectionBuilderFromFullListTest extends AbstractHALCollectionB
 		int maxPageSize = 100;
 		boolean compact = true;
 		HALCollection<TestResource> actual = builder.page(page).maxPageSize(maxPageSize).compact(compact).build();
-		Assertions.assertEquals(MediaType.APPLICATION_HAL_JSON, actual.getSelf().getType());
+		Assertions.assertEquals(AdditionalMediaTypes.APPLICATION_HAL_JSON, actual.getSelf().getType());
 	}
 }

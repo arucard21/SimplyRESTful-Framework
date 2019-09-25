@@ -2,7 +2,6 @@ package simplyrestful.api.framework.resources;
 
 import java.net.URI;
 import java.util.Objects;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -12,18 +11,8 @@ import io.openapitools.jackson.dataformat.hal.annotation.Resource;
 
 @Resource
 public abstract class HALResource{
-	@JsonIgnore
-	public UUID uuid;
 	@Link
-	protected HALLink self;
-	
-	public UUID getUUID() {
-		return uuid;
-	}
-
-	public void setUUID(UUID uuid) {
-		this.uuid = uuid;
-	}
+	private HALLink self;
 
 	public void setSelf(HALLink selfLink){
 		this.self = selfLink;
@@ -46,17 +35,20 @@ public abstract class HALResource{
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(self, getProfile());
+		return Objects.hash(self);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof HALResource)){
-			return false;
+		if (obj instanceof HALResource){
+			HALResource resource = ((HALResource) obj);
+			return resource.canEqual(this) &&
+					Objects.equals(self, resource.getSelf());
 		}
-		HALResource otherCollection = (HALResource) obj;
-		return
-				Objects.equals(self, otherCollection.getSelf()) &&
-				Objects.equals(getProfile(), otherCollection.getProfile());
+		return false;
+	}
+	
+	public boolean canEqual(Object obj) {
+		return (obj instanceof HALResource);
 	}
 }

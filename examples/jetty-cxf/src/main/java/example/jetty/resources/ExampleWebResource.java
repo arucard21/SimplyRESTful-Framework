@@ -19,21 +19,93 @@
 
 package example.jetty.resources;
 
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.UriBuilder;
 
+import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.Api;
+import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
-import simplyrestful.api.framework.core.MediaType;
-import simplyrestful.api.framework.core.ResourceDAO;
 
 @Path("/resources")
 @Api(value = "Example Resources")
-@Produces(MediaType.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
-@Consumes(MediaType.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
+@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
+@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
-	public ExampleWebResource(ResourceDAO<ExampleResource> resourceDao) {
-		super(resourceDao);
+	private ExampleEntityDAO dao = new ExampleEntityDAO();
+	
+	@Override
+	public ExampleResource create(ExampleResource resource, UUID resourceUUID) {
+		ExampleResource entity = getEntityDao().persist(map(resource));
+		if (entity == null) {
+			return null;
+		}
+		return map(entity);
+	}
+
+	@Override
+	public ExampleResource read(UUID resourceUUID) {
+		return map(getEntityDao().findByUUID(resourceUUID));
+	}
+
+	@Override
+	public ExampleResource update(ExampleResource resource, UUID resourceUUID) {
+		resource.setUUID(resourceUUID);
+		ExampleResource entity = getEntityDao().persist(map(resource));
+		if (entity == null) {
+			return null;
+		}
+		return map(entity);
+	}
+
+	@Override
+	public ExampleResource delete(UUID resourceUUID) {
+		ExampleResource entity = getEntityDao().remove(resourceUUID);
+		return map(entity);
+	}
+
+	@Override
+	public List<ExampleResource> listing(long pageNumber, long pageSize) {
+		return getEntityDao().findAllForPage(pageNumber, pageSize).stream()
+				.map(entity -> map(entity))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * This simple map method allows using the same POJO as both the API resource and the entity used for persistence. 
+	 * 
+	 * @param entity is either the API resource or the entity
+	 * @return the entity for the given API resource, or the API resource for the given entity 
+	 */
+	private ExampleResource map(ExampleResource entity) {
+		if(entity == null) {
+			return null;
+		}
+		ensureSelfLinkPresent(entity);
+		return entity;
+	}
+	
+	private void ensureSelfLinkPresent(ExampleResource persistedResource) {
+		if(persistedResource.getSelf() == null) {
+			persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI()).path(persistedResource.getUUID().toString()).build())
+					.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
+					.profile(persistedResource.getProfile())
+					.build());
+		}
+		if(persistedResource.getUUID() == null) {
+			UUID id = UUID.fromString(getAbsoluteWebResourceURI().relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
+			persistedResource.setUUID(id);
+		}
+	}
+
+	private ExampleEntityDAO getEntityDao() {
+		return dao;
 	}
 }
