@@ -14,7 +14,7 @@ What this library does:
 ## Usage
 To use it in your project you have to:
 * *Prerequisite: Your project should be [set up as a Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/).* 
-* Depend on `[deploy-springboot-cxf](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-springboot-cxf/)`
+* Depend on [`deploy-springboot-cxf`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-springboot-cxf/)
 * Implement your SimplyRESTful API according to the [standard instructions](/SimplyRESTful#usage).
 * Make sure your implemented JAX-RS Web Resources can be detected by a Spring Component Scan.
     * An easy way to do this is to annotate your Web Resource class with `@Named` (`javax.inject.Named`) and make sure it is located in a subpackage of the package containing your Spring Boot Application class (or the same package).
