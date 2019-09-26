@@ -2,17 +2,23 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-springboot-cxf/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/deploy-springboot-cxf)
 
-Deploy your SimplyRESTful API using Apache CXF with Spring Boot.
+Convenience library for starting the SimplyRESTful API on a Tomcat server with Apache CXF using Spring Boot.
 
-Provides the configuration required to deploy a SimplyRESTful API using Apache CXF with Spring Boot auto-scanning. This should provide quite a flexible base from which to customize your deployment but if you want or need more advanced configuration, you can always copy the code from this library and customize it as needed.
-
-The configuration makes all JAX-RS resources available under the path `/services` (e.g. `/services/apiresource`). The configuration also includes generation of an OpenAPI Specification file at `/services/swagger.json`. It enables Swagger-UI as well at `/services/api-docs`. You can access Swagger-UI with `/services/api-docs?url=../swagger.json` so it automatically loads the generated OpenAPI Specification file. By default, Spring Boot runs the server on `http://localhost:8080`.
+What this library does:
+* Registers the JAX-RS providers required by SimplyRESTful.
+* Makes the registered JAX-RS Web Resources available directly under the path `/`.
+* Generates an OpenAPI Specification document at `/swagger.json`
+* Provides a Swagger UI at `/api-docs`. 
+    * Tip: If you access Swagger UI with `/api-docs?url=../swagger.json` it automatically loads the generated OpenAPI Specification file of the API. Or you can go to `/services`, which provides you with this link.
 
 ## Usage
-To use it, in your project you have to:
-* Depend on SimplyRESTful-cxf-spring-boot
-* [Implement your SimplyRESTful API](/SimplyRESTful#usage)
-* Make sure your web resource class (which extends WebResourceBase) is annotated with `@javax.inject.Named` so it is detected by Spring Boot's auto-scan.
-* Create a Spring Boot application class which scans the `simplyrestful.springboot` package as well as your own package(s), containing the web resource class(es).
+To use it in your project you have to:
+* *Prerequisite: Your project should be [set up as a Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/).* 
+* Depend on `[deploy-springboot-cxf](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-springboot-cxf/)`
+* Implement your SimplyRESTful API according to the [standard instructions](/SimplyRESTful#usage).
+* Make sure your implemented JAX-RS Web Resources can be detected by a Spring Component Scan.
+    * An easy way to do this is to annotate your Web Resource class with `@Named` (`javax.inject.Named`) and make sure it is located in a subpackage of the package containing your Spring Boot Application class (or the same package).
+* Start your SimplyRESTful API by simply [running your Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/#using-boot-running-your-application).
+    * By default, Spring Boot runs the API on `http://localhost:8080`.
 
-See the [SimplyRESTful-example](/examples/springboot-cxf) project for a simple example of this deployment method.
+See the [example project](/examples/springboot-cxf) for a simple example of how this library can be used.
