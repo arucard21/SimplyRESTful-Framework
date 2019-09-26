@@ -8,7 +8,7 @@ The framework provides a default implementation of a JAX-RS Web Resource (often 
 
 ## Usage
 * *Prerequisite: You have designed your API resources*  
-* Add a dependency on `[SimplyRESTful](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/SimplyRESTful/)` to your project
+* Add a dependency on [`SimplyRESTful`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/SimplyRESTful/) to your project
 * For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object) that extends [HALResource](/SimplyRESTful-resources/src/main/java/simplyrestful/api/framework/resources/HALResource.java), providing it with a profile URI.
     * *It's strongly recommended to provide full documentation for your resource at the location indicated by the profile URI*
 * For each POJO, create a JAX-RS Web Resource (aka endpoint) that extends [DefaultWebResource](src/main/java/simplyrestful/api/framework/core/DefaultWebResource.java) and uses that POJO as its generic type T.
