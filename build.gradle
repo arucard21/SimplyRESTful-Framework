@@ -159,17 +159,12 @@ project(":persist-springdata"){
 	}
 }
 
-project(":examples:datastore"){
-	uploadArchives.enabled = false;
-}
-
 project(":examples:springboot-cxf"){
 	apply plugin: "org.springframework.boot"
 	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
 		compile project(':SimplyRESTful')
 		compile project(':deploy-springboot-cxf')
-		compile project(':examples:datastore')
 	}
 	uploadArchives.enabled = false;
 }
@@ -179,7 +174,6 @@ project(":examples:jetty-cxf"){
 	dependencies {
 		compile project(':SimplyRESTful')
 		compile project(':deploy-jetty-cxf')
-		compile project(':examples:datastore')
 		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
 	}
 	uploadArchives.enabled = false;

@@ -131,8 +131,12 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 
 	@Override
 	public List<ExampleResource> listing(long pageNumber, long pageSize) {
-		int startElement = Math.toIntExact((pageNumber-1)*pageSize);
-		int endElement = Math.toIntExact((pageNumber)*pageSize);
+		int integerPageNumber = (pageNumber > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageNumber);
+		int integerPageSize = (pageSize > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageSize);
+		
+		int startElement = Math.toIntExact((integerPageNumber-1)*integerPageSize);
+		int endElement = Math.toIntExact((integerPageNumber)*integerPageSize);
+		
 		List<StoredObject> data = dataStore.getData();
 		int dataSize = data.size();
 		if (startElement > dataSize) {
@@ -190,7 +194,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	private HALLink createSelfLinkWithUUID(UUID id, URI resourceProfile) {
-		return new HALLink.Builder(getAbsoluteWebResourceURI())
+		return new HALLink.Builder(getAbsoluteWebResourceURI(id))
 			.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 			.profile(resourceProfile)
 			.build();
