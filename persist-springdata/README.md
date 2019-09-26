@@ -23,7 +23,7 @@ To use it, in your project you have to:
     * *In this Web Resource, you only need to define the constructor and provide it with your implementation of the `SpringDataEntityDAO`.*
 * In your JAX-RS framework, register:
     * a `JacksonJsonProvider` instance that uses `HALMapper` (`io.openapitools.jackson.dataformat.hal.HALMapper`) as `ObjectMapper`.
-    * the [`WebResourceRoot`](src/main/java/simplyrestful/api/framework/core/) class.
+    * the [`WebResourceRoot`](/SimplyRESTful/src/main/java/simplyrestful/api/framework/core/servicedocument/WebResourceRoot.java) class.
     * the Web Resources you created for each POJO.
 * Deploy and run your SimplyRESTful API as any other JAX-RS API.
 
