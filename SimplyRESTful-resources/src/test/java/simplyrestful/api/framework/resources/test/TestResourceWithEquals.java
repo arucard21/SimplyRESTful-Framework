@@ -1,35 +1,24 @@
-package simplyrestful.api.framework.test.implementation;
+package simplyrestful.api.framework.resources.test;
 
 import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 
-import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.resources.HALResource;
 
-public class TestResource extends HALResource{
+public class TestResourceWithEquals extends HALResource{
 	public static final String PROFILE_STRING = "local://docs/resources/testresource";
-	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/");
-	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources/");
 	public static final UUID TEST_RESOURCE_ID = UUID.fromString("bb2adabf-effe-4fb4-900b-d3b32cd9eed3");
 	public static final URI TEST_RESOURCE_PROFILE_URI = URI.create(PROFILE_STRING);
+	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources/");
 	public static final URI TEST_RESOURCE_URI = TEST_REQUEST_URI.resolve(TEST_RESOURCE_ID.toString());
 	
-	private TestResource(URI resourceUri) {
+	private TestResourceWithEquals(URI resourceUri) {
 		super();
-		this.setSelf(new HALLink.Builder(resourceUri)
-				.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
-				.profile(TEST_RESOURCE_PROFILE_URI)
-				.build());
 	}
 	
-	public TestResource() {
+	public TestResourceWithEquals() {
 		this(TEST_RESOURCE_URI);
-	}
-	
-	public static TestResource random() {
-		return new TestResource(TEST_REQUEST_URI.resolve(UUID.randomUUID().toString()));
 	}
 	
 	@Override
@@ -44,8 +33,8 @@ public class TestResource extends HALResource{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof TestResource) {
-			TestResource resource = (TestResource) obj;
+		if (obj instanceof TestResourceWithEquals) {
+			TestResourceWithEquals resource = (TestResourceWithEquals) obj;
 			return super.equals(obj) && 
 					Objects.equals(this.getProfile(), resource.getProfile());
 		}
@@ -54,6 +43,6 @@ public class TestResource extends HALResource{
 	
 	@Override
 	public boolean canEqual(Object obj) {
-		return (obj instanceof TestResource);
+		return (obj instanceof TestResourceWithEquals);
 	}
 }

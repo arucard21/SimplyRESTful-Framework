@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.hal;
+package simplyrestful.api.framework.resources;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.test.implementation.TestResource;
+import simplyrestful.api.framework.resources.test.TestResourceWithEquals;
 
 public class HALCollectionTest {
 	private static final String TEST_COLLECTION_HREF_1 = "local://docs/resources/testcollection/1";
@@ -22,16 +21,16 @@ public class HALCollectionTest {
 	private static final String TEST_COLLECTION_PAGE_BASE = "local://docs/resources/testcollection/2?page=";
 	private static final URI requestURI = URI.create("local://resources/testresources/");
 
-	private HALCollection<TestResource> testCollection;
-	private HALCollection<TestResource> testCollectionSame;
-	private HALCollection<TestResource> testCollectionDifferent;
-	private List<TestResource> testResourcesList;
+	private HALCollection<TestResourceWithEquals> testCollection;
+	private HALCollection<TestResourceWithEquals> testCollectionSame;
+	private HALCollection<TestResourceWithEquals> testCollectionDifferent;
+	private List<TestResourceWithEquals> testResourcesList;
 
 	@BeforeEach
 	public void createTestResources(){
-		testResourcesList = new ArrayList<TestResource>();
+		testResourcesList = new ArrayList<TestResourceWithEquals>();
 		for (int i = 0; i < 100; i++){
-			TestResource testResource = new TestResource();
+			TestResourceWithEquals testResource = new TestResourceWithEquals();
 			URI selfLink = UriBuilder.fromUri(requestURI).path(String.valueOf(i)).build();
 			testResource.setSelf(new HALLink.Builder(selfLink).build());
 			testResourcesList.add(testResource);
@@ -98,10 +97,10 @@ public class HALCollectionTest {
 
 	@Test
 	public void halCollection_shouldNotBeEqual_whenOnlySelfLinkDiffers() throws Exception {
-		HALCollection<TestResource> onlySelfLink1 = new HALCollection<>();
+		HALCollection<TestResourceWithEquals> onlySelfLink1 = new HALCollection<>();
 		onlySelfLink1.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_1).profile(onlySelfLink1.getProfile()).build());
 
-		HALCollection<TestResource> onlySelfLink2 = new HALCollection<>();
+		HALCollection<TestResourceWithEquals> onlySelfLink2 = new HALCollection<>();
 		onlySelfLink2.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_2).profile(onlySelfLink2.getProfile()).build());
 
 		Assertions.assertNotEquals(onlySelfLink1, onlySelfLink2);

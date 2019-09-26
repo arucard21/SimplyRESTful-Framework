@@ -22,8 +22,6 @@ import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultWebResourceTest{
-	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/");
-	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources/");
 
 	@Mock
 	private UriInfo uriInfo;
@@ -34,21 +32,21 @@ public class DefaultWebResourceTest{
 	public void endpoint_shouldCreateLinkWithCorrectMediaType(){
 		Assertions.assertEquals(
 				AdditionalMediaTypes.APPLICATION_HAL_JSON,
-				testEndpoint.createLink(TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
+				testEndpoint.createLink(TestResource.TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
 	}
 
 	@Test
 	public void endpoint_shouldCreateLinkWithCorrectProfile(){
 		Assertions.assertEquals(
 				TestResource.TEST_RESOURCE_PROFILE_URI,
-				testEndpoint.createLink(TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getProfile());
+				testEndpoint.createLink(TestResource.TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getProfile());
 	}
 
 	@Test
 	public void endpoint_shouldCreateLinkWithCorrectRequestURI(){
 		Assertions.assertEquals(
-				TEST_REQUEST_URI,
-				URI.create(testEndpoint.createLink(TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getHref()));
+				TestResource.TEST_REQUEST_URI,
+				URI.create(testEndpoint.createLink(TestResource.TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getHref()));
 	}
 
 	@Test

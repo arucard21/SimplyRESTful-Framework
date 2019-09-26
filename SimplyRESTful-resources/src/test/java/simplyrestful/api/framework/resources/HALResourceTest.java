@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.hal;
+package simplyrestful.api.framework.resources;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import simplyrestful.api.framework.resources.HALResource;
-import simplyrestful.api.framework.test.implementation.TestResource;
+import simplyrestful.api.framework.resources.test.TestResourceWithEquals;
 
 public class HALResourceTest{
 	private static final String TEST_RESOURCE_HREF_1 = "local://docs/resources/testresource/1";
@@ -20,20 +19,20 @@ public class HALResourceTest{
 
 	@BeforeEach
 	public void createTestResources(){
-		testResource = new TestResource();
+		testResource = new TestResourceWithEquals();
 		testResource.setSelf(new HALLink.Builder(TEST_RESOURCE_HREF_1).profile(testResource.getProfile()).build());
 
-		testResourceSame = new TestResource();
+		testResourceSame = new TestResourceWithEquals();
 		testResourceSame.setSelf(new HALLink.Builder(TEST_RESOURCE_HREF_1).profile(testResourceSame.getProfile()).build());
 
-		testResourceDifferent = new TestResource();
+		testResourceDifferent = new TestResourceWithEquals();
 		testResourceDifferent.setSelf(new HALLink.Builder(TEST_RESOURCE_HREF_2).profile(testResourceDifferent.getProfile()).build());
 	}
 	
 	@Test
 	public void equalsContract() {
 	    EqualsVerifier.forClass(HALResource.class)
-	    		.withRedefinedSubclass(TestResource.class)
+	    		.withRedefinedSubclass(TestResourceWithEquals.class)
 	    		.suppress(Warning.NONFINAL_FIELDS)
 	    		.verify();
 	}

@@ -24,6 +24,7 @@ import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.HALMapper;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALServiceDocument;
+import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,12 +46,12 @@ public class WebResourceRootIntegrationTest{
 		sf.setProvider(new JacksonJsonProvider(new HALMapper()));
 		sf.setResourceProvider(TestWebResource.class, new SingletonResourceProvider(webResource, true));
 		sf.setResourceProvider(WebResourceRoot.class, new SingletonResourceProvider(new WebResourceRoot(), true));
-		sf.setAddress(DefaultWebResourceTest.TEST_REQUEST_BASE_URI.toString());
+		sf.setAddress(TestResource.TEST_REQUEST_BASE_URI.toString());
 		server = sf.create();
 	}
 
 	private void createClient() {
-		client = WebClient.create(DefaultWebResourceTest.TEST_REQUEST_BASE_URI.toString(), Arrays.asList(new JacksonJsonProvider(new HALMapper())));
+		client = WebClient.create(TestResource.TEST_REQUEST_BASE_URI.toString(), Arrays.asList(new JacksonJsonProvider(new HALMapper())));
 		client.accept(AdditionalMediaTypes.APPLICATION_HAL_JSON);
 		client.header(HttpHeaders.CONTENT_TYPE, AdditionalMediaTypes.APPLICATION_HAL_JSON);
 	}
@@ -64,7 +65,7 @@ public class WebResourceRootIntegrationTest{
 	@Test
 	public void webResource_shouldReturnServiceDocument_whenGETReceivedOnRootURI(){
 		HALServiceDocument serviceDocument = client.get(HALServiceDocument.class);
-		URI pathToOpenAPISpecification = UriBuilder.fromUri(DefaultWebResourceTest.TEST_REQUEST_BASE_URI).path("swagger.json").build();
+		URI pathToOpenAPISpecification = UriBuilder.fromUri(TestResource.TEST_REQUEST_BASE_URI).path("swagger.json").build();
 		Assertions.assertEquals(new HALLink.Builder(pathToOpenAPISpecification).build(), serviceDocument.getDescribedby());
 	}
 }

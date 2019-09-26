@@ -72,6 +72,12 @@ project(":SimplyRESTful-resources"){
 	dependencies {
 		compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
 		compile ("io.openapitools.hal:swagger-hal:1.0.4")
+
+		testCompile ("org.junit.jupiter:junit-jupiter-api:${junit}")
+		testCompile ("org.junit.jupiter:junit-jupiter-engine:${junit}")
+		testCompile ("org.junit.platform:junit-platform-launcher:1.5.2")
+		testCompile ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
+		testCompile ("nl.jqno.equalsverifier:equalsverifier:3.1.9")
 	}
 }
 
