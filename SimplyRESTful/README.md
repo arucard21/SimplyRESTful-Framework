@@ -13,3 +13,8 @@ The framework provides a default implementation of a JAX-RS Web Resource (often 
     * *It's strongly recommended to provide full documentation for your resource at the location indicated by the profile URI*
 * For each POJO, create a JAX-RS Web Resource (aka endpoint) that extends [DefaultWebResource](src/main/java/simplyrestful/api/framework/core/DefaultWebResource.java) and uses that POJO as its generic type T.
 * In this Web Resource, you can now implement the `create()`, `read()`, `update()`, `delete()` and `listing()` methods to connect to your backend as needed.
+* In your JAX-RS framework, register:
+    * a `JacksonJsonProvider` instance that uses `HALMapper` (`io.openapitools.jackson.dataformat.hal.HALMapper`) as `ObjectMapper`.
+    * the [`WebResourceRoot`](src/main/java/simplyrestful/api/framework/core/) class.
+    * the Web Resources you created for each POJO.
+* Deploy and run your SimplyRESTful API as any other JAX-RS API. 

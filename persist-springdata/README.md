@@ -2,16 +2,29 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?style=plastic)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/persist-springdata/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/persist-springdata)
 
-A framework that connects Spring Data Rrepositories to SimplyRESTful APIs.
+Convenience library for creating a SimplyRESTful API that stores its API resources directly in a database using Spring Data.
 
-Provides convenience code connecting the SimplyRESTful API's EntityDAO to a Spring Data Repository.
+What this library does:
+* Extends SimplyRESTful's default implementation of a JAX-RS Web Resource to persist the API resources directly to a database using a Spring Data Repository.
+* Extends SimplyRESTful's `HALResource` to directly include the UUID used in the resource's self-link.
+* Ensures that the self-link and UUID remain consistent (only the UUID is stored in the database, not the self-link).  
 
 ## Usage
 To use it, in your project you have to:
-* Depend on persist-springdata
-* [Implement your SimplyRESTful API](/SimplyRESTful#usage). However, you must extend [`SpringDataEntityDAO`](src/main/java/simplyrestful/springdata/repository/SpringDataEntityDAO.java) instead of `EntityDAO`.
-* Extend the [`SpringDataEntityDAO`](src/main/java/simplyrestful/springdata/repository/SpringDataEntityDAO.java) and provide an object you created for persistence as its generic object. This Repository interface will not require any additional code unless functionality that requires it was added to the class that extends `SpringDataEntityDAO`.
-* Configure the Spring Data Repository to suit your needs. The documentation provided by Spring Data can elaborate on how exactly this can be done.
-* Deploy your API as required by your chosen deployment method
+* *Prerequisite: You have designed your API resources*
+* Add a dependency on [`persist-springdata`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/persist-springdata/) to your project
+* For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object) that extends [`SpringDataHALResource`](src/main/java/simplyrestful/springdata/resources/SpringDataHALResource.java), providing it with a profile URI.
+    * *It's strongly recommended to provide full documentation for your resource at the location indicated by the profile URI.*
+* For each POJO, create an interface class that extends [`SpringDataRepository`](src/main/java/simplyrestful/springdata/repository/SpringDataRepository.java) and uses that POJO as its generic type E.
+    * *This class does not require any code.*
+* For each POJO, create a class that extends [`SpringDataEntityDAO`](src/main/java/simplyrestful/springdata/repository/SpringDataEntityDAO.java) and uses that POJO as its generic type E. 
+    * *In this class, you only need to define the constructor and provide it with your implementation of the `SpringDataRepository`.*
+* For each POJO, create a JAX-RS Web Resource (aka endpoint) that extends [`SpringDataWebResource`](src/main/java/simplyrestful/springdata/resources/SpringDataWebResource.java) and uses that POJO as its generic type T.
+    * *In this Web Resource, you only need to define the constructor and provide it with your implementation of the `SpringDataEntityDAO`.*
+* In your JAX-RS framework, register:
+    * a `JacksonJsonProvider` instance that uses `HALMapper` (`io.openapitools.jackson.dataformat.hal.HALMapper`) as `ObjectMapper`.
+    * the [`WebResourceRoot`](src/main/java/simplyrestful/api/framework/core/) class.
+    * the Web Resources you created for each POJO.
+* Deploy and run your SimplyRESTful API as any other JAX-RS API.
 
-See the [example](/examples/springboot-jersey-nomapping-springdata) project for a simple example of using Spring Data Repositories without mapping the resource.
+See the [example project](/examples/springboot-jersey-nomapping-springdata) for a simple example of how this library can be used.
