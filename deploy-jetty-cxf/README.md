@@ -14,9 +14,9 @@ What this library does:
 
 ## Usage
 To use it in your project you have to:
-* Depend on `[deploy-jetty-cxf](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-jetty-cxf/)`
+* Depend on [`deploy-jetty-cxf`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-jetty-cxf/)
 * Implement your SimplyRESTful API according to the [standard instructions](/SimplyRESTful#usage).
-* Build the Jetty `Server` object using the `[ServerBuilder](/deploy-jetty-cxf/src/main/java/simplyrestful/jetty/deploy/ServerBuilder.java)`.
+* Build the Jetty `Server` object using the [`ServerBuilder`](/deploy-jetty-cxf/src/main/java/simplyrestful/jetty/deploy/ServerBuilder.java).
     * Use `withWebResource()` to register your JAX-RS Web Resources in Apache CXF.
     * You can also provide the address where the server should be hosted. (default: `http://localhost:9000`).
 * Use the `Server` object to start your SimplyRESTful API.
