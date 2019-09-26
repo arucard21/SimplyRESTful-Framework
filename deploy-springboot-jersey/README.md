@@ -14,7 +14,7 @@ What this library does:
 ## Usage
 To use it in your project you have to:
 * *Prerequisite: Your project should be [set up as a Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/).* 
-* Depend on `[deploy-springboot-jersey](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-springboot-jersey/)`
+* Depend on [`deploy-springboot-jersey`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-springboot-jersey/).
 * Implement your SimplyRESTful API according to the [standard instructions](/SimplyRESTful#usage).
 * Register your implemented JAX-RS Web Resources in Jersey [as documented for Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/html/#boot-features-jersey).
 * Start your SimplyRESTful API by simply [running your Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/#using-boot-running-your-application).
