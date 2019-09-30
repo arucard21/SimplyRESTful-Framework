@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALMapper;
-import simplyrestful.api.framework.core.BaseWebResource;
+import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALResource;
 
@@ -58,7 +58,7 @@ import simplyrestful.api.framework.resources.HALResource;
 public class ServerBuilder {
 	private static final Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.APIServer");
 	private String address = "http://localhost:9000";
-	private List<Class<? extends BaseWebResource<? extends HALResource>>> webResources = new ArrayList<>();
+	private List<Class<? extends DefaultWebResource<? extends HALResource>>> webResources = new ArrayList<>();
 	private List<Object> providers = new ArrayList<>();
 
 	/**
@@ -80,7 +80,7 @@ public class ServerBuilder {
 	 * @return the builder object
 	 */
 	public <T extends HALResource> ServerBuilder withWebResource(
-			Class<? extends BaseWebResource<T>> webResource) {
+			Class<? extends DefaultWebResource<T>> webResource) {
 		webResources.add(webResource);
 		return this;
 	}
@@ -114,7 +114,7 @@ public class ServerBuilder {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
         resourceProviders.add(new SingletonResourceProvider(new WebResourceRoot()));
-        for (Class<? extends BaseWebResource<? extends HALResource>> webResource: webResources){
+        for (Class<? extends DefaultWebResource<? extends HALResource>> webResource: webResources){
 			resourceProviders.add(new SingletonResourceProvider(webResource.newInstance()));
         }
         sf.setResourceProviders(resourceProviders);
