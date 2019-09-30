@@ -60,10 +60,10 @@ public class ServerBuilder {
 	private String address = "http://localhost:9000";
 	private List<Class<? extends BaseWebResource<? extends HALResource>>> webResources = new ArrayList<>();
 	private List<Object> providers = new ArrayList<>();
-	
+
 	/**
 	 * Configure the address used by the server
-	 * 
+	 *
 	 * @param address is the address which should be used by the server
 	 * @return the builder object
 	 */
@@ -71,10 +71,11 @@ public class ServerBuilder {
 		this.address = address;
 		return this;
 	}
-	
+
 	/**
 	 * Add a SimplyRESTful JAX-RS web resource to the server
-	 * 
+	 *
+	 * @param <T> is the HAL-based resource to which the Web Resource provides acces.
 	 * @param webResource is the SimplyRESTful JAX-RS web resource to add to the server
 	 * @return the builder object
 	 */
@@ -83,10 +84,10 @@ public class ServerBuilder {
 		webResources.add(webResource);
 		return this;
 	}
-	
+
 	/**
 	 * Add a JAX-RS provider to the server
-	 * 
+	 *
 	 * @param provider is the JAX-RS provider that should be added to the server
 	 * @return the builder object
 	 */
@@ -103,7 +104,7 @@ public class ServerBuilder {
      *
      * @throws SecurityException when the constructor of the web resource class can not be used
      * @throws NoSuchMethodException when the constructor of the web resource class does not exist
-     * @throws InvocationTargetException when the new instance of the web resource class can not be created 
+     * @throws InvocationTargetException when the new instance of the web resource class can not be created
      * @throws IllegalArgumentException when the new instance of the web resource class can not be created
      * @throws IllegalAccessException when the new instance of the web resource class can not be created
      * @throws InstantiationException when the new instance of the web resource class can not be created
@@ -129,7 +130,7 @@ public class ServerBuilder {
         sf.setInvoker(new JAXRSBeanValidationInvoker());
         Swagger2Feature swagger = new Swagger2Feature();
         swagger.setPrettyPrint(true);
-        sf.getFeatures().add(swagger);	
+        sf.getFeatures().add(swagger);
         sf.getFeatures().add(new JAXRSBeanValidationFeature());
         providers.addAll(Arrays.asList(
         		new MultipartProvider(),
