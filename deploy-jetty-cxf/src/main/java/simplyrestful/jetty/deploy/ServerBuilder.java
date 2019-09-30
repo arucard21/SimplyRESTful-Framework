@@ -76,7 +76,6 @@ public class ServerBuilder {
 	 * Add a SimplyRESTful JAX-RS web resource to the server
 	 * 
 	 * @param webResource is the SimplyRESTful JAX-RS web resource to add to the server
-	 * @param resourceDao is the DAO class for the provided web resource
 	 * @return the builder object
 	 */
 	public <T extends HALResource> ServerBuilder withWebResource(
