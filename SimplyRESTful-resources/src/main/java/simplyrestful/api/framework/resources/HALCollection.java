@@ -131,8 +131,8 @@ public class HALCollection<T extends HALResource> extends HALResource {
 		}
 		return false;
 	}
-	
-	public boolean canEqual(Object obj) {
+
+	protected boolean canEqual(Object obj) {
 		return (obj instanceof HALCollection<?>);
 	}
 }

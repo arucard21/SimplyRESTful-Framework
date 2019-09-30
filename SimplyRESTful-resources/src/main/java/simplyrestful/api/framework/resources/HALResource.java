@@ -47,8 +47,8 @@ public abstract class HALResource{
 		}
 		return false;
 	}
-	
-	public boolean canEqual(Object obj) {
+
+	protected boolean canEqual(Object obj) {
 		return (obj instanceof HALResource);
 	}
 }
