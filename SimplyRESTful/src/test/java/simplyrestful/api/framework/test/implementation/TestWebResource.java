@@ -63,7 +63,7 @@ public class TestWebResource extends DefaultWebResource<TestResource>{
 	}
 
 	@Override
-	public List<TestResource> listing(long pageNumber, long pageSize) {
+	public List<TestResource> list(long pageNumber, long pageSize) {
 		return Arrays.asList(TEST_RESOURCE, TestResource.random());
 	}	
 }

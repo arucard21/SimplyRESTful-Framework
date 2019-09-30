@@ -156,7 +156,7 @@ public abstract class BaseWebResource<T extends HALResource> {
 	 * @param pageSize is the requested size of each page
 	 * @return the requested HAL collection containing the resources for the requested page
 	 */
-	public abstract List<T> listing(long pageNumber, long pageSize);
+	public abstract List<T> list(long pageNumber, long pageSize);
 
 	/**
 	 * Retrieve how many resources are available.
@@ -166,7 +166,7 @@ public abstract class BaseWebResource<T extends HALResource> {
 	 * @return the total amount of resources that are available
 	 */
 	public long count() {
-		return this.listing(1, Long.MAX_VALUE).stream().count();
+		return this.list(1, Long.MAX_VALUE).stream().count();
 	}
 
 	/**

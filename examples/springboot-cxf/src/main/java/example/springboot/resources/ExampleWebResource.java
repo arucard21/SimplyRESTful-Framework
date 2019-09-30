@@ -130,7 +130,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> listing(long pageNumber, long pageSize) {
+	public List<ExampleResource> list(long pageNumber, long pageSize) {
 		int integerPageNumber = (pageNumber > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageNumber);
 		int integerPageSize = (pageSize > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageSize);
 		

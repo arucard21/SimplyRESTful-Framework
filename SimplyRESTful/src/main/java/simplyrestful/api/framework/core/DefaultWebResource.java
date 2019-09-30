@@ -53,7 +53,7 @@ public abstract class DefaultWebResource<T extends HALResource> extends BaseWebR
 			@DefaultValue(HALCollectionBuilder.DEFAULT_COMPACT_VALUE_STRING)
 			boolean compact) {
 		return HALCollectionBuilder.fromPartial(
-				this.listing(page, pageSize),
+				this.list(page, pageSize),
 				getRequestURI(),
 				this.count())
 						.page(page)

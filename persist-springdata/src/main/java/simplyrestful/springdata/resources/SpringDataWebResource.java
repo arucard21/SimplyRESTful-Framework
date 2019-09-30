@@ -71,7 +71,7 @@ public class SpringDataWebResource<T extends SpringDataHALResource> extends Defa
 	}
 
 	@Override
-	public List<T> listing(long pageNumber, long pageSize) {
+	public List<T> list(long pageNumber, long pageSize) {
 		return entityDao.findAllForPage(pageNumber, pageSize).stream()
 				.map(entity -> map(entity))
 				.collect(Collectors.toList());
