@@ -11,10 +11,10 @@ buildscript {
 
 ext {
 	jaxrs = "2.1.1"
-	cxf = "3.2.6"
+	cxf = "3.3.3"
 	junit = "5.5.2"
 	mockito = "2.22.0"
-	spring = "2.1.8.RELEASE"
+	spring = "2.1.9.RELEASE"
 }
 
 allprojects{
