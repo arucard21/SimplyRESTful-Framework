@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -50,6 +51,7 @@ public abstract class DefaultWebResource<T extends HALResource>{
 	 */
 	@GET
 	@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + HALCollection.PROFILE_STRING + "\"")
+	@Consumes
 	@ApiOperation(
 		value = "Get a list of resources",
 		notes = "Get a list of resources"
@@ -89,6 +91,7 @@ public abstract class DefaultWebResource<T extends HALResource>{
 		value = "Create a new resource",
 		notes = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated"
 	)
+	@Produces
 	public Response postHALResource(
 			@ApiParam(value = "resource", required = true)
 			@NotNull
@@ -115,6 +118,7 @@ public abstract class DefaultWebResource<T extends HALResource>{
 		value = "Retrieve a single resource",
 		notes = "Retrieve a single resource"
 	)
+	@Consumes
 	public T getHALResource(
 			@ApiParam(value = "The identifier for the resource", required = true)
 			@PathParam("id")
@@ -140,6 +144,7 @@ public abstract class DefaultWebResource<T extends HALResource>{
 		value = "Create or update a resource",
 		notes = "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK."
 	)
+	@Produces
 	public Response putHALResource(
 			@ApiParam(value = "The UUID part of the identifier for the resource", required = true)
 			@PathParam("id")
@@ -169,6 +174,8 @@ public abstract class DefaultWebResource<T extends HALResource>{
 		value = "Delete a single resource",
 		notes = "Delete a single resource"
 	)
+	@Consumes
+	@Produces
 	public Response deleteHALResource(
 			@ApiParam(value = "The UUID part of the identifier for the resource", required = true)
 			@PathParam("id")
