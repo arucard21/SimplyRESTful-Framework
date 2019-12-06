@@ -36,6 +36,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	private static final String QUERY_PARAM_PAGE = "page";
 	private static final String QUERY_PARAM_PAGESIZE = "pageSize";
 	private static final String QUERY_PARAM_COMPACT = "compact";
+	private GenericType<T> apiResourceType = new GenericType<T>() {};
+	private GenericType<HALCollection<T>> collectionResourceType = new GenericType<HALCollection<T>>() {};
 	private Class<T> resourceClass;
 	private URI baseApiUri;
 	private URI resourceUri;
@@ -47,7 +49,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	public SimplyRESTfulClient(URI baseApiUri) {
 		this.baseApiUri = baseApiUri;
 		this.client = ClientBuilder.newClient();
-		this.resourceClass = (Class<T>) new APIResource().getRawType();
+		this.resourceClass = (Class<T>) apiResourceType.getRawType();
 		this.resourceUri = discoverResourceURI();
 		detectResourceMediaType();
 	}
@@ -167,7 +169,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 		return target
 				.queryParam(QUERY_PARAM_COMPACT, compact)
 				.request()
-				.get(new APICollection());
+				.get(collectionResourceType);
 	}
 
 	/**
@@ -243,7 +245,4 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	public WebTarget hypermediaControls(HALLink action) {
 		return client.target(action.getHref());
 	}
-
-	private final class APICollection extends GenericType<HALCollection<T>> { /** Class representing the collection of API resources **/ }
-	private final class APIResource extends GenericType<T> { /** Class representing the API resource **/ }
 }

@@ -110,6 +110,17 @@ project(":client"){
 		compile project(":SimplyRESTful-resources")
 		compile ("org.glassfish.jersey.core:jersey-client:2.27")
 		compile ("io.swagger:swagger-models:1.5.21")
+		
+		integrationTestCompile project(":SimplyRESTful")
+		integrationTestCompile ("org.mockito:mockito-core:${mockito}")
+		integrationTestCompile ("org.mockito:mockito-junit-jupiter:${mockito}")
+		integrationTestCompile ("org.junit.jupiter:junit-jupiter-api:${junit}")
+		integrationTestCompile ("org.junit.jupiter:junit-jupiter-engine:${junit}")
+		integrationTestCompile ("org.junit.platform:junit-platform-launcher:1.5.2")
+		integrationTestCompile ("org.apache.cxf:cxf-rt-transports-local:${cxf}")
+		integrationTestCompile ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
+		integrationTestCompile ("org.apache.cxf:cxf-rt-rs-client:${cxf}")
+		integrationTestCompile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
 	}
 }
 
