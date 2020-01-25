@@ -23,10 +23,11 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.HALMapper;
-import io.swagger.models.Operation;
-import io.swagger.models.Path;
-import io.swagger.models.Swagger;
-import io.swagger.models.parameters.Parameter;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
@@ -54,8 +55,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
 		.register(new JacksonJsonProvider(new HALMapper()))
 		.build();
 	this.resourceClass = resourceClass;
-	this.resourceUri = discoverResourceURI();
 	detectResourceMediaType();
+	this.resourceUri = discoverResourceURI();
     }
 
     private void detectResourceMediaType() {
@@ -72,7 +73,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * Discover the resource URI for the HAL resource T for the API at baseApiUri.
      *
-     * This discovery is done by accessing the OpenAPI Specification v2 document
+     * This discovery is done by accessing the OpenAPI Specification document
      * which is linked in the HAL Service Document located at the root of the API
      * (baseApiUri). Here, we find the GET path for the media type matching that of
      * the HAL resource T, which is the resource URI.
@@ -84,28 +85,25 @@ public class SimplyRESTfulClient<T extends HALResource> {
      */
     private URI discoverResourceURI() {
 	HALServiceDocument serviceDocument = client.target(baseApiUri).request().get(HALServiceDocument.class);
-	URI openApiJson = URI.create(serviceDocument.getDescribedby().getHref());
-	Swagger openApiSpecification = client.target(openApiJson).request().get(Swagger.class);
-	for (Entry<String, Path> pathEntry : openApiSpecification.getPaths().entrySet()) {
+	URI openApiDocumentUri = URI.create(serviceDocument.getDescribedby().getHref());
+	OpenAPI openApiSpecification = new OpenAPIV3Parser().read(openApiDocumentUri.toString());
+	for (Entry<String, PathItem> pathEntry : openApiSpecification.getPaths().entrySet()) {
 	    Operation getHttpMethod = pathEntry.getValue().getGet();
-	    boolean containsPathParameter = false;
-	    for (Parameter parameter : getHttpMethod.getParameters()) {
-		if ("path".equals(parameter.getIn())) {
-		    containsPathParameter = true;
-		    break;
-		}
-	    }
-	    if (containsPathParameter) {
-		continue;
-	    }
-	    boolean matchingMediaType = getHttpMethod.getProduces().stream().map(MediaType::valueOf)
+	    boolean matchingMediaType = getHttpMethod.getResponses().get("200").getContent().keySet().stream()
+		    .map(MediaType::valueOf) 
 		    .anyMatch(mediaType -> mediaType.equals(resourceMediaType));
 	    if (matchingMediaType) {
-		String basePath = openApiSpecification.getBasePath();
-		if (basePath == null) {
-		    return UriBuilder.fromUri(baseApiUri).path(pathEntry.getKey()).build();
+		String resourcePath = pathEntry.getKey();
+		for (Parameter parameter : getHttpMethod.getParameters()) {
+		    if ("path".equals(parameter.getIn())) {
+			resourcePath = resourcePath.replaceAll(String.format("\\{%s\\}", parameter.getName()), "");
+			resourcePath = resourcePath.replaceAll("//", "/");
+		    }
 		}
-		return UriBuilder.fromUri(baseApiUri).path(basePath).path(pathEntry.getKey()).build();
+		return UriBuilder.fromUri(openApiSpecification.getServers().get(0).getUrl())
+			.scheme(baseApiUri.getScheme())
+			.path(resourcePath)
+			.build();
 	    }
 	}
 	throw new IllegalArgumentException(

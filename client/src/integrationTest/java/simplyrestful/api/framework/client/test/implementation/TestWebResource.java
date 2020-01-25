@@ -17,8 +17,8 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
 @Api("Test Resources")
-@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + TestWebResource.TEST_HOST_STRING + "/"+TestResource.TEST_RESOURCE_PROFILE_PATH+"\"")
-@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + TestWebResource.TEST_HOST_STRING + "/"+TestResource.TEST_RESOURCE_PROFILE_PATH+"\"")
+@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=" + TestWebResource.TEST_HOST_STRING + "/"+TestResource.TEST_RESOURCE_PROFILE_PATH)
+@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=" + TestWebResource.TEST_HOST_STRING + "/"+TestResource.TEST_RESOURCE_PROFILE_PATH)
 public class TestWebResource extends DefaultWebResource<TestResource> {
     public static final String TEST_HOST_STRING = "http://localhost:9999";
     public static final URI TEST_HOST = URI.create(TEST_HOST_STRING);
