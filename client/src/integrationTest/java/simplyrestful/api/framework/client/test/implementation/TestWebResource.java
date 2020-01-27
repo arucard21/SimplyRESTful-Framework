@@ -25,6 +25,7 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final URI TEST_REQUEST_BASE_URI = UriBuilder.fromUri(TEST_HOST).path(WEBRESOURCE_PATH).build();
     public static final TestResource TEST_RESOURCE = new TestResource();
+    public static final TestResource TEST_RESOURCE_RANDOM = TestResource.random();
 
     @Override
     public TestResource create(TestResource resource, UUID resourceUUID) {
@@ -54,6 +55,6 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
 
     @Override
     public List<TestResource> list(long pageNumber, long pageSize) {
-	return Arrays.asList(TEST_RESOURCE, TestResource.random());
+	return Arrays.asList(TEST_RESOURCE, TEST_RESOURCE_RANDOM);
     }
 }

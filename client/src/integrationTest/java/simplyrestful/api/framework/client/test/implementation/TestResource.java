@@ -15,7 +15,6 @@ public class TestResource extends HALResource {
     public static final String PROFILE_STRING = UriBuilder.fromUri(TestWebResource.TEST_HOST).path(TEST_RESOURCE_PROFILE_PATH).build().toString();
     public static final UUID TEST_RESOURCE_ID = UUID.fromString("bb2adabf-effe-4fb4-900b-d3b32cd9eed3");
     public static final URI TEST_RESOURCE_PROFILE_URI = URI.create(PROFILE_STRING);
-    public static final URI TEST_RESOURCE_URI = TestWebResource.TEST_REQUEST_BASE_URI.resolve(TEST_RESOURCE_ID.toString());
 
     private TestResource(URI resourceUri) {
 	super();
@@ -24,11 +23,11 @@ public class TestResource extends HALResource {
     }
 
     public TestResource() {
-	this(TEST_RESOURCE_URI);
+	this(UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(TEST_RESOURCE_ID.toString()).build());
     }
 
     public static TestResource random() {
-	return new TestResource(TestWebResource.TEST_REQUEST_BASE_URI.resolve(UUID.randomUUID().toString()));
+	return new TestResource(UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(UUID.randomUUID().toString()).build());
     }
 
     @Override
