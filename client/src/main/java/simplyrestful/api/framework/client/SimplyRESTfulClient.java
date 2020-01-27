@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.client;
 
+import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -8,17 +9,21 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
@@ -33,6 +38,8 @@ import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
+    private static final String HAL_ITEM_KEY = "item";
+    private static final String HAL_EMBEDDED_KEY = "_embedded";
     private static final String HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE = "profile";
     private static final String MEDIA_TYPE_HAL_JSON_TYPE = "application";
     private static final String MEDIA_TYPE_HAL_JSON_SUBTYPE = "hal+json";
@@ -40,7 +47,6 @@ public class SimplyRESTfulClient<T extends HALResource> {
     private static final String QUERY_PARAM_PAGE = "page";
     private static final String QUERY_PARAM_PAGESIZE = "pageSize";
     private static final String QUERY_PARAM_COMPACT = "compact";
-    private GenericType<HALCollection<T>> collectionResourceType = new GenericType<HALCollection<T>>() { };
     private Class<T> resourceClass;
     private URI baseApiUri;
     private URI resourceUri;
@@ -114,9 +120,9 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * List the full API resource using the API's default paging configuration.
      *
-     * @param page     is the number of the page. If negative, will not be included
+     * @param page     is the number of the page. If zero or negative, will not be included
      *                 in the HTTP request.
-     * @param pageSize is the size of each page. If negative, will not be included
+     * @param pageSize is the size of each page. If zero or negative, will not be included
      *                 in the HTTP request.
      * @return a list of API resources from the page corresponding to the provided
      *         parameters.
@@ -156,8 +162,11 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *                 resource will be entirely embedded in the list.
      * @return the entire collection resource that was retrieved, containing either
      *         resource identifiers or embedded resources.
+     * @throws JsonProcessingException 
+     * @throws JsonMappingException 
      */
-    public HALCollection<T> retrievePagedCollection(int page, int pageSize, boolean compact) {
+    @SuppressWarnings("unchecked")
+    public HALCollection<T> retrievePagedCollection(int page, int pageSize, boolean compact){
 	WebTarget target = client.target(resourceUri);
 	if (page >= 0) {
 	    target = target.queryParam(QUERY_PARAM_PAGE, page);
@@ -165,7 +174,39 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	if (pageSize >= 0) {
 	    target = target.queryParam(QUERY_PARAM_PAGESIZE, pageSize);
 	}
-	return target.queryParam(QUERY_PARAM_COMPACT, compact).request().get(collectionResourceType);
+	String nonDeserialized =  target.queryParam(QUERY_PARAM_COMPACT, compact).request().get(String.class);
+	HALCollection<T> collection;
+	
+	collection = (HALCollection<T>) deserializeJsonWithGenerics(nonDeserialized, new TypeReference<HALCollection<BasicHALResource>>() {});
+	JsonObject embedded = Json
+		.createReader(new StringReader(nonDeserialized))
+		.readObject()
+		.getJsonObject(HAL_EMBEDDED_KEY);
+	if(Objects.nonNull(embedded)) {	    
+	    collection.setItemEmbedded(
+		    embedded.getJsonArray(HAL_ITEM_KEY).stream()
+		    .filter(Objects::nonNull)
+		    .map(jsonValue -> deserializeJson(jsonValue.toString(), resourceClass))
+		    .filter(Objects::nonNull)
+		    .collect(Collectors.toList()));
+	}
+	return collection;
+    }
+
+    private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {
+	try {
+	    return new HALMapper().readValue(jsonString, deserializationClass);
+	} catch (JsonProcessingException e) {
+	    throw new RuntimeException(e);
+	}
+    }
+    
+    private <S> S deserializeJsonWithGenerics(String jsonString, TypeReference<S> typeRef) {
+	try {
+	    return new HALMapper().readValue(jsonString, typeRef);
+	} catch (JsonProcessingException e) {
+	    throw new RuntimeException(e);
+	}
     }
 
     /**
@@ -237,7 +278,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @return a WebTarget (from a JAX-RS client) configured with the URI for the
      *         provided action.
      */
-    public WebTarget hypermediaControls(HALLink action) {
+    public WebTarget hypermediaControl(HALLink action) {
 	return client.target(action.getHref());
     }
 }
