@@ -1,7 +1,5 @@
 package example.jetty;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.cxf.endpoint.Server;
 
 import example.jetty.resources.ExampleWebResource;
@@ -14,7 +12,7 @@ import simplyrestful.jetty.deploy.ServerBuilder;
  *
  */
 public class ExampleCXFJettyServer {
-	public static void main(String[] args) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
+	public static void main(String[] args) throws ReflectiveOperationException {
 		Server apiServer = new ServerBuilder()
 				.withAddress("http://localhost:8080")
 				.withWebResource(ExampleWebResource.class)

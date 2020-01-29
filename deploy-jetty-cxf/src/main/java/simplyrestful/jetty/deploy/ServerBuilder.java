@@ -110,12 +110,12 @@ public class ServerBuilder {
      * @throws InstantiationException when the new instance of the web resource class can not be created
      * @return the CXF server, as configured in the builder
      */
-    public Server build() throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException {
+    public Server build() throws ReflectiveOperationException {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
         resourceProviders.add(new SingletonResourceProvider(new WebResourceRoot()));
         for (Class<? extends DefaultWebResource<? extends HALResource>> webResource: webResources){
-			resourceProviders.add(new SingletonResourceProvider(webResource.newInstance()));
+			resourceProviders.add(new SingletonResourceProvider(webResource.getDeclaredConstructor().newInstance()));
         }
         sf.setResourceProviders(resourceProviders);
         if (address != null && !address.isEmpty()){

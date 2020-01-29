@@ -25,8 +25,8 @@ allprojects{
 		mavenCentral()
 	}
 
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
 
 	group = 'com.github.arucard21.simplyrestful'
 	version = '0.10.3'
@@ -50,7 +50,10 @@ subprojects{
 	}
 	
 	configurations {
-		integrationTestImplementation.extendsFrom testImplementation
+		integrationTestImplementation{
+			extendsFrom testImplementation
+			canBeResolved = true
+		}
 		integrationTestRuntime.extendsFrom testRuntime
 	}
 	
@@ -79,7 +82,7 @@ project(":SimplyRESTful-resources"){
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
 		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
 		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
-		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.9")
+		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.12")
 	}
 }
 
@@ -98,7 +101,7 @@ project(":SimplyRESTful"){
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
 		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
 		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
-		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.9")
+		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.12")
 		
 		integrationTestImplementation ("org.apache.cxf:cxf-rt-transports-local:${cxf}")
 		integrationTestImplementation ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
@@ -158,6 +161,7 @@ project(":deploy-jetty-cxf"){
 	dependencies {
 		compile project(':SimplyRESTful')
 		compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
+		compile ("jakarta.xml.ws:jakarta.xml.ws-api:2.3.2")
 		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
 		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
 		compile ("org.webjars:swagger-ui:2.2.6")

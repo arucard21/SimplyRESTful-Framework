@@ -70,12 +70,12 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     private void detectResourceMediaType() {
 	try {
-	    this.resourceProfile = resourceClass.newInstance().getProfile().toString();
+	    this.resourceProfile = resourceClass.getDeclaredConstructor().newInstance().getProfile().toString();
 	    HashMap<String, String> parameters = new HashMap<>();
 	    parameters.put(HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE, resourceProfile);
 	    this.resourceMediaType = new MediaType(MEDIA_TYPE_HAL_JSON_TYPE, MEDIA_TYPE_HAL_JSON_SUBTYPE, parameters);
-	} catch (InstantiationException | IllegalAccessException e) {
-	    throw new IllegalArgumentException("Resource class could not be instantiated", e);
+	} catch (ReflectiveOperationException e) {
+	    throw new IllegalArgumentException("Resource class could not be instantiated so the profile and media type could not be detected", e);
 	}
     }
 
