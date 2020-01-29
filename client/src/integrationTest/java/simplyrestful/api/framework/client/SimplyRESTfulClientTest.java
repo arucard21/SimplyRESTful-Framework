@@ -113,4 +113,38 @@ public class SimplyRESTfulClientTest {
     public void exists_shouldReturnFalse_whenProvidingAnNonExistingResourceUriAsArgument() {
 	Assertions.assertFalse(client.exists(UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(UUID_NIL.toString()).build()));
     }
+    
+    @Test
+    public void update_shouldReturnTrue_whenTheProvidedResourceContainsANonExistingId() {
+	boolean wasCreated = client.update(TestResource.withId(UUID_NIL));
+	Assertions.assertFalse(wasCreated);
+    }
+    
+    @Test
+    public void update_shouldReturnFalse_whenTheProvidedResourceContainsAnExistingId() {
+	boolean wasCreated = client.update(TestWebResource.TEST_RESOURCE);
+	Assertions.assertFalse(wasCreated);
+    }
+    
+    @Test
+    public void update_shouldThrowNullPointerException_whenNullIsProvidedAsArgument() {
+	Assertions.assertThrows(NullPointerException.class, () -> client.update(null));
+    }
+    
+    @Test
+    public void delete_shouldReturnTrue_whenAnExistingIdIsProvided() {
+	boolean wasDeleted = client.delete(TestResource.TEST_RESOURCE_ID);
+	Assertions.assertFalse(wasDeleted);
+    }
+    
+    @Test
+    public void delete_shouldReturnFalse_whenANonExistingIdIsProvided() {
+	boolean wasDeleted = client.delete(UUID_NIL);
+	Assertions.assertFalse(wasDeleted);
+    }
+    
+    @Test
+    public void delete_shouldThrowNullPointerException_whenNullIsProvidedAsArgument() {
+	Assertions.assertThrows(NullPointerException.class, () -> client.delete(null));
+    }
 }
