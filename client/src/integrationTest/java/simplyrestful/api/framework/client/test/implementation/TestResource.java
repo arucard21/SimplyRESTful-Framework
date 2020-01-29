@@ -14,20 +14,26 @@ public class TestResource extends HALResource {
     public static final String TEST_RESOURCE_PROFILE_PATH = "testresource";
     public static final String PROFILE_STRING = UriBuilder.fromUri(TestWebResource.TEST_HOST).path(TEST_RESOURCE_PROFILE_PATH).build().toString();
     public static final UUID TEST_RESOURCE_ID = UUID.fromString("bb2adabf-effe-4fb4-900b-d3b32cd9eed3");
+    public static final URI TEST_RESOURCE_URI = UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(TEST_RESOURCE_ID.toString()).build();
     public static final URI TEST_RESOURCE_PROFILE_URI = URI.create(PROFILE_STRING);
 
     private TestResource(URI resourceUri) {
-	super();
 	this.setSelf(new HALLink.Builder(resourceUri).type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 		.profile(TEST_RESOURCE_PROFILE_URI).build());
     }
-
-    public TestResource() {
-	this(UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(TEST_RESOURCE_ID.toString()).build());
+    
+    public TestResource() {}
+    
+    public static TestResource testInstance() {
+	return new TestResource(TEST_RESOURCE_URI);
     }
 
     public static TestResource random() {
-	return new TestResource(UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(UUID.randomUUID().toString()).build());
+	return TestResource.withId(UUID.randomUUID());
+    }
+    
+    public static TestResource withId(UUID resourceId) {
+	return new TestResource(UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(resourceId.toString()).build());
     }
 
     @Override

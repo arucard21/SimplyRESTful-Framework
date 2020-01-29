@@ -24,11 +24,12 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
     public static final URI TEST_HOST = URI.create(TEST_HOST_STRING);
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final URI TEST_REQUEST_BASE_URI = UriBuilder.fromUri(TEST_HOST).path(WEBRESOURCE_PATH).build();
-    public static final TestResource TEST_RESOURCE = new TestResource();
+    public static final TestResource TEST_RESOURCE = TestResource.testInstance();
     public static final TestResource TEST_RESOURCE_RANDOM = TestResource.random();
 
     @Override
     public TestResource create(TestResource resource, UUID resourceUUID) {
+	// The provided resource is not actually stored anywhere in this test API.
 	return resource;
     }
 
