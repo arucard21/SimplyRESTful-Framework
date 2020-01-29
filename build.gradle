@@ -56,7 +56,7 @@ subprojects{
 	
 	task integrationTest(type:Test){
 		useJUnitPlatform()
-		testClassesDir = project.sourceSets.integrationTest.output.classesDir
+		setTestClassesDirs(project.sourceSets.integrationTest.output.getClassesDirs())
 		classpath = project.sourceSets.integrationTest.runtimeClasspath
 	}
 	
