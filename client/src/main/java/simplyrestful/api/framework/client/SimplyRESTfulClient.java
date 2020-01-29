@@ -20,7 +20,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +39,7 @@ import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
     private static final String ERROR_CREATE_RESOURCE_EXISTS = "The resource already exists on the server. Use update() if you wish to modify the existing resource.";
+    private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
     private static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
     private static final String HAL_ITEM_KEY = "item";
     private static final String HAL_EMBEDDED_KEY = "_embedded";
@@ -234,15 +234,15 @@ public class SimplyRESTfulClient<T extends HALResource> {
     public UUID create(T resource) {
 	HALLink resourceSelf = resource.getSelf();
 	Response response;
-	if(Objects.nonNull(resourceSelf) && isResourceUriValid(URI.create(resourceSelf.getHref()))) {
+	if(Objects.nonNull(resourceSelf)) {
 	    URI resourceInstanceUri = URI.create(resourceSelf.getHref());
-	    if(exists(resourceInstanceUri)) {
-		throw new IllegalArgumentException(ERROR_CREATE_RESOURCE_EXISTS);
-	    }
-	    response = client
-		    .target(resourceInstanceUri)
-		    .request()
-		    .put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON));
+    	    if(exists(resourceInstanceUri)) {
+    		throw new IllegalArgumentException(ERROR_CREATE_RESOURCE_EXISTS);
+    	    }
+    	    response = client
+    		    .target(resourceInstanceUri)
+    		    .request()
+    		    .put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON));
 	}
 	else {
 	    response = client
@@ -261,45 +261,34 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * Update an existing API resource.
      *
-     * This may also create a new resource at the absolute URI provided in the
-     * resource. The return value indicates whether a new resource was created or
-     * not.
-     *
      * @param resource is the updated resource
-     * @return true if the resource was newly created, false if an existing resource
-     *         was updated
      */
-    public boolean update(T resource) {
+    public void update(T resource) {
 	URI resourceInstanceURI = URI.create(resource.getSelf().getHref());
-	validateResourceUri(resourceInstanceURI);
-	StatusType statusCode = client.target(resourceInstanceURI).request()
-		.put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON)).getStatusInfo();
-	return statusCode == Status.CREATED;
-    }
-
-    /**
-     * Verify that the provided URI is relative to the web resource that's being served. 
-     * 
-     * @param resourceInstanceURI is the URI to be verified
-     * @return true iff the provided URI is not null and relative to the URI of the web resource, false otherwise.
-     */
-    private boolean isResourceUriValid(URI resourceInstanceURI) {
-	if(Objects.isNull(resourceInstanceURI)) {
-	    return false;
+	if(!exists(resourceInstanceURI)) {
+	    throw new IllegalArgumentException(ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST);
 	}
-	if (!resourceUri.relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
-	    return true;
+	Response response = client
+		.target(resourceInstanceURI)
+		.request()
+		.put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON));
+	if(!Objects.equals(response.getStatusInfo(), Status.OK)){
+	    throw new WebApplicationException(response);
 	}
-	return false;
     }
     
     /**
-     * Validates the give URI according to isResourceUriValid() and throws an exception if it is not valid. 
+     * Validates that the given URI refers to to the web resource that is served.
+     * 
+     * The URI should have the same host as the web resource being server. Its path should also be relative to the root 
+     * of the web resource's path. 
      * 
      * @param resourceInstanceURI is the URI that is required to be valid.
      */
     private void validateResourceUri(URI resourceInstanceURI) {
-	if(!isResourceUriValid(resourceInstanceURI)) {
+	if(Objects.isNull(resourceInstanceURI) || 
+		!resourceUri.getHost().equals(resourceInstanceURI.getHost()) || 
+		resourceUri.relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
 	    throw new IllegalArgumentException(ERROR_INVALID_RESOURCE_URI);
 	}
     }
@@ -308,12 +297,13 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * Remove an API resource.
      *
      * @param resourceId is the id of the resource
-     * @return true if the resource was deleted, false otherwise
      */
-    public boolean delete(UUID resourceId) {
+    public void delete(UUID resourceId) {
 	URI resourceInstanceURI = UriBuilder.fromUri(resourceUri).path(resourceId.toString()).build();
-	StatusType statusCode = client.target(resourceInstanceURI).request().delete().getStatusInfo();
-	return statusCode == Status.NO_CONTENT;
+	Response response = client.target(resourceInstanceURI).request().delete();
+	if(!Objects.equals(response.getStatusInfo(), Status.NO_CONTENT)){
+	    throw new WebApplicationException(response);
+	}
     }
 
     /**
