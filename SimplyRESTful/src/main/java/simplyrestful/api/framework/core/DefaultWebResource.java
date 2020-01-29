@@ -348,7 +348,7 @@ public abstract class DefaultWebResource<T extends HALResource>{
 				throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
 			}
 			UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
-			if (providedID != null && providedID != resourceIdFromSelf){
+			if (!Objects.equals(providedID, resourceIdFromSelf)){
 				throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
 			}
 			return resourceIdFromSelf;
