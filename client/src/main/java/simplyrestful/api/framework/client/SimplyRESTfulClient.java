@@ -11,19 +11,20 @@ import java.util.stream.Collectors;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
@@ -38,6 +39,8 @@ import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
+    private static final String ERROR_CREATE_RESOURCE_EXISTS = "The resource already exists on the server. Use update() if you wish to modify the existing resource.";
+    private static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
     private static final String HAL_ITEM_KEY = "item";
     private static final String HAL_EMBEDDED_KEY = "_embedded";
     private static final String HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE = "profile";
@@ -162,11 +165,9 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *                 resource will be entirely embedded in the list.
      * @return the entire collection resource that was retrieved, containing either
      *         resource identifiers or embedded resources.
-     * @throws JsonProcessingException 
-     * @throws JsonMappingException 
      */
     @SuppressWarnings("unchecked")
-    public HALCollection<T> retrievePagedCollection(int page, int pageSize, boolean compact){
+    private HALCollection<T> retrievePagedCollection(int page, int pageSize, boolean compact){
 	WebTarget target = client.target(resourceUri);
 	if (page >= 0) {
 	    target = target.queryParam(QUERY_PARAM_PAGE, page);
@@ -212,8 +213,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * Retrieve a single API resource.
      *
-     * @param resourceId is the id of the resource
-     * @return the API resource at the given URI
+     * @param resourceId is the id of the resource.
+     * @return the API resource at the given URI.
      */
     public T read(UUID resourceId) {
 	URI resourceInstanceURI = UriBuilder.fromUri(resourceUri).path(resourceId.toString()).build();
@@ -222,13 +223,37 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     /**
      * Create a new API resource.
+     * 
+     * If the provided resource contains a valid id, the resource will be created on the server
+     * with that same id, using HTTP PUT. Otherwise, the resource will be created using HTTP POST
+     * which will generate an id for that resource.
      *
      * @param resource is the new resource
      * @return the id for the created resource, applicable to the provided base URI
      */
     public UUID create(T resource) {
-	String location = client.target(resourceUri).request().post(Entity.entity(resource, MEDIA_TYPE_HAL_JSON))
-		.getHeaderString(HttpHeaders.LOCATION);
+	HALLink resourceSelf = resource.getSelf();
+	Response response;
+	if(Objects.nonNull(resourceSelf) && isResourceUriValid(URI.create(resourceSelf.getHref()))) {
+	    URI resourceInstanceUri = URI.create(resourceSelf.getHref());
+	    if(exists(resourceInstanceUri)) {
+		throw new IllegalArgumentException(ERROR_CREATE_RESOURCE_EXISTS);
+	    }
+	    response = client
+		    .target(resourceInstanceUri)
+		    .request()
+		    .put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON));
+	}
+	else {
+	    response = client
+		    .target(resourceUri)
+		    .request()
+		    .post(Entity.entity(resource, MEDIA_TYPE_HAL_JSON));
+	}
+	if(!Objects.equals(201, response.getStatus())) {
+	    throw new WebApplicationException(response);
+	}
+	String location = response.getHeaderString(HttpHeaders.LOCATION);
 	URI relativizedURI = resourceUri.relativize(URI.create(location));
 	return UUID.fromString(relativizedURI.getPath());
     }
@@ -246,13 +271,37 @@ public class SimplyRESTfulClient<T extends HALResource> {
      */
     public boolean update(T resource) {
 	URI resourceInstanceURI = URI.create(resource.getSelf().getHref());
-	if (resourceUri.relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
-	    throw new IllegalArgumentException(
-		    "The identifier of the resource does not correspond to the API in this client");
-	}
+	validateResourceUri(resourceInstanceURI);
 	StatusType statusCode = client.target(resourceInstanceURI).request()
 		.put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON)).getStatusInfo();
 	return statusCode == Status.CREATED;
+    }
+
+    /**
+     * Verify that the provided URI is relative to the web resource that's being served. 
+     * 
+     * @param resourceInstanceURI is the URI to be verified
+     * @return true iff the provided URI is not null and relative to the URI of the web resource, false otherwise.
+     */
+    private boolean isResourceUriValid(URI resourceInstanceURI) {
+	if(Objects.isNull(resourceInstanceURI)) {
+	    return false;
+	}
+	if (!resourceUri.relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
+	    return true;
+	}
+	return false;
+    }
+    
+    /**
+     * Validates the give URI according to isResourceUriValid() and throws an exception if it is not valid. 
+     * 
+     * @param resourceInstanceURI is the URI that is required to be valid.
+     */
+    private void validateResourceUri(URI resourceInstanceURI) {
+	if(!isResourceUriValid(resourceInstanceURI)) {
+	    throw new IllegalArgumentException(ERROR_INVALID_RESOURCE_URI);
+	}
     }
 
     /**
@@ -280,5 +329,40 @@ public class SimplyRESTfulClient<T extends HALResource> {
      */
     public WebTarget hypermediaControl(HALLink action) {
 	return client.target(action.getHref());
+    }
+    
+    
+    /**
+     * Check whether a resource the given id exists on the server.
+     * 
+     * @param resourceId is the id of the resource that should be checked.
+     * @return true iff the resource exists on the server, false if it does not exist.
+     * @throws WebApplicationException if the client cannot confirm that the resource either exists or does not exist. 
+     * Is likely caused by an error returned by the server.
+     */
+    public boolean exists(UUID resourceId) {
+	URI resourceInstanceURI = UriBuilder.fromUri(resourceUri).path(resourceId.toString()).build();
+	return exists(resourceInstanceURI);
+    }
+    
+    /**
+     * Check whether a resource with the given URI exists on the server.
+     * 
+     * @param resourceInstanceURI is the URI of the resource that should be checked.
+     * @return true iff the resource exists on the server, false if it does not exist.
+     * @throws WebApplicationException if the client cannot confirm that the resource either exists or does not exist. 
+     * Is likely caused by an error returned by the server. 
+     */
+    public boolean exists(URI resourceInstanceURI) {
+	validateResourceUri(resourceInstanceURI);
+	Response response = client.target(resourceInstanceURI).request().get();
+	int responseStatus = response.getStatus();
+	if (Objects.equals(200, responseStatus)) {
+	    return true;
+	}
+	if (Objects.equals(404, responseStatus)) {
+	    return false;
+	}
+	throw new WebApplicationException(response);
     }
 }
