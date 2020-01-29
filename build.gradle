@@ -50,7 +50,7 @@ subprojects{
 	}
 	
 	configurations {
-		integrationTestCompile.extendsFrom testCompile
+		integrationTestImplementation.extendsFrom testImplementation
 		integrationTestRuntime.extendsFrom testRuntime
 	}
 	
@@ -62,7 +62,7 @@ subprojects{
 	
 	eclipse {
 		classpath {
-			plusConfigurations += [configurations.integrationTestCompile]
+			plusConfigurations += [configurations.integrationTestImplementation]
 		}
 	}
 }
@@ -75,11 +75,11 @@ project(":SimplyRESTful-resources"){
 			exclude group: "javax.ws.rs"
 		}
 
-		testCompile ("org.junit.jupiter:junit-jupiter-api:${junit}")
-		testCompile ("org.junit.jupiter:junit-jupiter-engine:${junit}")
-		testCompile ("org.junit.platform:junit-platform-launcher:1.5.2")
-		testCompile ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
-		testCompile ("nl.jqno.equalsverifier:equalsverifier:3.1.9")
+		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
+		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
+		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
+		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
+		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.9")
 	}
 }
 
@@ -92,17 +92,17 @@ project(":SimplyRESTful"){
 		compile ("javax.validation:validation-api:2.0.1.Final")
 		compile ("io.swagger:swagger-annotations:1.5.21")
 
-		testCompile ("org.mockito:mockito-core:${mockito}")
-		testCompile ("org.mockito:mockito-junit-jupiter:${mockito}")
-		testCompile ("org.junit.jupiter:junit-jupiter-api:${junit}")
-		testCompile ("org.junit.jupiter:junit-jupiter-engine:${junit}")
-		testCompile ("org.junit.platform:junit-platform-launcher:1.5.2")
-		testCompile ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
-		testCompile ("nl.jqno.equalsverifier:equalsverifier:3.1.9")
+		testImplementation ("org.mockito:mockito-core:${mockito}")
+		testImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
+		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
+		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
+		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
+		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
+		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.9")
 		
-		integrationTestCompile ("org.apache.cxf:cxf-rt-transports-local:${cxf}")
-		integrationTestCompile ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
-		integrationTestCompile ("org.apache.cxf:cxf-rt-rs-client:${cxf}")
+		integrationTestImplementation ("org.apache.cxf:cxf-rt-transports-local:${cxf}")
+		integrationTestImplementation ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
+		integrationTestImplementation ("org.apache.cxf:cxf-rt-rs-client:${cxf}")
 	}
 }
 
@@ -116,16 +116,16 @@ project(":client"){
 		compile ("io.swagger.parser.v3:swagger-parser:2.0.17")
 		compile ("org.glassfish.jersey.inject:jersey-hk2:2.27")
 		
-		runtime ("org.glassfish:javax.json:1.1.4")
+		runtimeOnly ("org.glassfish:javax.json:1.1.4")
 		
-		integrationTestCompile project(":SimplyRESTful")
-		integrationTestCompile project(":deploy-jetty-cxf")
-		integrationTestCompile ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
-		integrationTestCompile ("org.mockito:mockito-core:${mockito}")
-		integrationTestCompile ("org.mockito:mockito-junit-jupiter:${mockito}")
-		integrationTestCompile ("org.junit.jupiter:junit-jupiter-api:${junit}")
-		integrationTestCompile ("org.junit.jupiter:junit-jupiter-engine:${junit}")
-		integrationTestCompile ("org.junit.platform:junit-platform-launcher:1.5.2")
+		integrationTestImplementation project(":SimplyRESTful")
+		integrationTestImplementation project(":deploy-jetty-cxf")
+		integrationTestImplementation ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
+		integrationTestImplementation ("org.mockito:mockito-core:${mockito}")
+		integrationTestImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
+		integrationTestImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
+		integrationTestImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
+		integrationTestImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
 	}
 }
 
