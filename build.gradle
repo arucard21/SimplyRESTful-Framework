@@ -1,40 +1,31 @@
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE"
-  }
+plugins{
+	id "org.springframework.boot" version "2.2.4.RELEASE" apply false
 }
 
 ext {
 	jaxrs = "2.1.1"
 	cxf = "3.3.5"
-	junit = "5.5.2"
-	mockito = "2.22.0"
-	spring = "2.1.9.RELEASE"
+	junit = "5.6.0"
+	mockito = "3.2.4"
+	spring = "2.2.4.RELEASE"
 }
 
 allprojects{
-	apply plugin: "java"
 	apply plugin: "eclipse"
 
 	repositories {
 		mavenCentral()
 	}
 
-	sourceCompatibility = JavaVersion.VERSION_11
-	targetCompatibility = JavaVersion.VERSION_11
-
 	group = 'com.github.arucard21.simplyrestful'
 	version = '0.10.3'
 }
 
 subprojects{
-	apply plugin: 'maven'
-	apply plugin: 'signing'
+	apply plugin: "java"
+
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
 
 	test {
 		useJUnitPlatform()
@@ -70,11 +61,19 @@ subprojects{
 	}
 }
 
+configure(allprojects - project(":examples").allprojects){
+	apply plugin: 'java-library'
+}
+
+configure(project(":examples").allprojects){
+	apply plugin: 'application'
+}
+
 project(":SimplyRESTful-resources"){
 	project.description = "The core API resources used in SimplyRESTful APIs"
 	dependencies {
-		compile ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
-		compile ("io.openapitools.hal:swagger-hal:1.0.4"){
+		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
+		api ("io.openapitools.hal:swagger-hal:1.0.4"){
 			exclude group: "javax.ws.rs"
 		}
 
@@ -89,11 +88,11 @@ project(":SimplyRESTful-resources"){
 project(":SimplyRESTful"){
 	project.description = "A framework for creating a RESTful API"
 	dependencies {
-		compile project(":SimplyRESTful-resources")
-		compile ("javax.inject:javax.inject:1")
-		compile ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
-		compile ("javax.validation:validation-api:2.0.1.Final")
-		compile ("io.swagger:swagger-annotations:1.5.21")
+		api project(":SimplyRESTful-resources")
+		api ("javax.inject:javax.inject:1")
+		api ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
+		api ("javax.validation:validation-api:2.0.1.Final")
+		api ("io.swagger:swagger-annotations:1.5.21")
 
 		testImplementation ("org.mockito:mockito-core:${mockito}")
 		testImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
@@ -112,12 +111,12 @@ project(":SimplyRESTful"){
 project(":client"){
 	project.description = "A generic client that can be used with any SimplyRESTful API"
 	dependencies {
-		compile project(":SimplyRESTful-resources")
-		compile ("javax.json:javax.json-api:1.1.4")
-		compile ("org.glassfish.jersey.core:jersey-client:2.27")
-		compile ("io.swagger:swagger-models:1.5.21")
-		compile ("io.swagger.parser.v3:swagger-parser:2.0.17")
-		compile ("org.glassfish.jersey.inject:jersey-hk2:2.27")
+		api project(":SimplyRESTful-resources")
+		api ("javax.json:javax.json-api:1.1.4")
+		api ("org.glassfish.jersey.core:jersey-client:2.27")
+		api ("io.swagger:swagger-models:1.5.21")
+		api ("io.swagger.parser.v3:swagger-parser:2.0.17")
+		api ("org.glassfish.jersey.inject:jersey-hk2:2.27")
 		
 		runtimeOnly ("org.glassfish:javax.json:1.1.4")
 		
@@ -135,83 +134,102 @@ project(":client"){
 project(":deploy-springboot-cxf"){
 	project.description = "Easily deploy your SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
-		compile project(":SimplyRESTful")
-		compile ("org.webjars:swagger-ui:2.2.6")
-		compile ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:${cxf}")
-		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
-		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
+		api project(":SimplyRESTful")
+		api ("org.webjars:swagger-ui:2.2.6")
+		api ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:${cxf}")
+		api ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
+		api ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
 	}
 }
 
 project(":deploy-springboot-jersey"){
 	project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
 	dependencies {
-		compile project(':SimplyRESTful')
-		compile ("org.springframework.boot:spring-boot:${spring}")
-		compile ("org.webjars:swagger-ui:2.2.6")
-		compile ("org.springframework.boot:spring-boot-starter-jersey:${spring}"){
+		api project(':SimplyRESTful')
+		api ("org.springframework.boot:spring-boot:${spring}")
+		api ("org.webjars:swagger-ui:2.2.6")
+		api ("org.springframework.boot:spring-boot-starter-jersey:${spring}"){
 			exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
 		}
-		compile ("io.swagger:swagger-jersey2-jaxrs:1.5.21")
+		api ("io.swagger:swagger-jersey2-jaxrs:1.5.21")
 	}
 }
 
 project(":deploy-jetty-cxf"){
 	project.description = "Easily deploy your SimplyRESTful API using Apache CXF"
 	dependencies {
-		compile project(':SimplyRESTful')
-		compile ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
-		compile ("jakarta.xml.ws:jakarta.xml.ws-api:2.3.2")
-		compile ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
-		compile ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
-		compile ("org.webjars:swagger-ui:2.2.6")
-		compile ("ch.qos.logback:logback-classic:1.2.1")
-		compile ("org.hibernate:hibernate-validator:5.4.0.Final")
-		compile ("org.glassfish:javax.el:3.0.1-b08")
+		api project(':SimplyRESTful')
+		api ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
+		api ("jakarta.xml.ws:jakarta.xml.ws-api:2.3.2")
+		api ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
+		api ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
+		api ("org.webjars:swagger-ui:2.2.6")
+		api ("ch.qos.logback:logback-classic:1.2.1")
+		api ("org.hibernate:hibernate-validator:5.4.0.Final")
+		api ("org.glassfish:javax.el:3.0.1-b08")
 	}
 }
 
 project(":persist-springdata"){
 	project.description = "Easily persist your SimplyRESTful API using Spring Data"
 	dependencies {
-		compile project(':SimplyRESTful')
-		compile ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
+		api project(':SimplyRESTful')
+		api ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
 	}
-}
-
-project(":examples:springboot-cxf"){
-	apply plugin: "org.springframework.boot"
-	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
-	dependencies {
-		compile project(':SimplyRESTful')
-		compile project(':deploy-springboot-cxf')
-	}
-	uploadArchives.enabled = false;
 }
 
 project(":examples:jetty-cxf"){
 	project.description = "Example project for a SimplyRESTful API using Apache CXF on Jetty"
+
+	application{
+		mainClassName = "example.jetty.ExampleCXFJettyServer"
+	}
+
 	dependencies {
-		compile project(':SimplyRESTful')
-		compile project(':deploy-jetty-cxf')
-		compile ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
+		implementation project(':SimplyRESTful')
+		implementation project(':deploy-jetty-cxf')
+		implementation ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
+	}
+	uploadArchives.enabled = false;
+}
+
+project(":examples:springboot-cxf"){
+	apply plugin: "org.springframework.boot"
+
+	application{
+		mainClassName = "example.springboot.ExampleCXFApplication"
+	}
+
+	project.description = "Example project for a SimplyRESTful API using Apache CXF with Spring Boot"
+	dependencies {
+		implementation project(':SimplyRESTful')
+		implementation project(':deploy-springboot-cxf')
 	}
 	uploadArchives.enabled = false;
 }
 
 project(":examples:springboot-jersey-nomapping-springdata"){
 	apply plugin: "org.springframework.boot"
+
 	project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
+
+	application{
+		mainClassName = "example.jersey.nomapping.JerseyNoMappingApplication"
+	}
+
 	dependencies {
-		compile project(':deploy-springboot-jersey')
-		compile project(':persist-springdata')
-		compile ("com.h2database:h2:1.4.197")
+		implementation project(':deploy-springboot-jersey')
+		implementation project(':persist-springdata')
+		implementation ("com.h2database:h2:1.4.197")
 	}
 	uploadArchives.enabled = false;
 }
 
 // Provide tasks to publish projects to Maven Central
 configure(subprojects - project(":examples").allprojects){
+	apply plugin: 'maven'
+	apply plugin: 'signing'
+	
 	task javadocJar(type: Jar) {
 		classifier = 'javadoc'
 		from javadoc
