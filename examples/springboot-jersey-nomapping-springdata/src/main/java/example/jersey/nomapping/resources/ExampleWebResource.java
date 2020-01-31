@@ -36,7 +36,7 @@ import simplyrestful.springdata.resources.SpringDataWebResource;
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\""+ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 public class ExampleWebResource extends SpringDataWebResource<ExampleResource> {
 	@Inject
-	public ExampleWebResource(ExampleEntityDAO entityDao) {
-		super(entityDao);
+	public ExampleWebResource(ExampleRepository exampleRepo) {
+		super(exampleRepo);
 	}
 }
