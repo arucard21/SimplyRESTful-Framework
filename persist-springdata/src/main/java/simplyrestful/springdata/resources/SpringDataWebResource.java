@@ -16,95 +16,95 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package simplyrestful.springdata.resources;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.core.UriBuilder;
+
+import org.springframework.data.domain.PageRequest;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
-import simplyrestful.springdata.repository.SpringDataEntityDAO;
+import simplyrestful.springdata.repository.SpringDataRepository;
 
 public class SpringDataWebResource<T extends SpringDataHALResource> extends DefaultWebResource<T> {
-	private SpringDataEntityDAO<T> entityDao;
+    private static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
+    private SpringDataRepository<T> repo;
 
-	public SpringDataWebResource(SpringDataEntityDAO<T> entityDao) {
-		this.entityDao = entityDao;
-	}
-	
-	@Override
-	public T create(T resource, UUID resourceUUID) {
-		T entity = entityDao.persist(map(resource));
-		if (entity == null) {
-			return null;
-		}
-		return map(entity);
-	}
+    public SpringDataWebResource(SpringDataRepository<T> repo) {
+	this.repo = repo;
+    }
 
-	@Override
-	public T read(UUID resourceUUID) {
-		return map(entityDao.findByUUID(resourceUUID));
-	}
+    @Override
+    public T create(T resource, UUID resourceUUID) {
+	ensureSelfLinkAndUUIDPresent(resource);
+	T entity = repo.save(resource);
+	ensureSelfLinkAndUUIDPresent(entity);
+	return entity;
+    }
 
-	@Override
-	public T update(T resource, UUID resourceUUID) {
-		T entity = entityDao.persist(map(resource));
-		if (entity == null) {
-			return null;
-		}
-		return map(entity);
+    @Override
+    public T read(UUID resourceUUID) {
+	Optional<T> entity = repo.findByUuid(resourceUUID);
+	if (entity.isPresent()) {
+		T retrievedEntity = entity.get();
+		ensureSelfLinkAndUUIDPresent(retrievedEntity);
+		return retrievedEntity;
 	}
+	return null;
+    }
 
-	@Override
-	public T delete(UUID resourceUUID) {
-		T entity = entityDao.remove(resourceUUID);
-		if (entity == null) {
-			return null;
-		}
-		return map(entity);
-	}
+    @Override
+    public T update(T resource, UUID resourceUUID) {
+	ensureSelfLinkAndUUIDPresent(resource);
+	T entity = repo.save(resource);
+	ensureSelfLinkAndUUIDPresent(entity);
+	return entity;
+    }
 
-	@Override
-	public List<T> list(long pageNumber, long pageSize) {
-		return entityDao.findAllForPage(pageNumber, pageSize).stream()
-				.map(entity -> map(entity))
-				.collect(Collectors.toList());
+    @Override
+    public T delete(UUID resourceUUID) {
+	T previousValue = read(resourceUUID);
+	if (previousValue == null) {
+		return null;
 	}
+	repo.delete(previousValue);
+	ensureSelfLinkAndUUIDPresent(previousValue);
+	return previousValue;
+    }
 
-	public SpringDataEntityDAO<T> getEntityDao() {
-		return entityDao;
-	}
+    @Override
+    public List<T> list(long pageNumber, long pageSize) {
+	int pageZeroIndexed = Math.toIntExact(pageNumber) - 1;
+	int integerPageSize = (pageSize > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageSize);
+	List<T> retrievedPage = repo.findAll(PageRequest.of(pageZeroIndexed, integerPageSize)).getContent();
+	retrievedPage.forEach(resource -> ensureSelfLinkAndUUIDPresent(resource));
+	return retrievedPage;
+    }
 
-	/**
-	 * This simple map method allows using the same POJO as both the API resource and the entity used for persistence. 
-	 * 
-	 * @param entity is either the API resource or the entity
-	 * @return the entity for the given API resource, or the API resource for the given entity 
-	 */
-	private T map(T entity) {
-		if(entity == null) {
-			return null;
-		}
-		ensureSelfLinkAndUUIDPresent(entity);
-		return entity;
-	}
+    protected SpringDataRepository<T> getRepo() {
+	return repo;
+    }
 
-	private void ensureSelfLinkAndUUIDPresent(T persistedResource) {
-		if(persistedResource.getSelf() == null) {
-			persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI()).path(persistedResource.getUUID().toString()).build())
-					.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
-					.profile(persistedResource.getProfile())
-					.build());
-		}
-		if(persistedResource.getUUID() == null) {
-			UUID id = UUID.fromString(getAbsoluteWebResourceURI().relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
-			persistedResource.setUUID(id);
-		}
+    private void ensureSelfLinkAndUUIDPresent(T persistedResource) {
+	if (persistedResource.getSelf() == null && persistedResource.getUUID() == null) {
+	    throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
 	}
+	if (persistedResource.getSelf() == null) {
+	    persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI())
+		    .path(persistedResource.getUUID().toString()).build())
+			    .type(AdditionalMediaTypes.APPLICATION_HAL_JSON).profile(persistedResource.getProfile())
+			    .build());
+	}
+	if (persistedResource.getUUID() == null) {
+	    UUID id = UUID.fromString(getAbsoluteWebResourceURI()
+		    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
+	    persistedResource.setUUID(id);
+	}
+    }
 }
