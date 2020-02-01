@@ -74,23 +74,25 @@ configure(subprojects - project(":examples").allprojects){
 		publications{
 			mavenJava(MavenPublication){
 				from components.java
-				pom {
-					name = project.name
-					packaging = 'jar'
-					description = project.description
-					url = 'https://github.com/arucard21/SimplyRESTful-Framework'
-
-					scm {
-						connection = 'scm:git:git://github.com:arucard21/SimplyRESTful-Framework.git'
-						developerConnection = 'scm:git:ssh://github.com:arucard21/SimplyRESTful-Framework.git'
+				afterEvaluate {
+					pom {
+						name = project.name
+						packaging = 'jar'
+						description = project.description
 						url = 'https://github.com/arucard21/SimplyRESTful-Framework'
-					}
-
-					developers {
-						developer {
-							name = 'Riaas Mokiem'
-							email = 'arucard21@gmail.com'
-							organizationUrl = 'https://github.com/arucard21'
+	
+						scm {
+							connection = 'scm:git:git://github.com:arucard21/SimplyRESTful-Framework.git'
+							developerConnection = 'scm:git:ssh://github.com:arucard21/SimplyRESTful-Framework.git'
+							url = 'https://github.com/arucard21/SimplyRESTful-Framework'
+						}
+	
+						developers {
+							developer {
+								name = 'Riaas Mokiem'
+								email = 'arucard21@gmail.com'
+								organizationUrl = 'https://github.com/arucard21'
+							}
 						}
 					}
 				}
