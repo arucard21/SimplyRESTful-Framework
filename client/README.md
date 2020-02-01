@@ -7,4 +7,12 @@ What this library does:
 * Provide access to any SimplyRESTful API using Java methods.
 
 ## Usage
-Not yet available
+Create the client by providing
+1. the URI of this specific resource's API (e.g. `http://localhost/api/myresources/`)
+1. the class to which the resource should be deserialized. (e.g. `MyResource.class`)
+```
+SimplyRESTfulClient<MyResource> client = new SimplyRESTfulClient<>(URI.create("http://localhost/api/myresources/"), MyResource.class)
+```
+You can now use this client to retrieve resources from the API through the `create()`, `read()`, `update()`, `delete()` and `list()` methods. See the javadoc on each method for more information. 
+
+Since hypermedia controls may require a highly customized HTTP request, the client provides a `hypermediaControl()` method that simply provides you with a [`WebTarget`](https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/client/WebTarget.html) object that is pre-configured with the URI to the API for convenience. It can be further configured with query parameters, HTTP headers and anything else required to correctly configure the request for that hypermedia control.  
