@@ -10,7 +10,9 @@ ext {
 	spring = "2.2.4.RELEASE"
 }
 
+//Shared configuration for all projects (root, library and example projects)
 allprojects{
+	apply plugin: "java"
 	apply plugin: "eclipse"
 
 	repositories {
@@ -18,11 +20,7 @@ allprojects{
 	}
 
 	group = 'com.github.arucard21.simplyrestful'
-	version = '0.10.3'
-}
-
-subprojects{
-	apply plugin: "java"
+	version = '0.11.0'
 
 	sourceCompatibility = JavaVersion.VERSION_11
 	targetCompatibility = JavaVersion.VERSION_11
@@ -61,10 +59,59 @@ subprojects{
 	}
 }
 
-configure(allprojects - project(":examples").allprojects){
+// Shared configuration for all library projects (excluding root and example projects)
+configure(subprojects - project(":examples").allprojects){
 	apply plugin: 'java-library'
+	apply plugin: 'maven-publish'
+	apply plugin: 'signing'
+	
+	java {
+    	withJavadocJar()
+    	withSourcesJar()
+	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				from components.java
+				pom {
+					name = project.name
+					packaging = 'jar'
+					description = project.description
+					url = 'https://github.com/arucard21/SimplyRESTful-Framework'
+
+					scm {
+						connection = 'scm:git:git://github.com:arucard21/SimplyRESTful-Framework.git'
+						developerConnection = 'scm:git:ssh://github.com:arucard21/SimplyRESTful-Framework.git'
+						url = 'https://github.com/arucard21/SimplyRESTful-Framework'
+					}
+
+					developers {
+						developer {
+							name = 'Riaas Mokiem'
+							email = 'arucard21@gmail.com'
+							organizationUrl = 'https://github.com/arucard21'
+						}
+					}
+				}
+			}
+		}
+		
+		repositories{
+			maven{
+				def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            	def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            	url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			}
+		}
+	}
+	
+	signing {
+		sign publishing.publications.mavenJava
+	}
 }
 
+// Shared configuration for all example projects
 configure(project(":examples").allprojects){
 	apply plugin: 'application'
 }
@@ -82,6 +129,21 @@ project(":SimplyRESTful-resources"){
 		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
 		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
 		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.12")
+	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'GNU Lesser General Public License'
+							url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -106,6 +168,21 @@ project(":SimplyRESTful"){
 		integrationTestImplementation ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
 		integrationTestImplementation ("org.apache.cxf:cxf-rt-rs-client:${cxf}")
 	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'GNU Lesser General Public License'
+							url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 project(":client"){
@@ -117,9 +194,7 @@ project(":client"){
 		api ("io.swagger:swagger-models:1.5.21")
 		api ("io.swagger.parser.v3:swagger-parser:2.0.17")
 		api ("org.glassfish.jersey.inject:jersey-hk2:2.27")
-		
-		runtimeOnly ("org.glassfish:javax.json:1.1.4")
-		
+				
 		integrationTestImplementation project(":SimplyRESTful")
 		integrationTestImplementation project(":deploy-jetty-cxf")
 		integrationTestImplementation ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
@@ -128,6 +203,22 @@ project(":client"){
 		integrationTestImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		integrationTestImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
 		integrationTestImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
+		integrationTestImplementation ("org.glassfish:javax.json:1.1.4")
+	}
+
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'GNU Lesser General Public License'
+							url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -139,6 +230,21 @@ project(":deploy-springboot-cxf"){
 		api ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:${cxf}")
 		api ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
 		api ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
+	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'The Apache License, Version 2.0'
+                        	url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    	}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -152,6 +258,21 @@ project(":deploy-springboot-jersey"){
 			exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
 		}
 		api ("io.swagger:swagger-jersey2-jaxrs:1.5.21")
+	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'The Apache License, Version 2.0'
+                        	url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    	}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -168,6 +289,21 @@ project(":deploy-jetty-cxf"){
 		api ("org.hibernate:hibernate-validator:5.4.0.Final")
 		api ("org.glassfish:javax.el:3.0.1-b08")
 	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'The Apache License, Version 2.0'
+                        	url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    	}
+					}
+				}
+			}
+		}
+	}
 }
 
 project(":persist-springdata"){
@@ -175,6 +311,21 @@ project(":persist-springdata"){
 	dependencies {
 		api project(':SimplyRESTful')
 		api ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
+	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'GNU Lesser General Public License'
+							url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -190,7 +341,6 @@ project(":examples:jetty-cxf"){
 		implementation project(':deploy-jetty-cxf')
 		implementation ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
 	}
-	uploadArchives.enabled = false;
 }
 
 project(":examples:springboot-cxf"){
@@ -205,7 +355,6 @@ project(":examples:springboot-cxf"){
 		implementation project(':SimplyRESTful')
 		implementation project(':deploy-springboot-cxf')
 	}
-	uploadArchives.enabled = false;
 }
 
 project(":examples:springboot-jersey-nomapping-springdata"){
@@ -221,77 +370,5 @@ project(":examples:springboot-jersey-nomapping-springdata"){
 		implementation project(':deploy-springboot-jersey')
 		implementation project(':persist-springdata')
 		implementation ("com.h2database:h2:1.4.197")
-	}
-	uploadArchives.enabled = false;
-}
-
-// Provide tasks to publish projects to Maven Central
-configure(subprojects - project(":examples").allprojects){
-	apply plugin: 'maven'
-	apply plugin: 'signing'
-	
-	task javadocJar(type: Jar) {
-		classifier = 'javadoc'
-		from javadoc
-	}
-
-	task sourcesJar(type: Jar) {
-		classifier = 'sources'
-		from sourceSets.main.allSource
-	}
-
-	artifacts {
-		archives javadocJar, sourcesJar
-	}
-
-	signing {
-		sign configurations.archives
-	}
-
-	uploadArchives {
-		repositories {
-			mavenDeployer {
-				beforeDeployment { MavenDeployment deployment ->
-					signing.signPom(deployment)
-				}
-
-				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-					authentication(userName: ossrhUsername, password: ossrhPassword)
-				}
-
-				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-					authentication(userName: ossrhUsername, password: ossrhPassword)
-				}
-
-				pom.project {
-					name project.name
-					packaging 'jar'
-
-					description project.description
-					url = 'https://github.com/arucard21/SimplyRESTful-Framework'
-
-					scm {
-						connection 'scm:git:git://github.com:arucard21/SimplyRESTful-Framework.git'
-						developerConnection 'scm:git:ssh://github.com:arucard21/SimplyRESTful-Framework.git'
-						url 'https://github.com/arucard21/SimplyRESTful-Framework'
-					}
-
-					licenses {
-						license {
-							name 'GNU Lesser General Public License'
-							url 'https://www.gnu.org/licenses/lgpl-3.0.txt'
-						}
-					}
-
-					developers {
-						developer {
-							name 'Riaas Mokiem'
-							email 'arucard21@gmail.com'
-							organizationUrl 'https://github.com/arucard21'
-						}
-					}
-				}
-			}
-		}
 	}
 }
