@@ -58,13 +58,13 @@ public class DefaultWebResourceTest{
 	@Test
 	public void endpoint_shouldThrowClientErrorExceptionWhenResourceAlreadyExists_withPOSTonResource(){
 		Assertions.assertThrows(ClientErrorException.class, 
-				() -> testEndpoint.postHALResource(new TestResource()));
+				() -> testEndpoint.postHALResource(TestResource.testInstance()));
 	}
 
 	@Test
 	public void endpoint_shouldThrowBadRequestWhenIDDoesNotMatchResource_withPUTonResource(){
 		Assertions.assertThrows(BadRequestException.class, 
-				() -> testEndpoint.putHALResource(UUID.randomUUID(), new TestResource()));
+				() -> testEndpoint.putHALResource(UUID.randomUUID(), TestResource.testInstance()));
 	}
 
 	@Test

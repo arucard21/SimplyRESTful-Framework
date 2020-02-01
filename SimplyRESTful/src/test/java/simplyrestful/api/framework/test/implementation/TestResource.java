@@ -24,8 +24,10 @@ public class TestResource extends HALResource{
 				.build());
 	}
 	
-	public TestResource() {
-		this(TEST_RESOURCE_URI);
+	public TestResource() {}
+	
+	public static TestResource testInstance() {
+		return new TestResource(TEST_RESOURCE_URI);
 	}
 	
 	public static TestResource random() {

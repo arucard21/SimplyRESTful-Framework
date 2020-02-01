@@ -18,17 +18,14 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 public class TestWebResource extends DefaultWebResource<TestResource>{
 	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/testresources/");
-	public static final TestResource TEST_RESOURCE = new TestResource();
+	public static final TestResource TEST_RESOURCE = TestResource.testInstance();
 	
 	@Override
 	protected URI getAbsoluteWebResourceURI(Class<?> resourceEndpoint, UUID id) {
 		if (id == null) {
 			return TEST_REQUEST_BASE_URI;
 		}
-		if (TestResource.TEST_RESOURCE_ID.equals(id)) {
-			return TestResource.TEST_RESOURCE_URI;
-		}
-		return null;
+		return TestResource.TEST_REQUEST_URI.resolve(id.toString());
 	}
 	
 	@Override

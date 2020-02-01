@@ -1,6 +1,5 @@
 package simplyrestful.api.framework.core;
 
-import java.net.URI;
 import java.util.Arrays;
 
 import javax.ws.rs.core.GenericType;
@@ -87,10 +86,10 @@ public class WebResourceIntegrationTest{
 
 	@Test
 	public void webResource_shouldCreateResourceAndReturnLocationURI_whenPOSTReceivedWithNewResource(){
-		TestResource expectedResource = TestResource.random();
+		TestResource expectedResource = new TestResource();
 		Response response = client.path(WEB_RESOURCE_PATH).post(expectedResource);
-		Assertions.assertEquals(response.getStatusInfo().getFamily(), Family.SUCCESSFUL);
-		Assertions.assertEquals(URI.create(expectedResource.getSelf().getHref()), response.getLocation());
+		Assertions.assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
+		Assertions.assertTrue(response.getLocation().toString().startsWith(TestResource.TEST_REQUEST_URI.toString()));
 	}
 
 	@Test
