@@ -39,22 +39,19 @@ allprojects{
 	}
 	
 	configurations {
-		integrationTestImplementation{
-			extendsFrom testImplementation
-			canBeResolved = true
-		}
+		integrationTestImplementation.extendsFrom testImplementation
 		integrationTestRuntime.extendsFrom testRuntime
 	}
 	
 	task integrationTest(type:Test){
 		useJUnitPlatform()
-		setTestClassesDirs(project.sourceSets.integrationTest.output.getClassesDirs())
+		setTestClassesDirs(project.sourceSets.integrationTest.output.classesDirs)
 		classpath = project.sourceSets.integrationTest.runtimeClasspath
 	}
 	
 	eclipse {
 		classpath {
-			plusConfigurations += [configurations.integrationTestImplementation]
+			plusConfigurations += [configurations.integrationTestRuntimeClasspath]
 		}
 	}
 }
