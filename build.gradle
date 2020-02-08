@@ -357,6 +357,7 @@ project(":examples:springboot-cxf"){
 	dependencies {
 		implementation project(':SimplyRESTful')
 		implementation project(':deploy-springboot-cxf')
+		implementation("jakarta.xml.ws:jakarta.xml.ws-api:2.3.2")
 	}
 }
 
