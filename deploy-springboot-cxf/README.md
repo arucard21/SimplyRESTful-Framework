@@ -17,7 +17,7 @@ To use it in your project you have to:
 * Depend on [`deploy-springboot-cxf`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/deploy-springboot-cxf/)
 * Implement your SimplyRESTful API according to the [standard instructions](/SimplyRESTful#usage).
 * Make sure your implemented JAX-RS Web Resources can be detected by a Spring Component Scan.
-    * An easy way to do this is to annotate your Web Resource class with `@Named` (`javax.inject.Named`) and make sure it is located in a subpackage of the package containing your Spring Boot Application class (or the same package).
+    * An good way to do this is through auto-discovery of the classes. For this to work, annotate your Web Resource class with `@Named` (`javax.inject.Named`) and make sure it is located in a subpackage of the package containing your Spring Boot Application class (or the same package). Also enable the CXF component scan by configuring the application property `cxf.jaxrs.component-scan` to `true`, e.g. by adding the line `cxf.jaxrs.component-scan: true` in `application.yml`.
 * Start your SimplyRESTful API by simply [running your Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/#using-boot-running-your-application).
     * By default, Spring Boot runs the API on `http://localhost:8080`.
 

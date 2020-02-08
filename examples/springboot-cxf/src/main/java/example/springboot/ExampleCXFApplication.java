@@ -1,7 +1,9 @@
 package example.springboot;
 
+import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Run the API server with the example endpoint and resource.
@@ -10,8 +12,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-public class ExampleCXFApplication{
-	public static void main(String[] args) {
-		SpringApplication.run(ExampleCXFApplication.class, args);
-	}
+public class ExampleCXFApplication {
+    public static void main(String[] args) {
+	SpringApplication.run(ExampleCXFApplication.class, args);
+    }
+    
+    @Bean
+    public SearchContextProvider searchContextProvider() {
+	return new SearchContextProvider();
+    }
 }
