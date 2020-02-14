@@ -99,7 +99,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	for (Entry<String, PathItem> pathEntry : openApiSpecification.getPaths().entrySet()) {
 	    Operation getHttpMethod = pathEntry.getValue().getGet();
 	    boolean matchingMediaType = getHttpMethod.getResponses().get("200").getContent().keySet().stream()
-		    .map(MediaType::valueOf) 
+		    .map(MediaType::valueOf)
 		    .anyMatch(mediaType -> mediaType.equals(resourceMediaType));
 	    if (matchingMediaType) {
 		String resourcePath = pathEntry.getKey();
@@ -111,6 +111,9 @@ public class SimplyRESTfulClient<T extends HALResource> {
 		}
 		return UriBuilder.fromUri(openApiSpecification.getServers().get(0).getUrl())
 			.scheme(baseApiUri.getScheme())
+			.host(baseApiUri.getHost())
+			.userInfo(baseApiUri.getUserInfo())
+			.port(baseApiUri.getPort())
 			.path(resourcePath)
 			.build();
 	    }
@@ -177,13 +180,13 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	}
 	String nonDeserialized =  target.queryParam(QUERY_PARAM_COMPACT, compact).request().get(String.class);
 	HALCollection<T> collection;
-	
+
 	collection = (HALCollection<T>) deserializeJsonWithGenerics(nonDeserialized, new TypeReference<HALCollection<BasicHALResource>>() {});
 	JsonObject embedded = Json
 		.createReader(new StringReader(nonDeserialized))
 		.readObject()
 		.getJsonObject(HAL_EMBEDDED_KEY);
-	if(Objects.nonNull(embedded)) {	    
+	if(Objects.nonNull(embedded)) {
 	    collection.setItemEmbedded(
 		    embedded.getJsonArray(HAL_ITEM_KEY).stream()
 		    .filter(Objects::nonNull)
@@ -201,7 +204,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	    throw new RuntimeException(e);
 	}
     }
-    
+
     private <S> S deserializeJsonWithGenerics(String jsonString, TypeReference<S> typeRef) {
 	try {
 	    return new HALMapper().readValue(jsonString, typeRef);
@@ -223,7 +226,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     /**
      * Create a new API resource.
-     * 
+     *
      * If the provided resource contains a valid id, the resource will be created on the server
      * with that same id, using HTTP PUT. Otherwise, the resource will be created using HTTP POST
      * which will generate an id for that resource.
@@ -276,18 +279,18 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	    throw new WebApplicationException(response);
 	}
     }
-    
+
     /**
      * Validates that the given URI refers to to the web resource that is served.
-     * 
-     * The URI should have the same host as the web resource being server. Its path should also be relative to the root 
-     * of the web resource's path. 
-     * 
+     *
+     * The URI should have the same host as the web resource being server. Its path should also be relative to the root
+     * of the web resource's path.
+     *
      * @param resourceInstanceURI is the URI that is required to be valid.
      */
     private void validateResourceUri(URI resourceInstanceURI) {
-	if(Objects.isNull(resourceInstanceURI) || 
-		!resourceUri.getHost().equals(resourceInstanceURI.getHost()) || 
+	if(Objects.isNull(resourceInstanceURI) ||
+		!resourceUri.getHost().equals(resourceInstanceURI.getHost()) ||
 		resourceUri.relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
 	    throw new IllegalArgumentException(ERROR_INVALID_RESOURCE_URI);
 	}
@@ -320,28 +323,28 @@ public class SimplyRESTfulClient<T extends HALResource> {
     public WebTarget hypermediaControl(HALLink action) {
 	return client.target(action.getHref());
     }
-    
-    
+
+
     /**
      * Check whether a resource the given id exists on the server.
-     * 
+     *
      * @param resourceId is the id of the resource that should be checked.
      * @return true iff the resource exists on the server, false if it does not exist.
-     * @throws WebApplicationException if the client cannot confirm that the resource either exists or does not exist. 
+     * @throws WebApplicationException if the client cannot confirm that the resource either exists or does not exist.
      * Is likely caused by an error returned by the server.
      */
     public boolean exists(UUID resourceId) {
 	URI resourceInstanceURI = UriBuilder.fromUri(resourceUri).path(resourceId.toString()).build();
 	return exists(resourceInstanceURI);
     }
-    
+
     /**
      * Check whether a resource with the given URI exists on the server.
-     * 
+     *
      * @param resourceInstanceURI is the URI of the resource that should be checked.
      * @return true iff the resource exists on the server, false if it does not exist.
-     * @throws WebApplicationException if the client cannot confirm that the resource either exists or does not exist. 
-     * Is likely caused by an error returned by the server. 
+     * @throws WebApplicationException if the client cannot confirm that the resource either exists or does not exist.
+     * Is likely caused by an error returned by the server.
      */
     public boolean exists(URI resourceInstanceURI) {
 	validateResourceUri(resourceInstanceURI);
