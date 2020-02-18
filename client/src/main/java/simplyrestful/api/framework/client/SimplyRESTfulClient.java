@@ -23,10 +23,11 @@ import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.openapitools.jackson.dataformat.hal.HALMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -56,13 +57,15 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	private final String resourceProfile;
 	private final MediaType resourceMediaType;
 	private final Client client;
+	private final ObjectMapper halMapper;
 
-	SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
+	SimplyRESTfulClient(Client client, ObjectMapper halMapper, URI baseApiUri, Class<T> resourceClass) {
 		this.baseApiUri = baseApiUri;
 		this.client = client;
 		if (!client.getConfiguration().isRegistered(JacksonJsonProvider.class)) {
-			client.register(new JacksonJsonProvider(new HALMapper()));
+			client.register(new JacksonJsonProvider(halMapper));
 		}
+		this.halMapper = halMapper;
 		this.resourceClass = resourceClass;
 		this.resourceProfile = discoverResourceProfile();
 		this.resourceMediaType = detectResourceMediaType();
@@ -196,7 +199,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
 	private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {
 		try {
-			return new HALMapper().readValue(jsonString, deserializationClass);
+			ObjectMapper mapper = halMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			return mapper.readValue(jsonString, deserializationClass);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
@@ -204,7 +208,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
 	private <S> S deserializeJsonWithGenerics(String jsonString, TypeReference<S> typeRef) {
 		try {
-			return new HALMapper().readValue(jsonString, typeRef);
+			ObjectMapper mapper = halMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			return mapper.readValue(jsonString, typeRef);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
