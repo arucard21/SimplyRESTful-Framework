@@ -15,6 +15,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @param <E> is the entity used to persist data (which contains a UUID field)
  */
 @Named
-public interface SpringDataRepository<E> extends PagingAndSortingRepository<E, UUID>{
+public interface SpringDataRepository<E> extends PagingAndSortingRepository<E, Long>{
 	Optional<E> findByUuid(UUID uuid);
 }
