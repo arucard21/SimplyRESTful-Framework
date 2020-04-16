@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
@@ -73,7 +74,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
     @POST
     @ApiOperation(value = "Create a new resource", notes = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated")
     @Produces
-    public Response postHALResource(@ApiParam(value = "resource", required = true) @NotNull T resource) {
+    public Response postHALResource(@ApiParam(value = "resource", required = true) @NotNull @Valid T resource) {
 	UUID resourceId = ensureSelfLinkValid(resource, null);
 	if (this.exists(resourceId)) {
 	    throw new ClientErrorException(
@@ -118,7 +119,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
     @Produces
     public Response putHALResource(
 	    @ApiParam(value = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id,
-	    @ApiParam(value = "The resource to be updated", required = true) @NotNull T resource) {
+	    @ApiParam(value = "The resource to be updated", required = true) @NotNull @Valid T resource) {
 	ensureSelfLinkValid(resource, id);
 	if (this.exists(id)) {
 	    this.update(resource, id);
