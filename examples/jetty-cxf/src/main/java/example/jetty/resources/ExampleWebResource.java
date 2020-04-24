@@ -27,8 +27,10 @@ import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 
+import example.jetty.resources.dao.ExampleEntityDAO;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.Api;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
@@ -39,7 +41,11 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 @Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
-	private ExampleEntityDAO dao = new ExampleEntityDAO();
+	private ExampleEntityDAO dao;
+	
+	public ExampleWebResource(@Context ExampleEntityDAO dao) {
+		this.dao = dao;
+	}
 	
 	@Override
 	public ExampleResource create(ExampleResource resource, UUID resourceUUID) {

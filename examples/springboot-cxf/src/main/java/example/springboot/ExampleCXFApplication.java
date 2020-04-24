@@ -5,6 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import example.datastore.DataStore;
+
 /**
  * Run the API server with the example endpoint and resource.
  *
@@ -20,5 +22,10 @@ public class ExampleCXFApplication {
     @Bean
     public SearchContextProvider searchContextProvider() {
 	return new SearchContextProvider();
+    }
+    
+    @Bean
+    public DataStore datastore() {
+    	return new DataStore();
     }
 }

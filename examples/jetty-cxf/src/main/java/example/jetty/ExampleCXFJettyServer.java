@@ -3,6 +3,7 @@ package example.jetty;
 import org.apache.cxf.endpoint.Server;
 
 import example.jetty.resources.ExampleWebResource;
+import example.jetty.resources.dao.ExampleEntityDAOProvider;
 import simplyrestful.jetty.deploy.ServerBuilder;
 
 /**
@@ -16,6 +17,7 @@ public class ExampleCXFJettyServer {
 		Server apiServer = new ServerBuilder()
 				.withAddress("http://localhost:8080")
 				.withWebResource(ExampleWebResource.class)
+				.withProvider(new ExampleEntityDAOProvider())
 				.build();
 		try {
 			Thread.sleep(60 * 60 * 1000);

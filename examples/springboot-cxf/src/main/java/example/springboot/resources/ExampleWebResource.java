@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -60,8 +61,8 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	private Map<String, UUID> resourceMapping;
 	private DataStore dataStore;
 
-	public ExampleWebResource() {
-		dataStore = new DataStore();
+	@Inject
+	public ExampleWebResource(DataStore dataStore) {
 		resourceMapping = new HashMap<>();
 		for(StoredObject entity : dataStore.getData()) {
 			UUID entityID = entity.getId();

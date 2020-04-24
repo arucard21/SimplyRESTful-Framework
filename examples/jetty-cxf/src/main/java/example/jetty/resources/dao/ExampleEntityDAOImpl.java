@@ -1,13 +1,16 @@
-package example.jetty.resources;
+package example.jetty.resources.dao;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ExampleEntityDAO {
+import example.jetty.resources.ExampleEmbeddedResource;
+import example.jetty.resources.ExampleResource;
+
+public class ExampleEntityDAOImpl implements ExampleEntityDAO {
 	private List<ExampleResource> unmappedDatastore;
 
-	public ExampleEntityDAO() {
+	public ExampleEntityDAOImpl() {
 		List<ExampleResource> datastore = new ArrayList<>();
 
 		ExampleResource resource1 =  new ExampleResource();
