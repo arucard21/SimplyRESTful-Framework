@@ -26,15 +26,18 @@ import java.util.List;
 
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSBindingFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
-import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
+import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInvoker;
+import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor;
+import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
+import org.apache.cxf.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,31 +115,38 @@ public class ServerBuilder {
      */
     public Server build() throws ReflectiveOperationException {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        ArrayList<ResourceProvider> resourceProviders = new ArrayList<ResourceProvider>();
-        resourceProviders.add(new SingletonResourceProvider(new WebResourceRoot()));
+        // Configure resources
+        List<Class<?>> resourceClasses = new ArrayList<>();
+        resourceClasses.add(WebResourceRoot.class);
         for (Class<? extends DefaultWebResource<? extends HALResource>> webResource: webResources){
-			resourceProviders.add(new SingletonResourceProvider(webResource.getDeclaredConstructor().newInstance()));
+			resourceClasses.add(webResource);
         }
-        sf.setResourceProviders(resourceProviders);
+        sf.setResourceClasses(resourceClasses);
+        // Configure address
         if (address != null && !address.isEmpty()){
         	sf.setAddress(address);
         }
-
+        // Register transport factory
         BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);
         JAXRSBindingFactory factory = new JAXRSBindingFactory();
         factory.setBus(sf.getBus());
         manager.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, factory);
-
-        sf.setInvoker(new JAXRSBeanValidationInvoker());
+        // Configure and enable Swagger for generation swagger.json
         Swagger2Feature swagger = new Swagger2Feature();
         swagger.setPrettyPrint(true);
         sf.getFeatures().add(swagger);
+        // Configure and enable Bean Validation along with registering all providers
+        sf.setInvoker(new JAXRSBeanValidationInvoker());
         sf.getFeatures().add(new JAXRSBeanValidationFeature());
         providers.addAll(Arrays.asList(
+        		new ValidationExceptionMapper(),
         		new MultipartProvider(),
         		new JacksonJsonProvider(new HALMapper()),
         		new SearchContextProvider()));
         sf.setProviders(providers);
+        sf.setInInterceptors(Arrays.< Interceptor< ? extends Message > >asList(new JAXRSBeanValidationInInterceptor()));
+        sf.setOutInterceptors(Arrays.< Interceptor< ? extends Message > >asList(new JAXRSBeanValidationOutInterceptor()));
+        // Start the server
         LOGGER.info("Server ready...");
         return sf.create();
     }
