@@ -9,13 +9,11 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -31,8 +29,6 @@ import simplyrestful.api.framework.test.implementation.TestWebResource;
 public class WebResourceRootIntegrationTest{
 	private Server server;
 	private WebClient client;
-	@InjectMocks
-	private TestWebResource webResource;
 	
 	@BeforeEach
 	private void createServerAndClient() {
@@ -44,8 +40,7 @@ public class WebResourceRootIntegrationTest{
 		JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();	   
 		sf.setResourceClasses(TestWebResource.class, WebResourceRoot.class);
 		sf.setProvider(new JacksonJsonProvider(new HALMapper()));
-		sf.setResourceProvider(TestWebResource.class, new SingletonResourceProvider(webResource, true));
-		sf.setResourceProvider(WebResourceRoot.class, new SingletonResourceProvider(new WebResourceRoot(), true));
+		sf.setResourceClasses(TestWebResource.class, WebResourceRoot.class);
 		sf.setAddress(TestResource.TEST_REQUEST_BASE_URI.toString());
 		server = sf.create();
 	}

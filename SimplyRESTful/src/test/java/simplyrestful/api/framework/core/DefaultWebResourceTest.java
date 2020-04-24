@@ -22,7 +22,6 @@ import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultWebResourceTest{
-
 	@Mock
 	private UriInfo uriInfo;
 	@InjectMocks

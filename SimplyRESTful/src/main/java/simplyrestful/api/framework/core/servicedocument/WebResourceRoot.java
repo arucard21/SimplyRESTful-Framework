@@ -20,7 +20,7 @@ import simplyrestful.api.framework.resources.HALServiceDocument;
 public class WebResourceRoot{
 	@Context
 	private UriInfo uriInfo;
-	
+
 	@Produces({AdditionalMediaTypes.APPLICATION_HAL_JSON})
 	@GET
 	@ApiOperation(
