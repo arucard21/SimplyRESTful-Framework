@@ -58,6 +58,7 @@ In this Web Resource, you can now implement the `create()`, `read()`, `update()`
 * Same as with `create()`, the `update()` method should return the exact resource that was updated.
 * Same as with `read()`, the `delete()` method should return `null` if it could not find the resource with the given ID.
 * The `list()` method works as expected and just returns a list of resources.
+* For improved performance, you should also override the `count()` and `exists()` methods with a more efficient implementation for your specific backend.
 
 ### Configure your JAX-RS framework
 You can configure your JAX-RS framework manually, as described below, or you can use one of the convenience deploy libraries provided by the framework (see the [main README](/../..) for more details).
