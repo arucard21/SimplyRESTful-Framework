@@ -60,7 +60,7 @@ In this Web Resource, you can now implement the `create()`, `read()`, `update()`
 * The `list()` method works as expected and just returns a list of resources.
 
 ### Configure your JAX-RS framework
-You can configure your JAX-RS framework manually, as described below, or you can use one of the convenience deploy libraries provided by the framework (see the [main README](/) for more details).
+You can configure your JAX-RS framework manually, as described below, or you can use one of the convenience deploy libraries provided by the framework (see the [main README](/../..) for more details).
 
 In your JAX-RS framework, register:
 * a `JacksonJsonProvider` instance that uses `HALMapper` (`io.openapitools.jackson.dataformat.hal.HALMapper`) as `ObjectMapper` (to correctly serialize and deserialize our HAL+JSON documents).
