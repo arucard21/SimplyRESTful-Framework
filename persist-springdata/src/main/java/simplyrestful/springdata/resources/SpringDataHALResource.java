@@ -13,7 +13,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import simplyrestful.api.framework.resources.HALResource;
-
+/**
+ * @deprecated Direct mapping of API resources to database entities is not useful enough to maintain this convenience library.
+ * Use the standard SimplyRESTful library (without automated mapping) instead.
+ * 
+ */
+@Deprecated
 @JsonIgnoreProperties(ignoreUnknown = true)
 @MappedSuperclass
 public abstract class SpringDataHALResource extends HALResource{

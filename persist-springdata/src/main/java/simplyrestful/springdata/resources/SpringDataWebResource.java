@@ -32,6 +32,12 @@ import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.springdata.repository.SpringDataRepository;
 
+/**
+ * @deprecated Direct mapping of API resources to database entities is not useful enough to maintain this convenience library.
+ * Use the standard SimplyRESTful library (without automated mapping) instead.
+ * 
+ */
+@Deprecated
 public class SpringDataWebResource<T extends SpringDataHALResource> extends DefaultWebResource<T> {
 	private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
 	private static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
