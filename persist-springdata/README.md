@@ -1,4 +1,4 @@
-# persist-springdata
+# persist-springdata (Deprecated)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?style=plastic)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/persist-springdata/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.arucard21.simplyrestful/persist-springdata)
 
@@ -7,7 +7,14 @@ Convenience library for creating a SimplyRESTful API that stores its API resourc
 What this library does:
 * Extends SimplyRESTful's default implementation of a JAX-RS Web Resource to persist the API resources directly to a database using a Spring Data Repository.
 * Extends SimplyRESTful's `HALResource` to directly include the UUID used in the resource's self-link.
-* Ensures that the self-link and UUID remain consistent (only the UUID is stored in the database, not the self-link).  
+* Ensures that the self-link and UUID remain consistent (only the UUID is stored in the database, not the self-link).
+
+## Deprecation Notice
+This library is now considered deprecated and will be removed soon. The usefulness of having API resources directly stored to a database has turned out to too little to merit maintaining this convenience library. The main reason is due to the different best practices when dealing with links in the API and in the database. 
+
+In the API, a link should be a represented as an absolute URI but in the database you should store only the UUID part of the URI. The rest of the URI, representing where the API being linked to is actually running, should be removed. This information is available within the API implementation and absolute URIs can be built up dynamically for the links when providing it in a response. this means that any API resource that contains a link will need to have at least some mapping between the API resource and the entity stored in the database. 
+
+Given that some mapping is almost always required, the convenience of automating the mapping between API resource and entity does not weigh up against the cost of maintaining this convenience library. Instead, you should use the standard [`SimpyRESTful`](/SimplyRESTful/) library.
 
 ## Usage
 To use it, in your project you have to:
