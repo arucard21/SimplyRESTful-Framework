@@ -22,7 +22,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALMapper;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
-import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
@@ -61,19 +61,19 @@ public class WebResourceIntegrationTest{
 
 	@Test
 	public void webResource_shouldReturnAllResources_whenGETReceivedOnWebResourcePath(){
-		HALCollection<TestResource> collection = client
+		HALCollectionV1<TestResource> collection = client
 				.path(WEB_RESOURCE_PATH)
-				.get(new GenericType<HALCollection<TestResource>>() {});
+				.get(new GenericType<HALCollectionV1<TestResource>>() {});
 		Assertions.assertEquals(2, collection.getTotal());
 		Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE.getSelf()));
 	}
 
 	@Test
 	public void webResource_shouldReturnAllResourcesEmbedded_whenGETReceivedOnWebResourcePathAndCompactIsFalse(){
-		HALCollection<TestResource> collection = client
+		HALCollectionV1<TestResource> collection = client
 				.path(WEB_RESOURCE_PATH)
 				.query(QUERY_PARAM_COMPACT, Boolean.toString(false))
-				.get(new GenericType<HALCollection<TestResource>>() {});
+				.get(new GenericType<HALCollectionV1<TestResource>>() {});
 		Assertions.assertEquals(2, collection.getTotal());
 		Assertions.assertTrue(collection.getItemEmbedded().contains(TestWebResource.TEST_RESOURCE));
 	}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HALCollection Specification</title>
+</head>
+<body>
+	<h1>HALCollection Specification</h1>
+	<p>
+		The HALCollection resource is a collection resource, one which contains multiple resources of a specific type, based on <a href="https://tools.ietf.org/html/draft-kelly-json-hal">HAL+JSON</a>. The HALCollection resource provides a single page of the collection of resources that you wish to retrieve. This resource can be represented as either HAL+JSON or plain JSON.<br>
+		<br>
+		This documentation is for version 2 of the HALCollection resource.
+	</p> 
+	<ul>
+		<li>Media Types: 
+			<ul>
+				<li><code>application/hal+json; profile=https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2</code></li>
+				<li><code>application/x.simplyrestful-halcollection-v2+json</code> (default)</li>
+			</ul>
+		</li>
+		
+	</ul>
+	<h2>HTTP headers</h2>
+	<p>The following HTTP headers can be used to influence the behavior of the HALCollection resource.</p>
+	<ul>
+		<li><code>Accept</code>: contains a list of the preferred media types for the HALCollection. This is a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept">standard HTTP header</a> and can be used to request a specific version of the HALCollection resource, or a specific type of representation (e.g. plain JSON). The media types that can be used here are provided in the specification section, at the top of this documentation page (and that of the previous version of this resource). If this HTTP header is not provided, the default media type will be used to represent the HALCollection resource.</li>
+	</ul>
+	<h2>Query parameters</h2>
+	<p>The following query parameters can be used to influence the behavior of the HALCollection resource.</p>
+	<ul>
+		<li><code>pageStart</code>: is the number of the resource (aka offset) at which to start the page of the collection. The default value is to show a page that starts at the first resource, "0".</li>
+		<li><code>pageSize</code>: is the maximum amount of resources that are being shown on a single page of the collection. This can be specified using a query string parameter of the same name. The default value is "100".</li>
+		<li><code>fields</code>: is a list of field names that should be included in the collection that is returned. The keyword "all" can be used to return all fields. The default value is "first,last,prev,next,total,item.self".</li>
+		<li><code>query</code>: is a FIQL query that can be used to filter the resources included in this collection. The default value is empty, meaning not to filter at all.</li>
+		<li><code>sort</code>: is the list of field names on which to sort, in order, along with their direction. The default value is empty, so there is no specific sort order applied.</li>
+	</ul>
+	<h2>Attributes</h2>
+	<ul>
+		<li><code>total</code>: is the number of resources that are available in the entire collection (meaning all pages of the collection), after filtering is applied.</li>
+	</ul>
+	<h2>Embedded</h2>
+	<ul>
+		<li><a href="https://tools.ietf.org/html/rfc6573#section-2.1"><code>item</code></a>: is the list of resources from the requested part of the collection</li>
+	</ul>
+	<h2>Links</h2>
+	<ul>
+		<li><a href="https://tools.ietf.org/html/rfc4287#section-4.2.7.2"><code>self</code></a>: is a link to the collection itself.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>first</code></a>: is a link to the first page of the collection.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>last</code></a>: is a link to the last page of the collection.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>prev</code></a>: is a link to the previous page of the collection.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>next</code></a>: is a link to the next page of the collection.</li>
+	</ul>
+	<h2>Paging</h2>
+	<p>The collection provides an offset-based paging mechanism. This is controlled using the <code>pageStart</code> and <code>pageSize</code> query parameters. By default, you'll get a page containing the first 100 resources. If you want to get the next 100 resources, you can set <code>pageStart</code> to <code>101</code> and keep <code>pageSize</code> on its default of 100 resources per page. So that means you just add <code>?pageStart=101</code> to the URL. For easy navigation, the HALCollection resource includes links to other pages that have the query parameters adjusted accordingly. These are the <code>first</code>, <code>last</code>, <code>prev</code> and <code>next</code> links, providing the obvious page implied by the name (if available).</p>
+	<h2>Field names</h2>
+	<p>The field names used in the <code>fields</code>, <code>query</code> and <code>sort</code> parameters are the fields in the HALCollection resource. You can address nested fields by separating it with a dot. However, the <code>_links</code> and <code>_embedded</code> are not included in this hierarchy. So the self link in each resource is located at <code>_embedded > item > _links > self</code> but you can address this as <code>item.self</code>.</p>
+	<h2>Query with FIQL</h2>
+	<p>You can use the FIQL query language to filter the resources that are included in the collection. For more details on how FIQL works, you can look at its <a href="https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00">specification</a>.</p>
+	<h2>Sorting</h2>
+	<p>To define the sort order of the resources in the collection, you can specify the field name on which you want to sort. You can specify the sort order for each field through the suffix <code>:asc</code> or <code>:desc</code>, for ascending and descending order respectively.</p>
+</body>
+</html>

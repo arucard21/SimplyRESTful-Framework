@@ -15,15 +15,15 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import simplyrestful.api.framework.resources.test.TestResourceWithEquals;
 
-public class HALCollectionTest {
+public class HALCollectionV1Test {
 	private static final String TEST_COLLECTION_HREF_1 = "local://docs/resources/testcollection/1";
 	private static final String TEST_COLLECTION_HREF_2 = "local://docs/resources/testcollection/2";
 	private static final String TEST_COLLECTION_PAGE_BASE = "local://docs/resources/testcollection/2?page=";
 	private static final URI requestURI = URI.create("local://resources/testresources/");
 
-	private HALCollection<TestResourceWithEquals> testCollection;
-	private HALCollection<TestResourceWithEquals> testCollectionSame;
-	private HALCollection<TestResourceWithEquals> testCollectionDifferent;
+	private HALCollectionV1<TestResourceWithEquals> testCollection;
+	private HALCollectionV1<TestResourceWithEquals> testCollectionSame;
+	private HALCollectionV1<TestResourceWithEquals> testCollectionDifferent;
 	private List<TestResourceWithEquals> testResourcesList;
 
 	@BeforeEach
@@ -36,7 +36,7 @@ public class HALCollectionTest {
 			testResourcesList.add(testResource);
 		}
 
-		testCollection = new HALCollection<>();
+		testCollection = new HALCollectionV1<>();
 		testCollection.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_1).profile(testCollection.getProfile()).build());
 		testCollection.setPage(1);
 		testCollection.setMaxPageSize(10);
@@ -46,7 +46,7 @@ public class HALCollectionTest {
 		testCollection.setPrev(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"1").profile(testCollection.getProfile()).build());
 		testCollection.setNext(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"10").profile(testCollection.getProfile()).build());
 
-		testCollectionSame = new HALCollection<>();
+		testCollectionSame = new HALCollectionV1<>();
 		testCollectionSame.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_1).profile(testCollectionSame.getProfile()).build());
 		testCollectionSame.setPage(1);
 		testCollectionSame.setMaxPageSize(10);
@@ -56,7 +56,7 @@ public class HALCollectionTest {
 		testCollectionSame.setPrev(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"1").profile(testCollectionSame.getProfile()).build());
 		testCollectionSame.setNext(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"10").profile(testCollectionSame.getProfile()).build());
 
-		testCollectionDifferent = new HALCollection<>();
+		testCollectionDifferent = new HALCollectionV1<>();
 		testCollectionDifferent.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_2).profile(testCollectionDifferent.getProfile()).build());
 		testCollectionDifferent.setPage(3);
 		testCollectionDifferent.setMaxPageSize(5);
@@ -69,7 +69,7 @@ public class HALCollectionTest {
 	
 	@Test
 	public void equalsContract() {
-	    EqualsVerifier.forClass(HALCollection.class)
+	    EqualsVerifier.forClass(HALCollectionV1.class)
 	    		.withRedefinedSuperclass()
 	    		.suppress(Warning.NONFINAL_FIELDS)
 	    		.verify();
@@ -97,10 +97,10 @@ public class HALCollectionTest {
 
 	@Test
 	public void halCollection_shouldNotBeEqual_whenOnlySelfLinkDiffers() throws Exception {
-		HALCollection<TestResourceWithEquals> onlySelfLink1 = new HALCollection<>();
+		HALCollectionV1<TestResourceWithEquals> onlySelfLink1 = new HALCollectionV1<>();
 		onlySelfLink1.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_1).profile(onlySelfLink1.getProfile()).build());
 
-		HALCollection<TestResourceWithEquals> onlySelfLink2 = new HALCollection<>();
+		HALCollectionV1<TestResourceWithEquals> onlySelfLink2 = new HALCollectionV1<>();
 		onlySelfLink2.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_2).profile(onlySelfLink2.getProfile()).build());
 
 		Assertions.assertNotEquals(onlySelfLink1, onlySelfLink2);

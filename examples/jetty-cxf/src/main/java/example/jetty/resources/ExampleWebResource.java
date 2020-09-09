@@ -78,7 +78,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> list(long pageNumber, long pageSize) {
+	public List<ExampleResource> list(int pageNumber, int pageSize, List<String> fields, String query, List<String> sort) {
 		return getEntityDao().findAllForPage(pageNumber, pageSize).stream()
 				.map(entity -> map(entity))
 				.collect(Collectors.toList());

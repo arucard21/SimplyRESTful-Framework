@@ -1,10 +1,13 @@
 package simplyrestful.api.framework.core;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -28,16 +31,32 @@ import javax.ws.rs.core.UriInfo;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import simplyrestful.api.framework.core.hal.HALCollectionBuilder;
-import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
+import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
+import simplyrestful.api.framework.resources.HALCollectionV1;
+import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 
 public abstract class DefaultWebResource<T extends HALResource> {
     private static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
     private static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
-    public static final String QUERY_PARAM_PAGE = "page";
+    public static final String V1_QUERY_PARAM_PAGE = "page";
+    public static final String V1_QUERY_PARAM_COMPACT = "compact";
+    public static final String QUERY_PARAM_PAGE_START = "pageStart";
     public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
-    public static final String QUERY_PARAM_COMPACT = "compact";
+    public static final String QUERY_PARAM_FIELDS = "fields";
+    public static final String QUERY_PARAM_QUERY = "query";
+    public static final String QUERY_PARAM_SORT = "sort";
+    public static final int QUERY_PARAM_PAGE_START_DEFAULT = 0;
+    public static final int QUERY_PARAM_PAGE_SIZE_DEFAULT = 100;
+    public static final String QUERY_PARAM_FIELDS_COLLECTION_DEFAULT = "first,last,prev,next,total,item.self";
+    public static final String QUERY_PARAM_FIELDS_RESOURCE_DEFAULT = "all";
+    public static final String QUERY_PARAM_FIELDS_DELIMITER = ",";
+    public static final String QUERY_PARAM_QUERY_DEFAULT = "query";
+    public static final String QUERY_PARAM_SORT_DEFAULT = "sort";
+    public static final String QUERY_PARAM_SORT_DELIMITER = ",";
+    
+    
     @Context
     protected UriInfo uriInfo;
 
@@ -50,18 +69,75 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * @param compact  determines whether the resource in the collection only shows
      *                 its self-link (if true), or the entire resource (if false)
      * @return the paginated collection of resources.
+     * @deprecated Use getHALResourcesV2() instead.
      */
     @GET
-    @Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + HALCollection.PROFILE_STRING + "\"")
+    @Produces(HALCollectionV1.MEDIATYPE_HAL_JSON+";qs=1.0")
     @Consumes
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
-    public HALCollection<T> getHALResources(
-	    @ApiParam(value = "The page to be shown", required = false) @QueryParam(QUERY_PARAM_PAGE) @DefaultValue(HALCollectionBuilder.DEFAULT_PAGE_NUMBER_STRING) long page,
-	    @ApiParam(value = "The amount of resources shown on each page", required = false) @QueryParam(QUERY_PARAM_PAGE_SIZE) @DefaultValue(HALCollectionBuilder.DEFAULT_MAX_PAGESIZE_STRING) long pageSize,
-	    @ApiParam(value = "Provide minimal information for each resource", required = false) @QueryParam(QUERY_PARAM_COMPACT) @DefaultValue(HALCollectionBuilder.DEFAULT_COMPACT_VALUE_STRING) boolean compact) {
-	return HALCollectionBuilder.fromPartial(this.list(page, pageSize), getRequestURI(), this.count()).page(page)
-		.maxPageSize(pageSize).compact(compact).build();
+    @Deprecated(since = "0.12.0")
+    public HALCollectionV1<T> getHALResourcesV1(
+            @ApiParam(value = "The page to be shown", required = false)
+            @QueryParam(V1_QUERY_PARAM_PAGE) 
+            @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING) 
+            int page,
+            @ApiParam(value = "The amount of resources shown on each page", required = false)
+            @QueryParam(QUERY_PARAM_PAGE_SIZE)
+            @DefaultValue(HALCollectionV1Builder.DEFAULT_MAX_PAGESIZE_STRING)
+            int pageSize,
+            @ApiParam(value = "Provide minimal information for each resource", required = false)
+            @QueryParam(V1_QUERY_PARAM_COMPACT)
+            @DefaultValue(HALCollectionV1Builder.DEFAULT_COMPACT_VALUE_STRING)
+            boolean compact) {
+        return HALCollectionV1Builder.fromPartial(this.list(page, pageSize, Collections.emptyList(), "", Collections.emptyList()), getRequestURI(), this.count("")).page(page)
+        	.maxPageSize(pageSize).compact(compact).build();
     }
+
+    /**
+     * Retrieve the paginated collection of resources.
+     *
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the requested size of each page.
+     * @param fields is a list that defines which fields should be retrieved. 
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted.
+     * @return the paginated collection of resources.
+     */
+    @GET
+    @Produces({HALCollectionV2.MEDIATYPE_HAL_JSON+";qs=0.5", HALCollectionV2.MEDIATYPE_JSON+";qs=0.25"})
+//    @Produces(MediaType.APPLICATION_JSON+";qs=0.5")
+    @Consumes
+    @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
+    public HALCollectionV2<T> getHALResourcesV2(
+            @ApiParam(value = "The page to be shown", required = false)
+            @QueryParam(QUERY_PARAM_PAGE_START)
+            @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING)
+            int pageStart,
+            @ApiParam(value = "The amount of resources shown on each page", required = false)
+            @QueryParam(QUERY_PARAM_PAGE_SIZE)
+            @DefaultValue(HALCollectionV1Builder.DEFAULT_MAX_PAGESIZE_STRING)
+            int pageSize,
+            @ApiParam(value = "The fields that should be included", required = false)
+            @QueryParam(QUERY_PARAM_FIELDS)
+            @DefaultValue(QUERY_PARAM_FIELDS_COLLECTION_DEFAULT)
+            List<String> fields,
+            @ApiParam(value = "The FIQL query according to which the resources should be filtered", required = false)
+            @QueryParam(QUERY_PARAM_QUERY)
+            @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
+            String query,
+            @ApiParam(value = "The fields on which the resources should be sorted", required = false)
+            @QueryParam(QUERY_PARAM_SORT)
+            @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
+            List<String> sort) {
+        fields = separateDelimited(fields, QUERY_PARAM_FIELDS_DELIMITER);
+        sort = separateDelimited(sort, QUERY_PARAM_SORT_DELIMITER);
+        List<T> filteredAndSortedResources = this.list(pageStart, pageSize, fields, query, sort);
+        
+        return HALCollectionV2Builder.from(filteredAndSortedResources, getRequestURI())
+        	.withNavigation(pageStart, pageSize)
+        	.collectionSize(this.count(query))
+        	.build();
+        }
 
     /**
      * Create a resource.
@@ -201,12 +277,14 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * object) should contain absolute URI's and a self-link must be available in
      * each resource.
      *
-     * @param pageNumber is the requested page number
-     * @param pageSize   is the requested size of each page
-     * @return the requested HAL collection containing the resources for the
-     *         requested page
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the requested size of each page.
+     * @param fields is a list that defines which fields should be retrieved. 
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted.
+     * @return the requested list of resources for the requested page.
      */
-    public abstract List<T> list(long pageNumber, long pageSize);
+    public abstract List<T> list(int pageStart, int pageSize, List<String> fields, String query, List<String> sort);
 
     /**
      * Retrieve how many resources are available.
@@ -214,10 +292,11 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * This provides a simple implementation for convenience but should be
      * overridden with an optimized implementation, if possible.
      *
+     * @param query is a FIQL query that defines how the resources should be filtered.
      * @return the total amount of resources that are available
      */
-    public long count() {
-	return this.list(1, Long.MAX_VALUE).stream().count();
+    public int count(String query) {
+	return this.list(1, Integer.MAX_VALUE, Collections.emptyList(), query, Collections.emptyList()).size();
     }
 
     /**
@@ -232,6 +311,13 @@ public abstract class DefaultWebResource<T extends HALResource> {
      */
     public boolean exists(UUID resourceUUID) {
 	return Objects.nonNull(this.read(resourceUUID));
+    }
+
+    protected List<String> separateDelimited(List<String> listContainingDelimitedStrings, String queryParamFieldsDelimiter) {
+        return listContainingDelimitedStrings.stream()
+        	.flatMap(delimitedString -> Arrays.asList(delimitedString.split(queryParamFieldsDelimiter)).stream())
+        	.map(String::trim)
+        	.collect(Collectors.toList());
     }
 
     /**

@@ -2,8 +2,6 @@ package example.datastore;
 
 import java.util.UUID;
 
-import example.datastore.StoredEmbeddedObject;
-
 public class StoredObject {
 	private UUID id;
 	private String description;

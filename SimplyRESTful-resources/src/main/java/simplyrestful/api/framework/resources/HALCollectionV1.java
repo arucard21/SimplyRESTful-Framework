@@ -9,9 +9,14 @@ import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
 import io.openapitools.jackson.dataformat.hal.annotation.Link;
 import io.openapitools.jackson.dataformat.hal.annotation.Resource;
 
+/**
+ * @deprecated Use HALCollectionV2 instead
+ */
 @Resource
-public class HALCollection<T extends HALResource> extends HALResource {
+@Deprecated(since="0.12.0")
+public class HALCollectionV1<T extends HALResource> extends HALResource {
 	public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1";
+	public static final String MEDIATYPE_HAL_JSON = "application/hal+json;profile="+PROFILE_STRING;
 
 	private long page;
 	private long pageSize;
@@ -114,8 +119,8 @@ public class HALCollection<T extends HALResource> extends HALResource {
 
 	@Override
 	public final boolean equals(Object obj) {
-		if (obj instanceof HALCollection<?>){
-			HALCollection<?> otherCollection = (HALCollection<?>) obj;
+		if (obj instanceof HALCollectionV1<?>){
+			HALCollectionV1<?> otherCollection = (HALCollectionV1<?>) obj;
 			return otherCollection.canEqual(this) &&
 					Objects.equals(getSelf(), otherCollection.getSelf()) &&
 					Objects.equals(getProfile(), otherCollection.getProfile()) &&
@@ -133,6 +138,6 @@ public class HALCollection<T extends HALResource> extends HALResource {
 	}
 
 	protected boolean canEqual(Object obj) {
-		return (obj instanceof HALCollection<?>);
+		return (obj instanceof HALCollectionV1<?>);
 	}
 }

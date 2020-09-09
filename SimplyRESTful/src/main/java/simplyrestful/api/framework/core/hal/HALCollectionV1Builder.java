@@ -9,10 +9,10 @@ import javax.ws.rs.core.UriBuilder;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
-import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALResource;
 
-public class HALCollectionBuilder<T extends HALResource> {
+public class HALCollectionV1Builder<T extends HALResource> {
 	private static final String ERROR_MORE_RESOURCES_PROVIDED_THAN_ALLOWED = "More resources were provided than the max page size. You may want to try using HALCollectionBuilder.fromFullList.";
 	public static final String DEFAULT_PAGE_NUMBER_STRING = "1";
 	public static final int DEFAULT_PAGE_NUMBER = Integer.parseInt(DEFAULT_PAGE_NUMBER_STRING);
@@ -29,38 +29,38 @@ public class HALCollectionBuilder<T extends HALResource> {
 	protected long maxPageSize = DEFAULT_MAX_PAGESIZE; 
 	protected boolean compact = DEFAULT_COMPACT_VALUE;
 	
-	public static <T extends HALResource> HALCollectionBuilder<T> fromFull(List<T> resources, URI requestURI) {
-		return new HALCollectionBuilder<T>(resources, requestURI, resources.size(), true);
+	public static <T extends HALResource> HALCollectionV1Builder<T> fromFull(List<T> resources, URI requestURI) {
+		return new HALCollectionV1Builder<T>(resources, requestURI, resources.size(), true);
 	}
 	
-	public static <T extends HALResource> HALCollectionBuilder<T> fromPartial(List<T> resources, URI requestURI, long collectionSize) {
-		return new HALCollectionBuilder<T>(resources, requestURI, collectionSize, false).maxPageSize(resources.size());
+	public static <T extends HALResource> HALCollectionV1Builder<T> fromPartial(List<T> resources, URI requestURI, long collectionSize) {
+		return new HALCollectionV1Builder<T>(resources, requestURI, collectionSize, false).maxPageSize(resources.size());
 	}
 	
-	private HALCollectionBuilder(List<T> resources, URI requestURI, long collectionSize, boolean fromFull){
+	private HALCollectionV1Builder(List<T> resources, URI requestURI, long collectionSize, boolean fromFull){
 		this.resources = resources;
 		this.requestURI = requestURI;
 		this.fromFull = fromFull;
 		this.collectionSize = collectionSize;
 	}
 	
-	public HALCollectionBuilder<T> page(long page) {
+	public HALCollectionV1Builder<T> page(long page) {
 		this.page = page;
 		return this;
 	}
 	
-	public HALCollectionBuilder<T> maxPageSize(long maxPageSize) {
+	public HALCollectionV1Builder<T> maxPageSize(long maxPageSize) {
 		this.maxPageSize = maxPageSize;
 		return this;
 	}
 	
-	public HALCollectionBuilder<T> compact(boolean compact) {
+	public HALCollectionV1Builder<T> compact(boolean compact) {
 		this.compact = compact;
 		return this;
 	}
 	
-	public HALCollection<T> build(){
-		HALCollection<T> collection = new HALCollection<T>();
+	public HALCollectionV1<T> build(){
+		HALCollectionV1<T> collection = new HALCollectionV1<T>();
 		collection.setPage(page);
 		collection.setMaxPageSize(maxPageSize);
 		collection.setTotal(collectionSize);
@@ -106,12 +106,12 @@ public class HALCollectionBuilder<T extends HALResource> {
 
 	protected HALLink createHALLinkFromURIWithModifiedPageNumber(URI requestURI, int pageNumber){
 		UriBuilder hrefBuilder = UriBuilder.fromUri(requestURI);
-		hrefBuilder.replaceQueryParam(DefaultWebResource.QUERY_PARAM_PAGE, pageNumber);
+		hrefBuilder.replaceQueryParam(DefaultWebResource.V1_QUERY_PARAM_PAGE, pageNumber);
 		HALLink link = new HALLink.Builder(hrefBuilder.build()).build();
 		return link;
 	}
 
-	protected void addResourcesToCollection(HALCollection<T> collection, List<T> pageResources, boolean compact) {
+	protected void addResourcesToCollection(HALCollectionV1<T> collection, List<T> pageResources, boolean compact) {
 		if(compact){
 			List<HALLink> resourcesOnPage = retrieveSelfLinks(pageResources);
 			collection.setItem(resourcesOnPage);
@@ -134,7 +134,7 @@ public class HALCollectionBuilder<T extends HALResource> {
 		return resourcesOnPage;
 	}
 
-	protected void addSelfLink(HALCollection<T> collection, URI collectionURI) {
+	protected void addSelfLink(HALCollectionV1<T> collection, URI collectionURI) {
 		collection.setSelf(new HALLink.Builder(collectionURI)
 										.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 										.profile(collection.getProfile())

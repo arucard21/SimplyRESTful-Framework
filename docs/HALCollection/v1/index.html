@@ -5,10 +5,13 @@
 </head>
 <body>
 	<h1>HALCollection Specification</h1>
+	<p>
+		The HALCollection resource is a collection resource, one which contains multiple resources of a specific type, based on <a href="https://tools.ietf.org/html/draft-kelly-json-hal">HAL+JSON</a>. The HALCollection resource provides a single page of the collection of resources that you wish to retrieve.<br>
+		<br>
+		This documentation is for version 1 of the HALCollection resource.
+	</p> 
 	<ul>
-		<li>Media Type: <a href="https://tools.ietf.org/html/draft-kelly-json-hal"><code>application/hal+json</code></a></li>
-		<li>Profile: <code>https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1</code></li>
-		<li>Version: <code>1</code></li>
+		<li>Media Type: <code>application/hal+json; profile=https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1</code></li>
 	</ul>
 	<h2>Attributes</h2>
 	<ul>
@@ -30,7 +33,7 @@
 		parameter is omitted or set to true.</li>
 		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>first</code></a>: is a link to the first page of the collection.</li>
 		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>last</code></a>: is a link to the last page of the collection.</li>
-		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>prev</code></a>: is a link to the next page of the collection.</li>
+		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>prev</code></a>: is a link to the previous page of the collection.</li>
 		<li><a href="https://tools.ietf.org/html/rfc5988#section-6.2.2"><code>next</code></a>: is a link to the next page of the collection.</li>
 	</ul>
 </body>

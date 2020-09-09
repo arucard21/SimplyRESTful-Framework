@@ -131,8 +131,8 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> list(long pageNumber, long pageSize) {
-		int integerPageNumber = (pageNumber > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageNumber);
+	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
+		int integerPageNumber = (pageStart > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageStart);
 		int integerPageSize = (pageSize > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageSize);
 		
 		int startElement = Math.toIntExact((integerPageNumber-1)*integerPageSize);

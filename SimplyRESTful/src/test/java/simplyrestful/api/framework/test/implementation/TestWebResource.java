@@ -60,7 +60,7 @@ public class TestWebResource extends DefaultWebResource<TestResource>{
 	}
 
 	@Override
-	public List<TestResource> list(long pageNumber, long pageSize) {
+	public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
 		return Arrays.asList(TEST_RESOURCE, TestResource.random());
 	}	
 }

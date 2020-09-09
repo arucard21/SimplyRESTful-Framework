@@ -9,7 +9,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
-import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALResource;
 
 public abstract class AbstractHALCollectionBuilderTest {
@@ -17,7 +17,7 @@ public abstract class AbstractHALCollectionBuilderTest {
 	protected static final int TEST_RESOURCES_SIZE = 1000;
 	protected static final URI requestURI = URI.create("local://resources/testresources/");
 	protected List<TestResource> testResourcesList;
-	protected HALCollectionBuilder<TestResource> builder;
+	protected HALCollectionV1Builder<TestResource> builder;
 
 	@BeforeEach
 	public void createSourceData() {
@@ -31,8 +31,8 @@ public abstract class AbstractHALCollectionBuilderTest {
 		}
 	}
 
-	protected HALCollection<TestResource> createExpectedCollection(int page, int pageSize, int first, int last, int prev, int next, int sublistBegin, int sublistEnd, boolean compact) {
-		HALCollection<TestResource> expected = new HALCollection<TestResource>();
+	protected HALCollectionV1<TestResource> createExpectedCollection(int page, int pageSize, int first, int last, int prev, int next, int sublistBegin, int sublistEnd, boolean compact) {
+		HALCollectionV1<TestResource> expected = new HALCollectionV1<TestResource>();
 		expected.setSelf(new HALLink.Builder(requestURI).type(AdditionalMediaTypes.APPLICATION_HAL_JSON).profile(expected.getProfile()).build());
 		expected.setPage(page);
 		expected.setMaxPageSize(pageSize);

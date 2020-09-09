@@ -20,7 +20,7 @@ allprojects{
 	}
 
 	group = 'com.github.arucard21.simplyrestful'
-	version = '0.11.5'
+	version = '0.12.0'
 
 	sourceCompatibility = JavaVersion.VERSION_11
 	targetCompatibility = JavaVersion.VERSION_11
@@ -312,7 +312,7 @@ project(":deploy-jetty-cxf"){
 project(":persist-springdata"){
 	project.description = "Easily persist your SimplyRESTful API using Spring Data"
 	dependencies {
-		api project(':SimplyRESTful')
+		api ("com.github.arucard21.simplyrestful:SimplyRESTful:0.11.5")
 		api ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
 	}
 	
