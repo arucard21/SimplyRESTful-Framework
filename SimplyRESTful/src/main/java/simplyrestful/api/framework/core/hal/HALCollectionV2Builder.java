@@ -86,20 +86,18 @@ public class HALCollectionV2Builder<T extends HALResource> {
 	collection.setFirst(createHALLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE));
 	if (this.pageStart > 0) {
 	    int startofPrevPage = this.pageStart - this.pageSize;
-	    if (startofPrevPage < 0) {
-		startofPrevPage = 0;
+	    if (startofPrevPage >= 0) {		
+		collection.setPrev(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage));
 	    }
-	    collection.setPrev(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage));
 	}
 	if (this.collectionSize != null) {
 	    int startofLastPage = calculateStartOfLastPage();
 	    collection.setLast(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofLastPage));
 	    if (this.pageStart < startofLastPage) {
 		int startOfNextPage = this.pageStart + this.pageSize;
-		if (startOfNextPage > startofLastPage) {
-		    startOfNextPage = startofLastPage;
+		if (startOfNextPage <= startofLastPage) {
+		    collection.setNext(createHALLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage));
 		}
-		collection.setNext(createHALLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage));
 	    }
 	}
     }

@@ -12,6 +12,7 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALResource;
 
+@Deprecated(since = "0.12.0")
 public class HALCollectionV1Builder<T extends HALResource> {
 	private static final String ERROR_MORE_RESOURCES_PROVIDED_THAN_ALLOWED = "More resources were provided than the max page size. You may want to try using HALCollectionBuilder.fromFullList.";
 	public static final String DEFAULT_PAGE_NUMBER_STRING = "1";

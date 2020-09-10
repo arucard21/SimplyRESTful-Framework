@@ -25,7 +25,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -35,7 +34,8 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.parser.OpenAPIV3Parser;
-import simplyrestful.api.framework.resources.HALCollectionV1;
+import simplyrestful.api.framework.core.providers.HALMapperProvider;
+import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
@@ -58,16 +58,14 @@ public class SimplyRESTfulClient<T extends HALResource> {
     private final String resourceProfile;
     private final MediaType resourceMediaType;
     private final Client client;
-    private final ObjectMapper halMapper;
     private URI resourceUri;
 
-    SimplyRESTfulClient(Client client, ObjectMapper halMapper, URI baseApiUri, Class<T> resourceClass) {
+    SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
 	this.baseApiUri = baseApiUri;
 	this.client = client;
-	if (!client.getConfiguration().isRegistered(JacksonJsonProvider.class)) {
-	    client.register(new JacksonJsonProvider(halMapper));
-	}
-	this.halMapper = halMapper;
+	client.register(JacksonJsonProvider.class);
+	client.register(HALMapperProvider.class);
+	client.register(ObjectMapperProvider.class);
 	this.resourceClass = resourceClass;
 	this.resourceProfile = discoverResourceProfile();
 	this.resourceMediaType = detectResourceMediaType();
@@ -170,46 +168,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      */
     public List<T> listResources(int page, int pageSize, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
 	discoverResourceURI(headers);
-	return retrievePagedCollection(page, pageSize, false, headers, queryParameters).getItemEmbedded();
-    }
-
-    /**
-     * Retrieve a list of API resource identifiers for a page of API resources.
-     *
-     * @param page     is the number of the page. If negative, will not be included
-     *                 in the HTTP request.
-     * @param pageSize is the size of each page. If negative, will not be included
-     *                 in the HTTP request.
-     * @return a list of resource identifiers from the page corresponding to the
-     *         provided parameters.
-     */
-    public List<UUID> listResourceIdentifiers(int page, int pageSize) {
-	return listResourceIdentifiers(page, pageSize, null, null);
-    }
-
-    /**
-     * Retrieve a list of API resource identifiers for a page of API resources.
-     *
-     * @param page            is the number of the page. If negative, will not be
-     *                        included in the HTTP request.
-     * @param pageSize        is the size of each page. If negative, will not be
-     *                        included in the HTTP request.
-     * @param headers         is the set of additional HTTP headers that should be
-     *                        used in the request.
-     * @param queryParameters is the set of queryparameter that should be used in
-     *                        the request
-     * @return a list of resource identifiers from the page corresponding to the
-     *         provided parameters.
-     */
-    public List<UUID> listResourceIdentifiers(int page, int pageSize, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
-	discoverResourceURI(headers);
-	return retrievePagedCollection(page, pageSize, true, headers, queryParameters).getItem().stream()		
-		.filter(selfLink -> Objects.isNull(selfLink.getTemplated()) || !selfLink.getTemplated())
-		.map(selfLink -> {
-		    URI resourceInstanceUri = URI.create(selfLink.getHref());
-		    URI relativizedURI = resourceUri.relativize(resourceInstanceUri);
-		    return UUID.fromString(relativizedURI.getPath());
-		}).collect(Collectors.toList());
+	return retrievePagedCollection(page, pageSize, false, headers, queryParameters).getItem();
     }
 
     /**
@@ -229,7 +188,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *         resource identifiers or embedded resources.
      */
     @SuppressWarnings("unchecked")
-    private HALCollectionV1<T> retrievePagedCollection(int page, int pageSize, boolean compact, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    private HALCollectionV2<T> retrievePagedCollection(int page, int pageSize, boolean compact, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
 	WebTarget target = client.target(resourceUri);
 	if (page >= 0) {
 	    target = target.queryParam(QUERY_PARAM_PAGE, page);
@@ -242,15 +201,15 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	Builder request = target.request();
 	configureHttpHeaders(request, headers);
 	String nonDeserialized = request.get(String.class);
-	HALCollectionV1<T> collection;
-	collection = (HALCollectionV1<T>) deserializeJsonWithGenerics(nonDeserialized,
-		new TypeReference<HALCollectionV1<BasicHALResource>>() {
-		});
+	HALCollectionV2<T> collection;
+	collection = (HALCollectionV2<T>) deserializeJsonWithGenerics(nonDeserialized, new TypeReference<HALCollectionV2<BasicHALResource>>() {});
 	JsonObject embedded = Json.createReader(new StringReader(nonDeserialized)).readObject()
 		.getJsonObject(HAL_EMBEDDED_KEY);
 	if (Objects.nonNull(embedded)) {
-	    collection.setItemEmbedded(embedded.getJsonArray(HAL_ITEM_KEY).stream().filter(Objects::nonNull)
-		    .map(jsonValue -> deserializeJson(jsonValue.toString(), resourceClass)).filter(Objects::nonNull)
+	    collection.setItem(embedded.getJsonArray(HAL_ITEM_KEY).stream()
+		    .filter(Objects::nonNull)
+		    .map(jsonValue -> deserializeJson(jsonValue.toString(), resourceClass))
+		    .filter(Objects::nonNull)
 		    .collect(Collectors.toList()));
 	}
 	return collection;
@@ -269,14 +228,13 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	if (Objects.isNull(headers)) {
 	    return;
 	}
-	headers.add(HttpHeaders.ACCEPT, HALCollectionV2.MEDIATYPE_JSON);
+	headers.add(HttpHeaders.ACCEPT, HALCollectionV2.MEDIA_TYPE_JSON);
 	request = request.headers(headers);
     }
 
     private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {
 	try {
-	    ObjectMapper mapper = halMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-	    return mapper.readValue(jsonString, deserializationClass);
+	    return new HALMapperProvider().getContext(ObjectMapper.class).readValue(jsonString, deserializationClass);
 	} catch (JsonProcessingException e) {
 	    throw new RuntimeException(e);
 	}
@@ -284,8 +242,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     private <S> S deserializeJsonWithGenerics(String jsonString, TypeReference<S> typeRef) {
 	try {
-	    ObjectMapper mapper = halMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-	    return mapper.readValue(jsonString, typeRef);
+	    return new HALMapperProvider().getContext(ObjectMapper.class).readValue(jsonString, typeRef);
 	} catch (JsonProcessingException e) {
 	    throw new RuntimeException(e);
 	}

@@ -43,8 +43,10 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import io.openapitools.jackson.dataformat.hal.HALMapper;
+import io.swagger.jaxrs.listing.ApiListingResource;
 import simplyrestful.api.framework.core.DefaultWebResource;
+import simplyrestful.api.framework.core.providers.HALMapperProvider;
+import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALResource;
 
@@ -139,10 +141,13 @@ public class ServerBuilder {
         sf.setInvoker(new JAXRSBeanValidationInvoker());
         sf.getFeatures().add(new JAXRSBeanValidationFeature());
         providers.addAll(Arrays.asList(
-        		new ValidationExceptionMapper(),
-        		new MultipartProvider(),
-        		new JacksonJsonProvider(new HALMapper()),
-        		new SearchContextProvider()));
+        		ValidationExceptionMapper.class,
+        		MultipartProvider.class,
+        		JacksonJsonProvider.class,
+        		HALMapperProvider.class,
+        		ObjectMapperProvider.class,
+        		ApiListingResource.class,
+        		SearchContextProvider.class));
         sf.setProviders(providers);
         sf.setInInterceptors(Arrays.< Interceptor< ? extends Message > >asList(new JAXRSBeanValidationInInterceptor()));
         sf.setOutInterceptors(Arrays.< Interceptor< ? extends Message > >asList(new JAXRSBeanValidationOutInterceptor()));

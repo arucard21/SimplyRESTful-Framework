@@ -48,14 +48,7 @@ public class SimplyRESTfulClientTest {
 
 	@Test
 	public void client_shouldDiscoverTheResourceURI_whenItIsCreated() {
-		Assertions.assertDoesNotThrow(() -> client.listResourceIdentifiers(-1, -1));
-	}
-
-	@Test
-	public void listResourceIds_shouldReturnTestResourceIdentifiers() {
-		List<UUID> listOfResourceIdentifiers = client.listResourceIdentifiers(-1, -1);
-		Assertions.assertEquals(2, listOfResourceIdentifiers.size());
-		Assertions.assertTrue(listOfResourceIdentifiers.contains(TestResource.TEST_RESOURCE_ID));
+		Assertions.assertDoesNotThrow(() -> client.listResources(-1, -1));
 	}
 
 	@Test

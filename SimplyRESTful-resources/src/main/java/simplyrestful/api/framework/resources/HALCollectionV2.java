@@ -12,8 +12,8 @@ import io.openapitools.jackson.dataformat.hal.annotation.Resource;
 @Resource
 public class HALCollectionV2<T extends HALResource> extends HALResource {
     public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2";
-    public static final String MEDIATYPE_HAL_JSON = "application/hal+json;profile="+PROFILE_STRING;
-    public static final String MEDIATYPE_JSON = "application/x.simplyrestful-halcollection-v2+json";
+    public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile="+PROFILE_STRING;
+    public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-halcollection-v2+json";
     
     private int total;
     @Link

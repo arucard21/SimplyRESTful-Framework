@@ -40,21 +40,23 @@ import simplyrestful.api.framework.resources.HALResource;
 public abstract class DefaultWebResource<T extends HALResource> {
     private static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
     private static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
+
     public static final String V1_QUERY_PARAM_PAGE = "page";
     public static final String V1_QUERY_PARAM_COMPACT = "compact";
     public static final String QUERY_PARAM_PAGE_START = "pageStart";
     public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
     public static final String QUERY_PARAM_FIELDS = "fields";
+    public static final String QUERY_PARAM_FIELDS_DELIMITER = ",";
     public static final String QUERY_PARAM_QUERY = "query";
     public static final String QUERY_PARAM_SORT = "sort";
-    public static final int QUERY_PARAM_PAGE_START_DEFAULT = 0;
-    public static final int QUERY_PARAM_PAGE_SIZE_DEFAULT = 100;
+    public static final String QUERY_PARAM_SORT_DELIMITER = ",";
+    
+    public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
+    public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
     public static final String QUERY_PARAM_FIELDS_COLLECTION_DEFAULT = "first,last,prev,next,total,item.self";
     public static final String QUERY_PARAM_FIELDS_RESOURCE_DEFAULT = "all";
-    public static final String QUERY_PARAM_FIELDS_DELIMITER = ",";
-    public static final String QUERY_PARAM_QUERY_DEFAULT = "query";
-    public static final String QUERY_PARAM_SORT_DEFAULT = "sort";
-    public static final String QUERY_PARAM_SORT_DELIMITER = ",";
+    public static final String QUERY_PARAM_QUERY_DEFAULT = "";
+    public static final String QUERY_PARAM_SORT_DEFAULT = "";
     
     
     @Context
@@ -72,7 +74,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * @deprecated Use getHALResourcesV2() instead.
      */
     @GET
-    @Produces(HALCollectionV1.MEDIATYPE_HAL_JSON+";qs=1.0")
+    @Produces(HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=1.0")
     @Consumes
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
     @Deprecated(since = "0.12.0")
@@ -104,18 +106,18 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * @return the paginated collection of resources.
      */
     @GET
-    @Produces({HALCollectionV2.MEDIATYPE_HAL_JSON+";qs=0.5", HALCollectionV2.MEDIATYPE_JSON+";qs=0.25"})
+    @Produces({HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.5", HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.25"})
 //    @Produces(MediaType.APPLICATION_JSON+";qs=0.5")
     @Consumes
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
     public HALCollectionV2<T> getHALResourcesV2(
             @ApiParam(value = "The page to be shown", required = false)
             @QueryParam(QUERY_PARAM_PAGE_START)
-            @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING)
+            @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
             int pageStart,
             @ApiParam(value = "The amount of resources shown on each page", required = false)
             @QueryParam(QUERY_PARAM_PAGE_SIZE)
-            @DefaultValue(HALCollectionV1Builder.DEFAULT_MAX_PAGESIZE_STRING)
+            @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
             int pageSize,
             @ApiParam(value = "The fields that should be included", required = false)
             @QueryParam(QUERY_PARAM_FIELDS)

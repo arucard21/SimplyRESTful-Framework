@@ -118,7 +118,7 @@ configure(subprojects - project(":examples").allprojects){
 configure(project(":examples").allprojects){
 	apply plugin: 'application'
 }
-
+	
 project(":SimplyRESTful-resources"){
 	project.description = "The core API resources used in SimplyRESTful APIs"
 	dependencies {
@@ -150,10 +150,19 @@ project(":SimplyRESTful-resources"){
 	}
 }
 
+project(":jaxrs-providers"){
+	project.description = "A collection of JAX-RS providers for use with SimplyRESTful server and client"
+	dependencies {
+		api ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
+		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
+	}
+}
+
 project(":SimplyRESTful"){
 	project.description = "A framework for creating a RESTful API"
 	dependencies {
 		api project(":SimplyRESTful-resources")
+		api project(":jaxrs-providers")
 		api ("javax.inject:javax.inject:1")
 		api ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
 		api ("javax.validation:validation-api:2.0.1.Final")
@@ -192,6 +201,7 @@ project(":client"){
 	project.description = "A generic client that can be used with any SimplyRESTful API"
 	dependencies {
 		api project(":SimplyRESTful-resources")
+		api project(":jaxrs-providers")
 		api ("javax.json:javax.json-api:1.1.4")
 		api ("org.glassfish.jersey.core:jersey-client:2.27")
 		api ("io.swagger:swagger-models:1.5.21")

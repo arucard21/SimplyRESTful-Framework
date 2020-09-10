@@ -9,7 +9,10 @@ import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class TestResource extends HALResource{
-	public static final String PROFILE_STRING = "local://docs/resources/testresource";
+	public static final String PROFILE_STRING = "local://docs/resources/testresource/v1";
+	public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile="+PROFILE_STRING;
+	public static final String MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
+	
 	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/");
 	public static final URI TEST_REQUEST_URI = URI.create("local://resources/testresources/");
 	public static final UUID TEST_RESOURCE_ID = UUID.fromString("bb2adabf-effe-4fb4-900b-d3b32cd9eed3");
