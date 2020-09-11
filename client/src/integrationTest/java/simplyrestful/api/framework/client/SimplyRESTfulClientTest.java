@@ -48,12 +48,12 @@ public class SimplyRESTfulClientTest {
 
 	@Test
 	public void client_shouldDiscoverTheResourceURI_whenItIsCreated() {
-		Assertions.assertDoesNotThrow(() -> client.listResources(-1, -1));
+		Assertions.assertDoesNotThrow(() -> client.listResources(-1, -1, "", "", ""));
 	}
 
 	@Test
 	public void listResources_shouldReturnTestResources() {
-		List<TestResource> listOfResourceIdentifiers = client.listResources(-1, -1);
+		List<TestResource> listOfResourceIdentifiers = client.listResources(-1, -1, "", "", "");
 		Assertions.assertEquals(2, listOfResourceIdentifiers.size());
 		Assertions.assertTrue(listOfResourceIdentifiers.contains(TestWebResource.TEST_RESOURCE));
 	}

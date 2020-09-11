@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.core.providers;
 
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.ext.ContextResolver;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.openapitools.jackson.dataformat.hal.HALMapper;
 
+@Named
 @Provider
 @Produces(HALMapperProvider.MEDIA_TYPE_APPLICATION_HAL_JSON)
 @Consumes(HALMapperProvider.MEDIA_TYPE_APPLICATION_HAL_JSON)

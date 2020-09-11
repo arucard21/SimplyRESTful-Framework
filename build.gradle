@@ -155,6 +155,7 @@ project(":jaxrs-providers"){
 	dependencies {
 		api ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
 		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
+		api ("javax.inject:javax.inject:1")
 	}
 }
 
@@ -384,5 +385,6 @@ project(":examples:springboot-jersey-nomapping-springdata"){
 		implementation project(':deploy-springboot-jersey')
 		implementation project(':persist-springdata')
 		implementation ("com.h2database:h2:1.4.197")
+		implementation("io.github.perplexhub:rsql-jpa-specification:5.0.6")
 	}
 }

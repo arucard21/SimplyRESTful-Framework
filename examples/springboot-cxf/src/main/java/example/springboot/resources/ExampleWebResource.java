@@ -20,6 +20,7 @@
 package example.springboot.resources;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +64,14 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 
 	@Inject
 	public ExampleWebResource(DataStore dataStore) {
-		resourceMapping = new HashMap<>();
-		for(StoredObject entity : dataStore.getData()) {
-			UUID entityID = entity.getId();
-			URI relativeResourceURI = UriBuilder.fromResource(ExampleWebResource.class).path(entityID.toString()).build();
-			resourceMapping.put(relativeResourceURI.getPath(), entityID);
-		}
+	    this.dataStore = dataStore;
+	    resourceMapping = new HashMap<>();
+	    for (StoredObject entity : dataStore.getData()) {
+		UUID entityID = entity.getId();
+		URI relativeResourceURI = UriBuilder.fromResource(ExampleWebResource.class).path(entityID.toString())
+			.build();
+		resourceMapping.put(relativeResourceURI.getPath(), entityID);
+	    }
 	}
 
 	@Override
@@ -131,37 +134,46 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
-		int integerPageNumber = (pageStart > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageStart);
-		int integerPageSize = (pageSize > Integer.valueOf(Integer.MAX_VALUE).longValue()) ?  Integer.MAX_VALUE : Math.toIntExact(pageSize);
-		
-		int startElement = Math.toIntExact((integerPageNumber-1)*integerPageSize);
-		int endElement = Math.toIntExact((integerPageNumber)*integerPageSize);
-		
-		List<StoredObject> data = dataStore.getData();
-		int dataSize = data.size();
-		if (startElement > dataSize) {
-			startElement = dataSize;
-			endElement = dataSize;
-		}
-		if (endElement > dataSize) {
-			endElement = dataSize;
-		}
-		List<ExampleResource> resources = data.subList(startElement, endElement)
-				.stream()
-				.map((entity) -> convertToResource(entity))
-				.collect(Collectors.toList());
-		SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
-		if (searchContext == null) {
-			return resources;
-		}
-		SearchCondition<ExampleResource> searchCondition = searchContext.getCondition(ExampleResource.class);
-    	if (searchCondition == null){
-    		return resources;
-    	}
-    	return searchCondition.findAll(resources);
+	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, String> sort) {
+	    List<StoredObject> data = dataStore.getData();
+	    int dataSize = data.size();
+	    if (pageStart > dataSize) {
+		return Collections.emptyList();
+	    }
+	    int endElement = pageStart + pageSize;
+	    if (endElement > dataSize) {
+		endElement = dataSize;
+	    }
+	    List<ExampleResource> resources = data.subList(pageStart, endElement).stream()
+		    .map((entity) -> convertToResource(entity)).collect(Collectors.toList());
+	    SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
+	    if (searchContext == null) {
+		return resources;
+	    }
+	    SearchCondition<ExampleResource> searchCondition = searchContext.getCondition(ExampleResource.class);
+	    if (searchCondition == null) {
+		return resources;
+	    }
+	    return searchCondition.findAll(resources);
 	}
 
+
+	@Override
+	public int count(String query) {
+	    SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
+	    if (searchContext == null) {
+		return dataStore.getData().size();
+	    }
+	    SearchCondition<ExampleResource> searchCondition = searchContext.getCondition(ExampleResource.class);
+	    if (searchCondition == null) {
+		return dataStore.getData().size();
+	    }
+	    return searchCondition
+		    .findAll(dataStore.getData().stream()
+			    .map(this::convertToResource)
+			    .collect(Collectors.toList()))
+		    .size();
+	}
 
 	private StoredObject convertToEntity(ExampleResource exampleResource) {
 		StoredObject dataResource = new StoredObject();

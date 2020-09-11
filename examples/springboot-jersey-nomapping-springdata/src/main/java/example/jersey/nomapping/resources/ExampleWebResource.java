@@ -20,6 +20,7 @@ package example.jersey.nomapping.resources;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,8 +31,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.UriBuilder;
 
-import org.springframework.data.domain.PageRequest;
-
+import example.jersey.nomapping.OffsetBasedPageRequest;
+import io.github.perplexhub.rsql.RSQLSupport;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.Api;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
@@ -104,13 +105,23 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     }
 
     @Override
-    public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
-	int pageZeroIndexed = Math.toIntExact(pageStart) - 1;
-	int integerPageSize = (pageSize > Integer.valueOf(Integer.MAX_VALUE).longValue()) ? Integer.MAX_VALUE
-		: Math.toIntExact(pageSize);
-	List<ExampleResource> retrievedPage = repo.findAll(PageRequest.of(pageZeroIndexed, integerPageSize)).getContent();
+    public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, String> sort) {
+	List<ExampleResource> retrievedPage = repo.findAll(
+		RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))),
+		new OffsetBasedPageRequest(pageStart, pageSize))
+		.getContent();
 	retrievedPage.forEach(resource -> ensureSelfLinkAndUUIDPresent(resource));
 	return retrievedPage;
+    }
+    
+    private String createSortQuery(Map<String, String> sort) {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public int count(String query) {
+	return Math.toIntExact(repo.count(RSQLSupport.toSpecification(query)));
     }
 
     private void ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {

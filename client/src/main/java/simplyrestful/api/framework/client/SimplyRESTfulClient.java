@@ -50,9 +50,11 @@ public class SimplyRESTfulClient<T extends HALResource> {
     private static final String MEDIA_TYPE_HAL_JSON_TYPE = "application";
     private static final String MEDIA_TYPE_HAL_JSON_SUBTYPE = "hal+json";
     private static final String MEDIA_TYPE_HAL_JSON = MEDIA_TYPE_HAL_JSON_TYPE + "/" + MEDIA_TYPE_HAL_JSON_SUBTYPE;
-    private static final String QUERY_PARAM_PAGE = "page";
+    private static final String QUERY_PARAM_PAGE_START = "pageStart";
     private static final String QUERY_PARAM_PAGESIZE = "pageSize";
-    private static final String QUERY_PARAM_COMPACT = "compact";
+    private static final String QUERY_PARAM_FIELDS = "fields";
+    private static final String QUERY_PARAM_QUERY = "query";
+    private static final String QUERY_PARAM_SORT= "sort";
     private final Class<T> resourceClass;
     private final URI baseApiUri;
     private final String resourceProfile;
@@ -148,8 +150,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @return a list of API resources from the page corresponding to the provided
      *         parameters.
      */
-    public List<T> listResources(int page, int pageSize) {
-	return listResources(page, pageSize, null, null);
+    public List<T> listResources(int page, int pageSize, String fields, String query, String sort) {
+	return listResources(page, pageSize, fields, query, sort, null, null);
     }
 
     /**
@@ -159,16 +161,23 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *                        not be included in the HTTP request.
      * @param pageSize        is the size of each page. If zero or negative, will
      *                        not be included in the HTTP request.
-     * @param headers         is the set of additional HTTP headers that should be
+     * @param additionalHeaders         is the set of additional HTTP headers that should be
      *                        used in the request.
-     * @param queryParameters is the set of queryparameter that should be used in
+     * @param additionalQueryParameters is the set of queryparameter that should be used in
      *                        the request
      * @return a list of API resources from the page corresponding to the provided
      *         parameters.
      */
-    public List<T> listResources(int page, int pageSize, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
-	discoverResourceURI(headers);
-	return retrievePagedCollection(page, pageSize, false, headers, queryParameters).getItem();
+    public List<T> listResources(
+	    int page,
+	    int pageSize,
+	    String fields,
+	    String query,
+	    String sort,
+	    MultivaluedMap<String, Object> additionalHeaders,
+	    MultivaluedMap<String, Object> additionalQueryParameters) {
+	discoverResourceURI(additionalHeaders);
+	return retrievePagedCollection(page, pageSize, fields, query, sort, additionalHeaders, additionalQueryParameters).getItem();
     }
 
     /**
@@ -188,17 +197,26 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *         resource identifiers or embedded resources.
      */
     @SuppressWarnings("unchecked")
-    private HALCollectionV2<T> retrievePagedCollection(int page, int pageSize, boolean compact, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    private HALCollectionV2<T> retrievePagedCollection(int pageStart, int pageSize, String fields, String query, String sort, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
 	WebTarget target = client.target(resourceUri);
-	if (page >= 0) {
-	    target = target.queryParam(QUERY_PARAM_PAGE, page);
+	if (pageStart >= 0) {
+	    target = target.queryParam(QUERY_PARAM_PAGE_START, pageStart);
 	}
 	if (pageSize >= 0) {
 	    target = target.queryParam(QUERY_PARAM_PAGESIZE, pageSize);
 	}
-	target = target.queryParam(QUERY_PARAM_COMPACT, compact);
+	if(!fields.isBlank()) {
+	    target = target.queryParam(QUERY_PARAM_FIELDS, fields);
+	}
+	if(!query.isBlank()) {
+	    target = target.queryParam(QUERY_PARAM_QUERY, query);
+	}
+	if(!sort.isBlank()) {
+	    target = target.queryParam(QUERY_PARAM_SORT, sort);
+	}
 	configureAdditionalQueryParameters(target, queryParameters);
 	Builder request = target.request();
+	request.accept(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
 	configureHttpHeaders(request, headers);
 	String nonDeserialized = request.get(String.class);
 	HALCollectionV2<T> collection;
@@ -228,8 +246,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	if (Objects.isNull(headers)) {
 	    return;
 	}
-	headers.add(HttpHeaders.ACCEPT, HALCollectionV2.MEDIA_TYPE_JSON);
-	request = request.headers(headers);
+	headers.forEach((headerName, headerValue) -> request.header(headerName, headerValue));
     }
 
     private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {

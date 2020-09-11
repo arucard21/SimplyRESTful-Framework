@@ -14,9 +14,9 @@ import io.openapitools.jackson.dataformat.hal.annotation.Resource;
  */
 @Resource
 @Deprecated(since="0.12.0")
-public class HALCollectionV1<T extends HALResource> extends HALResource {
+public class HALCollectionV1<T extends HALResource> extends HALCollection<T>{
 	public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1";
-	public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile="+PROFILE_STRING;
+	public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile=\""+PROFILE_STRING+"\"";
 
 	private long page;
 	private long pageSize;

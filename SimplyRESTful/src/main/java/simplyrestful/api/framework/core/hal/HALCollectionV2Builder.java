@@ -3,6 +3,7 @@ package simplyrestful.api.framework.core.hal;
 import java.net.URI;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
@@ -69,10 +70,10 @@ public class HALCollectionV2Builder<T extends HALResource> {
 	return this;
     }
 
-    public HALCollectionV2<T> build() {
+    public HALCollectionV2<T> build(MediaType type) {
 	HALCollectionV2<T> collection = new HALCollectionV2<T>();
 	collection.setItem(this.resources);
-	collection.setSelf(createLink(requestURI, collection.getProfile()));
+	collection.setSelf(createLink(requestURI, type, collection.getProfile()));
 	if(this.collectionSize != null) {
 		collection.setTotal(this.collectionSize);
 	}
@@ -121,10 +122,16 @@ public class HALCollectionV2Builder<T extends HALResource> {
 	return new HALLink.Builder(modifiedUri).build();
     }
 
-    protected HALLink createLink(URI collectionUri, URI collectionProfileUri) {
-	return new HALLink.Builder(collectionUri)
-		.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
-		.profile(collectionProfileUri)
-		.build();
+    protected HALLink createLink(URI collectionUri, MediaType collectionType, URI collectionProfileUri) {
+	HALLink.Builder builder = new HALLink.Builder(collectionUri);
+	if(collectionType.isCompatible(AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE)) {
+	    builder
+	    .type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
+	    .profile(collectionProfileUri);
+	}
+	else {
+	    builder.type(collectionType.toString());
+	}
+	return builder.build();
     }
 }

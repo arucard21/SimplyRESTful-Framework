@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import org.junit.jupiter.api.Assertions;
@@ -16,10 +17,11 @@ import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class HALCollectionV2BuilderTest {
-    protected static final String HALCOLLECTION_PROFILE = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2";
     protected static final int TEST_RESOURCES_SIZE = 1000;
     protected static final URI requestURI = URI.create("local://resources/testresources/");
     protected List<TestResource> testResourcesList;
+    private final MediaType halJson = new MediaType("application", "hal+json", HALCollectionV2.PROFILE_STRING);
+    private final MediaType customJson = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
 
     @BeforeEach
     public void createSourceData() {
@@ -89,7 +91,7 @@ public class HALCollectionV2BuilderTest {
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
 		.withNavigation(pageStart, maxPageSize)
-		.build();
+		.build(halJson);
 	HALCollectionV2<TestResource> expected = createExpectedCollection(0, 900, -1, 100, 0, 100);
 	Assertions.assertEquals(expected, actual);
     }
@@ -104,7 +106,7 @@ public class HALCollectionV2BuilderTest {
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
 		.withNavigation(pageStart, maxPageSize)
-		.build();
+		.build(halJson);
 	HALCollectionV2<TestResource> expected = createExpectedCollection(0, 900, 200, 400, 200, 300);
 	Assertions.assertEquals(expected, actual);
     }
@@ -119,7 +121,7 @@ public class HALCollectionV2BuilderTest {
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
 		.withNavigation(pageStart, maxPageSize)
-		.build();
+		.build(halJson);
 	HALCollectionV2<TestResource> expected = createExpectedCollection(0, 900, 800, -1, 900, 1000);
 	Assertions.assertEquals(expected, actual);
     }
@@ -134,7 +136,7 @@ public class HALCollectionV2BuilderTest {
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
 		.withNavigation(pageStart, maxPageSize)
-		.build();
+		.build(halJson);
 	Assertions.assertEquals(100, actual.getItem().size());
     }
 
@@ -148,12 +150,12 @@ public class HALCollectionV2BuilderTest {
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
 		.withNavigation(pageStart, maxPageSize)
-		.build();
-	Assertions.assertEquals(URI.create(HALCOLLECTION_PROFILE), actual.getProfile());
+		.build(halJson);
+	Assertions.assertEquals(URI.create(HALCollectionV2.PROFILE_STRING), actual.getProfile());
     }
 
     @Test
-    public void test_createPagedCollection_UsesCorrectMediaType() {
+    public void test_createPagedCollection_UsesCorrectMediaTypeForHALJson() {
 	int pageStart = 1;
 	int maxPageSize = 100;
 	List<TestResource> resources = testResourcesList.subList(200, 300);
@@ -161,7 +163,20 @@ public class HALCollectionV2BuilderTest {
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
 		.withNavigation(pageStart, maxPageSize)
-		.build();
+		.build(halJson);
 	Assertions.assertEquals(AdditionalMediaTypes.APPLICATION_HAL_JSON, actual.getSelf().getType());
+    }
+    
+    @Test
+    public void test_createPagedCollection_UsesCorrectMediaTypeForCustomJson() {
+	int pageStart = 1;
+	int maxPageSize = 100;
+	List<TestResource> resources = testResourcesList.subList(200, 300);
+	HALCollectionV2<TestResource> actual = HALCollectionV2Builder
+		.from(resources, requestURI)
+		.collectionSize(TEST_RESOURCES_SIZE)
+		.withNavigation(pageStart, maxPageSize)
+		.build(customJson);
+	Assertions.assertEquals(HALCollectionV2.MEDIA_TYPE_JSON, actual.getSelf().getType());
     }
 }
