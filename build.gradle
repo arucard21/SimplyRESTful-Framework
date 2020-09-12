@@ -130,7 +130,7 @@ project(":SimplyRESTful-resources"){
 		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
 		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
-		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
+		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.31")
 		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.12")
 	}
 	
@@ -174,12 +174,13 @@ project(":SimplyRESTful"){
 		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
 		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
-		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.27")
+		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.31")
 		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.12")
 		
-		integrationTestImplementation ("org.apache.cxf:cxf-rt-transports-local:${cxf}")
-		integrationTestImplementation ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
-		integrationTestImplementation ("org.apache.cxf:cxf-rt-rs-client:${cxf}")
+		integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:2.31")
+		integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:2.31")
+		integrationTestImplementation ("org.glassfish.jersey.inject:jersey-hk2:2.31")
+		integrationTestImplementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
 	}
 	
 	publishing{
@@ -204,14 +205,17 @@ project(":client"){
 		api project(":SimplyRESTful-resources")
 		api project(":jaxrs-providers")
 		api ("javax.json:javax.json-api:1.1.4")
-		api ("org.glassfish.jersey.core:jersey-client:2.27")
+		api ("org.glassfish.jersey.core:jersey-client:2.31")
 		api ("io.swagger:swagger-models:1.5.21")
 		api ("io.swagger.parser.v3:swagger-parser:2.0.17")
-		api ("org.glassfish.jersey.inject:jersey-hk2:2.27")
+		api ("org.glassfish.jersey.inject:jersey-hk2:2.31")
 				
 		integrationTestImplementation project(":SimplyRESTful")
 		integrationTestImplementation project(":deploy-jetty-cxf")
-		integrationTestImplementation ("org.apache.cxf:cxf-rt-transports-http-jetty:${cxf}")
+		integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:2.31")
+		integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:2.31")
+		integrationTestImplementation ("org.glassfish.jersey.inject:jersey-hk2:2.31")
+		integrationTestImplementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
 		integrationTestImplementation ("org.mockito:mockito-core:${mockito}")
 		integrationTestImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
 		integrationTestImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
@@ -383,7 +387,6 @@ project(":examples:springboot-jersey-nomapping-springdata"){
 
 	dependencies {
 		implementation project(':deploy-springboot-jersey')
-		implementation project(':persist-springdata')
 		implementation ("com.h2database:h2:1.4.197")
 		implementation("io.github.perplexhub:rsql-jpa-specification:5.0.6")
 	}

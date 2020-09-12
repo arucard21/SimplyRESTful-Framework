@@ -11,11 +11,13 @@ import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class TestResource extends HALResource {
-    public static final String TEST_RESOURCE_PROFILE_PATH = "testresource";
-    public static final String PROFILE_STRING = UriBuilder.fromUri(TestWebResource.TEST_HOST).path(TEST_RESOURCE_PROFILE_PATH).build().toString();
+    public static final String TEST_RESOURCE_PROFILE = "http://localhost/profiles/testresource";
+    public static final URI TEST_RESOURCE_PROFILE_URI = UriBuilder.fromUri(TEST_RESOURCE_PROFILE).build();
     public static final UUID TEST_RESOURCE_ID = UUID.randomUUID();
-    public static final URI TEST_RESOURCE_URI = UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(TEST_RESOURCE_ID.toString()).build();
-    public static final URI TEST_RESOURCE_PROFILE_URI = URI.create(PROFILE_STRING);
+    
+    public static URI getResourceUri(UUID id) {
+	return UriBuilder.fromUri(TestWebResource.getBaseUri()).path(TestWebResource.class).path(id.toString()).build();
+    }
 
     private TestResource(URI resourceUri) {
 	this.setSelf(new HALLink.Builder(resourceUri).type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
@@ -25,7 +27,7 @@ public class TestResource extends HALResource {
     public TestResource() {}
     
     public static TestResource testInstance() {
-	return new TestResource(TEST_RESOURCE_URI);
+	return new TestResource(TestResource.getResourceUri(TEST_RESOURCE_ID));
     }
 
     public static TestResource random() {
@@ -33,7 +35,7 @@ public class TestResource extends HALResource {
     }
     
     public static TestResource withId(UUID resourceId) {
-	return new TestResource(UriBuilder.fromUri(TestWebResource.TEST_REQUEST_BASE_URI).path(resourceId.toString()).build());
+	return new TestResource(getResourceUri(resourceId));
     }
 
     @Override

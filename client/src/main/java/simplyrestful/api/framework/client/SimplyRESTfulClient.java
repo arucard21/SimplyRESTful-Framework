@@ -110,7 +110,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	Builder request = client.target(baseApiUri).request();
 	configureHttpHeaders(request, headers);
 	HALServiceDocument serviceDocument = request.get(HALServiceDocument.class);
-	URI openApiDocumentUri = URI.create(serviceDocument.getDescribedby().getHref());
+	URI openApiDocumentUri = URI.create(serviceDocument.getDescribedBy().getHref());
 	OpenAPI openApiSpecification = new OpenAPIV3Parser().read(openApiDocumentUri.toString());
 	for (Entry<String, PathItem> pathEntry : openApiSpecification.getPaths().entrySet()) {
 	    Operation getHttpMethod = pathEntry.getValue().getGet();
@@ -486,6 +486,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      */
     public boolean exists(UUID resourceId, MultivaluedMap<String, Object> headers,
 	    MultivaluedMap<String, Object> queryParameters) {
+	discoverResourceURI(headers);
 	URI resourceInstanceURI = UriBuilder.fromUri(resourceUri).path(resourceId.toString()).build();
 	return exists(resourceInstanceURI, headers, queryParameters);
     }

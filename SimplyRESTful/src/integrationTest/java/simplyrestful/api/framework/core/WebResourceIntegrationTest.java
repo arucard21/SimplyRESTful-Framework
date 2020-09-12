@@ -1,18 +1,16 @@
 package simplyrestful.api.framework.core;
 
-import java.util.Arrays;
-import java.util.Map;
-
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.Status.Family;
 
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.client.WebClient;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,49 +30,55 @@ import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
-public class WebResourceIntegrationTest {
+public class WebResourceIntegrationTest extends JerseyTest {
     private static final String WEB_RESOURCE_PATH = "testresources";
     private static final String QUERY_PARAM_COMPACT = "compact";
-    private Server server;
-    private WebClient client;
+    private static final MediaType MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON);
+    private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
+    private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
 
     @BeforeEach
-    private void createServerAndClient() {
-	startServer();
-	createClient();
-    }
-
-    private void startServer() {
-	JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-	sf.setResourceClasses(TestWebResource.class, WebResourceRoot.class);
-	sf.setProvider(JacksonJsonProvider.class);
-	sf.setProvider(HALMapperProvider.class);
-	sf.setProvider(ObjectMapperProvider.class);
-	sf.setAddress(TestResource.TEST_REQUEST_BASE_URI.toString());
-	server = sf.create();
-    }
-
-    private void createClient() {
-	client = WebClient.create(TestResource.TEST_REQUEST_BASE_URI.toString(),
-		Arrays.asList(JacksonJsonProvider.class, HALMapperProvider.class, ObjectMapperProvider.class));
-	client.header(HttpHeaders.CONTENT_TYPE, AdditionalMediaTypes.APPLICATION_HAL_JSON);
+    @Override
+    public void setUp() throws Exception {
+	super.setUp();
     }
 
     @AfterEach
-    private void removeServer() {
-	server.stop();
-	server.destroy();
+    @Override
+    public void tearDown() throws Exception {
+	super.tearDown();
     }
 
+    @Override
+    protected Application configure() {
+        return new ResourceConfig(
+        	TestWebResource.class,
+        	WebResourceRoot.class,
+        	JacksonJsonProvider.class,
+        	HALMapperProvider.class,
+        	ObjectMapperProvider.class);
+    }
+    
+    @Override
+    protected void configureClient(ClientConfig config) {
+	config.register(JacksonJsonProvider.class);
+	config.register(HALMapperProvider.class);
+	config.register(ObjectMapperProvider.class);
+    }
+
+    // FIXME: Switch server setup to Jersey
     @Test
     @Deprecated(since="0.12.0")
-    @Disabled("This does not return a collection and causes an NPE")
+    @Disabled("Returns v2 collection since Jersey doesn't include the media type parameters when matching so it doesn't check the profile")
     public void webResource_shouldReturnAllResourcesInV1Collection_whenGETReceivedOnWebResourcePath() {
-	Response response = client
+	Response response = target()
 		.path(WEB_RESOURCE_PATH)
-		.accept(HALCollectionV1.MEDIA_TYPE_HAL_JSON)
+		.request()
+		.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
 		.get();		
 	Assertions.assertEquals(200, response.getStatus());
+	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE, response.getMediaType());
+	
 	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {}); 
 	Assertions.assertEquals(2, collection.getTotal());
 	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE.getSelf()));
@@ -82,17 +86,17 @@ public class WebResourceIntegrationTest {
 
     @Test
     @Deprecated(since="0.12.0")
-    @Disabled("This returns a 400 Bad Request")
+    @Disabled("Returns v2 collection since CXF doesn't include the media type parameters when matching so it doesn't check the profile")
     public void webResource_shouldReturnAllResourcesEmbeddedInV1Collection_whenGETReceivedOnWebResourcePathAndCompactIsFalse() {
-	Response response = client
+	Response response = target()
 		.path(WEB_RESOURCE_PATH)
-		.query(QUERY_PARAM_COMPACT, Boolean.toString(false))
-		.accept(HALCollectionV1.MEDIA_TYPE_HAL_JSON)
+		.queryParam(QUERY_PARAM_COMPACT, Boolean.toString(false))
+		.request()
+		.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
-	Assertions.assertEquals(
-		halJsonWithProfile(HALCollectionV1.PROFILE_STRING),
-		response.getMediaType());
+	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE, response.getMediaType());
+	
 	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
 	Assertions.assertTrue(collection.getItemEmbedded().contains(TestWebResource.TEST_RESOURCE));
@@ -100,11 +104,13 @@ public class WebResourceIntegrationTest {
 
     @Test
     public void webResource_shouldReturnAllResourcesEmbeddedInHALJsonV2Collection_whenGETToPathAndAcceptIsHALJson() {
-	Response response = client.path(WEB_RESOURCE_PATH)
-		.accept(HALCollectionV2.MEDIA_TYPE_HAL_JSON)
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.request()
+		.accept(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE)
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
-	Assertions.assertTrue(response.getMediaType().isCompatible(AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE));
+	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE, response.getMediaType());
 	HALCollectionV2<TestResource> collection = response
 		.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
@@ -113,11 +119,13 @@ public class WebResourceIntegrationTest {
     
     @Test
     public void webResource_shouldContainLinkAndEmbeddedFieldsInHALJsonV2Collection_whenGETToPathAndAcceptIsHALJson() {
-	Response response = client.path(WEB_RESOURCE_PATH)
-		.accept(HALCollectionV2.MEDIA_TYPE_HAL_JSON)
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.request()
+		.accept(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE)
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
-	Assertions.assertTrue(response.getMediaType().isCompatible(AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE));
+	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE, response.getMediaType());
 	String halJsonRepresentation = response.readEntity(String.class);
 	Assertions.assertTrue(halJsonRepresentation.contains("_links"));
 	Assertions.assertTrue(halJsonRepresentation.contains("_embedded"));
@@ -125,27 +133,28 @@ public class WebResourceIntegrationTest {
 
     @Test
     public void webResource_shouldReturnAllResourcesEmbeddedInHALJsonV2Collection_whenGETToPathAndAcceptIsCustomJson() {
-	Response response = client.path(WEB_RESOURCE_PATH)
-		.accept(HALCollectionV2.MEDIA_TYPE_JSON)
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.request()
+		.accept(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE)
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
-	Assertions.assertEquals(
-		MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON),
-		response.getMediaType());
-	HALCollectionV2<TestResource> collection = response
-		.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
+	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
+	
+	HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
 	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE));
     }
     
     @Test
     public void webResource_shouldNotContainLinkAndEmbeddedFieldsInHALJsonV2Collection_whenGETToPathAndAcceptIsCustomJson() {
-	Response response = client.path(WEB_RESOURCE_PATH)
-		.header(HttpHeaders.ACCEPT, HALCollectionV2.MEDIA_TYPE_JSON).get();
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.request()
+		.accept(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE).get();
 	Assertions.assertEquals(200, response.getStatus());
-	Assertions.assertEquals(
-		MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON),
-		response.getMediaType());
+	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
+	
 	String jsonRepresentation = response.readEntity(String.class);
 	Assertions.assertFalse(jsonRepresentation.contains("_links"));
 	Assertions.assertFalse(jsonRepresentation.contains("_embedded"));
@@ -153,9 +162,10 @@ public class WebResourceIntegrationTest {
 
     @Test
     public void webResource_shouldReturnSingleResource_whenGETReceivedWithID() {
-	TestResource testResource = client
+	TestResource testResource = target()
 		.path(WEB_RESOURCE_PATH)
-		.path(TestResource.TEST_RESOURCE_ID)
+		.path(TestResource.TEST_RESOURCE_ID.toString())
+		.request()
 		.get(TestResource.class);
 	Assertions.assertEquals(TestWebResource.TEST_RESOURCE, testResource);
     }
@@ -163,34 +173,22 @@ public class WebResourceIntegrationTest {
     @Test
     public void webResource_shouldCreateResourceAndReturnLocationURI_whenPOSTReceivedWithNewResource() {
 	TestResource expectedResource = new TestResource();
-	Response response = client
+	Response response = target()
 		.path(WEB_RESOURCE_PATH)
-		.post(expectedResource);
+		.request()
+		.post(Entity.entity(expectedResource, TestResource.MEDIA_TYPE_HAL_JSON));
 	Assertions.assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
 	Assertions.assertTrue(response.getLocation().toString().startsWith(TestResource.TEST_REQUEST_URI.toString()));
     }
 
     @Test
     public void webResource_shouldRemoveResource_whenDELETEReceived() {
-	Response response = client
+	Response response = target()
 		.path(WEB_RESOURCE_PATH)
-		.path(TestResource.TEST_RESOURCE_ID)
+		.path(TestResource.TEST_RESOURCE_ID.toString())
+		.request()
 		.delete();
 	Assertions.assertEquals(response.getStatusInfo().getFamily(), Family.SUCCESSFUL);
 	Assertions.assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
-    }
-
-    /**
-     * Convenience method to create a MediaType instance for HAL+JSON with a profile attribute.
-     * 
-     * The default MediaType.valueOf() method breaks when the profile value has a ":" in it, 
-     * as it does for our URI-based profile name. Using the constructor does allow the instance
-     * to be created. 
-     *  
-     * @param profile is the HAL+JSON profile for this resource.
-     * @return the MediaType instance for the provided profile.
-     */
-    private MediaType halJsonWithProfile(String profile) {
-        return new MediaType("application", "hal+json", Map.of("profile", profile));
     }
 }

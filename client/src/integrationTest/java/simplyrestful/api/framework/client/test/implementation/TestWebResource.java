@@ -11,25 +11,33 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.UriBuilder;
 
 import io.swagger.annotations.Api;
+import simplyrestful.api.framework.client.SimplyRESTfulClientTest;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
 @Api("Test Resources")
-@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=" + TestWebResource.TEST_HOST_STRING + "/"+TestResource.TEST_RESOURCE_PROFILE_PATH)
-@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=" + TestWebResource.TEST_HOST_STRING + "/"+TestResource.TEST_RESOURCE_PROFILE_PATH)
+@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
+@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
 public class TestWebResource extends DefaultWebResource<TestResource> {
-    public static final String TEST_HOST_STRING = "http://localhost:9999";
-    public static final URI TEST_HOST = URI.create(TEST_HOST_STRING);
+//    public static final String TEST_PROFILE_STRING = "http://localhost/profiles";
+//    public static final String TEST_HOST_STRING = "http://localhost:9999";
+//    public static final URI TEST_HOST = URI.create(TEST_HOST_STRING);
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();
     public static final UUID ERROR_UPDATE_RESOURCE_ID = UUID.randomUUID();
-    public static final URI TEST_REQUEST_BASE_URI = UriBuilder.fromUri(TEST_HOST).path(WEBRESOURCE_PATH).build();
-    public static final TestResource TEST_RESOURCE = TestResource.testInstance();
-    public static final TestResource TEST_RESOURCE_RANDOM = TestResource.random();
+    
+    private static URI baseUri;
+
+    public static URI getBaseUri() {
+        return baseUri;
+    }
+
+    public static void setBaseUri(URI baseUri) {
+        TestWebResource.baseUri = baseUri;
+    }
 
     @Override
     public TestResource create(TestResource resource, UUID resourceUUID) {
@@ -40,7 +48,7 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
     @Override
     public TestResource read(UUID resourceUUID) {
 	if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-	    return TEST_RESOURCE;
+	    return SimplyRESTfulClientTest.getTestResource();
 	}
 	if (Objects.equals(resourceUUID, ERROR_READ_RESOURCE_ID)) {
 	    throw new InternalServerErrorException("Pretending that something went wrong on the server");
@@ -53,20 +61,20 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
 	if (Objects.equals(resourceUUID, ERROR_UPDATE_RESOURCE_ID)) {
 	    throw new InternalServerErrorException("Pretending that something went wrong on the server");
 	}
-	return TEST_RESOURCE;
+	return SimplyRESTfulClientTest.getTestResource();
     }
 
     @Override
     public TestResource delete(UUID resourceUUID) {
 	if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-	    return TEST_RESOURCE;
+	    return SimplyRESTfulClientTest.getTestResource();
 	}
 	return null;
     }
 
     @Override
     public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, String> sort) {
-	return Arrays.asList(TEST_RESOURCE, TEST_RESOURCE_RANDOM);
+	return Arrays.asList(SimplyRESTfulClientTest.getTestResource(), SimplyRESTfulClientTest.getTestResourceRandom());
     }
 
     @Override

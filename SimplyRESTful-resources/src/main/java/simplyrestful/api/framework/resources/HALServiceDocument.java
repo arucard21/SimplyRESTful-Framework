@@ -9,26 +9,26 @@ public class HALServiceDocument extends HALResource {
 	public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ServiceDocument/v1";
 	
 	@Link
-	private HALLink describedby;
+	private HALLink describedBy;
 
 	@Override
 	public URI getProfile() {
 		return URI.create(PROFILE_STRING);
 	}
 
-	public HALLink getDescribedby() {
-		return describedby;
+	public HALLink getDescribedBy() {
+		return describedBy;
 	}
 
-	public void setDescribedby(HALLink describedby) {
-		this.describedby = describedby;
+	public void setDescribedBy(HALLink describedBy) {
+		this.describedBy = describedBy;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((describedby == null) ? 0 : describedby.hashCode());
+		result = prime * result + ((describedBy == null) ? 0 : describedBy.hashCode());
 		return result;
 	}
 
@@ -41,11 +41,11 @@ public class HALServiceDocument extends HALResource {
 		if (getClass() != obj.getClass())
 			return false;
 		HALServiceDocument other = (HALServiceDocument) obj;
-		if (describedby == null) {
-			if (other.describedby != null)
+		if (describedBy == null) {
+			if (other.describedBy != null)
 				return false;
 		}
-		else if (!describedby.equals(other.describedby))
+		else if (!describedBy.equals(other.describedBy))
 			return false;
 		return true;
 	}

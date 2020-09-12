@@ -10,7 +10,7 @@ import simplyrestful.api.framework.resources.HALResource;
 
 public class TestResource extends HALResource{
 	public static final String PROFILE_STRING = "local://docs/resources/testresource/v1";
-	public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile="+PROFILE_STRING;
+	public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile=\""+PROFILE_STRING+"\"";
 	public static final String MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
 	
 	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/");

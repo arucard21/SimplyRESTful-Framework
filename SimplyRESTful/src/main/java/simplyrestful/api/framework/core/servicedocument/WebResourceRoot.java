@@ -30,7 +30,7 @@ public class WebResourceRoot{
 	public HALServiceDocument getServiceDocument() {
 		HALServiceDocument serviceDocument = new HALServiceDocument();
 		HALLink descriptionLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().path("swagger.json").build()).build();
-		serviceDocument.setDescribedby(descriptionLink);
+		serviceDocument.setDescribedBy(descriptionLink);
 		HALLink selfLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().build())
 				.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 				.profile(serviceDocument.getProfile())
