@@ -37,6 +37,7 @@ import javax.ws.rs.core.Variant;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import simplyrestful.api.framework.core.filters.CollectionResource;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -45,6 +46,8 @@ import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 
 public abstract class DefaultWebResource<T extends HALResource> {
+    private static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
+    private static final String HAL_LINK_OBJECT_NAME = "_links";
     private static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
     private static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
 
@@ -66,13 +69,15 @@ public abstract class DefaultWebResource<T extends HALResource> {
     
     public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
     public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
-    public static final String QUERY_PARAM_FIELDS_MINIMUM = "first,last,prev,next,total,item.self";
+    public static final String QUERY_PARAM_FIELDS_MINIMUM = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self";
     public static final String QUERY_PARAM_FIELDS_ALL = "all";
     public static final String QUERY_PARAM_QUERY_DEFAULT = "";
     public static final String QUERY_PARAM_SORT_DEFAULT = "";
     
     @Context
     protected UriInfo uriInfo;
+    @Context
+    protected Request request;
     
     /**
      * Retrieve the paginated collection of resources.
@@ -88,19 +93,19 @@ public abstract class DefaultWebResource<T extends HALResource> {
      *                  resources (for both {@link HALCollectionV1} and {@link HALCollectionV2})
      * @param compact   determines whether the resource in the collection only shows
      *                  its self-link (if true), or the entire resource (if false) (for {@link HALCollectionV1} only)
-     * @param fields    is a list that defines which fields should be retrieved.
+     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience 
+     * 			as it is already handled by the framework.
      * @param query     is a FIQL query that defines how the resources should be
      *                  filtered.
      * @param sort      is a list of field names on which the resources should be
-     *                  sorted.
+     *                  sorted. This is only included for convenience as it is already handled by the framework.
      * @return the paginated collection of resources.
      */
+    @CollectionResource
     @GET
     @Produces({MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED, MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED})
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
     public HALCollection<T> getHALResourcesAsHALJson(
-	    @Context
-	    Request request,
 	    @ApiParam(value = "The page to be shown", required = false)
             @QueryParam(V1_QUERY_PARAM_PAGE) 
             @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING) 
@@ -137,7 +142,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
 		fields = Collections.singletonList(QUERY_PARAM_FIELDS_MINIMUM);
 	    }
 	    return HALCollectionV1Builder.fromPartial(
-			this.list(calculatedPageStart, pageSize, separateDelimitedFields(fields), query, separateDelimitedSort(sort)),
+			this.list(calculatedPageStart, pageSize, removeHALStructureFromQueryParameter(query)),
 			getRequestURI(),
 			this.count(""))
 		.page(page)
@@ -147,7 +152,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	}
 	if(selectedProfile.equals(new HALCollectionV2<>().getProfile())) {
 	    verifyNonV2ParametersAreNotUsedOnV2();
-	    return getHALCollectionV2(pageStart, pageSize, fields, query, sort, MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON));
+	    return getHALCollectionV2(pageStart, pageSize, removeHALStructureFromQueryParameter(query), MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON));
 	}
 	throw new NotAcceptableException(
 		String.format(
@@ -165,13 +170,15 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize  is the size of a single page in this paginated collection of
      *                  resources (for both {@link HALCollectionV1} and {@link HALCollectionV2})
-     * @param fields    is a list that defines which fields should be retrieved.
+     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience
+     * 			as it is already handled by the framework.
      * @param query     is a FIQL query that defines how the resources should be
      *                  filtered.
      * @param sort      is a list of field names on which the resources should be
-     *                  sorted.
+     *                  sorted. This is only included for convenience as it is already handled by the framework.
      * @return the paginated collection of resources.
      */
+    @CollectionResource
     @GET
     @Produces(MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED)
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
@@ -184,20 +191,24 @@ public abstract class DefaultWebResource<T extends HALResource> {
             @QueryParam(QUERY_PARAM_PAGE_SIZE)
             @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
             int pageSize,
-	    @ApiParam(value = "The fields that should be included", required = false)
+	    @ApiParam(value = "The fields that should be included (as shown in reponse, dot-separated for nesting)", required = false)
 	    @QueryParam(QUERY_PARAM_FIELDS)
 	    @DefaultValue(QUERY_PARAM_FIELDS_MINIMUM)
 	    List<String> fields,
-	    @ApiParam(value = "The FIQL query according to which the resources should be filtered", required = false)
+	    @ApiParam(value = "The FIQL query according to which the resources should be filtered (with fields as shown in reponse, dot-separated for nesting)", required = false)
 	    @QueryParam(QUERY_PARAM_QUERY)
 	    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
 	    String query,
-	    @ApiParam(value = "The fields on which the resources should be sorted", required = false)
+	    @ApiParam(value = "The fields on which the resources should be sorted (as shown in reponse, dot-separated for nesting)", required = false)
 	    @QueryParam(QUERY_PARAM_SORT)
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort) {
 	verifyNonV2ParametersAreNotUsedOnV2();
-	return getHALCollectionV2(pageStart, pageSize, fields, query, sort, MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON));
+	return getHALCollectionV2(pageStart, pageSize, removeHALStructureFromQueryParameter(query), MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON));
+    }
+
+    private String removeHALStructureFromQueryParameter(String query) {
+	return query.replaceAll(HAL_LINK_OBJECT_NAME+".", "").replaceAll(HAL_EMBEDDED_OBJECT_NAME+".", "");
     }
 
     /*
@@ -231,16 +242,20 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	if(queryParameters.containsKey(QUERY_PARAM_PAGE_START)) {
 	    throw new BadRequestException("The pageStart parameter can not be used on version 1 of this collection resource");
 	}
+	if(queryParameters.containsKey(QUERY_PARAM_FIELDS)) {
+	    throw new BadRequestException("The fields parameter can not be used on version 1 of this collection resource");
+	}
+	if(queryParameters.containsKey(QUERY_PARAM_SORT)) {
+	    throw new BadRequestException("The sort parameter can not be used on version 1 of this collection resource");
+	}
     }
 
-    private HALCollectionV2<T> getHALCollectionV2(int pageStart, int pageSize, List<String> fields, String query, List<String> sort, MediaType mediaType) {
-	List<T> filteredAndSortedResources = this.list(
+    private HALCollectionV2<T> getHALCollectionV2(int pageStart, int pageSize, String query, MediaType mediaType) {
+	List<T> filteredResources = this.list(
         	pageStart,
         	pageSize,
-        	separateDelimitedFields(fields),
-        	query,
-        	separateDelimitedSort(sort));
-        return HALCollectionV2Builder.from(filteredAndSortedResources, getRequestURI())
+        	query);
+        return HALCollectionV2Builder.from(filteredResources, getRequestURI())
         	.withNavigation(pageStart, pageSize)
         	.collectionSize(this.count(query))
         	.build(mediaType);
@@ -386,12 +401,10 @@ public abstract class DefaultWebResource<T extends HALResource> {
      *
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize is the requested size of each page.
-     * @param fields is a list that defines which fields should be retrieved. 
      * @param query is a FIQL query that defines how the resources should be filtered.
-     * @param sort is a list of field names on which the resources should be sorted.
-     * @return the requested list of resources for the requested page.
+     * @return the filtered list of resources for the requested page.
      */
-    public abstract List<T> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, String> sort);
+    public abstract List<T> list(int pageStart, int pageSize, String query);
 
     /**
      * Retrieve how many resources are available.

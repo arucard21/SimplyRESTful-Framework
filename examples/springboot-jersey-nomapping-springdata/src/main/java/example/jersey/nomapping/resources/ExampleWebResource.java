@@ -20,7 +20,6 @@ package example.jersey.nomapping.resources;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -105,18 +104,13 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     }
 
     @Override
-    public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, String> sort) {
+    public List<ExampleResource> list(int pageStart, int pageSize, String query) {
 	List<ExampleResource> retrievedPage = repo.findAll(
-		RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))),
+		RSQLSupport.<ExampleResource>toSpecification(query),
 		new OffsetBasedPageRequest(pageStart, pageSize))
 		.getContent();
 	retrievedPage.forEach(resource -> ensureSelfLinkAndUUIDPresent(resource));
 	return retrievedPage;
-    }
-    
-    private String createSortQuery(Map<String, String> sort) {
-	// TODO Auto-generated method stub
-	return null;
     }
 
     @Override

@@ -21,7 +21,6 @@ package example.jetty.resources;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -79,7 +78,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> list(int pageNumber, int pageSize, List<String> fields, String query, Map<String, String> sort) {
+	public List<ExampleResource> list(int pageNumber, int pageSize, String query) {
 		return getEntityDao().findAllForPage(pageNumber, pageSize).stream()
 				.map(entity -> map(entity))
 				.collect(Collectors.toList());

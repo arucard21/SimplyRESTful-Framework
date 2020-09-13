@@ -134,7 +134,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, String> sort) {
+	public List<ExampleResource> list(int pageStart, int pageSize, String query) {
 	    List<StoredObject> data = dataStore.getData();
 	    int dataSize = data.size();
 	    if (pageStart > dataSize) {
