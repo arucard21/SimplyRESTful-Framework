@@ -21,12 +21,14 @@ package example.jetty.resources;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 
@@ -78,8 +80,11 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> list(int pageNumber, int pageSize, String query) {
-		return getEntityDao().findAllForPage(pageNumber, pageSize).stream()
+	public List<ExampleResource> list(int pageNumber, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
+	    if(!sort.isEmpty()) {
+		throw new ServerErrorException("This API does not yet support sorting", 501);
+	    }
+	    return getEntityDao().findAllForPage(pageNumber, pageSize).stream()
 				.map(entity -> map(entity))
 				.collect(Collectors.toList());
 	}

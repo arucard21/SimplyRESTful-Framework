@@ -45,6 +45,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.swagger.jaxrs.listing.ApiListingResource;
 import simplyrestful.api.framework.core.DefaultWebResource;
+import simplyrestful.api.framework.core.filters.JsonFieldsFilter;
 import simplyrestful.api.framework.core.providers.HALMapperProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
@@ -146,6 +147,7 @@ public class ServerBuilder {
         		JacksonJsonProvider.class,
         		HALMapperProvider.class,
         		ObjectMapperProvider.class,
+        		JsonFieldsFilter.class,
         		ApiListingResource.class,
         		SearchContextProvider.class));
         sf.setProviders(providers);

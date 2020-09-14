@@ -1,10 +1,14 @@
 package simplyrestful.api.framework.core;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,18 +30,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Variant;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import simplyrestful.api.framework.core.filters.CollectionResource;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -46,8 +50,15 @@ import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 
 public abstract class DefaultWebResource<T extends HALResource> {
+    private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE = 0; // Example: */*
+    private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
+    private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS = 2; // Example: application/json
+    private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS = 3; // Example: application/hal+json;profile="https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2"
+    private static final String MEDIA_TYPE_PARAMETER_QUALITY_SERVER = "qs";
+    private static final String MEDIA_TYPE_PARAMETER_QUALITY_CLIENT = "q";
+    private static final String QUERY_PARAM_SORT_ORDER_ASCENDING = "asc";
     private static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
-    private static final String HAL_LINK_OBJECT_NAME = "_links";
+    private static final String HAL_LINKS_OBJECT_NAME = "_links";
     private static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
     private static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
 
@@ -78,13 +89,104 @@ public abstract class DefaultWebResource<T extends HALResource> {
     protected UriInfo uriInfo;
     @Context
     protected Request request;
+    @Context
+    protected HttpHeaders httpHeaders;
     
+    /**
+     * Create the resource in the data store where it is stored.
+     *
+     * The resource should contain a self-link that contains the unique ID for this
+     * resource.
+     *
+     * @param resource     is the resource that should be created, containing a
+     *                     self-link with its unique ID
+     * @param resourceUUID is the unique ID of the resource which should match the
+     *                     UUID used in the self-link
+     * @return the created resource as persisted
+     */
+    public abstract T create(T resource, UUID resourceUUID);
+
+    /**
+     * Retrieve the resource from the data store where it is stored.
+     *
+     * The identifier provided by the API is the URI of the resource. This does not
+     * have to be the identifier used in the data store (UUID is more commonly used)
+     * but each entity in the data store must be uniquely identifiable by the
+     * information provided in the URI.
+     *
+     * @param resourceUUID is the identifier (from API perspective) for the resource
+     * @return the resource that was requested or null if it doesn't exist
+     */
+    public abstract T read(UUID resourceUUID);
+
+    /**
+     * Update the resource in the data store where it is stored.
+     *
+     * The resource should contain a self-link in order to identify which resource
+     * needs to be updated.
+     *
+     * @param resource     is the updated resource (which contains a self-link with
+     *                     which to identify the resource)
+     * @param resourceUUID is the identifier of the resource that should be updated
+     * @return the updated resource as persisted
+     */
+    public abstract T update(T resource, UUID resourceUUID);
+
+    /**
+     * Remove a resource from the data store.
+     *
+     * @param resourceUUID is the identifier of the resource that should be removed
+     * @return the removed resource, or null if it did not exist
+     */
+    public abstract T delete(UUID resourceUUID);
+
+    /**
+     * Retrieve the paged collection of resources that have been requested.
+     *
+     * For proper discoverability of the API, all links (href values in each HALLink
+     * object) should contain absolute URI's and a self-link must be available in
+     * each resource.
+     *
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the requested size of each page.
+     * @param fields is the list of fields on which to filter. This is only provided to optimize data 
+     * retrieval as the actual filtering of fields is done by the framework.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is the list of fields according to which the collection should be sorted. Each entry
+     * provides the field name (dot-separated for nested fields) and the sort order (true for ascending, false for descending)
+     * @return the filtered and sorted list of resources for the requested page.
+     */
+    public abstract List<T> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort);
+
+    /**
+     * Retrieve how many resources are available.
+     *
+     * This provides a simple implementation for convenience but should be
+     * overridden with an optimized implementation, if possible.
+     *
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @return the total amount of resources that are available
+     */
+    public abstract int count(String query);
+
+    /**
+     * Check if a resource, identified by its resourceURI, exists.
+     *
+     * This provides a simple implementation for convenience but should be
+     * overridden with an optimized implementation, if possible.
+     *
+     * @param resourceUUID is the identifier of a resource.
+     * @return true if the resource identified by resourceURI exists, false
+     *         otherwise.
+     */
+    public boolean exists(UUID resourceUUID) {
+        return Objects.nonNull(this.read(resourceUUID));
+    }
+
     /**
      * Retrieve the paginated collection of resources.
      * 
-     * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}.
-     * 
-     * This is a separate method because otherwise Jackson will use the same ObjectMapper for both the HAL+JSON and JSON collection. 
+     * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}. 
      *
      * @param request	represents the current HTTP request.
      * @param page      is the page number of the paginated collection of resources (for {@link HALCollectionV1} only)
@@ -101,9 +203,11 @@ public abstract class DefaultWebResource<T extends HALResource> {
      *                  sorted. This is only included for convenience as it is already handled by the framework.
      * @return the paginated collection of resources.
      */
-    @CollectionResource
     @GET
-    @Produces({MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED, MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED})
+    @Produces({
+	MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED,
+	MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
+	MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED})
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
     public HALCollection<T> getHALResourcesAsHALJson(
 	    @ApiParam(value = "The page to be shown", required = false)
@@ -134,131 +238,38 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	    @QueryParam(QUERY_PARAM_SORT)
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort) {
-	URI selectedProfile = getSelectedHALJsonProfile(request);
-	if(selectedProfile.equals(new HALCollectionV1<>().getProfile())) {
+	MediaType selected = this.selectMediaType(
+		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED), 
+		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED), 
+		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED));
+	if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
 	    verifyNonV1ParametersAreNotUsedOnV1();
 	    int calculatedPageStart = (page -1) * pageSize;
 	    if(compact) {
 		fields = Collections.singletonList(QUERY_PARAM_FIELDS_MINIMUM);
 	    }
 	    return HALCollectionV1Builder.fromPartial(
-			this.list(calculatedPageStart, pageSize, removeHALStructureFromQueryParameter(query)),
-			getRequestURI(),
-			this.count(""))
-		.page(page)
-		.maxPageSize(pageSize)
-		.compact(compact)
-		.build();
+		    this.list(
+			    calculatedPageStart, 
+			    pageSize,
+			    getFieldsQueryParameter(fields),
+			    removeHALStructure(query),
+			    getSortQueryParameter(sort)),
+		    getRequestURI(),
+		    this.count(removeHALStructure(query)))
+		    .page(page)
+		    .maxPageSize(pageSize)
+		    .compact(compact)
+		    .build();
 	}
-	if(selectedProfile.equals(new HALCollectionV2<>().getProfile())) {
-	    verifyNonV2ParametersAreNotUsedOnV2();
-	    return getHALCollectionV2(pageStart, pageSize, removeHALStructureFromQueryParameter(query), MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON));
-	}
-	throw new NotAcceptableException(
-		String.format(
-			"The HAL+JSON resource with profile \"%s\" is not supported in this API",
-			selectedProfile.toString()));
-    }
-
-    /**
-     * Retrieve the paginated collection of resources.
-     * 
-     * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}.
-     * 
-     * This is a separate method because otherwise Jackson will use the same ObjectMapper for both the HAL+JSON and JSON collection. 
-     *
-     * @param pageStart is the offset at which the requested page starts.
-     * @param pageSize  is the size of a single page in this paginated collection of
-     *                  resources (for both {@link HALCollectionV1} and {@link HALCollectionV2})
-     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience
-     * 			as it is already handled by the framework.
-     * @param query     is a FIQL query that defines how the resources should be
-     *                  filtered.
-     * @param sort      is a list of field names on which the resources should be
-     *                  sorted. This is only included for convenience as it is already handled by the framework.
-     * @return the paginated collection of resources.
-     */
-    @CollectionResource
-    @GET
-    @Produces(MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED)
-    @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
-    public HALCollectionV2<T> getHALResourcesV2Json(
-	    @ApiParam(value = "The page to be shown", required = false)
-	    @QueryParam(QUERY_PARAM_PAGE_START)
-	    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
-	    int pageStart,
-	    @ApiParam(value = "The amount of resources shown on each page", required = false)
-            @QueryParam(QUERY_PARAM_PAGE_SIZE)
-            @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
-            int pageSize,
-	    @ApiParam(value = "The fields that should be included (as shown in reponse, dot-separated for nesting)", required = false)
-	    @QueryParam(QUERY_PARAM_FIELDS)
-	    @DefaultValue(QUERY_PARAM_FIELDS_MINIMUM)
-	    List<String> fields,
-	    @ApiParam(value = "The FIQL query according to which the resources should be filtered (with fields as shown in reponse, dot-separated for nesting)", required = false)
-	    @QueryParam(QUERY_PARAM_QUERY)
-	    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
-	    String query,
-	    @ApiParam(value = "The fields on which the resources should be sorted (as shown in reponse, dot-separated for nesting)", required = false)
-	    @QueryParam(QUERY_PARAM_SORT)
-	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
-	    List<String> sort) {
 	verifyNonV2ParametersAreNotUsedOnV2();
-	return getHALCollectionV2(pageStart, pageSize, removeHALStructureFromQueryParameter(query), MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON));
-    }
-
-    private String removeHALStructureFromQueryParameter(String query) {
-	return query.replaceAll(HAL_LINK_OBJECT_NAME+".", "").replaceAll(HAL_EMBEDDED_OBJECT_NAME+".", "");
-    }
-
-    /*
-     * FIXME Don't use selectVariant but implement this yourself
-     * (since most JAX-RS frameworks don't include media type parameters when matching)
-     */
-    private URI getSelectedHALJsonProfile(Request request) {
-        return URI.create(
-        	request.selectVariant(
-        		Variant.mediaTypes(
-        			MediaType.valueOf(MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED),
-        			MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED))
-        		.build())
-        		.getMediaType()
-        		.getParameters()
-        		.get(MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME));
-    }
-
-    private void verifyNonV2ParametersAreNotUsedOnV2() {
-	MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-	if(queryParameters.containsKey(V1_QUERY_PARAM_PAGE)) {
-	    throw new BadRequestException("The page parameter can not be used on version 2 of this collection resource");
-	}
-	if(queryParameters.containsKey(V1_QUERY_PARAM_COMPACT)) {
-	    throw new BadRequestException("The compact parameter can not be used on version 2 of this collection resource");
-	}
-    }
-
-    private void verifyNonV1ParametersAreNotUsedOnV1() {
-	MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-	if(queryParameters.containsKey(QUERY_PARAM_PAGE_START)) {
-	    throw new BadRequestException("The pageStart parameter can not be used on version 1 of this collection resource");
-	}
-	if(queryParameters.containsKey(QUERY_PARAM_FIELDS)) {
-	    throw new BadRequestException("The fields parameter can not be used on version 1 of this collection resource");
-	}
-	if(queryParameters.containsKey(QUERY_PARAM_SORT)) {
-	    throw new BadRequestException("The sort parameter can not be used on version 1 of this collection resource");
-	}
-    }
-
-    private HALCollectionV2<T> getHALCollectionV2(int pageStart, int pageSize, String query, MediaType mediaType) {
-	List<T> filteredResources = this.list(
-        	pageStart,
-        	pageSize,
-        	query);
-        return HALCollectionV2Builder.from(filteredResources, getRequestURI())
-        	.withNavigation(pageStart, pageSize)
-        	.collectionSize(this.count(query))
-        	.build(mediaType);
+	return getHALCollectionV2(
+		pageStart, 
+		pageSize,
+		getFieldsQueryParameter(fields),
+		removeHALStructure(query),
+		getSortQueryParameter(sort),
+		selected);
     }
 
     /**
@@ -342,93 +353,6 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	    @ApiParam(value = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
 	return Optional.ofNullable(this.delete(id)).map(resource -> Response.noContent().build())
 		.orElseThrow(NotFoundException::new);
-    }
-
-    /**
-     * Create the resource in the data store where it is stored.
-     *
-     * The resource should contain a self-link that contains the unique ID for this
-     * resource.
-     *
-     * @param resource     is the resource that should be created, containing a
-     *                     self-link with its unique ID
-     * @param resourceUUID is the unique ID of the resource which should match the
-     *                     UUID used in the self-link
-     * @return the created resource as persisted
-     */
-    public abstract T create(T resource, UUID resourceUUID);
-
-    /**
-     * Retrieve the resource from the data store where it is stored.
-     *
-     * The identifier provided by the API is the URI of the resource. This does not
-     * have to be the identifier used in the data store (UUID is more commonly used)
-     * but each entity in the data store must be uniquely identifiable by the
-     * information provided in the URI.
-     *
-     * @param resourceUUID is the identifier (from API perspective) for the resource
-     * @return the resource that was requested or null if it doesn't exist
-     */
-    public abstract T read(UUID resourceUUID);
-
-    /**
-     * Update the resource in the data store where it is stored.
-     *
-     * The resource should contain a self-link in order to identify which resource
-     * needs to be updated.
-     *
-     * @param resource     is the updated resource (which contains a self-link with
-     *                     which to identify the resource)
-     * @param resourceUUID is the identifier of the resource that should be updated
-     * @return the updated resource as persisted
-     */
-    public abstract T update(T resource, UUID resourceUUID);
-
-    /**
-     * Remove a resource from the data store.
-     *
-     * @param resourceUUID is the identifier of the resource that should be removed
-     * @return the removed resource, or null if it did not exist
-     */
-    public abstract T delete(UUID resourceUUID);
-
-    /**
-     * Retrieve the paged collection of resources that have been requested.
-     *
-     * For proper discoverability of the API, all links (href values in each HALLink
-     * object) should contain absolute URI's and a self-link must be available in
-     * each resource.
-     *
-     * @param pageStart is the offset at which the requested page starts.
-     * @param pageSize is the requested size of each page.
-     * @param query is a FIQL query that defines how the resources should be filtered.
-     * @return the filtered list of resources for the requested page.
-     */
-    public abstract List<T> list(int pageStart, int pageSize, String query);
-
-    /**
-     * Retrieve how many resources are available.
-     *
-     * This provides a simple implementation for convenience but should be
-     * overridden with an optimized implementation, if possible.
-     *
-     * @param query is a FIQL query that defines how the resources should be filtered.
-     * @return the total amount of resources that are available
-     */
-    public abstract int count(String query);
-
-    /**
-     * Check if a resource, identified by its resourceURI, exists.
-     *
-     * This provides a simple implementation for convenience but should be
-     * overridden with an optimized implementation, if possible.
-     *
-     * @param resourceUUID is the identifier of a resource.
-     * @return true if the resource identified by resourceURI exists, false
-     *         otherwise.
-     */
-    public boolean exists(UUID resourceUUID) {
-	return Objects.nonNull(this.read(resourceUUID));
     }
 
     protected List<String> separateDelimitedFields(List<String> delimitedFields) {
@@ -516,6 +440,69 @@ public abstract class DefaultWebResource<T extends HALResource> {
 		.build();
     }
 
+    private String removeHALStructure(String query) {
+        return query.replaceAll(HAL_LINKS_OBJECT_NAME+".", "").replaceAll(HAL_EMBEDDED_OBJECT_NAME+".", "");
+    }
+
+    private List<String> getFieldsQueryParameter(List<String> fields) {
+        return fields.stream()
+        	.flatMap(delimitedString -> Arrays.asList(delimitedString.split(DefaultWebResource.QUERY_PARAM_FIELDS_DELIMITER)).stream())
+        	.map(String::trim)
+        	.map(this::removeHALStructure)
+        	.collect(Collectors.toList());
+    }
+
+    private Map<String, Boolean> getSortQueryParameter(List<String> sort) {
+        return sort.stream()
+        	.filter(sortField -> sortField.contains(DefaultWebResource.QUERY_PARAM_SORT_DELIMITER))
+        	.flatMap(sortMultipleEntries -> Arrays.asList(sortMultipleEntries.split(DefaultWebResource.QUERY_PARAM_SORT_DELIMITER)).stream())
+        	.map(String::trim)
+        	.filter(sortSingleEntry -> sortSingleEntry.contains(DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER))
+        	.map(this::removeHALStructure)
+        	.collect(Collectors.toMap(
+        		sortWithOrderDelimeter -> sortWithOrderDelimeter.split(
+        			DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[0], 
+        		sortWithOrderDelimeter -> Boolean.valueOf(
+        			sortWithOrderDelimeter.split(
+        				DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[1].equalsIgnoreCase(QUERY_PARAM_SORT_ORDER_ASCENDING))));
+    }
+
+    private void verifyNonV2ParametersAreNotUsedOnV2() {
+        MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+        if(queryParameters.containsKey(V1_QUERY_PARAM_PAGE)) {
+            throw new BadRequestException("The page parameter can not be used on version 2 of this collection resource");
+        }
+        if(queryParameters.containsKey(V1_QUERY_PARAM_COMPACT)) {
+            throw new BadRequestException("The compact parameter can not be used on version 2 of this collection resource");
+        }
+    }
+
+    private void verifyNonV1ParametersAreNotUsedOnV1() {
+        MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+        if(queryParameters.containsKey(QUERY_PARAM_PAGE_START)) {
+            throw new BadRequestException("The pageStart parameter can not be used on version 1 of this collection resource");
+        }
+        if(queryParameters.containsKey(QUERY_PARAM_FIELDS)) {
+            throw new BadRequestException("The fields parameter can not be used on version 1 of this collection resource");
+        }
+        if(queryParameters.containsKey(QUERY_PARAM_SORT)) {
+            throw new BadRequestException("The sort parameter can not be used on version 1 of this collection resource");
+        }
+    }
+
+    private HALCollectionV2<T> getHALCollectionV2(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort, MediaType mediaType) {
+        List<T> filteredResources = this.list(
+        	pageStart,
+        	pageSize,
+        	fields,
+        	query,
+        	sort);
+        return HALCollectionV2Builder.from(filteredResources, getRequestURI())
+        	.withNavigation(pageStart, pageSize)
+        	.collectionSize(this.count(query))
+        	.build(mediaType);
+    }
+
     /**
      * Checks if the self-link is present and valid.
      *
@@ -529,23 +516,170 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * @return the resource UUID that matches the ID used in the self-link.
      */
     private UUID ensureSelfLinkValid(T resource, UUID providedID) {
-	if (resource.getSelf() == null) {
-	    if (providedID == null) {
-		providedID = UUID.randomUUID();
-	    }
-	    resource.setSelf(createLink(getAbsoluteWebResourceURI(providedID), resource.getProfile()));
-	    return providedID;
-	} else {
-	    URI selfUri = URI.create(resource.getSelf().getHref());
-	    URI relativizedResourceUri = getAbsoluteWebResourceURI().relativize(selfUri);
-	    if (relativizedResourceUri.equals(selfUri)) {
-		throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
-	    }
-	    UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
-	    if (!Objects.equals(providedID, resourceIdFromSelf)) {
-		throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
-	    }
-	    return resourceIdFromSelf;
-	}
+        if (resource.getSelf() == null) {
+            if (providedID == null) {
+        	providedID = UUID.randomUUID();
+            }
+            resource.setSelf(createLink(getAbsoluteWebResourceURI(providedID), resource.getProfile()));
+            return providedID;
+        } else {
+            URI selfUri = URI.create(resource.getSelf().getHref());
+            URI relativizedResourceUri = getAbsoluteWebResourceURI().relativize(selfUri);
+            if (relativizedResourceUri.equals(selfUri)) {
+        	throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
+            }
+            UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
+            if (!Objects.equals(providedID, resourceIdFromSelf)) {
+        	throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
+            }
+            return resourceIdFromSelf;
+        }
+    }
+
+    /**
+     * 
+     * Select the most suitable media type according to JAX-RS specification. 
+     * 
+     * This custom method is provided since some JAX-RS frameworks do not consider
+     * media type parameters as a more specific media type (at least, when using
+     * the {@link Request}.selectVariant() method). This method provides a correct
+     * implementation for this, limited to only the media type. 
+     * 
+     * This framework requires the media type parameters to be considered since that
+     * is where the profile is found. This profile is what uniquely typifies each 
+     * API resource (representing a single version of a specific API resource).
+     * 
+     * This method does not change the Content-Type HTTP header that the JAX-RS
+     * framework returns. The JAX-RS framework must already set this correctly,
+     * based on the {@link @Produces} or (@link @Consumes} annotations. Or it must be 
+     * adjusted in some other way, e.g. using a {@link ContainerResponseFilter}.
+     * 
+     */
+    protected MediaType selectMediaType(MediaType... mediaTypes) {
+        List<MediaType> producibleMediaTypes = mediaTypes.length == 0 ?
+        	Collections.singletonList(MediaType.WILDCARD_TYPE):
+        	Arrays.asList(mediaTypes);
+        List<MediaType> acceptableMediaTypes = httpHeaders.getAcceptableMediaTypes();
+        List<MediaType> selectedMediaTypes = new ArrayList<>();
+        for(MediaType acceptableMediaType : acceptableMediaTypes) {
+            for(MediaType producibleMediaType : producibleMediaTypes) {
+        	if(acceptableMediaType.isCompatible(producibleMediaType)) {
+        	    selectedMediaTypes.add(getMostSpecificMediaType(acceptableMediaType, producibleMediaType));
+        	}
+            }
+        }
+        if(selectedMediaTypes.isEmpty()) {
+            throw new NotAcceptableException();
+        }
+        selectedMediaTypes.sort(
+        	Comparator.comparingInt(this::determineMediaTypeSpecificity)
+        	.thenComparingDouble(this::getQParameter).reversed()
+        	.thenComparingDouble(this::getQSParameter).reversed());
+        for(MediaType selectedMediaType : selectedMediaTypes) {
+            if(isConcreteMediaType(selectedMediaType)) {
+        	return withoutQualityParameters(selectedMediaType);
+            }
+            if((selectedMediaType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) ||
+        	    selectedMediaType.getType().equals(MediaType.APPLICATION_OCTET_STREAM_TYPE.getType())) &&
+        	    selectedMediaType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD)) {
+        	return MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            }
+        }
+        throw new NotAcceptableException();
+    }
+    
+    private MediaType addQualityParameters(MediaType mediaType, double q, double qs) {
+	return addQSParameter(addQParameter(mediaType, q), qs);
+    }
+
+    private MediaType addQSParameter(MediaType mediaType, double qs) {
+        Map<String, String> newParameters = new HashMap<>(mediaType.getParameters());
+        newParameters.put(MEDIA_TYPE_PARAMETER_QUALITY_SERVER, Double.toString(qs));
+        return new MediaType(mediaType.getType(), mediaType.getSubtype(), newParameters);
+    }
+
+    private MediaType addQParameter(MediaType mediaType, double q) {
+	Map<String, String> newParameters = new HashMap<>(mediaType.getParameters());
+        newParameters.put(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT, Double.toString(q));
+        return new MediaType(mediaType.getType(), mediaType.getSubtype(), newParameters);
+    }
+    
+    private Double getQSParameter(MediaType mediaType) {
+        String qsParameter = mediaType.getParameters().get(MEDIA_TYPE_PARAMETER_QUALITY_SERVER);
+        return qsParameter == null ? 1.0 : Double.valueOf(qsParameter);
+    }
+
+    private Double getQParameter(MediaType mediaType) {
+        String qParameter = mediaType.getParameters().get(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT);
+        return qParameter == null ? 1.0 : Double.valueOf(qParameter);
+    }
+
+    private MediaType withoutQualityParameters(MediaType selectedMediaType) {
+        Map<String, String> parametersWithoutQAndQS = selectedMediaType.getParameters().entrySet().stream()
+        	.filter(entry -> !entry.getKey().equals(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT))
+        	.filter(entry -> !entry.getKey().equals(MEDIA_TYPE_PARAMETER_QUALITY_SERVER))
+        	.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        
+        return new MediaType(selectedMediaType.getType(), selectedMediaType.getSubtype(), parametersWithoutQAndQS);
+    }
+
+    private boolean isConcreteMediaType(MediaType selectedMediaType) {
+        if(!selectedMediaType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) && 
+        	!selectedMediaType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD)) {
+            return true;
+        }
+        return false;
+    }
+
+    private MediaType getMostSpecificMediaType(MediaType acceptableMediaType, MediaType producibleMediaType) {
+        int clientSpecificity = determineMediaTypeSpecificity(acceptableMediaType);
+        int serverSpecificity = determineMediaTypeSpecificity(producibleMediaType);
+        if(clientSpecificity == MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS && clientSpecificity == serverSpecificity) {
+            Map<String, String> serverParameters = producibleMediaType.getParameters();
+            for(Entry<String, String> clientParameter : acceptableMediaType.getParameters().entrySet()) {
+        	String serverParameter = serverParameters.get(clientParameter.getKey());
+        	if(serverParameter == null || !clientParameter.getValue().equals(serverParameter)) {
+        	    /*
+        	     * The client has this parameter in the media type while the server does not or 
+        	     * the client has a different value for this parameter than the server. 
+        	     * 
+        	     * This makes the client media type more specific than the server media type. 
+        	     */
+        	    clientSpecificity++;
+        	}
+            }
+        }
+        return clientSpecificity > serverSpecificity ? 
+        	addQualityParameters(
+        		acceptableMediaType, 
+        		getQParameter(acceptableMediaType), 
+        		getQSParameter(producibleMediaType)):
+		addQualityParameters(
+			producibleMediaType, 
+			getQParameter(acceptableMediaType), 
+			getQSParameter(producibleMediaType));
+    }
+
+    /**
+     * Determines how specific the media type is. 
+     * A higher number denotes a more specific media type.
+     * 
+     * @param mediaType is the media type for which to determine specificity
+     * @return the specificity of the media type (higher is more specific)
+     */
+    private int determineMediaTypeSpecificity(MediaType mediaType) {
+        String type = mediaType.getType();
+        String subType = mediaType.getSubtype();
+        Map<String, String> parameters = mediaType.getParameters();
+        if(type.equals(MediaType.MEDIA_TYPE_WILDCARD)) {
+            return MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE;
+        }
+        if(subType.equals(MediaType.MEDIA_TYPE_WILDCARD)) {
+            return MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE;
+        }
+        if(parameters.isEmpty()) {
+            return MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS;
+        }
+        return MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS;
     }
 }

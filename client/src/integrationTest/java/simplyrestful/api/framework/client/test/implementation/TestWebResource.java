@@ -3,6 +3,7 @@ package simplyrestful.api.framework.client.test.implementation;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -72,7 +73,7 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
     }
 
     @Override
-    public List<TestResource> list(int pageStart, int pageSize, String query) {
+    public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
 	return Arrays.asList(SimplyRESTfulClientTest.getTestResource(), SimplyRESTfulClientTest.getTestResourceRandom());
     }
 

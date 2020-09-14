@@ -2,10 +2,12 @@ package simplyrestful.api.framework.core.filters;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Named;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -15,14 +17,13 @@ import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import simplyrestful.api.framework.core.DefaultWebResource;
 
+@Named
 @Provider
-// TODO Perhaps make this a WriteInterceptor instead?
 public class JsonFieldsFilter implements ContainerResponseFilter{
+    private static final String MEDIA_TYPE_STRUCTURE_SUFFIX_JSON = "+json";
     private static final String FIELDS_VALUE_ALL = "all";
     @Context
     private ObjectMapper mapper;
@@ -36,7 +37,10 @@ public class JsonFieldsFilter implements ContainerResponseFilter{
     }
 
     private boolean isJsonCompatibleMediaType(ContainerResponseContext responseContext) {
-	if(responseContext.hasEntity() && responseContext.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
+	if(responseContext.hasEntity() && 
+		(
+			responseContext.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE) ||
+			responseContext.getMediaType().getSubtype().endsWith(MEDIA_TYPE_STRUCTURE_SUFFIX_JSON))) {
 	    return true;
 	}
 	return false;
@@ -48,18 +52,21 @@ public class JsonFieldsFilter implements ContainerResponseFilter{
 	if (fields.contains(FIELDS_VALUE_ALL)) {
 	    return;
 	}
-	// TODO maybe create a custom PropertyFilter that can filter nested fields
-	mapper.setFilterProvider(
-		new SimpleFilterProvider().addFilter(
-			"fieldsFilter",
-			SimpleBeanPropertyFilter.filterOutAllExcept(Set.copyOf(fields))));
+	if(!fields.isEmpty()) {
+	    throw new ServerErrorException("This API does not yet filter fields", 501);
+	}
+	// FIXME implement this missing functionality (maybe as WriteInterceptor?)
     }
 
     private List<String> getFieldsQueryParameter(ContainerRequestContext requestContext) {
-	return requestContext
+	List<String> fields = requestContext
 		.getUriInfo()
 		.getQueryParameters()
-		.get(DefaultWebResource.QUERY_PARAM_FIELDS)
+		.get(DefaultWebResource.QUERY_PARAM_FIELDS);
+	if(fields == null) {
+	    return Collections.emptyList();
+	}
+	return fields
 		.stream()
         	.flatMap(delimitedString -> Arrays.asList(delimitedString.split(DefaultWebResource.QUERY_PARAM_FIELDS_DELIMITER)).stream())
         	.map(String::trim)

@@ -33,6 +33,7 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -134,7 +135,10 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public List<ExampleResource> list(int pageStart, int pageSize, String query) {
+	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
+	    if(!sort.isEmpty()) {
+		throw new ServerErrorException("This API does not yet support sorting", 501);
+	    }
 	    List<StoredObject> data = dataStore.getData();
 	    int dataSize = data.size();
 	    if (pageStart > dataSize) {

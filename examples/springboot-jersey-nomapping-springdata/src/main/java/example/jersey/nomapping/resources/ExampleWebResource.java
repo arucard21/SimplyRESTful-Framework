@@ -20,8 +20,10 @@ package example.jersey.nomapping.resources;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,6 +45,10 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 @Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
+    private static final String RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER = ",";
+    private static final String RSQL_JPA_SORT_QUERY_FIELD_DELIMITER = ";";
+    private static final String RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING = "asc";
+    private static final String RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING = "desc";
     private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
     private static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
     private static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
@@ -52,6 +58,21 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     public ExampleWebResource(ExampleRepository repo) {
 	super();
 	this.repo = repo;
+	addInitialTestData(repo);
+    }
+
+    private void addInitialTestData(ExampleRepository repo) {
+	if(repo.count() == 0) {
+	    for(int i = 0; i < 3; i++) {
+		ExampleResource resource = new ExampleResource();
+       	    	resource.setUUID(UUID.randomUUID());
+       	    	resource.setDescription("This is test resource "+ i);
+       	    	ExampleComplexAttribute complexAttribute = new ExampleComplexAttribute();
+       	    	complexAttribute.setName("complex attribute of test resource "+ i);
+       	    	resource.setComplexAttribute(complexAttribute);
+       	    	repo.save(resource);
+       	    }
+	}
     }
 
     @Override
@@ -104,13 +125,28 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     }
 
     @Override
-    public List<ExampleResource> list(int pageStart, int pageSize, String query) {
+    public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
 	List<ExampleResource> retrievedPage = repo.findAll(
-		RSQLSupport.<ExampleResource>toSpecification(query),
+		RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))),
 		new OffsetBasedPageRequest(pageStart, pageSize))
 		.getContent();
 	retrievedPage.forEach(resource -> ensureSelfLinkAndUUIDPresent(resource));
 	return retrievedPage;
+    }
+
+    private String createSortQuery(Map<String, Boolean> sort) {
+	return sort.entrySet().stream()
+		.map(entry -> createSingleSortQueryField(entry.getKey(), entry.getValue()))
+		.collect(Collectors.joining(RSQL_JPA_SORT_QUERY_FIELD_DELIMITER));
+    }
+
+    private String createSingleSortQueryField(String sortField, Boolean ascending) {
+	String direction = RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING;
+	if (!ascending) {
+	    direction = RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
+	}
+	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER,sortField, direction);
+	
     }
 
     @Override
