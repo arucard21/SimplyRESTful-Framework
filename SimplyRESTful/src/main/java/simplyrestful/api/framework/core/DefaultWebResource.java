@@ -188,7 +188,6 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * 
      * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}. 
      *
-     * @param request	represents the current HTTP request.
      * @param page      is the page number of the paginated collection of resources (for {@link HALCollectionV1} only)
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize  is the size of a single page in this paginated collection of
@@ -209,7 +208,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
 	MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED})
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
-    public HALCollection<T> getHALResourcesAsHALJson(
+    public HALCollection<T> getHALResources(
 	    @ApiParam(value = "The page to be shown", required = false)
             @QueryParam(V1_QUERY_PARAM_PAGE) 
             @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING) 
@@ -551,9 +550,12 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * 
      * This method does not change the Content-Type HTTP header that the JAX-RS
      * framework returns. The JAX-RS framework must already set this correctly,
-     * based on the {@link @Produces} or (@link @Consumes} annotations. Or it must be 
+     * based on the @{@link Produces} or @(@link Consumes} annotations. Or it must be 
      * adjusted in some other way, e.g. using a {@link ContainerResponseFilter}.
      * 
+     * @param mediaTypes is the list of media types that the server can produce.
+     * @return the most suitable media type, considering the client's preferences and
+     * the server's capabilities. 
      */
     protected MediaType selectMediaType(MediaType... mediaTypes) {
         List<MediaType> producibleMediaTypes = mediaTypes.length == 0 ?

@@ -25,9 +25,6 @@ public class HALCollectionV2Builder<T extends HALResource> {
      * @param <T> is the type of resource that this collection will contain.
      * @param resources is the list of resources for the page of the collection that the HALCollectionV2 object should contain.
      * @param requestURI is the request URI used to request this collection from the API.
-     * @param pageStart is the offset at which to start the page of resources in the collection.
-     * @param pageSize is the maximum size of the page in the collection.
-     * @param collectionSize is the size of the entire collection (all pages), after filtering.
      * @return the builder object. 
      */
     public static <T extends HALResource> HALCollectionV2Builder<T> from(
