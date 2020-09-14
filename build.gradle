@@ -157,6 +157,21 @@ project(":jaxrs-providers"){
 		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
 		api ("javax.inject:javax.inject:1")
 	}
+	
+	publishing{
+		publications{
+			mavenJava(MavenPublication){
+				pom {
+					licenses {
+						license {
+							name = 'The Apache License, Version 2.0'
+                        	url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    	}
+					}
+				}
+			}
+		}
+	}
 }
 
 project(":SimplyRESTful"){
