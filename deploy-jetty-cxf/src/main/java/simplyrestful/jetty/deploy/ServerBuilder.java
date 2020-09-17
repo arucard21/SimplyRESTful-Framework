@@ -47,6 +47,7 @@ import io.swagger.jaxrs.listing.ApiListingResource;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.filters.JsonFieldsFilter;
 import simplyrestful.api.framework.core.providers.HALMapperProvider;
+import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALResource;
@@ -144,9 +145,10 @@ public class ServerBuilder {
         providers.addAll(Arrays.asList(
         		ValidationExceptionMapper.class,
         		MultipartProvider.class,
-        		JacksonJsonProvider.class,
-        		HALMapperProvider.class,
         		ObjectMapperProvider.class,
+        		HALMapperProvider.class,
+        		JacksonHALJsonProvider.class,
+        		JacksonJsonProvider.class,
         		JsonFieldsFilter.class,
         		ApiListingResource.class,
         		SearchContextProvider.class));
