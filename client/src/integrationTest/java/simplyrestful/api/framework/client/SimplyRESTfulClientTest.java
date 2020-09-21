@@ -21,8 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.client.test.implementation.TestResource;
 import simplyrestful.api.framework.client.test.implementation.TestWebResource;
 import simplyrestful.api.framework.core.providers.HALMapperProvider;
@@ -77,8 +77,8 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 		JacksonJsonProvider.class,
 		HALMapperProvider.class,
 		ObjectMapperProvider.class,
-		ApiListingResource.class,
-		SwaggerSerializers.class);
+		OpenApiResource.class,
+		AcceptHeaderOpenApiResource.class);
     }
 
     @Override

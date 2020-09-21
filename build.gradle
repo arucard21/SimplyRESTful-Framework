@@ -1,13 +1,15 @@
 plugins{
-	id "org.springframework.boot" version "2.2.4.RELEASE" apply false
+	id "org.springframework.boot" version "2.3.4.RELEASE" apply false
 }
 
 ext {
-	jaxrs = "2.1.1"
-	cxf = "3.3.5"
-	junit = "5.6.0"
-	mockito = "3.2.4"
-	spring = "2.2.4.RELEASE"
+	jaxrs = "2.1.6"
+	cxf = "3.4.0"
+	junit = "5.7.0"
+	mockito = "3.5.11"
+	spring = "2.3.4.RELEASE"
+	jersey = "2.31"
+	swagger = "2.1.4"
 }
 
 //Shared configuration for all projects (root, library and example projects)
@@ -122,16 +124,19 @@ configure(project(":examples").allprojects){
 project(":SimplyRESTful-resources"){
 	project.description = "The core API resources used in SimplyRESTful APIs"
 	dependencies {
-		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
+		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.7")
+		
+		// FIXME needs to be upgraded (upstream) for use with OpenAPI 3.0
 		api ("io.openapitools.hal:swagger-hal:1.0.4"){
 			exclude group: "javax.ws.rs"
+			exclude group: "io.swagger"
 		}
 
 		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
-		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
-		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.31")
-		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.12")
+		testImplementation ("org.junit.platform:junit-platform-launcher:1.7.0")
+		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:${jersey}")
+		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.4.3")
 	}
 	
 	publishing{
@@ -153,9 +158,9 @@ project(":SimplyRESTful-resources"){
 project(":jaxrs-providers"){
 	project.description = "A collection of JAX-RS providers for use with SimplyRESTful server and client"
 	dependencies {
-		api ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
-		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.4")
-		api ("javax.inject:javax.inject:1")
+		api ("jakarta.ws.rs:jakarta.ws.rs-api:${jaxrs}")
+		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.7")
+		api ("jakarta.inject:jakarta.inject-api:2.0.0")
 	}
 	
 	publishing{
@@ -179,22 +184,22 @@ project(":SimplyRESTful"){
 	dependencies {
 		api project(":SimplyRESTful-resources")
 		api project(":jaxrs-providers")
-		api ("javax.inject:javax.inject:1")
-		api ("javax.ws.rs:javax.ws.rs-api:${jaxrs}")
-		api ("javax.validation:validation-api:2.0.1.Final")
-		api ("io.swagger:swagger-annotations:1.5.21")
+		api ("jakarta.inject:jakarta.inject-api:2.0.0")
+		api ("jakarta.ws.rs:jakarta.ws.rs-api:${jaxrs}")
+		api ("jakarta.validation:jakarta.validation-api:2.0.2")
+		api ("io.swagger.core.v3:swagger-annotations:${swagger}")
 
 		testImplementation ("org.mockito:mockito-core:${mockito}")
 		testImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
 		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
-		testImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
-		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:2.31")
-		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.1.12")
+		testImplementation ("org.junit.platform:junit-platform-launcher:1.7.0")
+		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:${jersey}")
+		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.4.3")
 		
-		integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:2.31")
-		integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:2.31")
-		integrationTestImplementation ("org.glassfish.jersey.inject:jersey-hk2:2.31")
+		integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:${jersey}")
+		integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:${jersey}")
+		integrationTestImplementation ("org.glassfish.jersey.inject:jersey-hk2:${jersey}")
 		integrationTestImplementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
 	}
 	
@@ -219,24 +224,24 @@ project(":client"){
 	dependencies {
 		api project(":SimplyRESTful-resources")
 		api project(":jaxrs-providers")
-		api ("javax.json:javax.json-api:1.1.4")
-		api ("org.glassfish.jersey.core:jersey-client:2.31")
-		api ("io.swagger:swagger-models:1.5.21")
-		api ("io.swagger.parser.v3:swagger-parser:2.0.17")
-		api ("org.glassfish.jersey.inject:jersey-hk2:2.31")
+		api ("jakarta.json:jakarta.json-api:1.1.6")
+		api ("org.glassfish.jersey.core:jersey-client:${jersey}")
+		api ("io.swagger.core.v3:swagger-models:${swagger}")
+		api ("io.swagger.parser.v3:swagger-parser:2.0.21")
+		api ("org.glassfish.jersey.inject:jersey-hk2:${jersey}")
 				
 		integrationTestImplementation project(":SimplyRESTful")
-		integrationTestImplementation project(":deploy-jetty-cxf")
-		integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:2.31")
-		integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:2.31")
-		integrationTestImplementation ("org.glassfish.jersey.inject:jersey-hk2:2.31")
+		integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:${jersey}")
+		integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:${jersey}")
+		integrationTestImplementation ("org.glassfish.jersey.inject:jersey-hk2:${jersey}")
 		integrationTestImplementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
 		integrationTestImplementation ("org.mockito:mockito-core:${mockito}")
 		integrationTestImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
 		integrationTestImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		integrationTestImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
-		integrationTestImplementation ("org.junit.platform:junit-platform-launcher:1.5.2")
-		integrationTestImplementation ("org.glassfish:javax.json:1.1.4")
+		integrationTestImplementation ("org.junit.platform:junit-platform-launcher:1.7.0")
+		integrationTestImplementation ("org.glassfish:jakarta.json:1.1.6")
+		integrationTestImplementation ("io.swagger.core.v3:swagger-jaxrs2:${swagger}")
 	}
 
 	publishing{
@@ -259,9 +264,8 @@ project(":deploy-springboot-cxf"){
 	project.description = "Easily deploy your SimplyRESTful API using Apache CXF with Spring Boot"
 	dependencies {
 		api project(":SimplyRESTful")
-		api ("org.webjars:swagger-ui:2.2.6")
 		api ("org.apache.cxf:cxf-spring-boot-starter-jaxrs:${cxf}")
-		api ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
+		api ("org.apache.cxf:cxf-rt-rs-service-description-openapi-v3:${cxf}")
 		api ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
 	}
 	
@@ -286,11 +290,10 @@ project(":deploy-springboot-jersey"){
 	dependencies {
 		api project(':SimplyRESTful')
 		api ("org.springframework.boot:spring-boot:${spring}")
-		api ("org.webjars:swagger-ui:2.2.6")
 		api ("org.springframework.boot:spring-boot-starter-jersey:${spring}"){
 			exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
 		}
-		api ("io.swagger:swagger-jersey2-jaxrs:1.5.21")
+		api ("io.swagger.core.v3:swagger-jaxrs2:${swagger}")
 	}
 	
 	publishing{
@@ -314,13 +317,12 @@ project(":deploy-jetty-cxf"){
 	dependencies {
 		api project(':SimplyRESTful')
 		api ("org.apache.cxf:cxf-rt-frontend-jaxrs:${cxf}")
-		api ("jakarta.xml.ws:jakarta.xml.ws-api:2.3.2")
-		api ("org.apache.cxf:cxf-rt-rs-service-description-swagger:${cxf}")
+		api ("jakarta.xml.ws:jakarta.xml.ws-api:2.3.3")
+		api ("org.apache.cxf:cxf-rt-rs-service-description-openapi-v3:${cxf}")
 		api ("org.apache.cxf:cxf-rt-rs-extension-search:${cxf}")
-		api ("org.webjars:swagger-ui:2.2.6")
-		api ("ch.qos.logback:logback-classic:1.2.1")
-		api ("org.hibernate:hibernate-validator:5.4.0.Final")
-		api ("org.glassfish:javax.el:3.0.1-b08")
+		api ("ch.qos.logback:logback-classic:1.2.3")
+		api ("org.hibernate:hibernate-validator:6.1.5.Final")
+		api ("org.glassfish:jakarta.el:3.0.3")
 	}
 	
 	publishing{
@@ -343,7 +345,7 @@ project(":persist-springdata"){
 	project.description = "Easily persist your SimplyRESTful API using Spring Data"
 	dependencies {
 		api ("com.github.arucard21.simplyrestful:SimplyRESTful:0.11.5")
-		api ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
+		api ("org.springframework.boot:spring-boot-starter-data-jpa:2.2.4.RELEASE")
 	}
 	
 	publishing{
@@ -387,7 +389,7 @@ project(":examples:springboot-cxf"){
 	dependencies {
 		implementation project(':SimplyRESTful')
 		implementation project(':deploy-springboot-cxf')
-		implementation("jakarta.xml.ws:jakarta.xml.ws-api:2.3.2")
+		implementation("jakarta.xml.ws:jakarta.xml.ws-api:2.3.3")
 	}
 }
 
@@ -404,7 +406,8 @@ project(":examples:springboot-jersey-nomapping-springdata"){
 		implementation project(':SimplyRESTful')
 		implementation project(':deploy-springboot-jersey')
 		implementation ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
-		implementation ("com.h2database:h2:1.4.197")
+		implementation("org.springframework.boot:spring-boot-starter-validation:2.3.4.RELEASE")
+		implementation ("com.h2database:h2:1.4.200")
 		implementation("io.github.perplexhub:rsql-jpa-specification:5.0.6")
 	}
 }

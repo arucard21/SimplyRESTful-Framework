@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -18,6 +17,7 @@ import javax.ws.rs.ext.Provider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.inject.Named;
 import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Named

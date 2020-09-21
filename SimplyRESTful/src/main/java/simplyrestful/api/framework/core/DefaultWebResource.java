@@ -40,8 +40,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -207,33 +207,33 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED,
 	MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
 	MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED})
-    @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
+    @Operation(description = "Get a list of resources")
     public HALCollection<T> getHALResources(
-	    @ApiParam(value = "The page to be shown", required = false)
+	    @Parameter(description  = "The page to be shown", required = false)
             @QueryParam(V1_QUERY_PARAM_PAGE)
             @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING)
             int page,
-            @ApiParam(value = "The page to be shown", required = false)
+            @Parameter(description = "The page to be shown", required = false)
 	    @QueryParam(QUERY_PARAM_PAGE_START)
 	    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
 	    int pageStart,
-	    @ApiParam(value = "The amount of resources shown on each page", required = false)
+	    @Parameter(description = "The amount of resources shown on each page", required = false)
 	    @QueryParam(QUERY_PARAM_PAGE_SIZE)
 	    @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
 	    int pageSize,
-            @ApiParam(value = "Provide minimal information for each resource", required = false)
+	    @Parameter(description = "Provide minimal information for each resource", required = false)
             @QueryParam(V1_QUERY_PARAM_COMPACT)
             @DefaultValue(HALCollectionV1Builder.DEFAULT_COMPACT_VALUE_STRING)
             boolean compact,
-	    @ApiParam(value = "The fields that should be retrieved", required = false)
+            @Parameter(description = "The fields that should be retrieved", required = false)
 	    @QueryParam(QUERY_PARAM_FIELDS)
 	    @DefaultValue(QUERY_PARAM_FIELDS_MINIMUM)
 	    List<String> fields,
-	    @ApiParam(value = "The FIQL query according to which the resources should be filtered", required = false)
+	    @Parameter(description = "The FIQL query according to which the resources should be filtered", required = false)
 	    @QueryParam(QUERY_PARAM_QUERY)
 	    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
 	    String query,
-	    @ApiParam(value = "The fields on which the resources should be sorted", required = false)
+	    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 	    @QueryParam(QUERY_PARAM_SORT)
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort) {
@@ -280,9 +280,9 @@ public abstract class DefaultWebResource<T extends HALResource> {
      *         was correctly created.
      */
     @POST
-    @ApiOperation(value = "Create a new resource", notes = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated")
+    @Operation(description = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated")
     @Produces
-    public Response postHALResource(@ApiParam(value = "resource", required = true) @NotNull @Valid T resource) {
+    public Response postHALResource(@Parameter(description = "resource", required = true) @NotNull @Valid T resource) {
 	UUID resourceId = ensureSelfLinkValid(resource, null);
 	if (this.exists(resourceId)) {
 	    throw new ClientErrorException(
@@ -301,10 +301,10 @@ public abstract class DefaultWebResource<T extends HALResource> {
      */
     @Path("/{id}")
     @GET
-    @ApiOperation(value = "Retrieve a single resource", notes = "Retrieve a single resource")
+    @Operation(description = "Retrieve a single resource")
     @Consumes
     public T getHALResource(
-	    @ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
+	    @Parameter(description = "The identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
 	return Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
     }
 
@@ -323,11 +323,11 @@ public abstract class DefaultWebResource<T extends HALResource> {
      */
     @Path("/{id}")
     @PUT
-    @ApiOperation(value = "Create or update a resource", notes = "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK.")
+    @Operation(description = "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK.")
     @Produces
     public Response putHALResource(
-	    @ApiParam(value = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id,
-	    @ApiParam(value = "The resource to be updated", required = true) @NotNull @Valid T resource) {
+	    @Parameter(description = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id,
+	    @Parameter(description = "The resource to be updated", required = true) @NotNull @Valid T resource) {
 	ensureSelfLinkValid(resource, id);
 	if (this.exists(id)) {
 	    this.update(resource, id);
@@ -345,11 +345,11 @@ public abstract class DefaultWebResource<T extends HALResource> {
      */
     @Path("/{id}")
     @DELETE
-    @ApiOperation(value = "Delete a single resource", notes = "Delete a single resource")
+    @Operation(description = "Delete a single resource")
     @Consumes
     @Produces
     public Response deleteHALResource(
-	    @ApiParam(value = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
+	    @Parameter(description = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
 	return Optional.ofNullable(this.delete(id)).map(resource -> Response.noContent().build())
 		.orElseThrow(NotFoundException::new);
     }

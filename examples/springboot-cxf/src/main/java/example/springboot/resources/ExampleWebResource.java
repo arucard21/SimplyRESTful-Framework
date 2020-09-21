@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
@@ -43,13 +41,18 @@ import example.datastore.DataStore;
 import example.datastore.StoredEmbeddedObject;
 import example.datastore.StoredObject;
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Named
 @Path("/resources")
-@Api(value = "Example Resources")
+@OpenAPIDefinition(tags = {
+	@Tag(name = "Example Resources")
+})
 @Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 public class ExampleWebResource extends DefaultWebResource<ExampleResource> {

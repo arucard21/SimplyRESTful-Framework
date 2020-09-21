@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.core.filters.JsonFieldsFilter;
 import simplyrestful.api.framework.core.providers.HALMapperProvider;
 import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
@@ -24,7 +24,7 @@ public class JerseySpringBootConfiguration implements ResourceConfigCustomizer{
 		config.register(JacksonHALJsonProvider.class);
 		config.register(JacksonJsonProvider.class);
 		config.register(JsonFieldsFilter.class);
-		config.register(ApiListingResource.class);
-		config.register(SwaggerSerializers.class);
+		config.register(OpenApiResource.class);
+		config.register(AcceptHeaderOpenApiResource.class);
 	}
 }

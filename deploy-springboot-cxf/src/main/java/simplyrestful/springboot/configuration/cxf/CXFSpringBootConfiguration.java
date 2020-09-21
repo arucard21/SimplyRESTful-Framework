@@ -1,6 +1,6 @@
 package simplyrestful.springboot.configuration.cxf;
 
-import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,7 +19,7 @@ public class CXFSpringBootConfiguration { /* Ensure that the simplyrestful packa
     
     @Bean
     @ConditionalOnMissingBean
-    public Swagger2Feature swaggerFeature() {
-	return new Swagger2Feature();
+    public OpenApiFeature swaggerFeature() {
+	return new OpenApiFeature();
     }
 }
