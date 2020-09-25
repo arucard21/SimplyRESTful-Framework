@@ -1,6 +1,7 @@
 package simplyrestful.springboot.configuration.jersey;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.springframework.boot.autoconfigure.jersey.ResourceConfigCustomizer;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,5 +27,6 @@ public class JerseySpringBootConfiguration implements ResourceConfigCustomizer{
 		config.register(JsonFieldsFilter.class);
 		config.register(OpenApiResource.class);
 		config.register(AcceptHeaderOpenApiResource.class);
+		config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
 	}
 }
