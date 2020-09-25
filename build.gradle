@@ -127,10 +127,10 @@ project(":SimplyRESTful-resources"){
 		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.7")
 		
 		// FIXME needs to be upgraded (upstream) for use with OpenAPI 3.0
-		api ("io.openapitools.hal:swagger-hal:1.0.4"){
-			exclude group: "javax.ws.rs"
-			exclude group: "io.swagger"
-		}
+		//api ("io.openapitools.hal:swagger-hal:1.0.4"){
+		//	exclude group: "javax.ws.rs"
+		//	exclude group: "io.swagger"
+		//}
 
 		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
@@ -187,7 +187,7 @@ project(":SimplyRESTful"){
 		api ("jakarta.inject:jakarta.inject-api:2.0.0")
 		api ("jakarta.ws.rs:jakarta.ws.rs-api:${jaxrs}")
 		api ("jakarta.validation:jakarta.validation-api:2.0.2")
-		api ("io.swagger.core.v3:swagger-annotations:${swagger}")
+		api ("io.swagger.core.v3:swagger-jaxrs2:${swagger}")
 
 		testImplementation ("org.mockito:mockito-core:${mockito}")
 		testImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")

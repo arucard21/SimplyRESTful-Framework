@@ -42,6 +42,9 @@ import javax.ws.rs.core.UriInfo;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -208,6 +211,20 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
 	MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED})
     @Operation(description = "Get a list of resources")
+    @ApiResponse(content = {
+	    @Content(
+		    mediaType = HALCollectionV2.MEDIA_TYPE_JSON,
+		    schema = @Schema(
+			    implementation = HALCollectionV2.class)),
+	    @Content(
+		    mediaType = HALCollectionV2.MEDIA_TYPE_HAL_JSON,
+		    schema = @Schema(
+			    implementation = HALCollectionV2.class)),
+	    @Content(
+		    mediaType = HALCollectionV1.MEDIA_TYPE_HAL_JSON,
+		    schema = @Schema(
+			    implementation = HALCollectionV1.class))
+    })
     public HALCollection<T> getHALResources(
 	    @Parameter(description  = "The page to be shown", required = false)
             @QueryParam(V1_QUERY_PARAM_PAGE)
