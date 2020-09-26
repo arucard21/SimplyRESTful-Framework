@@ -1,2 +1,1 @@
-prettyPrint: true
-readerClass: simplyrestful.api.framework.core.swagger.ReaderUsingProducesWithoutQsParameter
+filterClass: simplyrestful.springboot.configuration.jersey.NoWadlFilter
