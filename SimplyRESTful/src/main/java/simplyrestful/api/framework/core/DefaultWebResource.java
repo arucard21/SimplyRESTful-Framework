@@ -213,15 +213,16 @@ public abstract class DefaultWebResource<T extends HALResource> {
     @Operation(description = "Get a list of resources")
     @ApiResponse(content = {
 	    @Content(
-		    mediaType = HALCollectionV2.MEDIA_TYPE_JSON,
+		    mediaType = MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED,
 		    schema = @Schema(
 			    implementation = HALCollectionV2.class)),
 	    @Content(
-		    mediaType = HALCollectionV2.MEDIA_TYPE_HAL_JSON,
+		    mediaType = MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED,
 		    schema = @Schema(
+			    name = "HALCollectionV2HALJson",
 			    implementation = HALCollectionV2.class)),
 	    @Content(
-		    mediaType = HALCollectionV1.MEDIA_TYPE_HAL_JSON,
+		    mediaType = MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
 		    schema = @Schema(
 			    implementation = HALCollectionV1.class))
     })
