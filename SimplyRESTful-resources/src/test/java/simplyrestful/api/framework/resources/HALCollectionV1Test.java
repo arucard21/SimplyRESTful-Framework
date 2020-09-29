@@ -40,7 +40,7 @@ public class HALCollectionV1Test {
 		testCollection = new HALCollectionV1<>();
 		testCollection.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_1).profile(testCollection.getProfile()).build());
 		testCollection.setPage(1);
-		testCollection.setMaxPageSize(10);
+		testCollection.setPageSize(10);
 		testCollection.setTotal(100);
 		testCollection.setFirst(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"1").profile(testCollection.getProfile()).build());
 		testCollection.setLast(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"10").profile(testCollection.getProfile()).build());
@@ -50,7 +50,7 @@ public class HALCollectionV1Test {
 		testCollectionSame = new HALCollectionV1<>();
 		testCollectionSame.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_1).profile(testCollectionSame.getProfile()).build());
 		testCollectionSame.setPage(1);
-		testCollectionSame.setMaxPageSize(10);
+		testCollectionSame.setPageSize(10);
 		testCollectionSame.setTotal(100);
 		testCollectionSame.setFirst(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"1").profile(testCollectionSame.getProfile()).build());
 		testCollectionSame.setLast(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"10").profile(testCollectionSame.getProfile()).build());
@@ -60,7 +60,7 @@ public class HALCollectionV1Test {
 		testCollectionDifferent = new HALCollectionV1<>();
 		testCollectionDifferent.setSelf(new HALLink.Builder(TEST_COLLECTION_HREF_2).profile(testCollectionDifferent.getProfile()).build());
 		testCollectionDifferent.setPage(3);
-		testCollectionDifferent.setMaxPageSize(5);
+		testCollectionDifferent.setPageSize(5);
 		testCollectionDifferent.setTotal(50);
 		testCollectionDifferent.setFirst(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"1").profile(testCollectionDifferent.getProfile()).build());
 		testCollectionDifferent.setLast(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"10").profile(testCollectionDifferent.getProfile()).build());
