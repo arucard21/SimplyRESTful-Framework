@@ -1,2 +1,1 @@
 filterClass: simplyrestful.api.framework.core.swagger.SimplyRESTfulOpenApiFilter
-objectMapperProcessorClass: simplyrestful.api.framework.core.swagger.HALMapperProcessor
