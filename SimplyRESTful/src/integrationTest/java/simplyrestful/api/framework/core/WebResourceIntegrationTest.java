@@ -14,7 +14,6 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -71,7 +70,6 @@ public class WebResourceIntegrationTest extends JerseyTest {
     // FIXME: Switch server setup to Jersey
     @Test
     @Deprecated(since="0.12.0")
-    @Disabled("Returns v2 collection since Jersey doesn't include the media type parameters when matching so it doesn't check the profile")
     public void webResource_shouldReturnAllResourcesInV1Collection_whenGETReceivedOnWebResourcePath() {
 	Response response = target()
 		.path(WEB_RESOURCE_PATH)
@@ -88,7 +86,6 @@ public class WebResourceIntegrationTest extends JerseyTest {
 
     @Test
     @Deprecated(since="0.12.0")
-    @Disabled("Returns v2 collection since CXF doesn't include the media type parameters when matching so it doesn't check the profile")
     public void webResource_shouldReturnAllResourcesEmbeddedInV1Collection_whenGETReceivedOnWebResourcePathAndCompactIsFalse() {
 	Response response = target()
 		.path(WEB_RESOURCE_PATH)
