@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALServiceDocument;
@@ -44,25 +43,23 @@ public class WebResourceRootIntegrationTest extends JerseyTest {
         	TestWebResource.class,
         	WebResourceRoot.class,
         	JacksonJsonProvider.class,
-        	HALMapperProvider.class,
         	ObjectMapperProvider.class);
     }
-    
+
     @Override
     protected void configureClient(ClientConfig config) {
 	config.register(JacksonJsonProvider.class);
-	config.register(HALMapperProvider.class);
 	config.register(ObjectMapperProvider.class);
     }
-    
+
     @Test
     public void webResource_shouldReturnServiceDocument_whenGETReceivedOnRootURI() {
 	Response response = target()
 		.request()
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
-	
-	String serviceDocument = response.readEntity(String.class); 
+
+	String serviceDocument = response.readEntity(String.class);
 	Assertions.assertTrue(serviceDocument.contains("describedBy"));
     }
 

@@ -46,7 +46,6 @@ import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.filters.JsonFieldsFilter;
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
 import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
@@ -146,7 +145,6 @@ public class ServerBuilder {
         		ValidationExceptionMapper.class,
         		MultipartProvider.class,
         		ObjectMapperProvider.class,
-        		HALMapperProvider.class,
         		JacksonHALJsonProvider.class,
         		JacksonJsonProvider.class,
         		JsonFieldsFilter.class,

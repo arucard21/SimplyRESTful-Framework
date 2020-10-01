@@ -34,7 +34,7 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.parser.OpenAPIV3Parser;
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
+import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
@@ -66,7 +66,6 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	this.baseApiUri = baseApiUri;
 	this.client = client;
 	client.register(JacksonJsonProvider.class);
-	client.register(HALMapperProvider.class);
 	client.register(ObjectMapperProvider.class);
 	this.resourceClass = resourceClass;
 	this.resourceProfile = discoverResourceProfile();
@@ -252,7 +251,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {
 	try {
-	    return new HALMapperProvider().getContext(ObjectMapper.class).readValue(jsonString, deserializationClass);
+	    return getHALMapper().readValue(jsonString, deserializationClass);
 	} catch (JsonProcessingException e) {
 	    throw new RuntimeException(e);
 	}
@@ -260,10 +259,19 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     private <S> S deserializeJsonWithGenerics(String jsonString, TypeReference<S> typeRef) {
 	try {
-	    return new HALMapperProvider().getContext(ObjectMapper.class).readValue(jsonString, typeRef);
+	    return getHALMapper().readValue(jsonString, typeRef);
 	} catch (JsonProcessingException e) {
 	    throw new RuntimeException(e);
 	}
+    }
+
+    private ObjectMapper getHALMapper() {
+	ObjectMapper mapper = new ObjectMapperProvider()
+	    .getContext(ObjectMapper.class);
+	if(!mapper.getRegisteredModuleIds().contains(JacksonHALJsonProvider.JACKSON_HAL_MODULE.getTypeId())) {
+	    mapper.registerModule(JacksonHALJsonProvider.JACKSON_HAL_MODULE);
+	}
+	return mapper;
     }
 
     /**

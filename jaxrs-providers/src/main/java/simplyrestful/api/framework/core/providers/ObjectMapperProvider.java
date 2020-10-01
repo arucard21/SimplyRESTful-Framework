@@ -6,6 +6,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -18,9 +19,9 @@ import jakarta.inject.Named;
 @Consumes(MediaType.WILDCARD)
 public class ObjectMapperProvider implements ContextResolver<ObjectMapper>{
     private final ObjectMapper mapper;
-    
+
     public ObjectMapperProvider() {
-	this.mapper = createMediaTypeSpecificMapper();
+	this.mapper = createMapper();
     }
 
     @Override
@@ -28,12 +29,12 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper>{
 	return mapper;
     }
 
-    private ObjectMapper createMediaTypeSpecificMapper() {
+    private ObjectMapper createMapper() {
 	ObjectMapper jsonObjectMapper = new ObjectMapper();
 	jsonObjectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 	jsonObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
 	jsonObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-	jsonObjectMapper.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
+	jsonObjectMapper.setSerializationInclusion(Include.NON_EMPTY);
         return jsonObjectMapper;
     }
 }

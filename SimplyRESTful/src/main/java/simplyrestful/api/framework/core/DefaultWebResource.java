@@ -219,7 +219,6 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	    @Content(
 		    mediaType = MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED,
 		    schema = @Schema(
-			    name = "HALCollectionV2HALJson",
 			    implementation = HALCollectionV2.class)),
 	    @Content(
 		    mediaType = MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
