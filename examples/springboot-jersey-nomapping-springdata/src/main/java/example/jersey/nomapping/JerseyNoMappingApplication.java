@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class JerseyNoMappingApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(JerseyNoMappingApplication.class, args);
-	}
+    public static void main(String[] args) {
+	SpringApplication.run(JerseyNoMappingApplication.class, args);
+    }
 }
