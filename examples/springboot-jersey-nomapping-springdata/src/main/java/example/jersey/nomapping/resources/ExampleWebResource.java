@@ -142,7 +142,19 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     @Override
     public Stream<ExampleResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
 	return repo.findAll(RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))))
+		.map(resource -> {
+		    simulateSlowDataRetrieval();
+		    return resource;
+		})
 		.map(this::ensureSelfLinkAndUUIDPresent);
+    }
+
+    private void simulateSlowDataRetrieval() {
+	try {
+	    Thread.sleep(1000);
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
     }
 
     private String createSortQuery(Map<String, Boolean> sort) {
