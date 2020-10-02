@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -58,8 +60,8 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     private ExampleRepository repo;
 
     @Inject
-    public ExampleWebResource(ExampleRepository repo) {
-	super();
+    public ExampleWebResource(ExampleRepository repo, ExecutorService executorService) {
+	this.executorService = executorService;
 	this.repo = repo;
 	addInitialTestData(repo);
     }
@@ -137,6 +139,12 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	return retrievedPage;
     }
 
+    @Override
+    public Stream<ExampleResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
+	return repo.findAll(RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))))
+		.map(this::ensureSelfLinkAndUUIDPresent);
+    }
+
     private String createSortQuery(Map<String, Boolean> sort) {
 	return sort.entrySet().stream()
 		.map(entry -> createSingleSortQueryField(entry.getKey(), entry.getValue()))
@@ -149,7 +157,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	    direction = RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
 	}
 	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER,sortField, direction);
-	
+
     }
 
     @Override
@@ -157,7 +165,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	return Math.toIntExact(repo.count(RSQLSupport.toSpecification(query)));
     }
 
-    private void ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
+    private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
 	if (persistedResource.getSelf() == null && persistedResource.getUUID() == null) {
 	    throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
 	}
@@ -172,5 +180,6 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 		    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
 	    persistedResource.setUUID(id);
 	}
+	return persistedResource;
     }
 }

@@ -12,7 +12,9 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -38,6 +40,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +49,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.inject.Inject;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -94,6 +99,9 @@ public abstract class DefaultWebResource<T extends HALResource> {
     protected Request request;
     @Context
     protected HttpHeaders httpHeaders;
+
+    @Inject
+    protected ExecutorService executorService;
 
     /**
      * Create the resource in the data store where it is stored.
@@ -160,6 +168,28 @@ public abstract class DefaultWebResource<T extends HALResource> {
      * @return the filtered and sorted list of resources for the requested page.
      */
     public abstract List<T> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort);
+
+    /**
+     * Retrieve the stream of resources that have been requested.
+     *
+     * For proper discoverability of the API, all links (href values in each HALLink
+     * object) should contain absolute URI's and a self-link must be available in
+     * each resource.
+     *
+     * For convenience, the default implementation for this is to simply provide a stream based on the list retrieved
+     * by the list() method. If your underlying data store supports streaming data, you should override this method and use
+     * that streaming mechanism to enable proper streaming.
+     *
+     * @param fields is the list of fields on which to filter. This is only provided to optimize data
+     * retrieval as the actual filtering of fields is done by the framework.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is the list of fields according to which the collection should be sorted. Each entry
+     * provides the field name (dot-separated for nested fields) and the sort order (true for ascending, false for descending)
+     * @return the filtered and sorted stream of resources for the requested page.
+     */
+    public Stream<T> stream(List<String> fields, String query, Map<String, Boolean> sort){
+	return list(0, Integer.MAX_VALUE, fields, query, sort).stream();
+    }
 
     /**
      * Retrieve how many resources are available.
@@ -286,6 +316,41 @@ public abstract class DefaultWebResource<T extends HALResource> {
 		removeHALStructure(query),
 		getSortQueryParameter(sort),
 		selected);
+    }
+
+    @GET
+    @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
+    @Operation(description = "Get a stream of resources")
+    public void streamHALResources(
+	    @Parameter(description = "The fields that should be retrieved", required = false)
+	    @QueryParam(QUERY_PARAM_FIELDS)
+	    @DefaultValue(QUERY_PARAM_FIELDS_MINIMUM)
+	    List<String> fields,
+	    @Parameter(description = "The FIQL query according to which the resources should be filtered", required = false)
+	    @QueryParam(QUERY_PARAM_QUERY)
+	    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
+	    String query,
+	    @Parameter(description = "The fields on which the resources should be sorted", required = false)
+	    @QueryParam(QUERY_PARAM_SORT)
+	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
+	    List<String> sort,
+	    @Context
+	    SseEventSink eventSink,
+	    @Context
+	    Sse sse) throws InterruptedException{
+	executorService.execute(() -> {
+	    try(SseEventSink sink = eventSink){
+		try(Stream<T> stream = stream(getFieldsQueryParameter(fields),removeHALStructure(query),getSortQueryParameter(sort))){
+		    stream.forEach(resourceItem -> {
+			sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
+				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getType(),
+				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getSubtype(), Collections.singletonMap(
+					MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME, resourceItem.getProfile().toString())))
+				.build());
+		    });
+		}
+	    }
+	});
     }
 
     /**

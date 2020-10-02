@@ -8,7 +8,7 @@ ext {
 	junit = "5.7.0"
 	mockito = "3.5.11"
 	spring = "2.3.4.RELEASE"
-	jersey = "2.31"
+	jersey = "2.32"
 	swagger = "2.1.4"
 }
 
@@ -293,6 +293,7 @@ project(":deploy-springboot-jersey"){
 		api ("org.springframework.boot:spring-boot-starter-jersey:${spring}"){
 			exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
 		}
+		api ("org.glassfish.jersey.media:jersey-media-sse:${jersey}")
 		api ("io.swagger.core.v3:swagger-jaxrs2:${swagger}")
 	}
 	
