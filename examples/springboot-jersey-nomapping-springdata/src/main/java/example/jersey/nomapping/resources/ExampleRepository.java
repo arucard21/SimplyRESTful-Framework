@@ -13,9 +13,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.lang.Nullable;
 
 @Named
-public interface ExampleRepository extends PagingAndSortingRepository<ExampleResource, Long>{
+public interface ExampleRepository extends PagingAndSortingRepository<ExampleResource, Long> {
 	Optional<ExampleResource> findByUuid(UUID uuid);
-	Page<ExampleResource> findAll(@Nullable Specification<ExampleResource> spec, Pageable pageabl);
+	Page<ExampleResource> findAll(@Nullable Specification<ExampleResource> spec, Pageable pageable);
 	Stream<ExampleResource> findAll(@Nullable Specification<ExampleResource> spec);
 	long count(@Nullable Specification<ExampleResource> spec);
 }
