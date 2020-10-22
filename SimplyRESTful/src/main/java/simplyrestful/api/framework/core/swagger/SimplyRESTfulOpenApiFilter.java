@@ -17,14 +17,14 @@ import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter{
-    
+
     /**
      * Remove the "qs" parameter from all media types.
-     * 
-     * If the removal of this parameter causes the map to contain duplicates, it 
+     *
+     * If the removal of this parameter causes the map to contain duplicates, it
      * is assumed that their values would have been the same (since this parameter
      * should not have any effect on the schema that is mapped to it). This allows it
-     * to be easily resolved by simply using the value of the first entry and 
+     * to be easily resolved by simply using the value of the first entry and
      * ignoring that of the second entry.
      */
     @Override
@@ -35,14 +35,14 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter{
 	    Map<String, String> cookies,
 	    Map<String, List<String>> headers) {
 	Content openApiMediaTypes = operation.getResponses().getDefault().getContent();
-	Content modifiedOpenApiMediaTypes = new Content(); 
+	Content modifiedOpenApiMediaTypes = new Content();
 	openApiMediaTypes.entrySet().stream()
 		.collect(Collectors.toMap(
 			entry -> withoutQsParameter(entry.getKey()),
 			Entry::getValue,
 			(duplicate1, duplicate2) -> duplicate1))
 		.forEach(modifiedOpenApiMediaTypes::addMediaType);
-	
+
 	operation.getResponses().getDefault().setContent(modifiedOpenApiMediaTypes);
 	return super.filterOperation(operation, api, params, cookies, headers);
     }
@@ -50,6 +50,7 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter{
     /**
      * Remove the schema that's detected for the {@link HALResource} and {@link HALCollection} parent classes.
      */
+    @SuppressWarnings("rawtypes")
     @Override
     public Optional<Schema> filterSchema(
 	    Schema schema,
