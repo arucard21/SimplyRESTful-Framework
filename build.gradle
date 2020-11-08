@@ -188,6 +188,7 @@ project(":SimplyRESTful"){
 		api ("jakarta.ws.rs:jakarta.ws.rs-api:${jaxrs}")
 		api ("jakarta.validation:jakarta.validation-api:2.0.2")
 		api ("io.swagger.core.v3:swagger-jaxrs2:${swagger}")
+		api ("jakarta.servlet:jakarta.servlet-api:5.0.0")
 
 		testImplementation ("org.mockito:mockito-core:${mockito}")
 		testImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")

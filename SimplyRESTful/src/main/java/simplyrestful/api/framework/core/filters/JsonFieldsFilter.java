@@ -1,75 +1,52 @@
 package simplyrestful.api.framework.core.filters;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Provider;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.inject.Named;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Named
-@Provider
-public class JsonFieldsFilter implements ContainerResponseFilter{
+@WebFilter("*")
+public class JsonFieldsFilter extends HttpFilter {
+    private static final long serialVersionUID = 6825636135376615562L;
     private static final String MEDIA_TYPE_STRUCTURE_SUFFIX_JSON = "+json";
     private static final String FIELDS_VALUE_ALL = "all";
-    @Context
-    private ObjectMapper mapper;
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-	if(!isJsonCompatibleMediaType(responseContext)) {
+    protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+	if(!isJsonCompatibleMediaType(response.getContentType())) {
 	    return;
 	}
-	showOnlyRequestedFields(requestContext, responseContext);
+	List<String> fields = Arrays.asList(request.getParameterValues(DefaultWebResource.QUERY_PARAM_FIELDS));
+	if (!fields.contains(FIELDS_VALUE_ALL) && !fields.isEmpty()) {
+	    response.getWriter().write(keepOnlyRequestedFields(request.getInputStream(), fields));
+	}
+        super.doFilter(request, response, chain);
     }
 
-    private boolean isJsonCompatibleMediaType(ContainerResponseContext responseContext) {
-	if(responseContext.hasEntity() && 
+    private boolean isJsonCompatibleMediaType(String contentType) {
+	if(contentType != null &&
 		(
-			responseContext.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE) ||
-			responseContext.getMediaType().getSubtype().endsWith(MEDIA_TYPE_STRUCTURE_SUFFIX_JSON))) {
+			MediaType.valueOf(contentType).isCompatible(MediaType.APPLICATION_JSON_TYPE) ||
+			MediaType.valueOf(contentType).getSubtype().endsWith(MEDIA_TYPE_STRUCTURE_SUFFIX_JSON))) {
 	    return true;
 	}
 	return false;
     }
 
-    private void showOnlyRequestedFields(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-	    throws JsonProcessingException {
-	List<String> fields = getFieldsQueryParameter(requestContext);
-	if (fields.contains(FIELDS_VALUE_ALL)) {
-	    return;
-	}
-	if(!fields.isEmpty()) {
-	    throw new ServerErrorException("This API does not yet filter fields", 501);
-	}
-	// FIXME implement this missing functionality (maybe as WriteInterceptor?)
-    }
-
-    private List<String> getFieldsQueryParameter(ContainerRequestContext requestContext) {
-	List<String> fields = requestContext
-		.getUriInfo()
-		.getQueryParameters()
-		.get(DefaultWebResource.QUERY_PARAM_FIELDS);
-	if(fields == null) {
-	    return Collections.emptyList();
-	}
-	return fields
-		.stream()
-        	.flatMap(delimitedString -> Arrays.asList(delimitedString.split(DefaultWebResource.QUERY_PARAM_FIELDS_DELIMITER)).stream())
-        	.map(String::trim)
-        	.collect(Collectors.toList());
+    private String keepOnlyRequestedFields(InputStream requestInputStream, List<String> fields) throws IOException {
+	throw new ServerErrorException("This API does not yet filter fields", 501);
     }
 }
