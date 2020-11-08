@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
@@ -55,15 +54,15 @@ public class WebResourceIntegrationTest extends JerseyTest {
         	TestWebResource.class,
         	WebResourceRoot.class,
         	ObjectMapperProvider.class,
+        	JacksonHALJsonProvider.class,
         	JacksonJsonProvider.class);
-        config.register(new JacksonHALJsonProvider(new ObjectMapperProvider().getContext(ObjectMapper.class)));
         return config;
     }
 
     @Override
     protected void configureClient(ClientConfig config) {
 	config.register(ObjectMapperProvider.class);
-	config.register(new JacksonHALJsonProvider(new ObjectMapperProvider().getContext(ObjectMapper.class)));
+	config.register(JacksonHALJsonProvider.class);
 	config.register(JacksonJsonProvider.class);
     }
 
