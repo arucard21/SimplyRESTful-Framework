@@ -61,7 +61,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 
     @Inject
     public ExampleWebResource(ExampleRepository repo, ExecutorService executorService) {
-	this.executorService = executorService;
+	this.executor = executorService;
 	this.repo = repo;
 	addInitialTestData(repo);
     }
