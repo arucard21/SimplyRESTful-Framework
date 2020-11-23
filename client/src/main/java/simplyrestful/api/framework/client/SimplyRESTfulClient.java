@@ -34,13 +34,14 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.parser.OpenAPIV3Parser;
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
+import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
+    private static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""+HALServiceDocument.PROFILE_STRING + "\"";
     private static final String ERROR_CREATE_RESOURCE_EXISTS = "The resource already exists on the server. Use update() if you wish to modify the existing resource.";
     private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
     private static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
@@ -49,7 +50,6 @@ public class SimplyRESTfulClient<T extends HALResource> {
     private static final String HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE = "profile";
     private static final String MEDIA_TYPE_HAL_JSON_TYPE = "application";
     private static final String MEDIA_TYPE_HAL_JSON_SUBTYPE = "hal+json";
-    private static final String MEDIA_TYPE_HAL_JSON = MEDIA_TYPE_HAL_JSON_TYPE + "/" + MEDIA_TYPE_HAL_JSON_SUBTYPE;
     private static final String QUERY_PARAM_PAGE_START = "pageStart";
     private static final String QUERY_PARAM_PAGESIZE = "pageSize";
     private static final String QUERY_PARAM_FIELDS = "fields";
@@ -66,7 +66,6 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	this.baseApiUri = baseApiUri;
 	this.client = client;
 	client.register(JacksonJsonProvider.class);
-	client.register(HALMapperProvider.class);
 	client.register(ObjectMapperProvider.class);
 	this.resourceClass = resourceClass;
 	this.resourceProfile = discoverResourceProfile();
@@ -109,6 +108,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	}
 	Builder request = client.target(baseApiUri).request();
 	configureHttpHeaders(request, headers);
+	request.accept(MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON);
 	HALServiceDocument serviceDocument = request.get(HALServiceDocument.class);
 	URI openApiDocumentUri = URI.create(serviceDocument.getDescribedBy().getHref());
 	OpenAPI openApiSpecification = new OpenAPIV3Parser().read(openApiDocumentUri.toString());
@@ -117,7 +117,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	    if (Objects.isNull(getHttpMethod)) {
 		break;
 	    }
-	    boolean matchingMediaType = getHttpMethod.getResponses().get("200").getContent().keySet().stream()
+	    boolean matchingMediaType = getHttpMethod.getResponses().getDefault().getContent().keySet().stream()
 		    .map(MediaType::valueOf).anyMatch(mediaType -> mediaType.equals(resourceMediaType));
 	    if (matchingMediaType) {
 		String resourcePath = pathEntry.getKey();
@@ -251,7 +251,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {
 	try {
-	    return new HALMapperProvider().getContext(ObjectMapper.class).readValue(jsonString, deserializationClass);
+	    return getHALMapper().readValue(jsonString, deserializationClass);
 	} catch (JsonProcessingException e) {
 	    throw new RuntimeException(e);
 	}
@@ -259,10 +259,19 @@ public class SimplyRESTfulClient<T extends HALResource> {
 
     private <S> S deserializeJsonWithGenerics(String jsonString, TypeReference<S> typeRef) {
 	try {
-	    return new HALMapperProvider().getContext(ObjectMapper.class).readValue(jsonString, typeRef);
+	    return getHALMapper().readValue(jsonString, typeRef);
 	} catch (JsonProcessingException e) {
 	    throw new RuntimeException(e);
 	}
+    }
+
+    private ObjectMapper getHALMapper() {
+	ObjectMapper mapper = new ObjectMapperProvider()
+	    .getContext(ObjectMapper.class);
+	if(!mapper.getRegisteredModuleIds().contains(JacksonHALJsonProvider.JACKSON_HAL_MODULE.getTypeId())) {
+	    mapper.registerModule(JacksonHALJsonProvider.JACKSON_HAL_MODULE);
+	}
+	return mapper;
     }
 
     /**
@@ -293,6 +302,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	configureAdditionalQueryParameters(target, queryParameters);
 	Builder request = target.request();
 	configureHttpHeaders(request, headers);
+	request.accept(resourceMediaType);
 	return request.get(resourceClass);
     }
 
@@ -341,7 +351,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	configureAdditionalQueryParameters(target, queryParameters);
 	Builder request = target.request();
 	configureHttpHeaders(request, headers);
-	Entity<T> halJsonEntity = Entity.entity(resource, MEDIA_TYPE_HAL_JSON);
+	Entity<T> halJsonEntity = Entity.entity(resource, resourceMediaType);
 	try (Response response = Objects.isNull(resourceSelf) ? request.post(halJsonEntity)
 		: request.put(halJsonEntity)) {
 	    if (!Objects.equals(201, response.getStatus())) {
@@ -382,7 +392,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	configureAdditionalQueryParameters(target, queryParameters);
 	Builder request = target.request();
 	configureHttpHeaders(request, headers);
-	Response response = request.put(Entity.entity(resource, MEDIA_TYPE_HAL_JSON));
+	Response response = request.put(Entity.entity(resource, resourceMediaType));
 	if (!Objects.equals(response.getStatusInfo(), Status.OK)) {
 	    throw new WebApplicationException(response);
 	}

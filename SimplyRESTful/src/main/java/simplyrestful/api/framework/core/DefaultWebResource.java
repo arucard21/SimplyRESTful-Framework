@@ -12,7 +12,9 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -38,10 +40,16 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.inject.Inject;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -49,7 +57,7 @@ import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 
-public abstract class DefaultWebResource<T extends HALResource> {
+public abstract class DefaultWebResource<T extends HALResource> implements ResourceAccess<T> {
     private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE = 0; // Example: */*
     private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
     private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS = 2; // Example: application/json
@@ -92,96 +100,8 @@ public abstract class DefaultWebResource<T extends HALResource> {
     @Context
     protected HttpHeaders httpHeaders;
 
-    /**
-     * Create the resource in the data store where it is stored.
-     *
-     * The resource should contain a self-link that contains the unique ID for this
-     * resource.
-     *
-     * @param resource     is the resource that should be created, containing a
-     *                     self-link with its unique ID
-     * @param resourceUUID is the unique ID of the resource which should match the
-     *                     UUID used in the self-link
-     * @return the created resource as persisted
-     */
-    public abstract T create(T resource, UUID resourceUUID);
-
-    /**
-     * Retrieve the resource from the data store where it is stored.
-     *
-     * The identifier provided by the API is the URI of the resource. This does not
-     * have to be the identifier used in the data store (UUID is more commonly used)
-     * but each entity in the data store must be uniquely identifiable by the
-     * information provided in the URI.
-     *
-     * @param resourceUUID is the identifier (from API perspective) for the resource
-     * @return the resource that was requested or null if it doesn't exist
-     */
-    public abstract T read(UUID resourceUUID);
-
-    /**
-     * Update the resource in the data store where it is stored.
-     *
-     * The resource should contain a self-link in order to identify which resource
-     * needs to be updated.
-     *
-     * @param resource     is the updated resource (which contains a self-link with
-     *                     which to identify the resource)
-     * @param resourceUUID is the identifier of the resource that should be updated
-     * @return the updated resource as persisted
-     */
-    public abstract T update(T resource, UUID resourceUUID);
-
-    /**
-     * Remove a resource from the data store.
-     *
-     * @param resourceUUID is the identifier of the resource that should be removed
-     * @return the removed resource, or null if it did not exist
-     */
-    public abstract T delete(UUID resourceUUID);
-
-    /**
-     * Retrieve the paged collection of resources that have been requested.
-     *
-     * For proper discoverability of the API, all links (href values in each HALLink
-     * object) should contain absolute URI's and a self-link must be available in
-     * each resource.
-     *
-     * @param pageStart is the offset at which the requested page starts.
-     * @param pageSize is the requested size of each page.
-     * @param fields is the list of fields on which to filter. This is only provided to optimize data
-     * retrieval as the actual filtering of fields is done by the framework.
-     * @param query is a FIQL query that defines how the resources should be filtered.
-     * @param sort is the list of fields according to which the collection should be sorted. Each entry
-     * provides the field name (dot-separated for nested fields) and the sort order (true for ascending, false for descending)
-     * @return the filtered and sorted list of resources for the requested page.
-     */
-    public abstract List<T> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort);
-
-    /**
-     * Retrieve how many resources are available.
-     *
-     * This provides a simple implementation for convenience but should be
-     * overridden with an optimized implementation, if possible.
-     *
-     * @param query is a FIQL query that defines how the resources should be filtered.
-     * @return the total amount of resources that are available
-     */
-    public abstract int count(String query);
-
-    /**
-     * Check if a resource, identified by its resourceURI, exists.
-     *
-     * This provides a simple implementation for convenience but should be
-     * overridden with an optimized implementation, if possible.
-     *
-     * @param resourceUUID is the identifier of a resource.
-     * @return true if the resource identified by resourceURI exists, false
-     *         otherwise.
-     */
-    public boolean exists(UUID resourceUUID) {
-        return Objects.nonNull(this.read(resourceUUID));
-    }
+    @Inject
+    protected Executor executor;
 
     /**
      * Retrieve the paginated collection of resources.
@@ -207,33 +127,47 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED,
 	MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
 	MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED})
-    @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
+    @Operation(description = "Get a list of resources")
+    @ApiResponse(content = {
+	    @Content(
+		    mediaType = MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED,
+		    schema = @Schema(
+			    implementation = HALCollectionV2.class)),
+	    @Content(
+		    mediaType = MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED,
+		    schema = @Schema(
+			    implementation = HALCollectionV2.class)),
+	    @Content(
+		    mediaType = MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED,
+		    schema = @Schema(
+			    implementation = HALCollectionV1.class))
+    })
     public HALCollection<T> getHALResources(
-	    @ApiParam(value = "The page to be shown", required = false)
+	    @Parameter(description  = "The page to be shown", required = false)
             @QueryParam(V1_QUERY_PARAM_PAGE)
             @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING)
             int page,
-            @ApiParam(value = "The page to be shown", required = false)
+            @Parameter(description = "The page to be shown", required = false)
 	    @QueryParam(QUERY_PARAM_PAGE_START)
 	    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
 	    int pageStart,
-	    @ApiParam(value = "The amount of resources shown on each page", required = false)
+	    @Parameter(description = "The amount of resources shown on each page", required = false)
 	    @QueryParam(QUERY_PARAM_PAGE_SIZE)
 	    @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
 	    int pageSize,
-            @ApiParam(value = "Provide minimal information for each resource", required = false)
+	    @Parameter(description = "Provide minimal information for each resource", required = false)
             @QueryParam(V1_QUERY_PARAM_COMPACT)
             @DefaultValue(HALCollectionV1Builder.DEFAULT_COMPACT_VALUE_STRING)
             boolean compact,
-	    @ApiParam(value = "The fields that should be retrieved", required = false)
+            @Parameter(description = "The fields that should be retrieved", required = false)
 	    @QueryParam(QUERY_PARAM_FIELDS)
 	    @DefaultValue(QUERY_PARAM_FIELDS_MINIMUM)
 	    List<String> fields,
-	    @ApiParam(value = "The FIQL query according to which the resources should be filtered", required = false)
+	    @Parameter(description = "The FIQL query according to which the resources should be filtered", required = false)
 	    @QueryParam(QUERY_PARAM_QUERY)
 	    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
 	    String query,
-	    @ApiParam(value = "The fields on which the resources should be sorted", required = false)
+	    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 	    @QueryParam(QUERY_PARAM_SORT)
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort) {
@@ -271,6 +205,41 @@ public abstract class DefaultWebResource<T extends HALResource> {
 		selected);
     }
 
+    @GET
+    @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
+    @Operation(description = "Get a stream of resources")
+    public void streamHALResources(
+	    @Parameter(description = "The fields that should be retrieved", required = false)
+	    @QueryParam(QUERY_PARAM_FIELDS)
+	    @DefaultValue(QUERY_PARAM_FIELDS_MINIMUM)
+	    List<String> fields,
+	    @Parameter(description = "The FIQL query according to which the resources should be filtered", required = false)
+	    @QueryParam(QUERY_PARAM_QUERY)
+	    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
+	    String query,
+	    @Parameter(description = "The fields on which the resources should be sorted", required = false)
+	    @QueryParam(QUERY_PARAM_SORT)
+	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
+	    List<String> sort,
+	    @Context
+	    SseEventSink eventSink,
+	    @Context
+	    Sse sse) throws InterruptedException{
+	executor.execute(() -> {
+	    try(SseEventSink sink = eventSink){
+		try(Stream<T> stream = stream(getFieldsQueryParameter(fields),removeHALStructure(query),getSortQueryParameter(sort))){
+		    stream.forEach(resourceItem -> {
+			sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
+				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getType(),
+				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getSubtype(), Collections.singletonMap(
+					MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME, resourceItem.getProfile().toString())))
+				.build());
+		    });
+		}
+	    }
+	});
+    }
+
     /**
      * Create a resource.
      *
@@ -280,9 +249,9 @@ public abstract class DefaultWebResource<T extends HALResource> {
      *         was correctly created.
      */
     @POST
-    @ApiOperation(value = "Create a new resource", notes = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated")
+    @Operation(description = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated")
     @Produces
-    public Response postHALResource(@ApiParam(value = "resource", required = true) @NotNull @Valid T resource) {
+    public Response postHALResource(@Parameter(description = "resource", required = true) @NotNull @Valid T resource) {
 	UUID resourceId = ensureSelfLinkValid(resource, null);
 	if (this.exists(resourceId)) {
 	    throw new ClientErrorException(
@@ -301,10 +270,10 @@ public abstract class DefaultWebResource<T extends HALResource> {
      */
     @Path("/{id}")
     @GET
-    @ApiOperation(value = "Retrieve a single resource", notes = "Retrieve a single resource")
+    @Operation(description = "Retrieve a single resource")
     @Consumes
     public T getHALResource(
-	    @ApiParam(value = "The identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
+	    @Parameter(description = "The identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
 	return Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
     }
 
@@ -323,11 +292,11 @@ public abstract class DefaultWebResource<T extends HALResource> {
      */
     @Path("/{id}")
     @PUT
-    @ApiOperation(value = "Create or update a resource", notes = "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK.")
+    @Operation(description = "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK.")
     @Produces
     public Response putHALResource(
-	    @ApiParam(value = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id,
-	    @ApiParam(value = "The resource to be updated", required = true) @NotNull @Valid T resource) {
+	    @Parameter(description = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id,
+	    @Parameter(description = "The resource to be updated", required = true) @NotNull @Valid T resource) {
 	ensureSelfLinkValid(resource, id);
 	if (this.exists(id)) {
 	    this.update(resource, id);
@@ -345,32 +314,13 @@ public abstract class DefaultWebResource<T extends HALResource> {
      */
     @Path("/{id}")
     @DELETE
-    @ApiOperation(value = "Delete a single resource", notes = "Delete a single resource")
+    @Operation(description = "Delete a single resource")
     @Consumes
     @Produces
     public Response deleteHALResource(
-	    @ApiParam(value = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
+	    @Parameter(description = "The UUID part of the identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
 	return Optional.ofNullable(this.delete(id)).map(resource -> Response.noContent().build())
 		.orElseThrow(NotFoundException::new);
-    }
-
-    protected List<String> separateDelimitedFields(List<String> delimitedFields) {
-        return delimitedFields.stream()
-        	.filter(Objects::nonNull)
-        	.flatMap(delimitedString -> Arrays.asList(delimitedString.split(QUERY_PARAM_FIELDS_DELIMITER)).stream())
-        	.map(String::trim)
-        	.collect(Collectors.toList());
-    }
-
-    protected Map<String, String> separateDelimitedSort(List<String> delimitedSort) {
-        return delimitedSort.stream()
-        	.filter(Objects::nonNull)
-        	.filter(sortEntry -> !sortEntry.isBlank())
-        	.flatMap(delimitedString -> Arrays.asList(delimitedString.split(QUERY_PARAM_SORT_DELIMITER)).stream())
-        	.map(String::trim)
-        	.collect(Collectors.toMap(
-        		entry -> entry.split(QUERY_PARAM_SORT_ORDER_DELIMITER)[0].trim(),
-        		entry -> entry.split(QUERY_PARAM_SORT_ORDER_DELIMITER)[1].trim()));
     }
 
     /**
@@ -445,7 +395,6 @@ public abstract class DefaultWebResource<T extends HALResource> {
 
     private List<String> getFieldsQueryParameter(List<String> fields) {
         return fields.stream()
-        	.flatMap(delimitedString -> Arrays.asList(delimitedString.split(DefaultWebResource.QUERY_PARAM_FIELDS_DELIMITER)).stream())
         	.map(String::trim)
         	.map(this::removeHALStructure)
         	.collect(Collectors.toList());
@@ -453,8 +402,6 @@ public abstract class DefaultWebResource<T extends HALResource> {
 
     private Map<String, Boolean> getSortQueryParameter(List<String> sort) {
         return sort.stream()
-        	.filter(sortField -> sortField.contains(DefaultWebResource.QUERY_PARAM_SORT_DELIMITER))
-        	.flatMap(sortMultipleEntries -> Arrays.asList(sortMultipleEntries.split(DefaultWebResource.QUERY_PARAM_SORT_DELIMITER)).stream())
         	.map(String::trim)
         	.filter(sortSingleEntry -> sortSingleEntry.contains(DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER))
         	.map(this::removeHALStructure)

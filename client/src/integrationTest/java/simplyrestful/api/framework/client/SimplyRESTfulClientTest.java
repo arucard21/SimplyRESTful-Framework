@@ -21,11 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.client.test.implementation.TestResource;
 import simplyrestful.api.framework.client.test.implementation.TestWebResource;
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
+import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 
@@ -35,7 +35,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
     private static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI.create("http://invalid-host/testresources/" + UUID_NIL.toString());
     private static final URI INVALID_RESOURCE_URI_DIFFERENT_PATH = URI.create(TestWebResource.getBaseUri() + "/different/path/testresources/" + UUID_NIL.toString());
     private static SimplyRESTfulClient<TestResource> simplyRESTfulClient;
-    
+
     private static TestResource testResource;
     private static TestResource testResourceRandom;
 
@@ -62,7 +62,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
     public void tearDown() throws Exception {
 	super.tearDown();
     }
-    
+
     public void configureSimplyRESTfulClient() {
 	simplyRESTfulClient = Assertions.assertDoesNotThrow(
 		() -> new SimplyRESTfulClientFactory<TestResource>(client()).newClient(getBaseUri(), TestResource.class));
@@ -71,21 +71,22 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-	return new ResourceConfig(
+	ResourceConfig config = new ResourceConfig(
 		TestWebResource.class,
 		WebResourceRoot.class,
-		JacksonJsonProvider.class,
-		HALMapperProvider.class,
 		ObjectMapperProvider.class,
-		ApiListingResource.class,
-		SwaggerSerializers.class);
+		JacksonJsonProvider.class,
+		JacksonHALJsonProvider.class,
+		OpenApiResource.class,
+		AcceptHeaderOpenApiResource.class);
+	return config;
     }
 
     @Override
     protected void configureClient(ClientConfig config) {
-	config.register(JacksonJsonProvider.class);
-	config.register(HALMapperProvider.class);
 	config.register(ObjectMapperProvider.class);
+	config.register(JacksonHALJsonProvider.class);
+	config.register(JacksonJsonProvider.class);
     }
 
     @Test
@@ -96,6 +97,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
     @Test
     public void listResources_shouldReturnTestResources() {
 	List<TestResource> listOfResourceIdentifiers = simplyRESTfulClient.listResources(-1, -1, "", "", "");
+	Assertions.assertNotNull(listOfResourceIdentifiers);
 	Assertions.assertEquals(2, listOfResourceIdentifiers.size());
 	Assertions.assertTrue(listOfResourceIdentifiers.contains(testResource));
     }

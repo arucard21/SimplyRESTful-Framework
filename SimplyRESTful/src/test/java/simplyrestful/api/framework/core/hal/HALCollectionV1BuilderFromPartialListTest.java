@@ -68,7 +68,7 @@ public class HALCollectionV1BuilderFromPartialListTest extends AbstractHALCollec
 		TEST_RESOURCES_SIZE);
 	HALCollectionV1<TestResource> actual = builder.page(page).maxPageSize(maxPageSize).compact(compact).build();
 	Assertions.assertEquals(100, actual.getItem().size());
-	Assertions.assertEquals(300, actual.getMaxPageSize());
+	Assertions.assertEquals(300, actual.getPageSize());
     }
 
     @Test

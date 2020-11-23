@@ -91,11 +91,11 @@ public class HALCollectionV1<T extends HALResource> extends HALCollection<T>{
 		this.page = page;
 	}
 
-	public long getMaxPageSize() {
+	public long getPageSize() {
 		return pageSize;
 	}
 
-	public void setMaxPageSize(long pageSize) {
+	public void setPageSize(long pageSize) {
 		this.pageSize = pageSize;
 	}
 
@@ -125,7 +125,7 @@ public class HALCollectionV1<T extends HALResource> extends HALCollection<T>{
 					Objects.equals(getSelf(), otherCollection.getSelf()) &&
 					Objects.equals(getProfile(), otherCollection.getProfile()) &&
 					Objects.equals(page, otherCollection.getPage()) &&
-					Objects.equals(pageSize, otherCollection.getMaxPageSize()) &&
+					Objects.equals(pageSize, otherCollection.getPageSize()) &&
 					Objects.equals(total, otherCollection.getTotal()) &&
 					Objects.equals(first, otherCollection.getFirst())&&
 					Objects.equals(last, otherCollection.getLast()) &&

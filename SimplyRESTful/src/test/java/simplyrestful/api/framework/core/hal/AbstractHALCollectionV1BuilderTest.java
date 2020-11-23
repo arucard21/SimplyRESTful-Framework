@@ -39,7 +39,7 @@ public abstract class AbstractHALCollectionV1BuilderTest {
 	expected.setSelf(new HALLink.Builder(requestURI).type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
 		.profile(expected.getProfile()).build());
 	expected.setPage(page);
-	expected.setMaxPageSize(pageSize);
+	expected.setPageSize(pageSize);
 	expected.setTotal(TEST_RESOURCES_SIZE);
 	HALLink firstPage = first == -1 ? null
 		: new HALLink.Builder(UriBuilder.fromUri(requestURI).replaceQueryParam("page", first).build()).build();

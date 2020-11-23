@@ -12,19 +12,21 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.client.SimplyRESTfulClientTest;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
-@Api("Test Resources")
+@OpenAPIDefinition(
+    tags = {
+	    @Tag(name = "Test Resources")
+    }
+)
 @Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
 public class TestWebResource extends DefaultWebResource<TestResource> {
-//    public static final String TEST_PROFILE_STRING = "http://localhost/profiles";
-//    public static final String TEST_HOST_STRING = "http://localhost:9999";
-//    public static final URI TEST_HOST = URI.create(TEST_HOST_STRING);
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();
     public static final UUID ERROR_UPDATE_RESOURCE_ID = UUID.randomUUID();

@@ -1,5 +1,7 @@
 package simplyrestful.api.framework.core;
 
+import java.net.URI;
+
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -16,8 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALServiceDocument;
@@ -43,25 +43,23 @@ public class WebResourceRootIntegrationTest extends JerseyTest {
         	TestWebResource.class,
         	WebResourceRoot.class,
         	JacksonJsonProvider.class,
-        	HALMapperProvider.class,
         	ObjectMapperProvider.class);
     }
-    
+
     @Override
     protected void configureClient(ClientConfig config) {
 	config.register(JacksonJsonProvider.class);
-	config.register(HALMapperProvider.class);
 	config.register(ObjectMapperProvider.class);
     }
-    
+
     @Test
     public void webResource_shouldReturnServiceDocument_whenGETReceivedOnRootURI() {
 	Response response = target()
 		.request()
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
-	
-	String serviceDocument = response.readEntity(String.class); 
+
+	String serviceDocument = response.readEntity(String.class);
 	Assertions.assertTrue(serviceDocument.contains("describedBy"));
     }
 
@@ -70,10 +68,8 @@ public class WebResourceRootIntegrationTest extends JerseyTest {
 	HALServiceDocument serviceDocument = target()
 		.request()
 		.get(HALServiceDocument.class);
-	HALLink expected = new HALLink.Builder(
-		UriBuilder.fromUri(getBaseUri()).path("swagger.json").build())
-		.build();
-	HALLink actual = serviceDocument.getDescribedBy();
+	URI expected = UriBuilder.fromUri(getBaseUri()).path("openapi.json").build();
+	URI actual = URI.create(serviceDocument.getDescribedBy().getHref());
 	Assertions.assertEquals(expected, actual);
     }
 }

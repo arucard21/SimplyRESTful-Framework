@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,13 +37,16 @@ import javax.ws.rs.core.UriBuilder;
 import example.jersey.nomapping.OffsetBasedPageRequest;
 import io.github.perplexhub.rsql.RSQLSupport;
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Named
 @Path("/resources")
-@Api(value = "Example Resources")
+@OpenAPIDefinition(tags = {
+	@Tag(name = "Example Resources")
+})
 @Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
@@ -55,8 +60,8 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     private ExampleRepository repo;
 
     @Inject
-    public ExampleWebResource(ExampleRepository repo) {
-	super();
+    public ExampleWebResource(ExampleRepository repo, ExecutorService executorService) {
+	this.executor = executorService;
 	this.repo = repo;
 	addInitialTestData(repo);
     }
@@ -134,6 +139,24 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	return retrievedPage;
     }
 
+    @Override
+    public Stream<ExampleResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
+	return repo.findAll(RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))))
+		.map(resource -> {
+		    simulateSlowDataRetrieval();
+		    return resource;
+		})
+		.map(this::ensureSelfLinkAndUUIDPresent);
+    }
+
+    private void simulateSlowDataRetrieval() {
+	try {
+	    Thread.sleep(1000);
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
+    }
+
     private String createSortQuery(Map<String, Boolean> sort) {
 	return sort.entrySet().stream()
 		.map(entry -> createSingleSortQueryField(entry.getKey(), entry.getValue()))
@@ -146,7 +169,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	    direction = RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
 	}
 	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER,sortField, direction);
-	
+
     }
 
     @Override
@@ -154,7 +177,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	return Math.toIntExact(repo.count(RSQLSupport.toSpecification(query)));
     }
 
-    private void ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
+    private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
 	if (persistedResource.getSelf() == null && persistedResource.getUUID() == null) {
 	    throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
 	}
@@ -169,5 +192,6 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 		    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
 	    persistedResource.setUUID(id);
 	}
+	return persistedResource;
     }
 }

@@ -67,7 +67,7 @@ public class HALCollectionBuilderV1FromFullListTest extends AbstractHALCollectio
 	boolean compact = true;
 	HALCollectionV1<TestResource> actual = builder.page(page).maxPageSize(maxPageSize).compact(compact).build();
 	Assertions.assertEquals(100, actual.getItem().size());
-	Assertions.assertEquals(300, actual.getMaxPageSize());
+	Assertions.assertEquals(300, actual.getPageSize());
     }
 
     @Test

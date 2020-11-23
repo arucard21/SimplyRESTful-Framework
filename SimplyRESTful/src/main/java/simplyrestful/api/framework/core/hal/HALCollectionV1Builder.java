@@ -63,7 +63,7 @@ public class HALCollectionV1Builder<T extends HALResource> {
 	public HALCollectionV1<T> build(){
 		HALCollectionV1<T> collection = new HALCollectionV1<T>();
 		collection.setPage(page);
-		collection.setMaxPageSize(maxPageSize);
+		collection.setPageSize(maxPageSize);
 		collection.setTotal(collectionSize);
 		if(fromFull) {
 			int pageBegin = Math.toIntExact((page - 1) * maxPageSize);

@@ -14,14 +14,13 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
+import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALCollectionV1;
@@ -51,42 +50,41 @@ public class WebResourceIntegrationTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(
+        ResourceConfig config = new ResourceConfig(
         	TestWebResource.class,
         	WebResourceRoot.class,
-        	JacksonJsonProvider.class,
-        	HALMapperProvider.class,
-        	ObjectMapperProvider.class);
+        	ObjectMapperProvider.class,
+        	JacksonHALJsonProvider.class,
+        	JacksonJsonProvider.class);
+        return config;
     }
-    
+
     @Override
     protected void configureClient(ClientConfig config) {
-	config.register(JacksonJsonProvider.class);
-	config.register(HALMapperProvider.class);
 	config.register(ObjectMapperProvider.class);
+	config.register(JacksonHALJsonProvider.class);
+	config.register(JacksonJsonProvider.class);
     }
 
     // FIXME: Switch server setup to Jersey
     @Test
     @Deprecated(since="0.12.0")
-    @Disabled("Returns v2 collection since Jersey doesn't include the media type parameters when matching so it doesn't check the profile")
     public void webResource_shouldReturnAllResourcesInV1Collection_whenGETReceivedOnWebResourcePath() {
 	Response response = target()
 		.path(WEB_RESOURCE_PATH)
 		.request()
 		.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
-		.get();		
+		.get();
 	Assertions.assertEquals(200, response.getStatus());
 	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE, response.getMediaType());
-	
-	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {}); 
+
+	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
 	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE.getSelf()));
     }
 
     @Test
     @Deprecated(since="0.12.0")
-    @Disabled("Returns v2 collection since CXF doesn't include the media type parameters when matching so it doesn't check the profile")
     public void webResource_shouldReturnAllResourcesEmbeddedInV1Collection_whenGETReceivedOnWebResourcePathAndCompactIsFalse() {
 	Response response = target()
 		.path(WEB_RESOURCE_PATH)
@@ -96,7 +94,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
 	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE, response.getMediaType());
-	
+
 	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
 	Assertions.assertTrue(collection.getItemEmbedded().contains(TestWebResource.TEST_RESOURCE));
@@ -116,7 +114,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 	Assertions.assertEquals(2, collection.getTotal());
 	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE));
     }
-    
+
     @Test
     public void webResource_shouldContainLinkAndEmbeddedFieldsInHALJsonV2Collection_whenGETToPathAndAcceptIsHALJson() {
 	Response response = target()
@@ -140,12 +138,12 @@ public class WebResourceIntegrationTest extends JerseyTest {
 		.get();
 	Assertions.assertEquals(200, response.getStatus());
 	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
-	
+
 	HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
 	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE));
     }
-    
+
     @Test
     public void webResource_shouldNotContainLinkAndEmbeddedFieldsInHALJsonV2Collection_whenGETToPathAndAcceptIsCustomJson() {
 	Response response = target()
@@ -154,7 +152,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 		.accept(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE).get();
 	Assertions.assertEquals(200, response.getStatus());
 	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
-	
+
 	String jsonRepresentation = response.readEntity(String.class);
 	Assertions.assertFalse(jsonRepresentation.contains("_links"));
 	Assertions.assertFalse(jsonRepresentation.contains("_embedded"));

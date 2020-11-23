@@ -29,9 +29,8 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSBindingFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
-import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInvoker;
@@ -43,10 +42,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.core.DefaultWebResource;
-import simplyrestful.api.framework.core.filters.JsonFieldsFilter;
-import simplyrestful.api.framework.core.providers.HALMapperProvider;
 import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
@@ -136,7 +134,7 @@ public class ServerBuilder {
         factory.setBus(sf.getBus());
         manager.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, factory);
         // Configure and enable Swagger for generation swagger.json
-        Swagger2Feature swagger = new Swagger2Feature();
+        OpenApiFeature swagger = new OpenApiFeature();
         swagger.setPrettyPrint(true);
         sf.getFeatures().add(swagger);
         // Configure and enable Bean Validation along with registering all providers
@@ -146,12 +144,10 @@ public class ServerBuilder {
         		ValidationExceptionMapper.class,
         		MultipartProvider.class,
         		ObjectMapperProvider.class,
-        		HALMapperProvider.class,
         		JacksonHALJsonProvider.class,
         		JacksonJsonProvider.class,
-        		JsonFieldsFilter.class,
-        		ApiListingResource.class,
-        		SearchContextProvider.class));
+        		OpenApiResource.class,
+        		AcceptHeaderOpenApiResource.class));
         sf.setProviders(providers);
         sf.setInInterceptors(Arrays.< Interceptor< ? extends Message > >asList(new JAXRSBeanValidationInInterceptor()));
         sf.setOutInterceptors(Arrays.< Interceptor< ? extends Message > >asList(new JAXRSBeanValidationOutInterceptor()));
