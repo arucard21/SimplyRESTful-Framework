@@ -2,7 +2,6 @@ package simplyrestful.api.framework.core;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -171,10 +170,11 @@ public abstract class DefaultWebResource<T extends HALResource> implements Resou
 	    @QueryParam(QUERY_PARAM_SORT)
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort) {
-	MediaType selected = this.selectMediaType(
-		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED),
-		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED),
-		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED));
+	String[] mediaTypesFromAnnotation = new Object(){}.getClass().getEnclosingMethod().getAnnotation(Produces.class).value();
+	List<MediaType> mediaTypes = Stream.of(mediaTypesFromAnnotation)
+		.map(MediaType::valueOf)
+		.collect(Collectors.toList());
+	MediaType selected = this.selectMediaType(mediaTypes);
 	if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
 	    verifyNonV1ParametersAreNotUsedOnV1();
 	    int calculatedPageStart = (page -1) * pageSize;
@@ -504,10 +504,7 @@ public abstract class DefaultWebResource<T extends HALResource> implements Resou
      * @return the most suitable media type, considering the client's preferences and
      * the server's capabilities.
      */
-    protected MediaType selectMediaType(MediaType... mediaTypes) {
-        List<MediaType> producibleMediaTypes = mediaTypes.length == 0 ?
-        	Collections.singletonList(MediaType.WILDCARD_TYPE):
-        	Arrays.asList(mediaTypes);
+    protected MediaType selectMediaType(List<MediaType> producibleMediaTypes) {
         List<MediaType> acceptableMediaTypes = httpHeaders.getAcceptableMediaTypes();
         List<MediaType> selectedMediaTypes = new ArrayList<>();
         for(MediaType acceptableMediaType : acceptableMediaTypes) {
