@@ -63,10 +63,10 @@ public abstract class DefaultWebResource<T extends HALResource> {
     private static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
 
     public static final String MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME = "profile";
-    public static final String MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED = HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.25";
-    public static final String MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED = HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.75";
-    public static final String MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED = HALCollectionV2.MEDIA_TYPE_JSON+";qs=1.0";
-    
+    public static final String MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED = HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.9";
+    public static final String MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED = HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7";
+    public static final String MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED = HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.8";
+
     public static final String V1_QUERY_PARAM_PAGE = "page";
     public static final String V1_QUERY_PARAM_COMPACT = "compact";
     public static final String QUERY_PARAM_PAGE_START = "pageStart";
@@ -77,21 +77,21 @@ public abstract class DefaultWebResource<T extends HALResource> {
     public static final String QUERY_PARAM_SORT = "sort";
     public static final String QUERY_PARAM_SORT_DELIMITER = ",";
     public static final String QUERY_PARAM_SORT_ORDER_DELIMITER = ":";
-    
+
     public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
     public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
     public static final String QUERY_PARAM_FIELDS_MINIMUM = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self";
     public static final String QUERY_PARAM_FIELDS_ALL = "all";
     public static final String QUERY_PARAM_QUERY_DEFAULT = "";
     public static final String QUERY_PARAM_SORT_DEFAULT = "";
-    
+
     @Context
     protected UriInfo uriInfo;
     @Context
     protected Request request;
     @Context
     protected HttpHeaders httpHeaders;
-    
+
     /**
      * Create the resource in the data store where it is stored.
      *
@@ -149,7 +149,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
      *
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize is the requested size of each page.
-     * @param fields is the list of fields on which to filter. This is only provided to optimize data 
+     * @param fields is the list of fields on which to filter. This is only provided to optimize data
      * retrieval as the actual filtering of fields is done by the framework.
      * @param query is a FIQL query that defines how the resources should be filtered.
      * @param sort is the list of fields according to which the collection should be sorted. Each entry
@@ -185,8 +185,8 @@ public abstract class DefaultWebResource<T extends HALResource> {
 
     /**
      * Retrieve the paginated collection of resources.
-     * 
-     * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}. 
+     *
+     * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}.
      *
      * @param page      is the page number of the paginated collection of resources (for {@link HALCollectionV1} only)
      * @param pageStart is the offset at which the requested page starts.
@@ -194,7 +194,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
      *                  resources (for both {@link HALCollectionV1} and {@link HALCollectionV2})
      * @param compact   determines whether the resource in the collection only shows
      *                  its self-link (if true), or the entire resource (if false) (for {@link HALCollectionV1} only)
-     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience 
+     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience
      * 			as it is already handled by the framework.
      * @param query     is a FIQL query that defines how the resources should be
      *                  filtered.
@@ -210,8 +210,8 @@ public abstract class DefaultWebResource<T extends HALResource> {
     @ApiOperation(value = "Get a list of resources", notes = "Get a list of resources")
     public HALCollection<T> getHALResources(
 	    @ApiParam(value = "The page to be shown", required = false)
-            @QueryParam(V1_QUERY_PARAM_PAGE) 
-            @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING) 
+            @QueryParam(V1_QUERY_PARAM_PAGE)
+            @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING)
             int page,
             @ApiParam(value = "The page to be shown", required = false)
 	    @QueryParam(QUERY_PARAM_PAGE_START)
@@ -238,8 +238,8 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort) {
 	MediaType selected = this.selectMediaType(
-		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED), 
-		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED), 
+		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_JSON_QUALIFIED),
+		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V1_HAL_JSON_QUALIFIED),
 		MediaType.valueOf(MEDIA_TYPE_COLLECTION_V2_HAL_JSON_QUALIFIED));
 	if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
 	    verifyNonV1ParametersAreNotUsedOnV1();
@@ -249,7 +249,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	    }
 	    return HALCollectionV1Builder.fromPartial(
 		    this.list(
-			    calculatedPageStart, 
+			    calculatedPageStart,
 			    pageSize,
 			    getFieldsQueryParameter(fields),
 			    removeHALStructure(query),
@@ -263,7 +263,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
 	}
 	verifyNonV2ParametersAreNotUsedOnV2();
 	return getHALCollectionV2(
-		pageStart, 
+		pageStart,
 		pageSize,
 		getFieldsQueryParameter(fields),
 		removeHALStructure(query),
@@ -361,7 +361,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
         	.map(String::trim)
         	.collect(Collectors.toList());
     }
-    
+
     protected Map<String, String> separateDelimitedSort(List<String> delimitedSort) {
         return delimitedSort.stream()
         	.filter(Objects::nonNull)
@@ -460,7 +460,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
         	.map(this::removeHALStructure)
         	.collect(Collectors.toMap(
         		sortWithOrderDelimeter -> sortWithOrderDelimeter.split(
-        			DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[0], 
+        			DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[0],
         		sortWithOrderDelimeter -> Boolean.valueOf(
         			sortWithOrderDelimeter.split(
         				DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[1].equalsIgnoreCase(QUERY_PARAM_SORT_ORDER_ASCENDING))));
@@ -536,26 +536,26 @@ public abstract class DefaultWebResource<T extends HALResource> {
     }
 
     /**
-     * 
-     * Select the most suitable media type according to JAX-RS specification. 
-     * 
+     *
+     * Select the most suitable media type according to JAX-RS specification.
+     *
      * This custom method is provided since some JAX-RS frameworks do not consider
      * media type parameters as a more specific media type (at least, when using
      * the {@link Request}.selectVariant() method). This method provides a correct
-     * implementation for this, limited to only the media type. 
-     * 
+     * implementation for this, limited to only the media type.
+     *
      * This framework requires the media type parameters to be considered since that
-     * is where the profile is found. This profile is what uniquely typifies each 
+     * is where the profile is found. This profile is what uniquely typifies each
      * API resource (representing a single version of a specific API resource).
-     * 
+     *
      * This method does not change the Content-Type HTTP header that the JAX-RS
      * framework returns. The JAX-RS framework must already set this correctly,
-     * based on the @{@link Produces} or @(@link Consumes} annotations. Or it must be 
+     * based on the @{@link Produces} or @(@link Consumes} annotations. Or it must be
      * adjusted in some other way, e.g. using a {@link ContainerResponseFilter}.
-     * 
+     *
      * @param mediaTypes is the list of media types that the server can produce.
      * @return the most suitable media type, considering the client's preferences and
-     * the server's capabilities. 
+     * the server's capabilities.
      */
     protected MediaType selectMediaType(MediaType... mediaTypes) {
         List<MediaType> producibleMediaTypes = mediaTypes.length == 0 ?
@@ -589,7 +589,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
         }
         throw new NotAcceptableException();
     }
-    
+
     private MediaType addQualityParameters(MediaType mediaType, double q, double qs) {
 	return addQSParameter(addQParameter(mediaType, q), qs);
     }
@@ -605,7 +605,7 @@ public abstract class DefaultWebResource<T extends HALResource> {
         newParameters.put(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT, Double.toString(q));
         return new MediaType(mediaType.getType(), mediaType.getSubtype(), newParameters);
     }
-    
+
     private Double getQSParameter(MediaType mediaType) {
         String qsParameter = mediaType.getParameters().get(MEDIA_TYPE_PARAMETER_QUALITY_SERVER);
         return qsParameter == null ? 1.0 : Double.valueOf(qsParameter);
@@ -621,12 +621,12 @@ public abstract class DefaultWebResource<T extends HALResource> {
         	.filter(entry -> !entry.getKey().equals(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT))
         	.filter(entry -> !entry.getKey().equals(MEDIA_TYPE_PARAMETER_QUALITY_SERVER))
         	.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-        
+
         return new MediaType(selectedMediaType.getType(), selectedMediaType.getSubtype(), parametersWithoutQAndQS);
     }
 
     private boolean isConcreteMediaType(MediaType selectedMediaType) {
-        if(!selectedMediaType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) && 
+        if(!selectedMediaType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) &&
         	!selectedMediaType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD)) {
             return true;
         }
@@ -642,30 +642,30 @@ public abstract class DefaultWebResource<T extends HALResource> {
         	String serverParameter = serverParameters.get(clientParameter.getKey());
         	if(serverParameter == null || !clientParameter.getValue().equals(serverParameter)) {
         	    /*
-        	     * The client has this parameter in the media type while the server does not or 
-        	     * the client has a different value for this parameter than the server. 
-        	     * 
-        	     * This makes the client media type more specific than the server media type. 
+        	     * The client has this parameter in the media type while the server does not or
+        	     * the client has a different value for this parameter than the server.
+        	     *
+        	     * This makes the client media type more specific than the server media type.
         	     */
         	    clientSpecificity++;
         	}
             }
         }
-        return clientSpecificity > serverSpecificity ? 
+        return clientSpecificity > serverSpecificity ?
         	addQualityParameters(
-        		acceptableMediaType, 
-        		getQParameter(acceptableMediaType), 
+        		acceptableMediaType,
+        		getQParameter(acceptableMediaType),
         		getQSParameter(producibleMediaType)):
 		addQualityParameters(
-			producibleMediaType, 
-			getQParameter(acceptableMediaType), 
+			producibleMediaType,
+			getQParameter(acceptableMediaType),
 			getQSParameter(producibleMediaType));
     }
 
     /**
-     * Determines how specific the media type is. 
+     * Determines how specific the media type is.
      * A higher number denotes a more specific media type.
-     * 
+     *
      * @param mediaType is the media type for which to determine specificity
      * @return the specificity of the media type (higher is more specific)
      */
