@@ -1,5 +1,8 @@
 package simplyrestful.api.framework.core;
 
+import java.net.URI;
+import java.util.UUID;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.GenericType;
@@ -7,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -20,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import simplyrestful.api.framework.core.filters.UriCustomizer;
 import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
@@ -30,22 +35,36 @@ import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
 public class WebResourceIntegrationTest extends JerseyTest {
+    private static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
     private static final String WEB_RESOURCE_PATH = "testresources";
     private static final String QUERY_PARAM_COMPACT = "compact";
     private static final MediaType MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON);
     private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
     private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
+    private TestResource testInstance;
 
     @BeforeEach
     @Override
     public void setUp() throws Exception {
 	super.setUp();
+	addTestResources();
+    }
+
+    private void addTestResources() {
+	testInstance = TestResource.testInstance(getBaseUri());
+	TestWebResource.TEST_RESOURCES.add(testInstance);
+	TestWebResource.TEST_RESOURCES.add(TestResource.random(getBaseUri()));
     }
 
     @AfterEach
     @Override
     public void tearDown() throws Exception {
 	super.tearDown();
+	clearTestResources();
+    }
+
+    private void clearTestResources() {
+	TestWebResource.TEST_RESOURCES.clear();
     }
 
     @Override
@@ -55,7 +74,8 @@ public class WebResourceIntegrationTest extends JerseyTest {
         	WebResourceRoot.class,
         	ObjectMapperProvider.class,
         	JacksonHALJsonProvider.class,
-        	JacksonJsonProvider.class);
+        	JacksonJsonProvider.class,
+        	UriCustomizer.class);
         return config;
     }
 
@@ -64,6 +84,21 @@ public class WebResourceIntegrationTest extends JerseyTest {
 	config.register(ObjectMapperProvider.class);
 	config.register(JacksonHALJsonProvider.class);
 	config.register(JacksonJsonProvider.class);
+    }
+
+    @Test
+    @Deprecated(since="0.12.0")
+    public void webResource_shouldReturnV1CollectionAsDefault_whenNoSpecificVersionIsRequested() {
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.request()
+		.get();
+	Assertions.assertEquals(200, response.getStatus());
+	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE, response.getMediaType());
+
+	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
+	Assertions.assertEquals(2, collection.getTotal());
+	Assertions.assertTrue(collection.getItem().contains(testInstance.getSelf()));
     }
 
     // FIXME: Switch server setup to Jersey
@@ -80,7 +115,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 
 	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
-	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE.getSelf()));
+	Assertions.assertTrue(collection.getItem().contains(testInstance.getSelf()));
     }
 
     @Test
@@ -97,7 +132,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 
 	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
-	Assertions.assertTrue(collection.getItemEmbedded().contains(TestWebResource.TEST_RESOURCE));
+	Assertions.assertTrue(collection.getItemEmbedded().contains(testInstance));
     }
 
     @Test
@@ -112,7 +147,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 	HALCollectionV2<TestResource> collection = response
 		.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
-	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE));
+	Assertions.assertTrue(collection.getItem().contains(testInstance));
     }
 
     @Test
@@ -141,7 +176,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 
 	HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
 	Assertions.assertEquals(2, collection.getTotal());
-	Assertions.assertTrue(collection.getItem().contains(TestWebResource.TEST_RESOURCE));
+	Assertions.assertTrue(collection.getItem().contains(testInstance));
     }
 
     @Test
@@ -165,7 +200,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
 		.path(TestResource.TEST_RESOURCE_ID.toString())
 		.request()
 		.get(TestResource.class);
-	Assertions.assertEquals(TestWebResource.TEST_RESOURCE, testResource);
+	Assertions.assertEquals(testInstance, testResource);
     }
 
     @Test
@@ -175,9 +210,31 @@ public class WebResourceIntegrationTest extends JerseyTest {
 		.path(WEB_RESOURCE_PATH)
 		.request()
 		.post(Entity.entity(expectedResource, TestResource.MEDIA_TYPE_HAL_JSON));
-	Assertions.assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
-	Assertions.assertTrue(response.getLocation().toString().startsWith(TestResource.TEST_REQUEST_URI.toString()));
+	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+	Assertions.assertTrue(response.getLocation().toString().startsWith(getBaseUri().toString()));
     }
+
+    @Test
+    public void webResource_shouldUpdateResource_whenPUTReceivedWithExistingResource() {
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.path(TestResource.TEST_RESOURCE_ID.toString())
+		.request()
+		.put(Entity.entity(testInstance, TestResource.MEDIA_TYPE_HAL_JSON));
+	Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void webResource_shouldCreateResourceAndReturnLocationURI_whenPUTReceivedWithNewResource() {
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.path(UUID.randomUUID().toString())
+		.request()
+		.put(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_HAL_JSON));
+	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+	Assertions.assertTrue(response.getLocation().toString().startsWith(getBaseUri().toString()));
+    }
+
 
     @Test
     public void webResource_shouldRemoveResource_whenDELETEReceived() {
@@ -188,5 +245,58 @@ public class WebResourceIntegrationTest extends JerseyTest {
 		.delete();
 	Assertions.assertEquals(response.getStatusInfo().getFamily(), Family.SUCCESSFUL);
 	Assertions.assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void webResource_shouldUseCustomUriInTheLocationHeader_whenCreatingWithPostAndUriCustomizerPropertyAndHeaderAreProvided() {
+	System.setProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME, HTTP_HEADER_NAME_CUSTOM_URI);
+	String customUriBase = "https://simplyrestful-testhost.org/services/";
+	URI customUri = UriBuilder.fromUri(customUriBase)
+		.path(WEB_RESOURCE_PATH)
+		.build();
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.request()
+		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
+		.post(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_HAL_JSON));
+	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+	Assertions.assertTrue(response.getLocation().toString().startsWith(customUri.toString()));
+	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
+    }
+
+    @Test
+    public void webResource_shouldUseCustomUriInTheLocationHeader_whenCreatingWithPutAndUriCustomizerPropertyAndHeaderAreProvided() {
+	System.setProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME, HTTP_HEADER_NAME_CUSTOM_URI);
+	String customUriBase = "https://simplyrestful-testhost.org/services/";
+	UUID customUuid = UUID.randomUUID();
+	URI customUri = UriBuilder.fromUri(customUriBase)
+		.path(WEB_RESOURCE_PATH)
+		.path(customUuid.toString())
+		.build();
+	Response response = target()
+		.path(WEB_RESOURCE_PATH)
+		.path(customUuid.toString())
+		.request()
+		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
+		.put(Entity.entity(TestResource.custom(URI.create(customUriBase), customUuid), TestResource.MEDIA_TYPE_HAL_JSON));
+	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+	Assertions.assertEquals(customUri, response.getLocation());
+	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
+    }
+
+    @Test
+    public void webResource_shouldUseCustomUriInTheCollection_whenUriCustomizerPropertyAndHeaderAreProvided() {
+	System.setProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME, HTTP_HEADER_NAME_CUSTOM_URI);
+	URI customUri = UriBuilder.fromUri("https://simplyrestful-testhost.org/services/")
+		.path(WEB_RESOURCE_PATH)
+		.build();
+	HALCollectionV2<TestResource> collection = target()
+		.path(WEB_RESOURCE_PATH)
+		.request()
+		.accept(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE)
+		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
+		.get(new GenericType<HALCollectionV2<TestResource>>() {});
+	Assertions.assertEquals(customUri, URI.create(collection.getSelf().getHref()));
+	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }
 }

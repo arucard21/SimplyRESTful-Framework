@@ -1,7 +1,6 @@
 package simplyrestful.api.framework.test.implementation;
 
-import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,21 +17,7 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 @Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 public class TestWebResource extends DefaultWebResource<TestResource>{
-	public static final URI TEST_REQUEST_BASE_URI = URI.create("local://resources/testresources/");
-	public static final TestResource TEST_RESOURCE = TestResource.testInstance();
-	
-	@Override
-	protected URI getAbsoluteWebResourceURI(Class<?> resourceEndpoint, UUID id) {
-		if (id == null) {
-			return TEST_REQUEST_BASE_URI;
-		}
-		return TestResource.TEST_REQUEST_URI.resolve(id.toString());
-	}
-	
-	@Override
-	protected URI getRequestURI() {
-		return TEST_REQUEST_BASE_URI;
-	}
+	public static final List<TestResource> TEST_RESOURCES = new ArrayList<>();
 
 	@Override
 	public TestResource create(TestResource resource, UUID resourceUUID) {
@@ -42,31 +27,31 @@ public class TestWebResource extends DefaultWebResource<TestResource>{
 	@Override
 	public TestResource read(UUID resourceUUID) {
 		if(Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-			return TEST_RESOURCE;
+			return TEST_RESOURCES.get(0);
 		}
 		return null;
 	}
 
 	@Override
 	public TestResource update(TestResource resource, UUID resourceUUID) {
-		return TEST_RESOURCE;
+		return TEST_RESOURCES.get(0);
 	}
 
 	@Override
 	public TestResource delete(UUID resourceUUID) {
 		if(Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-			return TEST_RESOURCE;
+			return TEST_RESOURCES.get(0);
 		}
 		return null;
 	}
 
 	@Override
 	public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
-		return Arrays.asList(TEST_RESOURCE, TestResource.random());
+		return TEST_RESOURCES;
 	}
 
 	@Override
 	public int count(String query) {
-	    return 2;
-	}	
+	    return TEST_RESOURCES.size();
+	}
 }
