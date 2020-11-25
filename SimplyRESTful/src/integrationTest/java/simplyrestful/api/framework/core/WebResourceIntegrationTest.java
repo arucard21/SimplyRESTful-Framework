@@ -30,6 +30,7 @@ import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
+import simplyrestful.api.framework.resources.HALServiceDocument;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
@@ -297,6 +298,18 @@ public class WebResourceIntegrationTest extends JerseyTest {
 		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
 		.get(new GenericType<HALCollectionV2<TestResource>>() {});
 	Assertions.assertEquals(customUri, URI.create(collection.getSelf().getHref()));
+	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
+    }
+
+    @Test
+    public void webResource_shouldUseCustomUriInTheServiceDocument_whenUriCustomizerPropertyAndHeaderAreProvided() {
+	System.setProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME, HTTP_HEADER_NAME_CUSTOM_URI);
+	URI customUri = UriBuilder.fromUri("https://simplyrestful-testhost.org/services/").build();
+	HALServiceDocument serviceDocument = target()
+		.request()
+		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
+		.get(HALServiceDocument.class);
+	Assertions.assertEquals(customUri, URI.create(serviceDocument.getSelf().getHref()));
 	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }
 }

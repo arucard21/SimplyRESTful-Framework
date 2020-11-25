@@ -37,6 +37,9 @@ public class UriCustomizer implements ContainerRequestFilter {
     }
 
     private URI buildNewBaseUri(URI originalBaseUri, URI originalRequestUri, URI newRequestUri) {
+	if (originalBaseUri.equals(originalRequestUri)) {
+	    return newRequestUri;
+	}
 	String originalRelativePath = originalBaseUri.relativize(originalRequestUri).getPath();
 	String newBasePath = newRequestUri.getPath().replaceAll(originalRelativePath+".*", "");
 	if(newBasePath.isBlank()) {
