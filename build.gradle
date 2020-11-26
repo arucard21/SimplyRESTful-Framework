@@ -22,7 +22,7 @@ allprojects{
 	}
 
 	group = 'com.github.arucard21.simplyrestful'
-	version = '0.13.2'
+	version = '0.13.3'
 
 	sourceCompatibility = JavaVersion.VERSION_11
 	targetCompatibility = JavaVersion.VERSION_11

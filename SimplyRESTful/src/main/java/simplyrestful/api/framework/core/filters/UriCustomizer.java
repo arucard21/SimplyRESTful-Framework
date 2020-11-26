@@ -13,7 +13,7 @@ import jakarta.inject.Named;
 @Named
 @PreMatching
 public class UriCustomizer implements ContainerRequestFilter {
-    public static final String CONFIGURATION_PROPERTY_NAME = "simplyrestful.uri.http.header";
+    public static final String CONFIGURATION_PROPERTY_NAME = "SIMPLYRESTFUL_URI_HTTP_HEADER";
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
