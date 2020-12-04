@@ -5,7 +5,10 @@ import java.util.concurrent.Executors;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+
+import simplyrestful.api.framework.core.filters.JsonFieldsFilter;
 
 /**
  * Run the API server with the example endpoint and resource.
@@ -22,5 +25,12 @@ public class JerseyNoMappingApplication {
     @Bean
     public ExecutorService threadPool() {
 	return Executors.newCachedThreadPool();
+    }
+
+    @Bean
+    public FilterRegistrationBean<JsonFieldsFilter> jsonFieldsFilter() {
+	FilterRegistrationBean<JsonFieldsFilter> registrationBean = new FilterRegistrationBean<>();
+	registrationBean.setFilter(new JsonFieldsFilter());
+	return registrationBean;
     }
 }
