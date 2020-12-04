@@ -411,6 +411,6 @@ project(":examples:springboot-jersey-nomapping-springdata"){
 		implementation("org.springframework.boot:spring-boot-starter-validation:${spring}")
 		implementation("org.springframework.boot:spring-boot-starter-actuator:${spring}")
 		implementation ("com.h2database:h2:1.4.200")
-		implementation("io.github.perplexhub:rsql-jpa-specification:5.0.6")
+		implementation("io.github.perplexhub:rsql-jpa:5.0.6")
 	}
 }

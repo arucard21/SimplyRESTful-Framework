@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.UriBuilder;
 
 import example.jersey.nomapping.OffsetBasedPageRequest;
-import io.github.perplexhub.rsql.RSQLSupport;
+import io.github.perplexhub.rsql.RSQLJPASupport;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -132,16 +132,15 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     @Override
     public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
 	List<ExampleResource> retrievedPage = repo.findAll(
-		RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))),
+		RSQLJPASupport.<ExampleResource>toSpecification(query).and(RSQLJPASupport.toSort(createSortQuery(sort))),
 		new OffsetBasedPageRequest(pageStart, pageSize))
 		.getContent();
-	retrievedPage.forEach(resource -> ensureSelfLinkAndUUIDPresent(resource));
-	return retrievedPage;
+	return retrievedPage.stream().map(resource -> ensureSelfLinkAndUUIDPresent(resource)).collect(Collectors.toList());
     }
 
     @Override
     public Stream<ExampleResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
-	return repo.findAll(RSQLSupport.<ExampleResource>toSpecification(query).and(RSQLSupport.toSort(createSortQuery(sort))))
+	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query).and(RSQLJPASupport.toSort(createSortQuery(sort))))
 		.map(resource -> {
 		    simulateSlowDataRetrieval();
 		    return resource;
@@ -174,7 +173,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 
     @Override
     public int count(String query) {
-	return Math.toIntExact(repo.count(RSQLSupport.toSpecification(query)));
+	return Math.toIntExact(repo.count(RSQLJPASupport.toSpecification(query)));
     }
 
     private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
