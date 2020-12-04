@@ -160,7 +160,7 @@ project(":jaxrs-providers"){
 	dependencies {
 		api ("jakarta.ws.rs:jakarta.ws.rs-api:${jaxrs}")
 		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.7")
-		api ("jakarta.inject:jakarta.inject-api:2.0.0")
+		api ("jakarta.inject:jakarta.inject-api:1.0.3")
 	}
 	
 	publishing{
@@ -184,11 +184,12 @@ project(":SimplyRESTful"){
 	dependencies {
 		api project(":SimplyRESTful-resources")
 		api project(":jaxrs-providers")
-		api ("jakarta.inject:jakarta.inject-api:2.0.0")
+		api ("jakarta.inject:jakarta.inject-api:1.0.3")
 		api ("jakarta.ws.rs:jakarta.ws.rs-api:${jaxrs}")
 		api ("jakarta.validation:jakarta.validation-api:2.0.2")
 		api ("io.swagger.core.v3:swagger-jaxrs2:${swagger}")
-		api ("jakarta.servlet:jakarta.servlet-api:5.0.0")
+		api ("jakarta.servlet:jakarta.servlet-api:4.0.4")
+		api ("jakarta.json:jakarta.json-api:1.1.6")
 
 		testImplementation ("org.mockito:mockito-core:${mockito}")
 		testImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
@@ -412,5 +413,6 @@ project(":examples:springboot-jersey-nomapping-springdata"){
 		implementation("org.springframework.boot:spring-boot-starter-actuator:${spring}")
 		implementation ("com.h2database:h2:1.4.200")
 		implementation("io.github.perplexhub:rsql-jpa:5.0.6")
+		implementation ("org.glassfish:jakarta.json:1.1.6")
 	}
 }

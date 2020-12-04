@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.core.providers;
 
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -12,7 +13,6 @@ import com.fasterxml.jackson.jaxrs.cfg.Annotations;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.JacksonHALModule;
-import jakarta.inject.Named;
 
 @Named
 @Provider

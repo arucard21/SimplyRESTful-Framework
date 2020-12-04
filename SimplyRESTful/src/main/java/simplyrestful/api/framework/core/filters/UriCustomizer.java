@@ -3,12 +3,11 @@ package simplyrestful.api.framework.core.filters;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.inject.Named;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.UriBuilder;
-
-import jakarta.inject.Named;
 
 @Named
 @PreMatching
