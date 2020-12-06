@@ -24,11 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 
-import simplyrestful.api.framework.core.DefaultWebResource;
-
 @Named
 @WebFilter("*")
 public class JsonFieldsFilter extends HttpFilter {
+    private static final String QUERY_PARAM_FIELDS = "fields";
     private static final String FIELDS_PARAMS_SEPARATOR = ",";
     private static final String FIELDS_NESTING_SEPARATOR = ".";
     private static final long serialVersionUID = 6825636135376615562L;
@@ -49,7 +48,7 @@ public class JsonFieldsFilter extends HttpFilter {
 	    response.getWriter().write(originalJson);
 	    return;
 	}
-	String[] parameterValues = request.getParameterValues(DefaultWebResource.QUERY_PARAM_FIELDS);
+	String[] parameterValues = request.getParameterValues(QUERY_PARAM_FIELDS);
 	if(parameterValues == null) {
 	    response.setContentLength(originalJson.getBytes().length);
 	    response.getWriter().write(originalJson);
