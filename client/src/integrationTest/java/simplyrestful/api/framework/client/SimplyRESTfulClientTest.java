@@ -8,7 +8,6 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 
-import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
@@ -80,13 +79,6 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 		OpenApiResource.class,
 		AcceptHeaderOpenApiResource.class);
 	return config;
-    }
-
-    @Override
-    protected void configureClient(ClientConfig config) {
-	config.register(ObjectMapperProvider.class);
-	config.register(JacksonHALJsonProvider.class);
-	config.register(JacksonJsonProvider.class);
     }
 
     @Test

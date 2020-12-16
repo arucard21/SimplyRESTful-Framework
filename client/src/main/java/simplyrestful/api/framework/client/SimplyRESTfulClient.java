@@ -26,7 +26,6 @@ import javax.ws.rs.core.UriBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -65,7 +64,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
     SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
 	this.baseApiUri = baseApiUri;
 	this.client = client;
-	client.register(JacksonJsonProvider.class);
+	client.register(JacksonHALJsonProvider.class);
 	client.register(ObjectMapperProvider.class);
 	this.resourceClass = resourceClass;
 	this.resourceProfile = discoverResourceProfile();
