@@ -1,6 +1,5 @@
 package simplyrestful.api.framework.core.filters;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -9,83 +8,34 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import javax.inject.Named;
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpFilter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 
-@Named
-@WebFilter("*")
-public class JsonFieldsFilter extends HttpFilter {
-    private static final String QUERY_PARAM_FIELDS = "fields";
-    private static final String FIELDS_PARAMS_SEPARATOR = ",";
-    private static final String FIELDS_NESTING_SEPARATOR = ".";
-    private static final long serialVersionUID = 6825636135376615562L;
-    private static final String MEDIA_TYPE_STRUCTURE_SUFFIX_JSON = "+json";
-    private static final String FIELDS_VALUE_ALL = "all";
-    private String skipUntilPath;
-    private String keepUntilPath;
-    private Stack<String> arrayPath;
-    private String currentPath;
+public class JsonFieldsFilter {
+    public static final String FIELDS_NESTING_SEPARATOR = ".";
 
-    @Override
-    protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-	CharResponseWrapper wrappedResponse = new CharResponseWrapper(response);
-	super.doFilter(request, wrappedResponse, chain);
-	String originalJson = wrappedResponse.toString();
-	if(!isJsonCompatibleMediaType(response.getContentType())) {
-	    response.setContentLength(originalJson.getBytes().length);
-	    response.getWriter().write(originalJson);
-	    return;
-	}
-	String[] parameterValues = request.getParameterValues(QUERY_PARAM_FIELDS);
-	if(parameterValues == null) {
-	    response.setContentLength(originalJson.getBytes().length);
-	    response.getWriter().write(originalJson);
-	    return;
-	}
-	List<String> fields = Stream.of(parameterValues)
-		.flatMap(oneOrMoreParams -> Stream.of(oneOrMoreParams.split(FIELDS_PARAMS_SEPARATOR)))
-		.map(param -> param.trim())
-		.collect(Collectors.toList());
-	if (fields.contains(FIELDS_VALUE_ALL) || fields.isEmpty()) {
-	    response.setContentLength(originalJson.getBytes().length);
-	    response.getWriter().write(originalJson);
-	    return;
-	}
-	List<String> pathToFields = new ArrayList<>();
-	for(String field : fields) {
-	    String[] fieldPathItems = field.split(Pattern.quote(FIELDS_NESTING_SEPARATOR));
-	    for(int i = 0 ; i < fieldPathItems.length ; i++) {
-		String[] pathToField = new String[i+1];
-		for (int j = 0 ; j <= i ; j++) {
-		    pathToField[j] = fieldPathItems[j];
-		}
-		pathToFields.add(String.join(FIELDS_NESTING_SEPARATOR, pathToField));
-	    }
-	}
-	String fieldFilteredJson = filterFieldsInJson(originalJson, fields, pathToFields);
-	response.setContentLength(fieldFilteredJson.getBytes().length);
-	response.getWriter().write(fieldFilteredJson);
-    }
+    private String skipUntilPath = null;
+    private String keepUntilPath = null;
+    private Stack<String> arrayPath = new Stack<>();
+    private String currentPath = "";
 
-    private String filterFieldsInJson(String originalJson, List<String> fields, List<String> pathToFields) throws IOException {
-	skipUntilPath = null;
-	keepUntilPath = null;
-	arrayPath = new Stack<>();
-	currentPath = "";
+    /**
+     * Filter the fields in the provided JSON object according to the provided list of field names.
+     *
+     * The field names can be nested, like "parent.child" or "object.subobject.subsubobject".
+     *
+     * For any field that is included, all its children will also be included.
+     *
+     * @param originalJson is the JSON object that should be filtered
+     * @param fields is the list of field names that should be kept in the JSON object.
+     * @return the JSON object that only includes the fields that are provided.
+     */
+    public String filterFieldsInJson(String originalJson, List<String> fields) {
+	List<String> pathToFields = generateAllPathsToProvidedFields(fields);
+	StringWriter jsonWriter = new StringWriter();
 	try(
-		StringWriter jsonWriter = new StringWriter();
 		JsonParser parser = Json.createParser(new StringReader(originalJson));
 		JsonGenerator generator = Json.createGenerator(jsonWriter)){
 	    while (parser.hasNext()) {
@@ -145,6 +95,21 @@ public class JsonFieldsFilter extends HttpFilter {
 	    generator.flush();
 	    return jsonWriter.toString();
 	}
+    }
+
+    private List<String> generateAllPathsToProvidedFields(List<String> fields) {
+	List<String> pathToFields = new ArrayList<>();
+	for(String field : fields) {
+	    String[] fieldPathItems = field.split(Pattern.quote(FIELDS_NESTING_SEPARATOR));
+	    for(int i = 0 ; i < fieldPathItems.length ; i++) {
+		String[] pathToField = new String[i+1];
+		for (int j = 0 ; j <= i ; j++) {
+		    pathToField[j] = fieldPathItems[j];
+		}
+		pathToFields.add(String.join(FIELDS_NESTING_SEPARATOR, pathToField));
+	    }
+	}
+	return pathToFields;
     }
 
     private void writeStart(JsonGenerator generator, boolean isObject) {
@@ -225,13 +190,5 @@ public class JsonFieldsFilter extends HttpFilter {
 		"" : String.join(FIELDS_NESTING_SEPARATOR, Arrays.copyOf(newPath, newPath.length - 1));
     }
 
-    private boolean isJsonCompatibleMediaType(String contentType) {
-	if(contentType != null &&
-		(
-			MediaType.valueOf(contentType).isCompatible(MediaType.APPLICATION_JSON_TYPE) ||
-			MediaType.valueOf(contentType).getSubtype().endsWith(MEDIA_TYPE_STRUCTURE_SUFFIX_JSON))) {
-	    return true;
-	}
-	return false;
-    }
+
 }

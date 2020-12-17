@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
-import simplyrestful.api.framework.core.filters.JsonFieldsFilter;
+import simplyrestful.api.framework.core.filters.JsonFieldsServletFilter;
 
 /**
  * Run the API server with the example endpoint and resource.
@@ -28,9 +28,9 @@ public class JerseyNoMappingApplication {
     }
 
     @Bean
-    public FilterRegistrationBean<JsonFieldsFilter> jsonFieldsFilter() {
-	FilterRegistrationBean<JsonFieldsFilter> registrationBean = new FilterRegistrationBean<>();
-	registrationBean.setFilter(new JsonFieldsFilter());
+    public FilterRegistrationBean<JsonFieldsServletFilter> jsonFieldsFilter() {
+	FilterRegistrationBean<JsonFieldsServletFilter> registrationBean = new FilterRegistrationBean<>();
+	registrationBean.setFilter(new JsonFieldsServletFilter());
 	return registrationBean;
     }
 }
