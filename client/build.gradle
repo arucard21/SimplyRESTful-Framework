@@ -1,0 +1,66 @@
+plugins {
+    id 'org.unbroken-dome.test-sets' version '3.0.1'
+}
+apply plugin: "java"
+apply plugin: 'eclipse'
+
+repositories {
+	mavenCentral()
+}
+
+project.description = "A generic client that can be used with any SimplyRESTful API"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+testSets {
+    integrationTest
+}
+
+tasks.withType(Test){
+	useJUnitPlatform()
+}
+
+eclipse {
+	classpath {
+		plusConfigurations.add configurations.integrationTestRuntimeClasspath
+	}
+}
+
+dependencies {
+	api project(":SimplyRESTful-resources")
+	api project(":jaxrs-providers")
+	api ("jakarta.json:jakarta.json-api:1.1.6")
+	api ("org.glassfish.jersey.core:jersey-client:${jersey}")
+	api ("io.swagger.core.v3:swagger-models:${swagger}")
+	api ("io.swagger.parser.v3:swagger-parser:2.0.21")
+	api ("org.glassfish.jersey.inject:jersey-hk2:${jersey}")
+			
+	integrationTestImplementation project(":SimplyRESTful").sourceSets.main.output
+	integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:${jersey}")
+	integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:${jersey}")
+	integrationTestImplementation ("org.glassfish.jersey.inject:jersey-hk2:${jersey}")
+	integrationTestImplementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
+	integrationTestImplementation ("org.mockito:mockito-core:${mockito}")
+	integrationTestImplementation ("org.mockito:mockito-junit-jupiter:${mockito}")
+	integrationTestImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
+	integrationTestImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
+	integrationTestImplementation ("org.junit.platform:junit-platform-launcher:1.7.0")
+	integrationTestImplementation ("org.glassfish:jakarta.json:1.1.6")
+	integrationTestImplementation ("io.swagger.core.v3:swagger-jaxrs2:${swagger}")
+}
+
+publishing{
+	publications{
+		mavenJava(MavenPublication){
+			pom {
+				licenses {
+					license {
+						name = 'GNU Lesser General Public License'
+						url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+					}
+				}
+			}
+		}
+	}
+}

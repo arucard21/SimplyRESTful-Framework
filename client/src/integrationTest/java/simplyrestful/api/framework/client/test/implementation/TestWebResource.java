@@ -30,7 +30,7 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();
     public static final UUID ERROR_UPDATE_RESOURCE_ID = UUID.randomUUID();
-    
+
     private static URI baseUri;
 
     public static URI getBaseUri() {
@@ -38,7 +38,7 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
     }
 
     public static void setBaseUri(URI baseUri) {
-        TestWebResource.baseUri = baseUri;
+	TestWebResource.baseUri = baseUri;
     }
 
     @Override

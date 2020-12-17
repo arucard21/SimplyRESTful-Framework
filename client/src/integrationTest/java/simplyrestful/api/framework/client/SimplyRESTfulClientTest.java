@@ -9,6 +9,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -24,6 +25,7 @@ import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.client.test.implementation.TestResource;
 import simplyrestful.api.framework.client.test.implementation.TestWebResource;
+import simplyrestful.api.framework.core.filters.UriCustomizer;
 import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
@@ -76,8 +78,11 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 		ObjectMapperProvider.class,
 		JacksonJsonProvider.class,
 		JacksonHALJsonProvider.class,
+		UriCustomizer.class,
 		OpenApiResource.class,
 		AcceptHeaderOpenApiResource.class);
+	config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
+	config.property(ServerProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
 	return config;
     }
 
