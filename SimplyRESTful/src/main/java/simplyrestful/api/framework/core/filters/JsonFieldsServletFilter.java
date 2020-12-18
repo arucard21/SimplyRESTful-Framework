@@ -27,30 +27,22 @@ public class JsonFieldsServletFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-	CharResponseWrapper wrappedResponse = new CharResponseWrapper(response);
-	super.doFilter(request, wrappedResponse, chain);
-	String originalJson = wrappedResponse.toString();
-	if(!isJsonCompatibleMediaType(response.getContentType())) {
-	    response.setContentLength(originalJson.getBytes().length);
-	    response.getWriter().write(originalJson);
-	    return;
-	}
 	String[] parameterValues = request.getParameterValues(QUERY_PARAM_FIELDS);
-	if(parameterValues == null) {
-	    response.setContentLength(originalJson.getBytes().length);
-	    response.getWriter().write(originalJson);
+	if(!isJsonCompatibleMediaType(request.getContentType()) || parameterValues == null) {
+	    super.doFilter(request, response, chain);
 	    return;
 	}
 	List<String> fields = Stream.of(parameterValues)
 		.flatMap(oneOrMoreParams -> Stream.of(oneOrMoreParams.split(FIELDS_PARAMS_SEPARATOR)))
 		.map(param -> param.trim())
 		.collect(Collectors.toList());
-	if (fields.contains(FIELDS_VALUE_ALL) || fields.isEmpty()) {
-	    response.setContentLength(originalJson.getBytes().length);
-	    response.getWriter().write(originalJson);
+	if(fields.isEmpty() || fields.contains(FIELDS_VALUE_ALL)) {
+	    super.doFilter(request, response, chain);
 	    return;
 	}
-
+	CharResponseWrapper wrappedResponse = new CharResponseWrapper(response);
+	super.doFilter(request, wrappedResponse, chain);
+	String originalJson = wrappedResponse.toString();
 	String fieldFilteredJson = new JsonFieldsFilter().filterFieldsInJson(originalJson, fields);
 	response.setContentLength(fieldFilteredJson.getBytes().length);
 	response.getWriter().write(fieldFilteredJson);
