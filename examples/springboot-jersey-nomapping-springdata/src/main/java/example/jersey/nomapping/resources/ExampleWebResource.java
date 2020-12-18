@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,8 +59,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     private ExampleRepository repo;
 
     @Inject
-    public ExampleWebResource(ExampleRepository repo, ExecutorService executorService) {
-	this.executor = executorService;
+    public ExampleWebResource(ExampleRepository repo) {
 	this.repo = repo;
 	addInitialTestData(repo);
     }

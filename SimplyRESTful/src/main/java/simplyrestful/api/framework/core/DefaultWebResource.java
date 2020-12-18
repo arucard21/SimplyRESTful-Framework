@@ -11,11 +11,9 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
@@ -98,9 +96,6 @@ public abstract class DefaultWebResource<T extends HALResource> implements Resou
     protected Request request;
     @Context
     protected HttpHeaders httpHeaders;
-
-    @Inject
-    protected ExecutorService executor;
 
     /**
      * Retrieve the paginated collection of resources.
@@ -225,19 +220,18 @@ public abstract class DefaultWebResource<T extends HALResource> implements Resou
 	    SseEventSink eventSink,
 	    @Context
 	    Sse sse) throws InterruptedException{
-	executor.execute(() -> {
-	    try(SseEventSink sink = eventSink){
-		try(Stream<T> stream = stream(getFieldsQueryParameter(fields),removeHALStructure(query),getSortQueryParameter(sort))){
-		    stream.forEach(resourceItem -> {
-			sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
-				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getType(),
-				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getSubtype(), Collections.singletonMap(
-					MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME, resourceItem.getProfile().toString())))
-				.build());
-		    });
-		}
+	try (SseEventSink sink = eventSink) {
+	    try (Stream<T> stream = stream(getFieldsQueryParameter(fields), removeHALStructure(query),
+		    getSortQueryParameter(sort))) {
+		stream.forEach(resourceItem -> {
+		    sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
+			    AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getType(),
+			    AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getSubtype(), Collections.singletonMap(
+				    MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME, resourceItem.getProfile().toString())))
+			    .build());
+		});
 	    }
-	});
+	}
     }
 
     /**
