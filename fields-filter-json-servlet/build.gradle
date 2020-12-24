@@ -17,7 +17,6 @@ dependencies {
 	api project(":fields-filter-json")
 	api ("jakarta.servlet:jakarta.servlet-api:4.0.4")
 	api ("jakarta.inject:jakarta.inject-api:1.0.3")
-	api ("jakarta.ws.rs:jakarta.ws.rs-api:2.1.6")
 }
 
 publishing{

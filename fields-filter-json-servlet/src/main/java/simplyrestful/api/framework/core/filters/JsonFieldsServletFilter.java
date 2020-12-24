@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 
 @Named
 @WebFilter("*")
@@ -20,6 +19,7 @@ public class JsonFieldsServletFilter extends HttpFilter {
     private static final long serialVersionUID = 6825636135376615562L;
     private static final String QUERY_PARAM_FIELDS = "fields";
     private static final String FIELDS_PARAMS_SEPARATOR = ",";
+    private static final String MEDIA_TYPE_JSON = "application/json";
     private static final String MEDIA_TYPE_STRUCTURE_SUFFIX_JSON = "+json";
 
     private static final String FIELDS_VALUE_ALL = "all";
@@ -28,8 +28,7 @@ public class JsonFieldsServletFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 	String[] parameterValues = request.getParameterValues(QUERY_PARAM_FIELDS);
-	// FIXME the filter should actually check response.getContentType but that means that you would always have to wrap the response.
-	if(!isJsonCompatibleMediaType(request.getContentType()) || parameterValues == null) {
+	if(parameterValues == null) {
 	    super.doFilter(request, response, chain);
 	    return;
 	}
@@ -43,17 +42,19 @@ public class JsonFieldsServletFilter extends HttpFilter {
 	}
 	CharResponseWrapper wrappedResponse = new CharResponseWrapper(response);
 	super.doFilter(request, wrappedResponse, chain);
+	if (!isJson(wrappedResponse.getContentType())) {
+	    return;
+	}
 	String originalJson = wrappedResponse.toString();
 	String fieldFilteredJson = new JsonFieldsFilter().filterFieldsInJson(originalJson, fields);
 	response.setContentLength(fieldFilteredJson.getBytes().length);
 	response.getWriter().write(fieldFilteredJson);
     }
 
-    private boolean isJsonCompatibleMediaType(String contentType) {
-	if(contentType != null &&
-		(
-			MediaType.valueOf(contentType).isCompatible(MediaType.APPLICATION_JSON_TYPE) ||
-			MediaType.valueOf(contentType).getSubtype().endsWith(MEDIA_TYPE_STRUCTURE_SUFFIX_JSON))) {
+    private boolean isJson(String contentType) {
+	if(contentType != null && (
+		contentType.startsWith(MEDIA_TYPE_JSON) ||
+		contentType.contains(MEDIA_TYPE_STRUCTURE_SUFFIX_JSON))) {
 	    return true;
 	}
 	return false;
