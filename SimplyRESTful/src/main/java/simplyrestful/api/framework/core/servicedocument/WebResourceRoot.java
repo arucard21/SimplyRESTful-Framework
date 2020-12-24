@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.core.servicedocument;
 
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -9,7 +10,6 @@ import javax.ws.rs.core.UriInfo;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.inject.Named;
 import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 

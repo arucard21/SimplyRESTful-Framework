@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +47,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.inject.Inject;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -98,9 +96,6 @@ public abstract class DefaultWebResource<T extends HALResource> implements Resou
     protected Request request;
     @Context
     protected HttpHeaders httpHeaders;
-
-    @Inject
-    protected Executor executor;
 
     /**
      * Retrieve the paginated collection of resources.
@@ -225,19 +220,18 @@ public abstract class DefaultWebResource<T extends HALResource> implements Resou
 	    SseEventSink eventSink,
 	    @Context
 	    Sse sse) throws InterruptedException{
-	executor.execute(() -> {
-	    try(SseEventSink sink = eventSink){
-		try(Stream<T> stream = stream(getFieldsQueryParameter(fields),removeHALStructure(query),getSortQueryParameter(sort))){
-		    stream.forEach(resourceItem -> {
-			sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
-				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getType(),
-				AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getSubtype(), Collections.singletonMap(
-					MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME, resourceItem.getProfile().toString())))
-				.build());
-		    });
-		}
+	try (SseEventSink sink = eventSink) {
+	    try (Stream<T> stream = stream(getFieldsQueryParameter(fields), removeHALStructure(query),
+		    getSortQueryParameter(sort))) {
+		stream.forEach(resourceItem -> {
+		    sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
+			    AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getType(),
+			    AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE.getSubtype(), Collections.singletonMap(
+				    MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME, resourceItem.getProfile().toString())))
+			    .build());
+		});
 	    }
-	});
+	}
     }
 
     /**

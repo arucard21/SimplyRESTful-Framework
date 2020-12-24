@@ -1,0 +1,35 @@
+apply plugin: "java-library"
+
+repositories {
+	mavenCentral()
+}
+
+project.description = "A Servlet Filter that can filter a JSON response based on fields provided in a query parameter."
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+tasks.withType(Test){
+	useJUnitPlatform()
+}
+
+dependencies {
+	api project(":fields-filter-json")
+	api ("jakarta.servlet:jakarta.servlet-api:4.0.4")
+	api ("jakarta.inject:jakarta.inject-api:1.0.3")
+}
+
+publishing{
+	publications{
+		mavenJava(MavenPublication){
+			pom {
+				licenses {
+					license {
+						name = 'GNU Lesser General Public License'
+						url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+					}
+				}
+			}
+		}
+	}
+}

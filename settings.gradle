@@ -1,6 +1,8 @@
 include "SimplyRESTful"
 include "SimplyRESTful-resources"
 include "jaxrs-providers"
+include "fields-filter-json"
+include "fields-filter-json-servlet"
 include "deploy-springboot-cxf"
 include "deploy-jetty-cxf"
 include "deploy-springboot-jersey"

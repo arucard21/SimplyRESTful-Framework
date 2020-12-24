@@ -1,11 +1,11 @@
 package example.jersey.nomapping;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+
+import simplyrestful.api.framework.core.filters.JsonFieldsServletFilter;
 
 /**
  * Run the API server with the example endpoint and resource.
@@ -20,7 +20,9 @@ public class JerseyNoMappingApplication {
     }
 
     @Bean
-    public ExecutorService threadPool() {
-	return Executors.newCachedThreadPool();
+    public FilterRegistrationBean<JsonFieldsServletFilter> jsonFieldsFilter() {
+	FilterRegistrationBean<JsonFieldsServletFilter> registrationBean = new FilterRegistrationBean<>();
+	registrationBean.setFilter(new JsonFieldsServletFilter());
+	return registrationBean;
     }
 }
