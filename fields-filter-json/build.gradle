@@ -1,0 +1,33 @@
+apply plugin: "java-library"
+
+repositories {
+	mavenCentral()
+}
+
+project.description = "A utility to filter a JSON object so it contains only a specified set of fields."
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+tasks.withType(Test){
+	useJUnitPlatform()
+}
+
+dependencies {
+	api ("jakarta.json:jakarta.json-api:1.1.6")
+}
+
+publishing{
+	publications{
+		mavenJava(MavenPublication){
+			pom {
+				licenses {
+					license {
+						name = 'GNU Lesser General Public License'
+						url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+					}
+				}
+			}
+		}
+	}
+}

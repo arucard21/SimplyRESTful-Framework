@@ -28,6 +28,7 @@ public class JsonFieldsServletFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 	String[] parameterValues = request.getParameterValues(QUERY_PARAM_FIELDS);
+	// FIXME the filter should actually check response.getContentType but that means that you would always have to wrap the response.
 	if(!isJsonCompatibleMediaType(request.getContentType()) || parameterValues == null) {
 	    super.doFilter(request, response, chain);
 	    return;

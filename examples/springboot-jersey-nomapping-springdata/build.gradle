@@ -1,0 +1,26 @@
+apply plugin: "org.springframework.boot"
+
+repositories {
+	mavenCentral()
+}
+
+project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+application{
+	mainClassName = "example.jersey.nomapping.JerseyNoMappingApplication"
+}
+
+dependencies {
+	implementation project(':SimplyRESTful')
+	implementation project(':deploy-springboot-jersey')
+	implementation project(':fields-filter-json-servlet')
+	implementation ("org.springframework.boot:spring-boot-starter-data-jpa:${spring}")
+	implementation("org.springframework.boot:spring-boot-starter-validation:${spring}")
+	implementation("org.springframework.boot:spring-boot-starter-actuator:${spring}")
+	implementation ("com.h2database:h2:1.4.200")
+	implementation("io.github.perplexhub:rsql-jpa:5.0.6")
+	implementation ("org.glassfish:jakarta.json:1.1.6")
+}
