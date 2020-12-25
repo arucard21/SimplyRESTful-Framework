@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.InternalServerErrorException;
@@ -82,5 +83,15 @@ public class TestWebResource extends DefaultWebResource<TestResource> {
     @Override
     public int count(String query) {
 	return 2;
+    }
+
+    @Override
+    public Stream<TestResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
+	return Stream.of(SimplyRESTfulClientTest.getTestResource(), SimplyRESTfulClientTest.getTestResourceRandom());
+    }
+
+    @Override
+    public boolean exists(UUID resourceUUID) {
+	return this.read(resourceUUID) != null;
     }
 }

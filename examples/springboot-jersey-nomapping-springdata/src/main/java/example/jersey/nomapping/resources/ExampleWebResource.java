@@ -146,6 +146,16 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 		.map(this::ensureSelfLinkAndUUIDPresent);
     }
 
+    @Override
+    public int count(String query) {
+        return Math.toIntExact(repo.count(RSQLJPASupport.toSpecification(query)));
+    }
+
+    @Override
+    public boolean exists(UUID resourceUUID) {
+        return repo.existsByUuid(resourceUUID);
+    }
+
     private void simulateSlowDataRetrieval() {
 	try {
 	    Thread.sleep(1000);
@@ -167,11 +177,6 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER,sortField, direction);
 
-    }
-
-    @Override
-    public int count(String query) {
-	return Math.toIntExact(repo.count(RSQLJPASupport.toSpecification(query)));
     }
 
     private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {

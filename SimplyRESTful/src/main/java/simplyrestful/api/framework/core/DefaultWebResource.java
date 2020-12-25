@@ -47,6 +47,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import simplyrestful.api.framework.core.api.DefaultCount;
+import simplyrestful.api.framework.core.api.DefaultCreate;
+import simplyrestful.api.framework.core.api.DefaultDelete;
+import simplyrestful.api.framework.core.api.DefaultExists;
+import simplyrestful.api.framework.core.api.DefaultList;
+import simplyrestful.api.framework.core.api.DefaultRead;
+import simplyrestful.api.framework.core.api.DefaultStream;
+import simplyrestful.api.framework.core.api.DefaultUpdate;
 import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.core.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
@@ -54,7 +62,16 @@ import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 
-public abstract class DefaultWebResource<T extends HALResource> implements ResourceAccess<T> {
+@SuppressWarnings("deprecation")
+public abstract class DefaultWebResource<T extends HALResource> implements
+	DefaultCreate<T>,
+	DefaultRead<T>,
+	DefaultUpdate<T>,
+	DefaultDelete<T>,
+	DefaultList<T>,
+	DefaultStream<T>,
+	DefaultCount,
+	DefaultExists {
     private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE = 0; // Example: */*
     private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
     private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS = 2; // Example: application/json

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
@@ -47,11 +48,11 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 @Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	private ExampleEntityDAO dao;
-	
+
 	public ExampleWebResource(@Context ExampleEntityDAO dao) {
 		this.dao = dao;
 	}
-	
+
 	@Override
 	public ExampleResource create(ExampleResource resource, UUID resourceUUID) {
 		ExampleResource entity = getEntityDao().persist(map(resource));
@@ -98,10 +99,10 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	}
 
 	/**
-	 * This simple map method allows using the same POJO as both the API resource and the entity used for persistence. 
-	 * 
+	 * This simple map method allows using the same POJO as both the API resource and the entity used for persistence.
+	 *
 	 * @param entity is either the API resource or the entity
-	 * @return the entity for the given API resource, or the API resource for the given entity 
+	 * @return the entity for the given API resource, or the API resource for the given entity
 	 */
 	private ExampleResource map(ExampleResource entity) {
 		if(entity == null) {
@@ -110,7 +111,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 		ensureSelfLinkPresent(entity);
 		return entity;
 	}
-	
+
 	private void ensureSelfLinkPresent(ExampleResource persistedResource) {
 		if(persistedResource.getSelf() == null) {
 			persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI()).path(persistedResource.getUUID().toString()).build())
@@ -126,5 +127,15 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 
 	private ExampleEntityDAO getEntityDao() {
 		return dao;
+	}
+
+	@Override
+	public Stream<ExampleResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
+	    return dao.stream();
+	}
+
+	@Override
+	public boolean exists(UUID resourceUUID) {
+	    return dao.exists(resourceUUID);
 	}
 }

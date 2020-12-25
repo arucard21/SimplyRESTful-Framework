@@ -3,6 +3,7 @@ package example.jetty.resources.dao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import example.jetty.resources.ExampleEmbeddedResource;
 import example.jetty.resources.ExampleResource;
@@ -88,5 +89,15 @@ public class ExampleEntityDAOImpl implements ExampleEntityDAO {
 		else {
 			return unmappedDatastore.remove(index);
 		}
+	}
+
+	@Override
+	public boolean exists(UUID entityID) {
+	    return this.findByUUID(entityID) != null;
+	}
+
+	@Override
+	public Stream<ExampleResource> stream() {
+	    return this.unmappedDatastore.stream();
 	}
 }
