@@ -21,6 +21,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation:${spring}")
 	implementation("org.springframework.boot:spring-boot-starter-actuator:${spring}")
 	implementation ("com.h2database:h2:1.4.200")
-	implementation("io.github.perplexhub:rsql-jpa:5.0.6")
+	implementation("io.github.perplexhub:rsql-jpa-spring-boot-starter:5.0.6")
 	implementation ("org.glassfish:jakarta.json:1.1.6")
 }

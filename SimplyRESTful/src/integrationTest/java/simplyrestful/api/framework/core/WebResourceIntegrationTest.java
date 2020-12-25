@@ -34,6 +34,7 @@ import simplyrestful.api.framework.resources.HALServiceDocument;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
+@SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
 public class WebResourceIntegrationTest extends JerseyTest {
     private static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
