@@ -34,7 +34,6 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -188,7 +187,6 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 		.collect(Collectors.toList());
 	MediaType selected = this.selectMediaType(mediaTypes);
 	if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
-	    verifyNonV1ParametersAreNotUsedOnV1();
 	    int calculatedPageStart = (page -1) * pageSize;
 	    if(compact) {
 		fields = Collections.singletonList(QUERY_PARAM_FIELDS_MINIMUM);
@@ -207,7 +205,6 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 		    .compact(compact)
 		    .build();
 	}
-	verifyNonV2ParametersAreNotUsedOnV2();
 	return getHALCollectionV2(
 		pageStart,
 		pageSize,
@@ -422,29 +419,6 @@ public abstract class DefaultWebResource<T extends HALResource> implements
         		sortWithOrderDelimeter -> Boolean.valueOf(
         			sortWithOrderDelimeter.split(
         				DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[1].equalsIgnoreCase(QUERY_PARAM_SORT_ORDER_ASCENDING))));
-    }
-
-    private void verifyNonV2ParametersAreNotUsedOnV2() {
-        MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-        if(queryParameters.containsKey(V1_QUERY_PARAM_PAGE)) {
-            throw new BadRequestException("The page parameter can not be used on version 2 of this collection resource");
-        }
-        if(queryParameters.containsKey(V1_QUERY_PARAM_COMPACT)) {
-            throw new BadRequestException("The compact parameter can not be used on version 2 of this collection resource");
-        }
-    }
-
-    private void verifyNonV1ParametersAreNotUsedOnV1() {
-        MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-        if(queryParameters.containsKey(QUERY_PARAM_PAGE_START)) {
-            throw new BadRequestException("The pageStart parameter can not be used on version 1 of this collection resource");
-        }
-        if(queryParameters.containsKey(QUERY_PARAM_FIELDS)) {
-            throw new BadRequestException("The fields parameter can not be used on version 1 of this collection resource");
-        }
-        if(queryParameters.containsKey(QUERY_PARAM_SORT)) {
-            throw new BadRequestException("The sort parameter can not be used on version 1 of this collection resource");
-        }
     }
 
     private HALCollectionV2<T> getHALCollectionV2(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort, MediaType mediaType) {
