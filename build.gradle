@@ -126,11 +126,7 @@ project(":SimplyRESTful-resources"){
 	dependencies {
 		api ("io.openapitools.jackson.dataformat:jackson-dataformat-hal:1.0.7")
 		
-		// FIXME needs to be upgraded (upstream) for use with OpenAPI 3.0
-		//api ("io.openapitools.hal:swagger-hal:1.0.4"){
-		//	exclude group: "javax.ws.rs"
-		//	exclude group: "io.swagger"
-		//}
+		api ("io.openapitools.hal:swagger-hal:2.0.0")
 
 		testImplementation ("org.junit.jupiter:junit-jupiter-api:${junit}")
 		testImplementation ("org.junit.jupiter:junit-jupiter-engine:${junit}")
