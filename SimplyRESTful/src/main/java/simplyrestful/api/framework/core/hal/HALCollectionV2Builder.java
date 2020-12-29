@@ -7,7 +7,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.AdditionalMediaTypes;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
@@ -121,9 +121,9 @@ public class HALCollectionV2Builder<T extends HALResource> {
 
     protected HALLink createLink(URI collectionUri, MediaType collectionType, URI collectionProfileUri) {
 	HALLink.Builder builder = new HALLink.Builder(collectionUri);
-	if(collectionType.isCompatible(AdditionalMediaTypes.APPLICATION_HAL_JSON_TYPE)) {
+	if(collectionType.isCompatible(MediaTypeUtils.APPLICATION_HAL_JSON_TYPE)) {
 	    builder
-	    .type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
+	    .type(MediaTypeUtils.APPLICATION_HAL_JSON)
 	    .profile(collectionProfileUri);
 	}
 	else {

@@ -49,7 +49,7 @@ public class DefaultWebResourceTest {
 
     @Test
     public void endpoint_shouldCreateLinkWithCorrectMediaType() {
-	Assertions.assertEquals(AdditionalMediaTypes.APPLICATION_HAL_JSON,
+	Assertions.assertEquals(MediaTypeUtils.APPLICATION_HAL_JSON,
 		testEndpoint.createLink(TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
     }
 

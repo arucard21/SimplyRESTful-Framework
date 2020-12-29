@@ -16,8 +16,8 @@ import javax.ws.rs.Produces;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.client.SimplyRESTfulClientTest;
-import simplyrestful.api.framework.core.AdditionalMediaTypes;
 import simplyrestful.api.framework.core.DefaultWebResource;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
 @OpenAPIDefinition(
@@ -25,8 +25,8 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 	    @Tag(name = "Test Resources")
     }
 )
-@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
-@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
+@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
+@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
 public class TestWebResource extends DefaultWebResource<TestResource> {
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();

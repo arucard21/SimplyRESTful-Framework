@@ -7,7 +7,7 @@ import java.util.UUID;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.AdditionalMediaTypes;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class TestResource extends HALResource {
@@ -20,7 +20,7 @@ public class TestResource extends HALResource {
     }
 
     private TestResource(URI resourceUri) {
-	this.setSelf(new HALLink.Builder(resourceUri).type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
+	this.setSelf(new HALLink.Builder(resourceUri).type(MediaTypeUtils.APPLICATION_HAL_JSON)
 		.profile(TEST_RESOURCE_PROFILE_URI).build());
     }
 

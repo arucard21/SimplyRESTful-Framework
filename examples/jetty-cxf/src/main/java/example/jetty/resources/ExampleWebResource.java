@@ -37,15 +37,15 @@ import example.jetty.resources.dao.ExampleEntityDAO;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import simplyrestful.api.framework.core.AdditionalMediaTypes;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.DefaultWebResource;
 
 @Path("/resources")
 @OpenAPIDefinition(tags = {
 	@Tag(name = "Example Resources")
 })
-@Produces(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
-@Consumes(AdditionalMediaTypes.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
+@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
+@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile="+ExampleResource.EXAMPLE_PROFILE_STRING)
 public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	private ExampleEntityDAO dao;
 
@@ -115,7 +115,7 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	private void ensureSelfLinkPresent(ExampleResource persistedResource) {
 		if(persistedResource.getSelf() == null) {
 			persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI()).path(persistedResource.getUUID().toString()).build())
-					.type(AdditionalMediaTypes.APPLICATION_HAL_JSON)
+					.type(MediaTypeUtils.APPLICATION_HAL_JSON)
 					.profile(persistedResource.getProfile())
 					.build());
 		}

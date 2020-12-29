@@ -5,7 +5,7 @@ import java.net.URI;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import simplyrestful.api.framework.core.AdditionalMediaTypes;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALCollectionV1;
 
 @Deprecated(since = "0.12.0")
@@ -90,6 +90,6 @@ public class HALCollectionV1BuilderFromPartialListTest extends AbstractHALCollec
 	builder = HALCollectionV1Builder.fromPartial(testResourcesList.subList(200, 300), requestURI,
 		TEST_RESOURCES_SIZE);
 	HALCollectionV1<TestResource> actual = builder.page(page).maxPageSize(maxPageSize).compact(compact).build();
-	Assertions.assertEquals(AdditionalMediaTypes.APPLICATION_HAL_JSON, actual.getSelf().getType());
+	Assertions.assertEquals(MediaTypeUtils.APPLICATION_HAL_JSON, actual.getSelf().getType());
     }
 }
