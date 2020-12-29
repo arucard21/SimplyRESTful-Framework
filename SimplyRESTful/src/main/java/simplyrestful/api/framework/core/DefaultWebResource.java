@@ -193,13 +193,17 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 		    .compact(compact)
 		    .build();
 	}
-	return getHALCollectionV2(
-		pageStart,
-		pageSize,
-		getFieldsQueryParameter(fields),
-		removeHALStructure(query),
-		getSortQueryParameter(sort),
-		selected);
+	return HALCollectionV2Builder.from(
+		this.list(
+			pageStart,
+			pageSize,
+			getFieldsQueryParameter(fields),
+			removeHALStructure(query),
+			getSortQueryParameter(sort))
+		,getRequestURI())
+		.withNavigation(pageStart, pageSize)
+		.collectionSize(this.count(removeHALStructure(query)))
+		.build(selected);
     }
 
     @GET
@@ -407,19 +411,6 @@ public abstract class DefaultWebResource<T extends HALResource> implements
         		sortWithOrderDelimeter -> Boolean.valueOf(
         			sortWithOrderDelimeter.split(
         				DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[1].equalsIgnoreCase(QUERY_PARAM_SORT_ORDER_ASCENDING))));
-    }
-
-    private HALCollectionV2<T> getHALCollectionV2(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort, MediaType mediaType) {
-        List<T> filteredResources = this.list(
-        	pageStart,
-        	pageSize,
-        	fields,
-        	query,
-        	sort);
-        return HALCollectionV2Builder.from(filteredResources, getRequestURI())
-        	.withNavigation(pageStart, pageSize)
-        	.collectionSize(this.count(query))
-        	.build(mediaType);
     }
 
     /**
