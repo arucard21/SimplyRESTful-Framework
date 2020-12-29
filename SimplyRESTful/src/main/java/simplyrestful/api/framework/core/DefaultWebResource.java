@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -199,8 +198,8 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 			pageSize,
 			getFieldsQueryParameter(fields),
 			removeHALStructure(query),
-			getSortQueryParameter(sort))
-		,getRequestURI())
+			getSortQueryParameter(sort)),
+		getRequestURI())
 		.withNavigation(pageStart, pageSize)
 		.collectionSize(this.count(removeHALStructure(query)))
 		.build(selected);
@@ -389,6 +388,15 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 		.build();
     }
 
+    protected UUID parseUuidFromResourceUri(URI resourceUri) {
+        URI relativizedResourceUri = getAbsoluteWebResourceURI().relativize(resourceUri);
+        if (relativizedResourceUri.equals(resourceUri)) {
+            return null;
+        }
+        UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
+        return resourceIdFromSelf;
+    }
+
     private String removeHALStructure(String query) {
         return query.replaceAll(HAL_LINKS_OBJECT_NAME+".", "").replaceAll(HAL_EMBEDDED_OBJECT_NAME+".", "");
     }
@@ -433,13 +441,11 @@ public abstract class DefaultWebResource<T extends HALResource> implements
             resource.setSelf(createLink(getAbsoluteWebResourceURI(providedID), resource.getProfile()));
             return providedID;
         } else {
-            URI selfUri = URI.create(resource.getSelf().getHref());
-            URI relativizedResourceUri = getAbsoluteWebResourceURI().relativize(selfUri);
-            if (relativizedResourceUri.equals(selfUri)) {
+            UUID resourceIdFromSelf = parseUuidFromResourceUri(URI.create(resource.getSelf().getHref()));
+            if (resourceIdFromSelf == null) {
         	throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
             }
-            UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
-            if (!Objects.equals(providedID, resourceIdFromSelf)) {
+            if (!resourceIdFromSelf.equals(providedID)) {
         	throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
             }
             return resourceIdFromSelf;
