@@ -43,6 +43,7 @@ public class MediaTypeUtils {
      * adjusted in some other way, e.g. using a {@link ContainerResponseFilter}.
      *
      * @param mediaTypes is the list of media types that the server can produce.
+     * @param acceptableMediaTypes is the list of media types that the client prefers to accept.
      * @return the most suitable media type, considering the client's preferences and
      * the server's capabilities.
      */
