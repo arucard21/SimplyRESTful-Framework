@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api;
+package simplyrestful.api.framework.core.api.crud;
 
 public interface DefaultCount {
     /**

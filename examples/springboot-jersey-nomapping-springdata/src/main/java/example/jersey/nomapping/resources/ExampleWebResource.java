@@ -31,15 +31,17 @@ import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import example.jersey.nomapping.OffsetBasedPageRequest;
 import io.github.perplexhub.rsql.RSQLJPASupport;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.DefaultWebResource;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 
 @Named
 @Path("/resources")
@@ -57,6 +59,9 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
     private static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
     private static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
     private ExampleRepository repo;
+
+    @Context
+    private UriInfo uriInfo;
 
     @Inject
     public ExampleWebResource(ExampleRepository repo) {
@@ -184,13 +189,13 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	    throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
 	}
 	if (persistedResource.getSelf() == null) {
-	    persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI())
+	    persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI(uriInfo))
 		    .path(persistedResource.getUUID().toString()).build())
 			    .type(MediaTypeUtils.APPLICATION_HAL_JSON).profile(persistedResource.getProfile())
 			    .build());
 	}
 	if (persistedResource.getUUID() == null) {
-	    UUID id = UUID.fromString(getAbsoluteWebResourceURI()
+	    UUID id = UUID.fromString(getAbsoluteWebResourceURI(uriInfo)
 		    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
 	    persistedResource.setUUID(id);
 	}

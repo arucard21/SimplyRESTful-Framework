@@ -34,7 +34,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
@@ -45,8 +47,8 @@ import example.datastore.StoredObject;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.DefaultWebResource;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 
 @Named
 @Path("/resources")
@@ -63,6 +65,8 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
      */
     private Map<String, UUID> resourceMapping;
     private DataStore dataStore;
+    @Context
+    private UriInfo uriInfo;
 
     @Inject
     public ExampleWebResource(DataStore dataStore) {
@@ -207,19 +211,19 @@ public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
 	// create resource URI with new UUID and add it to the mapping
 	exampleResource.setSelf(createSelfLinkWithUUID(storedResource.getId(), exampleResource.getProfile()));
 	exampleResource.setEmbeddedResource(convertEmbeddedToResource(storedResource.getEmbedded()));
-	resourceMapping.put(getAbsoluteWebResourceURI().getPath(), storedResource.getId());
+	resourceMapping.put(getAbsoluteWebResourceURI(uriInfo).getPath(), storedResource.getId());
 	return exampleResource;
     }
 
     private ExampleEmbeddedResource convertEmbeddedToResource(StoredEmbeddedObject embedded) {
 	ExampleEmbeddedResource embRes = new ExampleEmbeddedResource();
 	embRes.setName(embedded.getName());
-	resourceMapping.put(getAbsoluteWebResourceURI().getPath(), embedded.getId());
+	resourceMapping.put(getAbsoluteWebResourceURI(uriInfo).getPath(), embedded.getId());
 	return embRes;
     }
 
     private HALLink createSelfLinkWithUUID(UUID id, URI resourceProfile) {
-	return new HALLink.Builder(getAbsoluteWebResourceURI(id)).type(MediaTypeUtils.APPLICATION_HAL_JSON)
+	return new HALLink.Builder(getAbsoluteWebResourceURI(uriInfo, id)).type(MediaTypeUtils.APPLICATION_HAL_JSON)
 		.profile(resourceProfile).build();
     }
 }

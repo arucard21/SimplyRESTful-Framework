@@ -74,14 +74,14 @@ public class DefaultWebResourceTest {
     public void endpoint_shouldThrowClientErrorExceptionWhenResourceAlreadyExists_withPOSTonResource() {
 	Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
 	Assertions.assertThrows(ClientErrorException.class,
-		() -> testEndpoint.postHALResource(TestResource.testInstance(TEST_BASE_URI)));
+		() -> testEndpoint.postHALResource(uriInfo, TestResource.testInstance(TEST_BASE_URI)));
     }
 
     @Test
     public void endpoint_shouldThrowBadRequestWhenIDDoesNotMatchResource_withPUTonResource() {
 	Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
 	Assertions.assertThrows(BadRequestException.class,
-		() -> testEndpoint.putHALResource(UUID.randomUUID(), TestResource.testInstance(TEST_BASE_URI)));
+		() -> testEndpoint.putHALResource(uriInfo, UUID.randomUUID(), TestResource.testInstance(TEST_BASE_URI)));
     }
 
     @Test
