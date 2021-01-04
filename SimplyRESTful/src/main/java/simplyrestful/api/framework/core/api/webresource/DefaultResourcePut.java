@@ -22,11 +22,11 @@ import simplyrestful.api.framework.resources.HALResource;
 public interface DefaultResourcePut<T extends HALResource> extends WebResourceBase<T>, DefaultExists, DefaultCreate<T>, DefaultUpdate<T> {
     /**
      * Update a resource (or create it with the given identifier)
-     *
-     * The resource should contain a self-link. This self-link must match the
+     * <p>
+     * The resource may contain a self-link. This self-link must match the
      * provided id. If a resource with that id does not exist yet, it will be
      * created with that id.
-     *
+     * </p>
      * @param id       is the UUID part from the entire URI identifier of the
      *                 resource.
      * @param resource is the updated resource.

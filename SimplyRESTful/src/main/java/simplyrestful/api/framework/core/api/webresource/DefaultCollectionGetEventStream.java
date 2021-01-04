@@ -21,6 +21,21 @@ import simplyrestful.api.framework.core.api.crud.DefaultStream;
 import simplyrestful.api.framework.resources.HALResource;
 
 public interface DefaultCollectionGetEventStream<T extends HALResource> extends WebResourceBase<T>, DefaultStream<T> {
+    /**
+     * Retrieve the collection of resources as a stream of events (as server-sent events).
+     * <p>
+     * This uses
+     * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events}">server-sent events (SSE)</a>
+     * to send each resource in the collection as an Event to the API consumer.
+     * </p>
+     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience
+     * 			as it is already handled by the framework. It can be used to filter on these fields in the backend
+     * 			as well, e.g. to improve performance.
+     * @param query     is a FIQL query that defines how the resources should be filtered.
+     * @param sort      is a list of field names on which the resources should be sorted. This is only included for
+     * 			convenience as it is already handled by the framework.
+     * @return the paginated collection of resources.
+     */
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
     @Operation(description = "Get a stream of resources")
