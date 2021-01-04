@@ -52,6 +52,8 @@ public class QueryParamUtils {
      */
     public static Map<String, Boolean> parseSort(List<String> sortValues) {
 	return stripHALStructure(sortValues).stream()
+		.filter(sortValue -> !sortValue.isBlank())
+		.map(String::trim)
 		.collect(Collectors.toMap(QueryParamUtils::parseSortField, QueryParamUtils::parseSortOrder));
     }
 
