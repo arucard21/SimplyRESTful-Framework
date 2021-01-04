@@ -3,7 +3,6 @@ package simplyrestful.api.framework.core;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -64,9 +63,7 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 	DefaultStream<T>,
 	DefaultCount,
 	DefaultExists {
-    private static final String QUERY_PARAM_SORT_ORDER_ASCENDING = "asc";
-    private static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
-    private static final String HAL_LINKS_OBJECT_NAME = "_links";
+
     private static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
     private static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
 
@@ -139,7 +136,7 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 		    schema = @Schema(
 			    implementation = HALCollectionV1.class))
     })
-    public HALCollection<T> getHALResources(
+    public HALCollection<T> listHALResources(
 	    @Parameter(description  = "The page to be shown", required = false)
             @QueryParam(V1_QUERY_PARAM_PAGE)
             @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING)
@@ -182,11 +179,11 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 		    this.list(
 			    calculatedPageStart,
 			    pageSize,
-			    getFieldsQueryParameter(fields),
-			    removeHALStructure(query),
-			    getSortQueryParameter(sort)),
+			    QueryParamUtils.stripHALStructure(fields),
+			    QueryParamUtils.stripHALStructure(query),
+			    QueryParamUtils.parseSort(sort)),
 		    getRequestURI(),
-		    this.count(removeHALStructure(query)))
+		    this.count(QueryParamUtils.stripHALStructure(query)))
 		    .page(page)
 		    .maxPageSize(pageSize)
 		    .compact(compact)
@@ -196,12 +193,12 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 		this.list(
 			pageStart,
 			pageSize,
-			getFieldsQueryParameter(fields),
-			removeHALStructure(query),
-			getSortQueryParameter(sort)),
+			QueryParamUtils.stripHALStructure(fields),
+			QueryParamUtils.stripHALStructure(query),
+			QueryParamUtils.parseSort(sort)),
 		getRequestURI())
 		.withNavigation(pageStart, pageSize)
-		.collectionSize(this.count(removeHALStructure(query)))
+		.collectionSize(this.count(QueryParamUtils.stripHALStructure(query)))
 		.build(selected);
     }
 
@@ -226,8 +223,10 @@ public abstract class DefaultWebResource<T extends HALResource> implements
 	    @Context
 	    Sse sse) throws InterruptedException{
 	try (SseEventSink sink = eventSink) {
-	    try (Stream<T> stream = stream(getFieldsQueryParameter(fields), removeHALStructure(query),
-		    getSortQueryParameter(sort))) {
+	    try (Stream<T> stream = stream(
+		    QueryParamUtils.stripHALStructure(fields),
+		    QueryParamUtils.stripHALStructure(query),
+		    QueryParamUtils.parseSort(sort))) {
 		stream.forEach(resourceItem -> {
 		    sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
 			    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.getType(),
@@ -395,30 +394,6 @@ public abstract class DefaultWebResource<T extends HALResource> implements
         }
         UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
         return resourceIdFromSelf;
-    }
-
-    private String removeHALStructure(String query) {
-        return query.replaceAll(HAL_LINKS_OBJECT_NAME+".", "").replaceAll(HAL_EMBEDDED_OBJECT_NAME+".", "");
-    }
-
-    private List<String> getFieldsQueryParameter(List<String> fields) {
-        return fields.stream()
-        	.map(String::trim)
-        	.map(this::removeHALStructure)
-        	.collect(Collectors.toList());
-    }
-
-    private Map<String, Boolean> getSortQueryParameter(List<String> sort) {
-        return sort.stream()
-        	.map(String::trim)
-        	.filter(sortSingleEntry -> sortSingleEntry.contains(DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER))
-        	.map(this::removeHALStructure)
-        	.collect(Collectors.toMap(
-        		sortWithOrderDelimeter -> sortWithOrderDelimeter.split(
-        			DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[0],
-        		sortWithOrderDelimeter -> Boolean.valueOf(
-        			sortWithOrderDelimeter.split(
-        				DefaultWebResource.QUERY_PARAM_SORT_ORDER_DELIMITER)[1].equalsIgnoreCase(QUERY_PARAM_SORT_ORDER_ASCENDING))));
     }
 
     /**
