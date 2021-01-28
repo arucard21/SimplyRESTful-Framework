@@ -4,3 +4,5 @@
 A utility to filter a JSON object so it contains only a specified set of fields. 
 
 Nested fields can be provided by using a dot (`.`) as separator. 
+
+This is still experimental. This still requires more testing to ensure its reliability.
