@@ -30,7 +30,7 @@ public class MediaTypeUtils {
      *
      * This custom method is provided since some JAX-RS frameworks do not consider
      * media type parameters as a more specific media type (at least, when using
-     * the {@link Request}.selectVariant() method). This method provides a correct
+     * the {@link javax.ws.rs.core.Request}.selectVariant() method). This method provides a correct
      * implementation for this, limited to only the media type.
      *
      * This framework requires the media type parameters to be considered since that
@@ -42,7 +42,7 @@ public class MediaTypeUtils {
      * based on the @{@link Produces} or @(@link Consumes} annotations. Or it must be
      * adjusted in some other way, e.g. using a {@link ContainerResponseFilter}.
      *
-     * @param mediaTypes is the list of media types that the server can produce.
+     * @param producibleMediaTypes is the list of media types that the server can produce.
      * @param acceptableMediaTypes is the list of media types that the client prefers to accept.
      * @return the most suitable media type, considering the client's preferences and
      * the server's capabilities.

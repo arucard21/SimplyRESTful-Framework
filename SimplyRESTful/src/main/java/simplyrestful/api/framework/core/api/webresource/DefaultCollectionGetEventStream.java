@@ -34,7 +34,6 @@ public interface DefaultCollectionGetEventStream<T extends HALResource> extends 
      * @param query     is a FIQL query that defines how the resources should be filtered.
      * @param sort      is a list of field names on which the resources should be sorted. This is only included for
      * 			convenience as it is already handled by the framework.
-     * @return the paginated collection of resources.
      */
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
@@ -56,19 +55,19 @@ public interface DefaultCollectionGetEventStream<T extends HALResource> extends 
 	    SseEventSink eventSink,
 	    @Context
 	    Sse sse) throws InterruptedException{
-	try (SseEventSink sink = eventSink) {
-	    try (Stream<T> stream = stream(
-		    QueryParamUtils.stripHALStructure(fields),
-		    QueryParamUtils.stripHALStructure(query),
-		    QueryParamUtils.parseSort(sort))) {
-		stream.forEach(resourceItem -> {
-		    sink.send(sse.newEventBuilder().data(resourceItem).mediaType(new MediaType(
-			    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.getType(),
-			    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.getSubtype(), Collections.singletonMap(
-				    MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME, resourceItem.getProfile().toString())))
-			    .build());
-		});
-	    }
-	}
+        try (SseEventSink sink = eventSink) {
+            try (Stream<T> stream = stream(QueryParamUtils.stripHALStructure(fields),
+                    QueryParamUtils.stripHALStructure(query), QueryParamUtils.parseSort(sort))) {
+                stream.forEach(resourceItem -> {
+                    sink.send(sse.newEventBuilder()
+                            .data(resourceItem)
+                            .mediaType(new MediaType(
+                                    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.getType(),
+                                    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.getSubtype(),
+                                    Collections.singletonMap(MEDIA_TYPE_HAL_PARAMETER_PROFILE_NAME,resourceItem.getProfile().toString())))
+                            .build());
+                });
+            }
+        }
     }
 }

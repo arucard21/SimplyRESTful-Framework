@@ -20,7 +20,7 @@ public class QueryParamUtils {
      * structure in their nesting format so their hierarchy should match that
      * of the POJOs.
      * </p>
-     * @param values is a list of field names from which the HAL structure
+     * @param fields is a list of field names from which the HAL structure
      * should be removed.
      * @return the list of field names with their HAL structure removed.
      */
