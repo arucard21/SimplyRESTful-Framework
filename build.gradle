@@ -300,29 +300,6 @@ project(":deploy-jetty-cxf"){
 	}
 }
 
-project(":persist-springdata"){
-	project.description = "Easily persist your SimplyRESTful API using Spring Data"
-	dependencies {
-		api ("com.github.arucard21.simplyrestful:SimplyRESTful:0.11.5")
-		api ("org.springframework.boot:spring-boot-starter-data-jpa:2.2.4.RELEASE")
-	}
-	
-	publishing{
-		publications{
-			mavenJava(MavenPublication){
-				pom {
-					licenses {
-						license {
-							name = 'GNU Lesser General Public License'
-							url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
 project(":examples:jetty-cxf"){
 	project.description = "Example project for a SimplyRESTful API using Apache CXF on Jetty"
 
