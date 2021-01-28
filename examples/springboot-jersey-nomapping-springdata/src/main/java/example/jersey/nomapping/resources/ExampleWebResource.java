@@ -42,6 +42,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
+import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
 
 @Named
 @Path("/resources")
@@ -50,7 +51,7 @@ import simplyrestful.api.framework.core.MediaTypeUtils;
 })
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
-public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
+public class ExampleWebResource extends DefaultWebResource<ExampleResource> implements DefaultCollectionGetEventStream<ExampleResource> {
     private static final String RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER = ",";
     private static final String RSQL_JPA_SORT_QUERY_FIELD_DELIMITER = ";";
     private static final String RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING = "asc";

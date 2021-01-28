@@ -194,6 +194,7 @@ project(":SimplyRESTful"){
 		testImplementation ("org.junit.platform:junit-platform-launcher:1.7.0")
 		testImplementation ("org.glassfish.jersey.containers:jersey-container-servlet:${jersey}")
 		testImplementation ("nl.jqno.equalsverifier:equalsverifier:3.4.3")
+		testImplementation ("org.glassfish.jersey.media:jersey-media-sse:${jersey}")
 		
 		integrationTestImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core:${jersey}")
 		integrationTestImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:${jersey}")

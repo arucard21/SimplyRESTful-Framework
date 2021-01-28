@@ -23,9 +23,9 @@ public interface DefaultCollectionPost<T extends HALResource> extends WebResourc
      * Create a resource.
      *
      * @param resource is a resource that should be created.
-     * @return a "201 Created" response for the resource that was created,
-     *         containing its URI identifier in the Location header, if the resource
-     *         was correctly created.
+     * @return a "201 Created" response for the resource that was created, containing its URI identifier in the Location header,
+     *          if the resource was correctly created. A "409 Conflict" response is returned if the resource contains an self-link
+     *          that refers to an existing resource.
      */
     @POST
     @Operation(description = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated")

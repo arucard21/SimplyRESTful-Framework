@@ -122,17 +122,17 @@ public interface WebResourceBase<T extends HALResource> {
     default UUID ensureSelfLinkValid(UriInfo uriInfo, T resource, UUID providedID) {
         if (resource.getSelf() == null) {
             if (providedID == null) {
-        	providedID = UUID.randomUUID();
+                providedID = UUID.randomUUID();
             }
             resource.setSelf(createLink(getAbsoluteWebResourceURI(uriInfo, providedID), resource.getProfile()));
             return providedID;
         } else {
             UUID resourceIdFromSelf = parseUuidFromResourceUri(uriInfo, URI.create(resource.getSelf().getHref()));
             if (resourceIdFromSelf == null) {
-        	throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
+                throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
             }
-            if (!resourceIdFromSelf.equals(providedID)) {
-        	throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
+            if (providedID != null && !resourceIdFromSelf.equals(providedID)) {
+                throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
             }
             return resourceIdFromSelf;
         }

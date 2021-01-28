@@ -17,6 +17,7 @@ import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter{
+    public static final String MEDIA_TYPE_PARAMETER_NAME_QS = "qs";
 
     /**
      * Remove the "qs" parameter from all media types.
@@ -69,7 +70,7 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter{
     private String withoutQsParameter(String mediaTypeString) {
         MediaType mediaType = MediaType.valueOf(mediaTypeString);
         Map<String, String> parameters = mediaType.getParameters().entrySet().stream()
-        	.filter(entry -> !entry.getKey().equalsIgnoreCase("qs"))
+        	.filter(entry -> !entry.getKey().equalsIgnoreCase(MEDIA_TYPE_PARAMETER_NAME_QS))
         	.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         return new MediaType(mediaType.getType(), mediaType.getSubtype(), parameters).toString();
     }

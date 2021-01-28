@@ -39,12 +39,13 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
+import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
 
 @Path("/resources")
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
-public class ExampleWebResource extends DefaultWebResource<ExampleResource> {
+public class ExampleWebResource extends DefaultWebResource<ExampleResource> implements DefaultCollectionGetEventStream<ExampleResource> {
     private ExampleEntityDAO dao;
     @Context
     private UriInfo uriInfo;
