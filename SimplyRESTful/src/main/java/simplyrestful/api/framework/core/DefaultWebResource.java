@@ -1,14 +1,14 @@
 package simplyrestful.api.framework.core;
 
-import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGet;
+import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetPreferJson;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionPost;
 import simplyrestful.api.framework.core.api.webresource.DefaultResourceDelete;
 import simplyrestful.api.framework.core.api.webresource.DefaultResourceGet;
 import simplyrestful.api.framework.core.api.webresource.DefaultResourcePut;
 import simplyrestful.api.framework.resources.HALResource;
 
-public abstract class DefaultWebResource<T extends HALResource> implements
-	DefaultCollectionGet<T>,
+public interface DefaultWebResource<T extends HALResource> extends
+	DefaultCollectionGetPreferJson<T>,
 	DefaultCollectionPost<T>,
 	DefaultResourceGet<T>,
 	DefaultResourcePut<T>,

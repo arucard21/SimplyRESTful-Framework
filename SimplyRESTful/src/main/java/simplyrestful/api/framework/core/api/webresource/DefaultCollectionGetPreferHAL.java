@@ -37,7 +37,7 @@ import simplyrestful.api.framework.resources.HALResource;
  * collection resource in HAL+JSON format.
  */
 @SuppressWarnings("deprecation")
-public interface DefaultCollectionGet<T extends HALResource> extends WebResourceBase<T>, DefaultList<T>, DefaultCount {
+public interface DefaultCollectionGetPreferHAL<T extends HALResource> extends WebResourceBase<T>, DefaultList<T>, DefaultCount {
     /**
      * Retrieve the paginated collection of resources.
      * <p>

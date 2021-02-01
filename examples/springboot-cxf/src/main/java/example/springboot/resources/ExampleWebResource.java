@@ -56,7 +56,7 @@ import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEven
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
-public class ExampleWebResource extends DefaultWebResource<ExampleResource> implements DefaultCollectionGetEventStream<ExampleResource> {
+public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
     public static final ThreadLocal<SearchContext> REQUEST_SEARCHCONTEXT = new ThreadLocal<>();
     /**
      * Contains the mapping between the API's HAL resources, identified by the

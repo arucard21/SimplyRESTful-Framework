@@ -18,7 +18,7 @@ import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEven
 @Path("testresources")
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
-public class TestWebResource extends DefaultWebResource<TestResource> implements DefaultCollectionGetEventStream<TestResource>{
+public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource>{
 	public static final List<TestResource> TEST_RESOURCES = new ArrayList<>();
 
 	@Override

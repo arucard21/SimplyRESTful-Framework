@@ -91,13 +91,13 @@ public class WebResourceIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void webResource_shouldReturnHALV2CollectionAsDefault_whenNoSpecificVersionIsRequested() {
+    public void webResource_shouldReturnPlainJsonV2CollectionAsDefault_whenNoSpecificVersionIsRequested() {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
     		.get();
     	Assertions.assertEquals(200, response.getStatus());
-    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE, response.getMediaType());
+    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
 
     	HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
     	Assertions.assertEquals(2, collection.getTotal());

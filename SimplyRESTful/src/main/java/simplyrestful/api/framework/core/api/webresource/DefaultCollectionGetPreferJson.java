@@ -28,7 +28,7 @@ import simplyrestful.api.framework.resources.HALResource;
  * collection resource in JSON format.
  */
 @SuppressWarnings("deprecation")
-public interface DefaultCollectionGetPreferJson<T extends HALResource> extends DefaultCollectionGet<T> {
+public interface DefaultCollectionGetPreferJson<T extends HALResource> extends DefaultCollectionGetPreferHAL<T> {
     /**
      * Retrieve the paginated collection of resources.
      * <p>
@@ -102,6 +102,6 @@ public interface DefaultCollectionGetPreferJson<T extends HALResource> extends D
 	    @QueryParam(QUERY_PARAM_SORT)
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort){
-	return DefaultCollectionGet.super.listHALResources(uriInfo, httpHeaders, page, pageStart, pageSize, compact, fields, query, sort);
+	return DefaultCollectionGetPreferHAL.super.listHALResources(uriInfo, httpHeaders, page, pageStart, pageSize, compact, fields, query, sort);
     }
 }

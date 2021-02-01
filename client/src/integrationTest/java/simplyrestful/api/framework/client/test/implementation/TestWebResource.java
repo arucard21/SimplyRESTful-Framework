@@ -28,7 +28,7 @@ import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEven
 )
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
-public class TestWebResource extends DefaultWebResource<TestResource> implements DefaultCollectionGetEventStream<TestResource>{
+public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource>{
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();
     public static final UUID ERROR_UPDATE_RESOURCE_ID = UUID.randomUUID();
