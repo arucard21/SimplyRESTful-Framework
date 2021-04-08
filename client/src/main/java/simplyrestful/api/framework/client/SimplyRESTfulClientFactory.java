@@ -9,6 +9,7 @@ import javax.ws.rs.client.Client;
 import simplyrestful.api.framework.resources.HALResource;
 
 @Named
+@Deprecated(since = "0.15.0" )
 public class SimplyRESTfulClientFactory<T extends HALResource> {
 	private final Client client;
 

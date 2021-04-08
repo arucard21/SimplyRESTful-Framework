@@ -39,6 +39,7 @@ import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
+@Deprecated(since = "0.15.0" )
 public class SimplyRESTfulClient<T extends HALResource> {
     private static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""+HALServiceDocument.PROFILE_STRING + "\"";
     private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
