@@ -15,8 +15,8 @@ tasks.withType(Test){
 
 dependencies {
 	api project(":fields-filter-json")
-	api ("jakarta.servlet:jakarta.servlet-api:4.0.4")
-	api ("jakarta.inject:jakarta.inject-api:1.0.3")
+	api group: "jakarta.servlet", name: "jakarta.servlet-api", version: jakartaServletVersion
+	api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
 }
 
 publishing{

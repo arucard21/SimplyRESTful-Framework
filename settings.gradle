@@ -1,3 +1,10 @@
+pluginManagement {
+    plugins {
+        id 'org.springframework.boot' version springBootVersion
+        id "com.github.ben-manes.versions" version versionsPluginVersion
+    }
+}
+
 include "SimplyRESTful"
 include "SimplyRESTful-resources"
 include "jaxrs-providers"
