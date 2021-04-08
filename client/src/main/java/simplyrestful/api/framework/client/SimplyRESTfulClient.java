@@ -41,7 +41,6 @@ import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
     private static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""+HALServiceDocument.PROFILE_STRING + "\"";
-    private static final String ERROR_CREATE_RESOURCE_EXISTS = "The resource already exists on the server. Use update() if you wish to modify the existing resource.";
     private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
     private static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
     private static final String HAL_ITEM_KEY = "item";
@@ -308,9 +307,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * Create a new API resource.
      *
-     * If the provided resource contains a valid id, the resource will be created on
-     * the server with that same id, using HTTP PUT. Otherwise, the resource will be
-     * created using HTTP POST which will generate an id for that resource.
+     * If the provided resource contains a self link, it will be removed.
      *
      * @param resource is the new resource
      * @return the id for the created resource, applicable to the provided base URI
@@ -322,9 +319,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * Create a new API resource.
      *
-     * If the provided resource contains a valid id, the resource will be created on
-     * the server with that same id, using HTTP PUT. Otherwise, the resource will be
-     * created using HTTP POST which will generate an id for that resource.
+     * If the provided resource contains a self link, it will be removed.
      *
      * @param resource        is the new resource
      * @param headers         is the set of additional HTTP headers that should be
@@ -336,23 +331,15 @@ public class SimplyRESTfulClient<T extends HALResource> {
     public UUID create(T resource, MultivaluedMap<String, Object> headers,
 	    MultivaluedMap<String, Object> queryParameters) {
 	discoverResourceURI(headers);
-	HALLink resourceSelf = resource.getSelf();
-	WebTarget target;
-	if (Objects.nonNull(resourceSelf)) {
-	    URI resourceInstanceUri = URI.create(resourceSelf.getHref());
-	    if (exists(resourceInstanceUri, headers, queryParameters)) {
-		throw new IllegalArgumentException(ERROR_CREATE_RESOURCE_EXISTS);
-	    }
-	    target = client.target(resourceInstanceUri);
-	} else {
-	    target = client.target(resourceUri);
+	if(resource.getSelf() != null) {
+	    resource.setSelf(null);
 	}
+	WebTarget target = client.target(resourceUri);
 	configureAdditionalQueryParameters(target, queryParameters);
 	Builder request = target.request();
 	configureHttpHeaders(request, headers);
 	Entity<T> halJsonEntity = Entity.entity(resource, resourceMediaType);
-	try (Response response = Objects.isNull(resourceSelf) ? request.post(halJsonEntity)
-		: request.put(halJsonEntity)) {
+	try (Response response = request.post(halJsonEntity)) {
 	    if (!Objects.equals(201, response.getStatus())) {
 		throw new WebApplicationException(response);
 	    }

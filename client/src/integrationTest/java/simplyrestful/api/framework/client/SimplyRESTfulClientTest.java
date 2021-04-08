@@ -122,39 +122,8 @@ public class SimplyRESTfulClientTest extends JerseyTest {
     }
 
     @Test
-    public void create_shouldThrowIllegalArgumentException_whenTheProvidedResourceRefersToAnExistingId() {
-	Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.create(testResource));
-    }
-
-    @Test
-    public void create_shouldThrowWebApplicationException_whenTheExistsCheckFails() {
-	Assertions.assertThrows(WebApplicationException.class,
-		() -> simplyRESTfulClient.create(TestResource.withId(TestWebResource.ERROR_READ_RESOURCE_ID)));
-    }
-
-    @Test
-    public void create_shouldReturnTheSameId_whenTheProvidedTestResourceContainsAnId() {
-	UUID actual = simplyRESTfulClient.create(TestResource.withId(UUID_NIL));
-	Assertions.assertEquals(UUID_NIL, actual);
-    }
-
-    @Test
     public void create_shouldThrowNullPointerException_whenProvidingNullAsArgument() {
 	Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.create(null));
-    }
-
-    @Test
-    public void create_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentHostname() {
-	TestResource invalidResource = new TestResource();
-	invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_HOST).build());
-	Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.create(invalidResource));
-    }
-
-    @Test
-    public void create_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentPath() {
-	TestResource invalidResource = new TestResource();
-	invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_PATH).build());
-	Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.create(invalidResource));
     }
 
     @Test

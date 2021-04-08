@@ -256,14 +256,13 @@ public class WebResourceIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void webResource_shouldCreateResourceAndReturnLocationURI_whenPUTReceivedWithNewResource() {
+    public void webResource_shouldThrow404NotFoundError_whenPUTReceivedWithNewResource() {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.path(UUID.randomUUID().toString())
     		.request()
     		.put(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_HAL_JSON));
-    	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-    	Assertions.assertTrue(response.getLocation().toString().startsWith(getBaseUri().toString()));
+    	Assertions.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
 
@@ -292,26 +291,6 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.post(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_HAL_JSON));
     	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     	Assertions.assertTrue(response.getLocation().toString().startsWith(customUri.toString()));
-    	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
-    }
-
-    @Test
-    public void webResource_shouldUseCustomUriInTheLocationHeader_whenCreatingWithPutAndUriCustomizerPropertyAndHeaderAreProvided() {
-    	System.setProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME, HTTP_HEADER_NAME_CUSTOM_URI);
-    	String customUriBase = "https://simplyrestful-testhost.org/services/";
-    	UUID customUuid = UUID.randomUUID();
-    	URI customUri = UriBuilder.fromUri(customUriBase)
-    		.path(WEB_RESOURCE_PATH)
-    		.path(customUuid.toString())
-    		.build();
-    	Response response = target()
-    		.path(WEB_RESOURCE_PATH)
-    		.path(customUuid.toString())
-    		.request()
-    		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
-    		.put(Entity.entity(TestResource.custom(URI.create(customUriBase), customUuid), TestResource.MEDIA_TYPE_HAL_JSON));
-    	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-    	Assertions.assertEquals(customUri, response.getLocation());
     	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }
 

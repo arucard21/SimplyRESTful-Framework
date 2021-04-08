@@ -6,13 +6,12 @@ import simplyrestful.api.framework.resources.HALResource;
 
 public interface DefaultUpdate<T extends HALResource> {
     /**
-     * Update the resource in the data store where it is stored.
+     * Update the existing resource in the data store where it is stored.
      *
-     * The resource should contain a self-link in order to identify which resource
-     * needs to be updated.
+     * The provided resource may contain a self-link that identifies itself through a URI containing a UUID.
+     * For convenience, this UUID is also provided directly as resourceUUID parameter.
      *
-     * @param resource     is the updated resource (which contains a self-link with
-     *                     which to identify the resource)
+     * @param resource is the updated resource
      * @param resourceUUID is the identifier of the resource that should be updated
      * @return the updated resource as persisted
      */

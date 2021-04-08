@@ -81,7 +81,7 @@ public class DefaultWebResourceTest {
     public void endpoint_shouldThrowBadRequestWhenIDDoesNotMatchResource_withPUTonResource() {
 	Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
 	Assertions.assertThrows(BadRequestException.class,
-		() -> testEndpoint.putHALResource(uriInfo, UUID.randomUUID(), TestResource.testInstance(TEST_BASE_URI)));
+		() -> testEndpoint.putHALResource(uriInfo, TestResource.TEST_RESOURCE_ID, TestResource.custom(TEST_BASE_URI, UUID.randomUUID())));
     }
 
     @Test
