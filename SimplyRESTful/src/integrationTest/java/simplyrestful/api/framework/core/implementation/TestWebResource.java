@@ -9,13 +9,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import simplyrestful.api.framework.core.MediaTypeUtils;
-import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetPreferLegacy;
+import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGet;
 import simplyrestful.api.framework.test.implementation.TestResource;
 
 @Path("testresources")
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
-public class TestWebResourcePreferLegacy implements DefaultCollectionGetPreferLegacy<TestResource>{
+public class TestWebResource implements DefaultCollectionGet<TestResource>{
     @Override
     public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
         return Collections.emptyList();

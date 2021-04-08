@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.core.filters.UriCustomizer;
-import simplyrestful.api.framework.core.implementation.TestWebResourcePreferHAL;
+import simplyrestful.api.framework.core.implementation.TestWebResource;
 import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
@@ -40,7 +40,7 @@ public class WebResourcePreferHALIntegrationTest extends JerseyTest {
     @Override
     protected Application configure() {
         ResourceConfig config = new ResourceConfig(
-        	TestWebResourcePreferHAL.class,
+        	TestWebResource.class,
         	WebResourceRoot.class,
         	ObjectMapperProvider.class,
         	JacksonHALJsonProvider.class,
