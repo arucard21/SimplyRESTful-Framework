@@ -20,7 +20,6 @@ package example.jetty.resources;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,6 +38,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
+import simplyrestful.api.framework.core.SortOrder;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
 
 @Path("/resources")
@@ -86,7 +86,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 
     @Override
     public List<ExampleResource> list(int pageNumber, int pageSize, List<String> fields, String query,
-	    Map<String, Boolean> sort) {
+	    List<SortOrder> sort) {
 	if (!sort.isEmpty()) {
 	    throw new ServerErrorException("This API does not yet support sorting", 501);
 	}
@@ -133,7 +133,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     }
 
     @Override
-    public Stream<ExampleResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
+    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
 	return dao.stream();
     }
 

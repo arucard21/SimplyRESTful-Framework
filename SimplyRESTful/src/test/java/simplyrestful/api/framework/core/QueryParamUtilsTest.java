@@ -1,7 +1,7 @@
 package simplyrestful.api.framework.core;
 
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -68,26 +68,39 @@ public class QueryParamUtilsTest {
 
     @Test
     public void parseSort_shouldStripHALStructureAndOrderAscendingByDefault() {
-        Map<String, Boolean> sortValues = QueryParamUtils.parseSort(List.of(
+        List<SortOrder> sortValues = QueryParamUtils.parseSort(List.of(
                 "_embedded._links.self.type",
                 "_links.self.profile",
                 "_embedded.description"));
         Assertions.assertEquals(3, sortValues.size());
-        Assertions.assertTrue(sortValues.keySet().contains("self.type"));
-        Assertions.assertTrue(sortValues.keySet().contains("self.profile"));
-        Assertions.assertTrue(sortValues.keySet().contains("description"));
-        sortValues.values().forEach(sortOrder -> Assertions.assertTrue(sortOrder.equals(true)));
+        List<String> sortFields = sortValues.stream().map(SortOrder::getField).collect(Collectors.toList());
+        Assertions.assertTrue(sortFields.contains("self.type"));
+        Assertions.assertTrue(sortFields.contains("self.profile"));
+        Assertions.assertTrue(sortFields.contains("description"));
+        sortValues.stream().map(SortOrder::isAscending).forEach(sortOrder -> Assertions.assertTrue(sortOrder.equals(true)));
     }
 
     @Test
     public void parseSort_shouldStripHALStructureAndParseSortOrder() {
-        Map<String, Boolean> sortValues = QueryParamUtils.parseSort(List.of(
+	List<SortOrder> sortValues = QueryParamUtils.parseSort(List.of(
                 "_embedded._links.self.type:asc",
                 "_links.self.profile",
                 "_embedded.description:desc"));
         Assertions.assertEquals(3, sortValues.size());
-        Assertions.assertEquals(true, sortValues.get("self.type"));
-        Assertions.assertEquals(true, sortValues.get("self.profile"));
-        Assertions.assertEquals(false, sortValues.get("description"));
+        Assertions.assertEquals(true, sortValues.stream()
+        	.filter( sortValue -> sortValue.getField().equals("self.type"))
+        	.findFirst()
+        	.orElseThrow()
+        	.isAscending());
+        Assertions.assertEquals(true, sortValues.stream()
+        	.filter( sortValue -> sortValue.getField().equals("self.profile"))
+        	.findFirst()
+        	.orElseThrow()
+        	.isAscending());
+        Assertions.assertEquals(false, sortValues.stream()
+        	.filter( sortValue -> sortValue.getField().equals("description"))
+        	.findFirst()
+        	.orElseThrow()
+        	.isAscending());
     }
 }

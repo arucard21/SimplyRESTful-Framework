@@ -56,8 +56,10 @@ public interface DefaultCollectionGetEventStream<T extends HALResource> extends 
 	    @Context
 	    Sse sse) throws InterruptedException{
         try (SseEventSink sink = eventSink) {
-            try (Stream<T> stream = stream(QueryParamUtils.stripHALStructure(fields),
-                    QueryParamUtils.stripHALStructure(query), QueryParamUtils.parseSort(sort))) {
+            try (Stream<T> stream = stream(
+        	    QueryParamUtils.stripHALStructure(fields),
+                    QueryParamUtils.stripHALStructure(query),
+                    QueryParamUtils.parseSort(sort))) {
                 stream.forEach(resourceItem -> {
                     sink.send(sse.newEventBuilder()
                             .data(resourceItem)

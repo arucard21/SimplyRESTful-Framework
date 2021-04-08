@@ -2,13 +2,13 @@ package simplyrestful.api.framework.core.implementation;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import simplyrestful.api.framework.core.MediaTypeUtils;
+import simplyrestful.api.framework.core.SortOrder;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGet;
 import simplyrestful.api.framework.test.implementation.TestResource;
 
@@ -17,7 +17,7 @@ import simplyrestful.api.framework.test.implementation.TestResource;
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
 public class TestWebResource implements DefaultCollectionGet<TestResource>{
     @Override
-    public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
+    public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
         return Collections.emptyList();
     }
 

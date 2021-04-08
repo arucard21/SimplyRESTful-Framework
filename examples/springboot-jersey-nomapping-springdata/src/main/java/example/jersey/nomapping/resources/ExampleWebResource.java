@@ -20,7 +20,6 @@ package example.jersey.nomapping.resources;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,6 +41,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
+import simplyrestful.api.framework.core.SortOrder;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
 
 @Named
@@ -134,7 +134,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     }
 
     @Override
-    public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
+    public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
 	List<ExampleResource> retrievedPage = repo.findAll(
 		RSQLJPASupport.<ExampleResource>toSpecification(query).and(RSQLJPASupport.toSort(createSortQuery(sort))),
 		new OffsetBasedPageRequest(pageStart, pageSize))
@@ -143,7 +143,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     }
 
     @Override
-    public Stream<ExampleResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
+    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
 	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query).and(RSQLJPASupport.toSort(createSortQuery(sort))))
 		.map(resource -> {
 		    simulateSlowDataRetrieval();
@@ -170,19 +170,15 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	}
     }
 
-    private String createSortQuery(Map<String, Boolean> sort) {
-	return sort.entrySet().stream()
-		.map(entry -> createSingleSortQueryField(entry.getKey(), entry.getValue()))
+    private String createSortQuery(List<SortOrder> sort) {
+	return sort.stream()
+		.map(this::createSingleSortQueryField)
 		.collect(Collectors.joining(RSQL_JPA_SORT_QUERY_FIELD_DELIMITER));
     }
 
-    private String createSingleSortQueryField(String sortField, Boolean ascending) {
-	String direction = RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING;
-	if (!ascending) {
-	    direction = RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
-	}
-	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER,sortField, direction);
-
+    private String createSingleSortQueryField(SortOrder sort) {
+	String direction = sort.isAscending() ? RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING : RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
+	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER, sort.getField(), direction);
     }
 
     private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {

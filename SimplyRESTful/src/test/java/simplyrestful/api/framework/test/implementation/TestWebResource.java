@@ -2,7 +2,6 @@ package simplyrestful.api.framework.test.implementation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -13,6 +12,7 @@ import javax.ws.rs.Produces;
 
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
+import simplyrestful.api.framework.core.SortOrder;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
 
 @Path("testresources")
@@ -48,7 +48,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 	}
 
 	@Override
-	public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, Map<String, Boolean> sort) {
+	public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
 		return TEST_RESOURCES;
 	}
 
@@ -58,7 +58,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 	}
 
 	@Override
-	public Stream<TestResource> stream(List<String> fields, String query, Map<String, Boolean> sort) {
+	public Stream<TestResource> stream(List<String> fields, String query, List<SortOrder> sort) {
 	    return TEST_RESOURCES.stream();
 	}
 

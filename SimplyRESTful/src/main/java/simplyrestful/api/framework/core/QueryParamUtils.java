@@ -1,7 +1,6 @@
 package simplyrestful.api.framework.core;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,14 +62,15 @@ public class QueryParamUtils {
      *
      * </p>
      * @param sortValues is the list of sort values that should be parsed.
-     * @return a Map containing the field name and sort order as String and Boolean
-     * respectively, for each field that should be sorted.
+     * @return a List containing the field name and sort order as SortOrder object for each
+     * field that should be sorted.
      */
-    public static Map<String, Boolean> parseSort(List<String> sortValues) {
+    public static List<SortOrder> parseSort(List<String> sortValues) {
     	return stripHALStructure(sortValues).stream()
     		.filter(sortValue -> !sortValue.isBlank())
     		.map(String::trim)
-    		.collect(Collectors.toMap(QueryParamUtils::parseSortField, QueryParamUtils::parseSortOrder));
+    		.map(sortEntry -> new SortOrder(parseSortField(sortEntry), parseSortOrder(sortEntry)))
+    		.collect(Collectors.toList());
     }
 
     private static List<String> flattenQueryParameters(List<String> parameters){
