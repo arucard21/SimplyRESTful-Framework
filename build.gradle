@@ -273,7 +273,7 @@ project(":deploy-jetty-cxf"){
 		api group: "org.apache.cxf", name: "cxf-rt-rs-service-description-openapi-v3", version: cxfVersion
 		api group: "org.apache.cxf", name: "cxf-rt-rs-extension-search", version: cxfVersion
 		api group: "ch.qos.logback", name: "logback-classic", version: logbackClassicVersion
-		api group: "org.hibernate", name: "hibernate-validator", version: hibernateValidatorVersion
+		api group: "org.hibernate.validator", name: "hibernate-validator", version: hibernateValidatorVersion
 		api group: "org.glassfish", name: "jakarta.el", version: jakartaElGlassfish
 	}
 	
