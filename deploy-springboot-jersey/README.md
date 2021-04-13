@@ -18,8 +18,8 @@ To use it in your project you have to:
 * Implement your SimplyRESTful API according to the [standard instructions](/SimplyRESTful#usage).
     * You do not need to depend on the SimplyRESTful library directly as it is already pulled in by this library.
     * You do not have to follow the steps to configure your JAX-RS framework since this library takes care of most of that automatically.
-* Register your implemented JAX-RS Web Resources in Jersey [as documented for Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/html/#boot-features-jersey).
-* Start your SimplyRESTful API by simply [running your Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/#using-boot-running-your-application).
+* Register your implemented JAX-RS Web Resources in Jersey [as documented for Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-jersey).
+* Start your SimplyRESTful API by simply [running your Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-running-your-application).
     * By default, Spring Boot runs the API on `http://localhost:8080`.
 
 See the [example project](/examples/springboot-jersey-nomapping-springdata) for a simple example of how this library can be used.
