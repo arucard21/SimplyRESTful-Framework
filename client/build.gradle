@@ -1,8 +1,6 @@
-plugins {
-    id 'org.unbroken-dome.test-sets' version '3.0.1'
-}
-apply plugin: "java"
+apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'org.unbroken-dome.test-sets'
 
 repositories {
 	mavenCentral()
@@ -21,12 +19,6 @@ tasks.withType(Test){
 	useJUnitPlatform()
 }
 
-eclipse {
-	classpath {
-		plusConfigurations.add configurations.integrationTestRuntimeClasspath
-	}
-}
-
 dependencies {
 	api project(":SimplyRESTful-resources")
 	api project(":jaxrs-providers")
@@ -36,7 +28,7 @@ dependencies {
 	api group: "io.swagger.parser.v3", name: "swagger-parser", version: swaggerParserVersion
 	api group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion
 			
-	integrationTestImplementation project(":SimplyRESTful").sourceSets.main.output
+	integrationTestImplementation project(":SimplyRESTful")
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework", name: "jersey-test-framework-core", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework.providers", name: "jersey-test-framework-provider-jetty", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion
