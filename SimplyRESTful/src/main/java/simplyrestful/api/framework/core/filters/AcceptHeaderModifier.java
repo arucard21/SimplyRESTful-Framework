@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 @Named
 @PreMatching
 public class AcceptHeaderModifier implements ContainerRequestFilter {
+    private static final String MEDIA_TYPE_STRUCTURED_SYNTAX_SUFFIX_JSON = "+json";
     private static final String MEDIA_TYPE_PARAMETER_QUALITY_SERVER = "qs";
     private static final String MEDIA_TYPE_PARAMETER_QUALITY_CLIENT = "q";
     @Context
@@ -35,8 +36,32 @@ public class AcceptHeaderModifier implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
 	List<MediaType> acceptableMediaTypes = httpHeaders.getAcceptableMediaTypes();
 	List<MediaType> producibleMediaTypes = getProducibleMediaTypes();
+	List<String> modifiedAcceptableMediaTypes = acceptableMediaTypes.stream().map(MediaType::toString).collect(Collectors.toList());
 
-	List<String> unacceptableMediaTypes = acceptableMediaTypes.stream()
+	if(acceptableMediaTypes.stream().anyMatch(acceptableMediaType -> acceptableMediaType.equals(MediaType.APPLICATION_JSON_TYPE))) {
+	    List<String> customJsonMediaTypes = getCustomJsonMediaTypes(producibleMediaTypes);
+	    modifiedAcceptableMediaTypes = Stream.concat(
+		    modifiedAcceptableMediaTypes.stream(),
+		    customJsonMediaTypes.stream()).collect(Collectors.toList());
+	}
+
+	List<String> unacceptableMediaTypes = getUnacceptableMediaTypesWithQualitySetToZero(acceptableMediaTypes, producibleMediaTypes);
+	modifiedAcceptableMediaTypes = Stream.concat(
+		modifiedAcceptableMediaTypes.stream(),
+		unacceptableMediaTypes.stream())
+		.collect(Collectors.toList());
+	requestContext.getHeaders().put(HttpHeaders.ACCEPT, modifiedAcceptableMediaTypes);
+    }
+
+    private List<String> getCustomJsonMediaTypes(List<MediaType> producibleMediaTypes) {
+	return producibleMediaTypes.stream()
+		.filter(producibleMediaType -> producibleMediaType.getSubtype().endsWith(MEDIA_TYPE_STRUCTURED_SYNTAX_SUFFIX_JSON))
+		.map(MediaType::toString)
+		.collect(Collectors.toList());
+    }
+
+    private List<String> getUnacceptableMediaTypesWithQualitySetToZero(List<MediaType> acceptableMediaTypes, List<MediaType> producibleMediaTypes) {
+	return acceptableMediaTypes.stream()
 		.flatMap(acceptableMediaType -> producibleMediaTypes.stream()
 			.filter(producibleMediaType -> !producibleMediaType.equals(MediaType.WILDCARD_TYPE))
 			.filter(producibleMediaType -> !producibleMediaType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD))
@@ -46,11 +71,6 @@ public class AcceptHeaderModifier implements ContainerRequestFilter {
 			.map(this::mediaTypeWithQualityZero))
 		.map(MediaType::toString)
 		.collect(Collectors.toList());
-	List<String> modifiedAcceptableMediaTypes = Stream.concat(
-		acceptableMediaTypes.stream().map(MediaType::toString),
-		unacceptableMediaTypes.stream())
-		.collect(Collectors.toList());
-	requestContext.getHeaders().put(HttpHeaders.ACCEPT, modifiedAcceptableMediaTypes);
     }
 
     private MediaType mediaTypeWithQualityZero(MediaType producibleMediaType) {
