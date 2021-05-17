@@ -41,6 +41,11 @@ public class AcceptHeaderModifier implements ContainerRequestFilter {
 		.findFirst();
 	if(plainJson.isPresent()) {
 	    List<MediaType> customJsonMediaTypes = getCustomJsonMediaTypes();
+	    List<MediaType> existingMediaTypes = customJsonMediaTypes.stream()
+		    .filter(customMediaType -> acceptableMediaTypes.stream()
+			    .anyMatch(acceptableMediaType -> MediaTypeUtils.withoutQualityParameters(acceptableMediaType).equals(MediaTypeUtils.withoutQualityParameters(customMediaType))))
+		    .collect(Collectors.toList());
+	    customJsonMediaTypes.removeAll(existingMediaTypes);
 	    double quality = Double.valueOf(plainJson.get().getParameters().getOrDefault(MediaTypeUtils.MEDIA_TYPE_PARAMETER_QUALITY_CLIENT, "1.0"));
 	    if(quality < 1.0) {
 		customJsonMediaTypes.forEach(
