@@ -1,9 +1,11 @@
 package simplyrestful.api.framework.core.api.webresource;
 
+import java.net.URI;
 import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -15,6 +17,7 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.api.crud.DefaultExists;
 import simplyrestful.api.framework.core.api.crud.DefaultUpdate;
 import simplyrestful.api.framework.resources.HALResource;
@@ -50,7 +53,21 @@ public interface DefaultResourcePut<T extends HALResource> extends WebResourceBa
 	if (!this.exists(id)) {
 	    throw new NotFoundException(ERROR_RESOURCE_WITH_ID_NOT_EXISTS);
 	}
-	ensureSelfLinkValid(uriInfo, resource, id);
+	if(resource.getSelf() == null) {
+	    resource.setSelf(createLink(
+		    getAbsoluteWebResourceURI(uriInfo, id),
+		    MediaTypeUtils.APPLICATION_HAL_JSON,
+		    resource.getProfile()));
+	}
+	else {
+	    UUID resourceIdFromSelf = parseUuidFromResourceUri(uriInfo, URI.create(resource.getSelf().getHref()));
+	    if (resourceIdFromSelf == null) {
+                throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
+            }
+            if (!resourceIdFromSelf.equals(id)) {
+                throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
+            }
+	}
 	this.update(resource, id);
 	return Response.ok().build();
     }

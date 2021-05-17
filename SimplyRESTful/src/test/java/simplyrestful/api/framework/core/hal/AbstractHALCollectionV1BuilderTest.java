@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -72,6 +73,11 @@ public abstract class AbstractHALCollectionV1BuilderTest {
 	@Override
 	public URI getProfile() {
 	    return URI.create("local://docs/resources/testresource");
+	}
+
+	@Override
+	public MediaType getCustomJsonMediaType() {
+	    return new MediaType("application", "x.testresource-v1+json");
 	}
 
 	public int getNumber() {

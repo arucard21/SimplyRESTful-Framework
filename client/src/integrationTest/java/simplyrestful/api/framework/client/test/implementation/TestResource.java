@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
@@ -41,6 +42,11 @@ public class TestResource extends HALResource {
     @Override
     public URI getProfile() {
 	return TEST_RESOURCE_PROFILE_URI;
+    }
+
+    @Override
+    public MediaType getCustomJsonMediaType() {
+	return new MediaType("application", "x.testresource-v1+json");
     }
 
     @Override

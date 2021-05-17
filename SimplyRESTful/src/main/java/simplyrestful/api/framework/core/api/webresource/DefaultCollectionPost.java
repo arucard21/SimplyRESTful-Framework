@@ -14,6 +14,7 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.api.crud.DefaultCreate;
 import simplyrestful.api.framework.core.api.crud.DefaultExists;
 import simplyrestful.api.framework.resources.HALResource;
@@ -37,11 +38,21 @@ public interface DefaultCollectionPost<T extends HALResource> extends WebResourc
 	    @NotNull
 	    @Valid
 	    T resource) {
-	UUID resourceId = ensureSelfLinkValid(uriInfo, resource, null);
-	if (this.exists(resourceId)) {
-	    throw new ClientErrorException(
-		    ERROR_RESOURCE_WITH_ID_EXISTS,
-		    Response.Status.CONFLICT);
+	UUID resourceId;
+	if(resource.getSelf() != null) {
+	    resourceId = parseUuidFromResourceUri(uriInfo, URI.create(resource.getSelf().getHref()));
+	    if (this.exists(resourceId)) {
+		throw new ClientErrorException(
+			ERROR_RESOURCE_WITH_ID_EXISTS,
+			Response.Status.CONFLICT);
+	    }
+	}
+	else {
+	    resourceId = UUID.randomUUID();
+	    resource.setSelf(createLink(
+		    getAbsoluteWebResourceURI(uriInfo, resourceId),
+		    MediaTypeUtils.APPLICATION_HAL_JSON,
+		    resource.getProfile()));
 	}
 	T updatedResource = this.create(resource, resourceId);
 	return Response.created(URI.create(updatedResource.getSelf().getHref())).build();

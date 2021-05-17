@@ -49,8 +49,12 @@ import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEven
 @OpenAPIDefinition(tags = {
 	@Tag(name = "Example Resources")
 })
-@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
-@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"")
+@Produces({
+    MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"; qs=0.5",
+    ExampleResource.EXAMPLE_MEDIA_TYPE_JSON+"; qs=0.8"})
+@Consumes({
+    MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"",
+    ExampleResource.EXAMPLE_MEDIA_TYPE_JSON})
 public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
     private static final String RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER = ",";
     private static final String RSQL_JPA_SORT_QUERY_FIELD_DELIMITER = ";";

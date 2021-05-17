@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 
+import javax.ws.rs.core.MediaType;
+
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALResource;
@@ -41,6 +43,11 @@ public class TestResource extends HALResource {
     @Override
     public URI getProfile() {
 	return TEST_RESOURCE_PROFILE_URI;
+    }
+
+    @Override
+    public MediaType getCustomJsonMediaType() {
+	return MediaType.valueOf(MEDIA_TYPE_JSON);
     }
 
     @Override

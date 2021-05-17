@@ -3,11 +3,9 @@ package simplyrestful.api.framework.core.api.webresource;
 import java.net.URI;
 import java.util.UUID;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.UriInfo;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALResource;
 
 public interface WebResourceBase<T extends HALResource> {
@@ -28,8 +26,9 @@ public interface WebResourceBase<T extends HALResource> {
 
     public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
     public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
-    // FIXME due to the servlet filter actually implementing this, the default behavior is currently to show all and this default is ignored.
     public static final String QUERY_PARAM_FIELDS_DEFAULT = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self";
+    public static final String QUERY_PARAM_FIELDS_ALL= "all";
+    public static final String QUERY_PARAM_FIELDS_COMPACT = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_links.item._links.self";
     public static final String QUERY_PARAM_QUERY_DEFAULT = "";
     public static final String QUERY_PARAM_SORT_DEFAULT = "";
 
@@ -94,8 +93,10 @@ public interface WebResourceBase<T extends HALResource> {
      * @return a {@link HALLink} that refers to the provided URI with the given
      *         profile
      */
-    default HALLink createLink(URI resourceURI, URI resourceProfile) {
-        return new HALLink.Builder(resourceURI).type(MediaTypeUtils.APPLICATION_HAL_JSON).profile(resourceProfile)
+    default HALLink createLink(URI resourceURI, String mediaType, URI resourceProfile) {
+        return new HALLink.Builder(resourceURI)
+        	.type(mediaType)
+        	.profile(resourceProfile)
         	.build();
     }
 
@@ -106,36 +107,5 @@ public interface WebResourceBase<T extends HALResource> {
         }
         UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
         return resourceIdFromSelf;
-    }
-
-    /**
-     * Checks if the self-link is present and valid.
-     *
-     * A new self-link can be generated with a random or provided UUID, if one does
-     * not yet exist. If a UUID is provided and a self-link exists, the ID in the
-     * self-link must match the provided UUID.
-     *
-     * @param resource   is the resource to check.
-     * @param providedID is a resource ID that should be used in the self-link, if
-     *                   one does not yet exist.
-     * @return the resource UUID that matches the ID used in the self-link.
-     */
-    default UUID ensureSelfLinkValid(UriInfo uriInfo, T resource, UUID providedID) {
-        if (resource.getSelf() == null) {
-            if (providedID == null) {
-                providedID = UUID.randomUUID();
-            }
-            resource.setSelf(createLink(getAbsoluteWebResourceURI(uriInfo, providedID), resource.getProfile()));
-            return providedID;
-        } else {
-            UUID resourceIdFromSelf = parseUuidFromResourceUri(uriInfo, URI.create(resource.getSelf().getHref()));
-            if (resourceIdFromSelf == null) {
-                throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
-            }
-            if (providedID != null && !resourceIdFromSelf.equals(providedID)) {
-                throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
-            }
-            return resourceIdFromSelf;
-        }
     }
 }

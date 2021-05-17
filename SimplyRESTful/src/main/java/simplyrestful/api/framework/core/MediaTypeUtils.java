@@ -1,16 +1,21 @@
 package simplyrestful.api.framework.core;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 
 public class MediaTypeUtils {
@@ -22,7 +27,10 @@ public class MediaTypeUtils {
     private static final String MEDIA_TYPE_PARAMETER_QUALITY_CLIENT = "q";
 
     public static final String APPLICATION_HAL_JSON = "application/hal+json";
-    public static final MediaType APPLICATION_HAL_JSON_TYPE = new MediaType("application", "hal+json");
+    public static final String TYPE_APPLICATION = "application";
+    public static final String APPLICATION_HAL_JSON_SUBTYPE = "hal+json";
+    public static final String APPLICATION_HAL_JSON_PARAMETER_PROFILE = "profile";
+    public static final MediaType APPLICATION_HAL_JSON_TYPE = new MediaType(TYPE_APPLICATION, APPLICATION_HAL_JSON_SUBTYPE);
 
     /**
      *
@@ -102,7 +110,7 @@ public class MediaTypeUtils {
         return qParameter == null ? 1.0 : Double.valueOf(qParameter);
     }
 
-    private static MediaType withoutQualityParameters(MediaType selectedMediaType) {
+    public static MediaType withoutQualityParameters(MediaType selectedMediaType) {
         Map<String, String> parametersWithoutQAndQS = selectedMediaType.getParameters().entrySet().stream()
         	.filter(entry -> !entry.getKey().equals(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT))
         	.filter(entry -> !entry.getKey().equals(MEDIA_TYPE_PARAMETER_QUALITY_SERVER))
@@ -169,5 +177,20 @@ public class MediaTypeUtils {
             return MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS;
         }
         return MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS;
+    }
+
+    public static List<MediaType> getProducibleMediaTypes(Configuration configuration) {
+	return getResourceClasses(configuration).stream()
+		.<AnnotatedElement>flatMap(resourceClass -> Stream.concat(Stream.of(resourceClass), Stream.of(resourceClass.getMethods())))
+		.flatMap(resourceClass -> Stream.of(resourceClass.getAnnotationsByType(Produces.class)))
+		.flatMap(produces -> Stream.of(produces.value()))
+		.map(MediaType::valueOf)
+		.collect(Collectors.toList());
+    }
+
+    public static Set<Class<?>> getResourceClasses(Configuration configuration) {
+	return Stream.concat(configuration.getClasses().stream(), configuration.getInstances().stream().map(Object::getClass))
+		.filter(configuredClass -> configuredClass.getAnnotationsByType(Path.class).length > 0)
+		.collect(Collectors.toSet());
     }
 }

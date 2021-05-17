@@ -3,12 +3,12 @@ package simplyrestful.api.framework.core.api.webresource;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -62,7 +62,7 @@ public interface DefaultCollectionGet<T extends HALResource> extends WebResource
     @Produces({
 	HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
 	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9",
-	HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2",
+	HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
 	})
     @Operation(description = "Get a list of resources")
     @ApiResponse(content = {
@@ -80,6 +80,8 @@ public interface DefaultCollectionGet<T extends HALResource> extends WebResource
 			    implementation = HALCollectionV1.class))
     })
     default HALCollection<T> listHALResources(
+	    @Context
+	    Configuration configuration,
 	    @Context
 	    UriInfo uriInfo,
 	    @Context
@@ -112,11 +114,14 @@ public interface DefaultCollectionGet<T extends HALResource> extends WebResource
 	    @QueryParam(QUERY_PARAM_SORT)
 	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	    List<String> sort) {
-	String[] mediaTypesFromAnnotation = new Object(){}.getClass().getEnclosingMethod().getAnnotation(Produces.class).value();
-	List<MediaType> mediaTypes = Stream.of(mediaTypesFromAnnotation)
-		.map(MediaType::valueOf)
+	List<MediaType> producibleMediaTypesWithQSValues = MediaTypeUtils.getProducibleMediaTypes(configuration).stream()
+		.filter(producibleMediaType ->
+			(MediaTypeUtils.withoutQualityParameters(producibleMediaType).equals(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON)) ||
+			MediaTypeUtils.withoutQualityParameters(producibleMediaType).equals(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON)) ||
+			MediaTypeUtils.withoutQualityParameters(producibleMediaType).equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))))
 		.collect(Collectors.toList());
-	MediaType selected = MediaTypeUtils.selectMediaType(mediaTypes, httpHeaders.getAcceptableMediaTypes());
+	MediaType selected = MediaTypeUtils.selectMediaType(producibleMediaTypesWithQSValues, httpHeaders.getAcceptableMediaTypes());
+
 	if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
 	    int calculatedPageStart = (page -1) * pageSize;
 	    if(compact) {

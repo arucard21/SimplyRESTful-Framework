@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
+import javax.ws.rs.core.MediaType;
+
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
 import io.openapitools.jackson.dataformat.hal.annotation.Link;
@@ -110,6 +112,11 @@ public class HALCollectionV1<T extends HALResource> extends HALCollection<T>{
 	@Override
 	public URI getProfile() {
 		return URI.create(PROFILE_STRING);
+	}
+
+	@Override
+	public MediaType getCustomJsonMediaType() {
+	    return MediaType.APPLICATION_JSON_TYPE;
 	}
 
 	@Override

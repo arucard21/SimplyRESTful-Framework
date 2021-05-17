@@ -6,6 +6,8 @@ import java.util.UUID;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -43,31 +45,35 @@ public class DefaultWebResourceTest {
     }
 
     @Mock
+    private Configuration configuration;
+    @Mock
     private UriInfo uriInfo;
+    @Mock
+    private HttpHeaders httpHeaders;
     @InjectMocks
     public TestWebResource testEndpoint;
 
     @Test
     public void endpoint_shouldCreateLinkWithCorrectMediaType() {
 	Assertions.assertEquals(MediaTypeUtils.APPLICATION_HAL_JSON,
-		testEndpoint.createLink(TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
+		testEndpoint.createLink(TEST_REQUEST_URI, MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
     }
 
     @Test
     public void endpoint_shouldCreateLinkWithCorrectProfile() {
 	Assertions.assertEquals(TestResource.TEST_RESOURCE_PROFILE_URI,
-		testEndpoint.createLink(TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getProfile());
+		testEndpoint.createLink(TEST_REQUEST_URI, MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getProfile());
     }
 
     @Test
     public void endpoint_shouldCreateLinkWithCorrectRequestURI() {
 	Assertions.assertEquals(TEST_REQUEST_URI, URI
-		.create(testEndpoint.createLink(TEST_REQUEST_URI, TestResource.TEST_RESOURCE_PROFILE_URI).getHref()));
+		.create(testEndpoint.createLink(TEST_REQUEST_URI, MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getHref()));
     }
 
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {
-	Assertions.assertThrows(NotFoundException.class, () -> testEndpoint.getHALResource(UUID.randomUUID()));
+	Assertions.assertThrows(NotFoundException.class, () -> testEndpoint.getHALResource(configuration, uriInfo, httpHeaders, UUID.randomUUID()));
     }
 
     @Test

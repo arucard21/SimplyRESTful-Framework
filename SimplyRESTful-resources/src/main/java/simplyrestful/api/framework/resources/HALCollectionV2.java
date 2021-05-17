@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
+import javax.ws.rs.core.MediaType;
+
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.openapitools.jackson.dataformat.hal.annotation.EmbeddedResource;
 import io.openapitools.jackson.dataformat.hal.annotation.Link;
@@ -14,7 +16,7 @@ public class HALCollectionV2<T extends HALResource> extends HALCollection<T> {
     public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2";
     public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile=\""+PROFILE_STRING+"\"";
     public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-halcollection-v2+json";
-    
+
     private int total;
     @Link
     private HALLink first;
@@ -78,6 +80,11 @@ public class HALCollectionV2<T extends HALResource> extends HALCollection<T> {
     @Override
     public URI getProfile() {
 	return URI.create(PROFILE_STRING);
+    }
+
+    @Override
+    public MediaType getCustomJsonMediaType() {
+	return MediaType.valueOf(MEDIA_TYPE_JSON);
     }
 
     @Override

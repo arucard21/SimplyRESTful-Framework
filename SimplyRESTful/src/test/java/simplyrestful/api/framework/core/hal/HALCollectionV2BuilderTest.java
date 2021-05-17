@@ -36,10 +36,10 @@ public class HALCollectionV2BuilderTest {
     }
 
     protected HALCollectionV2<TestResource> createExpectedCollection(
-	    int startOfFirst, 
+	    int startOfFirst,
 	    int startOfLast,
 	    int startOfPrev,
-	    int startOfNext, 
+	    int startOfNext,
 	    int sublistBegin,
 	    int sublistEnd) {
 	HALCollectionV2<TestResource> expected = new HALCollectionV2<TestResource>();
@@ -59,7 +59,7 @@ public class HALCollectionV2BuilderTest {
 	expected.setPrev(prevPage);
 	expected.setNext(nextPage);
 	List<TestResource> resourcesForPage = testResourcesList.subList(sublistBegin, sublistEnd);
-	
+
 	expected.setItem(resourcesForPage);
 	return expected;
     }
@@ -70,6 +70,11 @@ public class HALCollectionV2BuilderTest {
 	@Override
 	public URI getProfile() {
 	    return URI.create("local://docs/resources/testresource");
+	}
+
+	@Override
+	public MediaType getCustomJsonMediaType() {
+	    return new MediaType("application", "x.testresource-v1+json");
 	}
 
 	public int getNumber() {
@@ -86,7 +91,7 @@ public class HALCollectionV2BuilderTest {
 	int pageStart = 0;
 	int maxPageSize = 100;
 	List<TestResource> resources = testResourcesList.subList(0, 100);
-	
+
 	HALCollectionV2<TestResource> actual = HALCollectionV2Builder
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
@@ -101,7 +106,7 @@ public class HALCollectionV2BuilderTest {
 	int pageStart = 300;
 	int maxPageSize = 100;
 	List<TestResource> resources = testResourcesList.subList(200, 300);
-	
+
 	HALCollectionV2<TestResource> actual = HALCollectionV2Builder
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
@@ -131,7 +136,7 @@ public class HALCollectionV2BuilderTest {
 	int pageStart = 4;
 	int maxPageSize = 300;
 	List<TestResource> resources = testResourcesList.subList(900, 1000);
-	
+
 	HALCollectionV2<TestResource> actual = HALCollectionV2Builder
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
@@ -145,7 +150,7 @@ public class HALCollectionV2BuilderTest {
 	int pageStart = 1;
 	int maxPageSize = 100;
 	List<TestResource> resources = testResourcesList.subList(200, 300);
-	
+
 	HALCollectionV2<TestResource> actual = HALCollectionV2Builder
 		.from(resources, requestURI)
 		.collectionSize(TEST_RESOURCES_SIZE)
@@ -166,7 +171,7 @@ public class HALCollectionV2BuilderTest {
 		.build(halJson);
 	Assertions.assertEquals(MediaTypeUtils.APPLICATION_HAL_JSON, actual.getSelf().getType());
     }
-    
+
     @Test
     public void test_createPagedCollection_UsesCorrectMediaTypeForCustomJson() {
 	int pageStart = 1;

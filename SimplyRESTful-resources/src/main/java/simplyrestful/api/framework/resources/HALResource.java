@@ -3,6 +3,8 @@ package simplyrestful.api.framework.resources;
 import java.net.URI;
 import java.util.Objects;
 
+import javax.ws.rs.core.MediaType;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
@@ -32,6 +34,16 @@ public abstract class HALResource{
 	 */
 	@JsonIgnore
 	public abstract URI getProfile();
+
+	/**
+	 * Provide the custom JSON media type representing this resource.
+	 *
+	 * This custom JSON media type is an alternative representation, alongside the HAL+JSON representation.
+	 *
+	 * @return the custom JSON media type for this resource.
+	 */
+	@JsonIgnore
+	public abstract MediaType getCustomJsonMediaType();
 
 	@Override
 	public int hashCode() {
