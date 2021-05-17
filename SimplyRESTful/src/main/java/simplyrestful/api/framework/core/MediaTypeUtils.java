@@ -26,6 +26,7 @@ public class MediaTypeUtils {
     private static final String MEDIA_TYPE_PARAMETER_QUALITY_SERVER = "qs";
     private static final String MEDIA_TYPE_PARAMETER_QUALITY_CLIENT = "q";
 
+    public static final String MEDIA_TYPE_STRUCTURED_SYNTAX_SUFFIX_JSON = "+json";
     public static final String APPLICATION_HAL_JSON = "application/hal+json";
     public static final String TYPE_APPLICATION = "application";
     public static final String APPLICATION_HAL_JSON_SUBTYPE = "hal+json";
@@ -69,8 +70,9 @@ public class MediaTypeUtils {
         }
         selectedMediaTypes.sort(
         	Comparator.comparingInt(MediaTypeUtils::determineMediaTypeSpecificity)
-        	.thenComparingDouble(MediaTypeUtils::getQParameter).reversed()
-        	.thenComparingDouble(MediaTypeUtils::getQSParameter).reversed());
+        	.thenComparingDouble(MediaTypeUtils::getQParameter)
+        	.thenComparingDouble(MediaTypeUtils::getQSParameter)
+        	.reversed());
         for(MediaType selectedMediaType : selectedMediaTypes) {
             if(isConcreteMediaType(selectedMediaType)) {
         	return withoutQualityParameters(selectedMediaType);
