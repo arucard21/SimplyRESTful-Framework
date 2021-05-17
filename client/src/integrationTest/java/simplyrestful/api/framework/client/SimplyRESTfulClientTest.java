@@ -30,6 +30,7 @@ import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
 
+@SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
 public class SimplyRESTfulClientTest extends JerseyTest {
     private static final UUID UUID_NIL = UUID.fromString("00000000-0000-0000-0000-000000000000");
