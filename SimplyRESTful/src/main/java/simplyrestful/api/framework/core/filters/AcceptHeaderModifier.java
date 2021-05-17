@@ -43,27 +43,34 @@ public class AcceptHeaderModifier implements ContainerRequestFilter {
 	    List<MediaType> customJsonMediaTypes = getCustomJsonMediaTypes();
 	    List<MediaType> existingMediaTypes = customJsonMediaTypes.stream()
 		    .filter(customMediaType -> acceptableMediaTypes.stream()
-			    .anyMatch(acceptableMediaType -> MediaTypeUtils.withoutQualityParameters(acceptableMediaType).equals(MediaTypeUtils.withoutQualityParameters(customMediaType))))
+			    .anyMatch(acceptableMediaType -> MediaTypeUtils.withoutQualityParameters(acceptableMediaType).equals(customMediaType)))
 		    .collect(Collectors.toList());
 	    customJsonMediaTypes.removeAll(existingMediaTypes);
 	    double quality = Double.valueOf(plainJson.get().getParameters().getOrDefault(MediaTypeUtils.MEDIA_TYPE_PARAMETER_QUALITY_CLIENT, "1.0"));
-	    if(quality < 1.0) {
-		customJsonMediaTypes.forEach(
-			mediaType -> mediaType.getParameters().put(
-				MediaTypeUtils.MEDIA_TYPE_PARAMETER_QUALITY_CLIENT,
-				Double.toString(quality)));
-	    }
+	    List<String> customJsonMediaTypesWithQ = customJsonMediaTypes.stream()
+		    .map(mediaType -> quality < 1.0 ? MediaTypeUtils.addQParameter(mediaType, quality) : mediaType)
+		    .map(MediaType::toString)
+		    .collect(Collectors.toList());
 	    modifiedAcceptableMediaTypes = Stream.concat(
 		    modifiedAcceptableMediaTypes.stream(),
-		    customJsonMediaTypes.stream().map(MediaType::toString))
+		    customJsonMediaTypesWithQ.stream())
 		    .collect(Collectors.toList());
 	}
 	requestContext.getHeaders().put(HttpHeaders.ACCEPT, modifiedAcceptableMediaTypes);
     }
 
+    /**
+     * Detect the media types that can be produced and return them without their server-side quality parameters.
+     * This will only return media types of the same level of specificity as plain JSON, which means that any media
+     * types with non-quality parameters will be removed as that makes them more specific than plain JSON.
+     *
+     * @return the list of similarly-specific plain JSON media types that can be produced.
+     */
     private List<MediaType> getCustomJsonMediaTypes() {
 	return MediaTypeUtils.getProducibleMediaTypes(jaxrsConfiguration).stream()
 		.filter(producibleMediaType -> producibleMediaType.getSubtype().endsWith(MediaTypeUtils.MEDIA_TYPE_STRUCTURED_SYNTAX_SUFFIX_JSON))
+		.map(MediaTypeUtils::withoutQualityParameters)
+		.filter(mediaType -> mediaType.getParameters().isEmpty())
 		.collect(Collectors.toList());
     }
 }

@@ -86,28 +86,28 @@ public class MediaTypeUtils {
         throw new NotAcceptableException();
     }
 
-    private static MediaType addQualityParameters(MediaType mediaType, double q, double qs) {
+    public static MediaType addQualityParameters(MediaType mediaType, double q, double qs) {
         return addQSParameter(addQParameter(mediaType, q), qs);
     }
 
-    private static MediaType addQSParameter(MediaType mediaType, double qs) {
+    public static MediaType addQSParameter(MediaType mediaType, double qs) {
         Map<String, String> newParameters = new HashMap<>(mediaType.getParameters());
         newParameters.put(MEDIA_TYPE_PARAMETER_QUALITY_SERVER, Double.toString(qs));
         return new MediaType(mediaType.getType(), mediaType.getSubtype(), newParameters);
     }
 
-    private static MediaType addQParameter(MediaType mediaType, double q) {
+    public static MediaType addQParameter(MediaType mediaType, double q) {
         Map<String, String> newParameters = new HashMap<>(mediaType.getParameters());
         newParameters.put(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT, Double.toString(q));
         return new MediaType(mediaType.getType(), mediaType.getSubtype(), newParameters);
     }
 
-    private static Double getQSParameter(MediaType mediaType) {
+    public static Double getQSParameter(MediaType mediaType) {
         String qsParameter = mediaType.getParameters().get(MEDIA_TYPE_PARAMETER_QUALITY_SERVER);
         return qsParameter == null ? 1.0 : Double.valueOf(qsParameter);
     }
 
-    private static Double getQParameter(MediaType mediaType) {
+    public static Double getQParameter(MediaType mediaType) {
         String qParameter = mediaType.getParameters().get(MEDIA_TYPE_PARAMETER_QUALITY_CLIENT);
         return qParameter == null ? 1.0 : Double.valueOf(qParameter);
     }
