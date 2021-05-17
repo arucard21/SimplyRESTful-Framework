@@ -7,7 +7,7 @@ plugins{
 //Shared configuration for all projects (root, library and example projects) including ones with a custom build.gradle
 configure(allprojects){
     group = 'com.github.arucard21.simplyrestful'
-    version = '0.16.0'
+    version = '0.16.1'
 }
 
 //Shared configuration for all projects (root, library and example projects) except ones with a custom build.gradle
