@@ -6,3 +6,5 @@ The main library in the framework is [`SimplyRESTful`](/SimplyRESTful). It conta
 Other than this, the other libraries are mostly for auto-configuration (e.g. `deploy-*` libraries ) or to provide additional features (e.g. `fields-filter-json-servlet`). 
 
 There are [examples for the different deploy libraries](/examples/) available for more concrete information about how to implement this.
+
+You can find more information about this framework on the [wiki](https://github.com/arucard21/SimplyRESTful-Framework/wiki). 
