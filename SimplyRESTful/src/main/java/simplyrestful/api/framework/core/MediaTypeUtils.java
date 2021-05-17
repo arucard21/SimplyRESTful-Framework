@@ -23,8 +23,8 @@ public class MediaTypeUtils {
     private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
     private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS = 2; // Example: application/json
     private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS = 3; // Example: application/hal+json;profile="https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2"
-    private static final String MEDIA_TYPE_PARAMETER_QUALITY_SERVER = "qs";
-    private static final String MEDIA_TYPE_PARAMETER_QUALITY_CLIENT = "q";
+    public static final String MEDIA_TYPE_PARAMETER_QUALITY_SERVER = "qs";
+    public static final String MEDIA_TYPE_PARAMETER_QUALITY_CLIENT = "q";
 
     public static final String MEDIA_TYPE_STRUCTURED_SYNTAX_SUFFIX_JSON = "+json";
     public static final String APPLICATION_HAL_JSON = "application/hal+json";
