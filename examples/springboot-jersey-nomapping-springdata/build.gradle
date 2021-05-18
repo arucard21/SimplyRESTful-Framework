@@ -17,6 +17,7 @@ dependencies {
 	implementation project(':SimplyRESTful')
 	implementation project(':deploy-springboot-jersey')
 	implementation project(':fields-filter-json-servlet')
+	implementation project(':springdata-paging-offset')
 	implementation group: "org.springframework.boot", name: "spring-boot-starter-data-jpa", version: springBootVersion
 	implementation group: "org.springframework.boot", name: "spring-boot-starter-validation", version: springBootVersion
 	implementation group: "org.springframework.boot", name: "spring-boot-starter-actuator", version: springBootVersion

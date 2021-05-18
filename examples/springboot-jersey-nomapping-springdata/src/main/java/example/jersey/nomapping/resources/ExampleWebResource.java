@@ -34,7 +34,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import example.jersey.nomapping.OffsetBasedPageRequest;
 import io.github.perplexhub.rsql.RSQLJPASupport;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -43,6 +42,7 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.SortOrder;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
+import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 
 @Named
 @Path("/resources")
