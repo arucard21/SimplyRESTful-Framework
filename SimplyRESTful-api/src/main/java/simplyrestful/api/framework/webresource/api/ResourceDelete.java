@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.webresource.api;
 
 import java.util.UUID;
 

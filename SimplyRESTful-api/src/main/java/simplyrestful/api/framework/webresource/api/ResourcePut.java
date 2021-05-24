@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.webresource.api;
 
 import java.util.UUID;
 
@@ -12,11 +12,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import simplyrestful.api.framework.core.api.crud.DefaultExists;
-import simplyrestful.api.framework.core.api.crud.DefaultUpdate;
 import simplyrestful.api.framework.resources.HALResource;
 
-public interface ResourcePut<T extends HALResource> extends DefaultExists, DefaultUpdate<T> {
+public interface ResourcePut<T extends HALResource> {
     /**
      * Update a resource (or create it with the given identifier)
      * <p>

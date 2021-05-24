@@ -7,10 +7,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.webresource.api.CollectionGet;
 
 public class HALCollectionV2Builder<T extends HALResource> {
     private static final int START_OF_FIRST_PAGE = 0;
@@ -140,7 +140,7 @@ public class HALCollectionV2Builder<T extends HALResource> {
 
     protected HALLink createHALLinkFromURIWithModifiedPageOffset(URI requestURI, int pageStart) {
 	URI modifiedUri = UriBuilder.fromUri(requestURI)
-		.replaceQueryParam(DefaultWebResource.QUERY_PARAM_PAGE_START, pageStart)
+		.replaceQueryParam(CollectionGet.QUERY_PARAM_PAGE_START, pageStart)
 		.build();
 	return new HALLink.Builder(modifiedUri).build();
     }

@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.core.webresource.api.implementation;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +14,7 @@ import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.QueryParamUtils;
 import simplyrestful.api.framework.core.api.crud.DefaultStream;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.webresource.api.CollectionGetEventStream;
 
 public interface DefaultCollectionGetEventStream<T extends HALResource> extends CollectionGetEventStream<T>, DefaultStream<T> {
     @Operation(description = "Get a stream of resources")

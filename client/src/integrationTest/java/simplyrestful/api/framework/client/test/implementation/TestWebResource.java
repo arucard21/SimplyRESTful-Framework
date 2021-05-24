@@ -18,7 +18,7 @@ import simplyrestful.api.framework.client.SimplyRESTfulClientTest;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.SortOrder;
-import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
+import simplyrestful.api.framework.core.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
 @OpenAPIDefinition(

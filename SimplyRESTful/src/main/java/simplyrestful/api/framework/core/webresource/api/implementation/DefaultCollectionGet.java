@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.core.webresource.api.implementation;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +23,7 @@ import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.webresource.api.CollectionGet;
 
 /**
  * Provide a default implementation for the collection resource.

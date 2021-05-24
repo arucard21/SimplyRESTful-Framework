@@ -43,7 +43,7 @@ import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.SortOrder;
 import simplyrestful.api.framework.core.WebResourceUtils;
-import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
+import simplyrestful.api.framework.core.webresource.api.implementation.DefaultCollectionGetEventStream;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 
 @Named
@@ -65,17 +65,17 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
     private static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
     private static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
-    private ExampleRepository repo;
 
+    private ExampleRepository repo;
     @Context
-    private ResourceInfo resourceInfo;
+    ResourceInfo resourceInfo;
     @Context
-    private UriInfo uriInfo;
+    UriInfo uriInfo;
 
     @Inject
     public ExampleWebResource(ExampleRepository repo) {
-	this.repo = repo;
-	addInitialTestData(repo);
+        this.repo = repo;
+        addInitialTestData(repo);
     }
 
     private void addInitialTestData(ExampleRepository repo) {

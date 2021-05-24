@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.core.webresource.api.implementation;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import simplyrestful.api.framework.core.api.crud.DefaultDelete;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.webresource.api.ResourceDelete;
 
 public interface DefaultResourceDelete<T extends HALResource> extends ResourceDelete<T>, DefaultDelete<T> {
     @Operation(description = "Delete a single resource")

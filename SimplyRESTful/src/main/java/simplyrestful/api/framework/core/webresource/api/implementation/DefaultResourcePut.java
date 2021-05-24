@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.core.webresource.api.implementation;
 
 import java.net.URI;
 import java.util.UUID;
@@ -16,6 +16,7 @@ import simplyrestful.api.framework.core.WebResourceUtils;
 import simplyrestful.api.framework.core.api.crud.DefaultExists;
 import simplyrestful.api.framework.core.api.crud.DefaultUpdate;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.webresource.api.ResourcePut;
 
 public interface DefaultResourcePut<T extends HALResource> extends ResourcePut<T>, DefaultExists, DefaultUpdate<T> {
     public static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";

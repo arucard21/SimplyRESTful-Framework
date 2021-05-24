@@ -13,7 +13,7 @@ import javax.ws.rs.Produces;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.SortOrder;
-import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
+import simplyrestful.api.framework.core.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path("testresources")
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")

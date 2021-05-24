@@ -1,0 +1,39 @@
+apply plugin: "java-library"
+
+repositories {
+	mavenCentral()
+}
+
+project.description = "A library containing the JAX-RS interface classes for SimplyRESTful APIs."
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+tasks.withType(Test){
+	useJUnitPlatform()
+}
+
+dependencies {
+    api project(":SimplyRESTful-resources")
+	api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
+	api group: "jakarta.validation", name: "jakarta.validation-api", version: jakartaValidationVersion
+	
+	testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
+	testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
+	testImplementation group: "org.junit.platform", name:"junit-platform-launcher", version: junitPlatformVersion
+}
+
+publishing{
+	publications{
+		mavenJava(MavenPublication){
+			pom {
+				licenses {
+					license {
+						name = 'GNU Lesser General Public License'
+						url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+					}
+				}
+			}
+		}
+	}
+}

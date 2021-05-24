@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.SortOrder;
-import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGet;
+import simplyrestful.api.framework.core.webresource.api.implementation.DefaultCollectionGet;
 import simplyrestful.api.framework.test.implementation.TestResource;
 
 @Path("testresources")

@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.webresource.api;
 
 import java.util.List;
 
@@ -11,7 +11,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
-import simplyrestful.api.framework.core.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
@@ -34,7 +33,9 @@ public interface CollectionGet<T extends HALResource> {
     public static final String QUERY_PARAM_SORT = "sort";
 
     public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
+    public static final String V1_QUERY_PARAM_PAGE_DEFAULT = "1";
     public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
+    public static final String V1_QUERY_PARAM_COMPACT_DEFAULT = "true";
     public static final String QUERY_PARAM_FIELDS_DEFAULT = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self";
     public static final String QUERY_PARAM_QUERY_DEFAULT = "";
     public static final String QUERY_PARAM_SORT_DEFAULT = "";
@@ -73,7 +74,7 @@ public interface CollectionGet<T extends HALResource> {
 	    @Context
 	    HttpHeaders httpHeaders,
 	    @QueryParam(V1_QUERY_PARAM_PAGE)
-        @DefaultValue(HALCollectionV1Builder.DEFAULT_PAGE_NUMBER_STRING)
+        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
         int page,
         @QueryParam(QUERY_PARAM_PAGE_START)
 	    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
@@ -82,7 +83,7 @@ public interface CollectionGet<T extends HALResource> {
 	    @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
 	    int pageSize,
 	    @QueryParam(V1_QUERY_PARAM_COMPACT)
-        @DefaultValue(HALCollectionV1Builder.DEFAULT_COMPACT_VALUE_STRING)
+        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
         boolean compact,
         @QueryParam(QUERY_PARAM_FIELDS)
 	    @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)

@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.webresource.api;
 
 import java.util.UUID;
 
@@ -11,10 +11,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
-import simplyrestful.api.framework.core.api.crud.DefaultRead;
 import simplyrestful.api.framework.resources.HALResource;
 
-public interface ResourceGet<T extends HALResource> extends DefaultRead<T> {
+public interface ResourceGet<T extends HALResource> {
     /**
      * Retrieve a resource.
      *

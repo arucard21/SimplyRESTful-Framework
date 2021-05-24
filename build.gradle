@@ -172,7 +172,7 @@ project(":jaxrs-providers"){
 project(":SimplyRESTful"){
 	project.description = "A framework for creating a RESTful API"
 	dependencies {
-		api project(":SimplyRESTful-resources")
+		api project(":SimplyRESTful-api")
 		api project(":jaxrs-providers")
 		api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
 		api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion

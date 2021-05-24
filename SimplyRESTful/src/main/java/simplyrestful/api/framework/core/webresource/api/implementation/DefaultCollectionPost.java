@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.core.webresource.api.implementation;
 
 import java.net.URI;
 import java.util.UUID;
@@ -15,6 +15,7 @@ import simplyrestful.api.framework.core.WebResourceUtils;
 import simplyrestful.api.framework.core.api.crud.DefaultCreate;
 import simplyrestful.api.framework.core.api.crud.DefaultExists;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.webresource.api.CollectionPost;
 
 public interface DefaultCollectionPost<T extends HALResource> extends CollectionPost<T>, DefaultExists, DefaultCreate<T> {
     public static final String ERROR_RESOURCE_WITH_ID_EXISTS = "A resource with the same ID already exists. Try to update the resource with a PUT request to the URI for that resource.";

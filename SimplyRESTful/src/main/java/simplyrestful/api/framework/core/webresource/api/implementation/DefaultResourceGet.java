@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.core.api.webresource;
+package simplyrestful.api.framework.core.webresource.api.implementation;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +15,7 @@ import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.WebResourceUtils;
 import simplyrestful.api.framework.core.api.crud.DefaultRead;
 import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.webresource.api.ResourceGet;
 
 public interface DefaultResourceGet<T extends HALResource> extends ResourceGet<T>, DefaultRead<T> {
     /**
