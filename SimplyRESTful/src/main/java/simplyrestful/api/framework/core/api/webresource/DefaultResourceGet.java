@@ -1,10 +1,7 @@
 package simplyrestful.api.framework.core.api.webresource;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -12,7 +9,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Configuration;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -36,21 +33,12 @@ public interface DefaultResourceGet<T extends HALResource> extends WebResourceBa
     @Operation(description = "Retrieve a single resource")
     @Consumes
     default T getHALResource(
-	    @Context Configuration configuration,
+	    @Context ResourceInfo resourceInfo,
 	    @Context UriInfo uriInfo,
 	    @Context HttpHeaders httpHeaders,
 	    @Parameter(description = "The identifier for the resource", required = true) @PathParam("id") @NotNull UUID id) {
 	T resource = Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
-
-	List<MediaType> producibleMediaTypesWithQSValues = MediaTypeUtils.getProducibleMediaTypes(configuration).stream()
-		.filter(producibleMediaType ->
-			(MediaTypeUtils.withoutQualityParameters(producibleMediaType).equals(new MediaType(
-				MediaTypeUtils.TYPE_APPLICATION,
-				MediaTypeUtils.APPLICATION_HAL_JSON_SUBTYPE,
-				Map.of(MediaTypeUtils.APPLICATION_HAL_JSON_PARAMETER_PROFILE, resource.getProfile().toString()))) ||
-			MediaTypeUtils.withoutQualityParameters(producibleMediaType).equals(resource.getCustomJsonMediaType())))
-		.collect(Collectors.toList());
-	MediaType selected = MediaTypeUtils.selectMediaType(producibleMediaTypesWithQSValues, httpHeaders.getAcceptableMediaTypes());
+	MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
 
 	if(MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.isCompatible(selected)) {
 	    resource.setSelf(createLink(

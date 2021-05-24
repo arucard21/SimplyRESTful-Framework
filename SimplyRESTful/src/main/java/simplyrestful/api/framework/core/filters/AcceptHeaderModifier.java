@@ -10,7 +10,7 @@ import javax.inject.Named;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Configuration;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -27,7 +27,7 @@ import simplyrestful.api.framework.core.MediaTypeUtils;
 @PreMatching
 public class AcceptHeaderModifier implements ContainerRequestFilter {
     @Context
-    private Configuration jaxrsConfiguration;
+    private ResourceInfo resourceInfo;
     @Context
     private HttpHeaders httpHeaders;
 
@@ -67,10 +67,14 @@ public class AcceptHeaderModifier implements ContainerRequestFilter {
      * @return the list of similarly-specific plain JSON media types that can be produced.
      */
     private List<MediaType> getCustomJsonMediaTypes() {
-	return MediaTypeUtils.getProducibleMediaTypes(jaxrsConfiguration).stream()
-		.filter(producibleMediaType -> producibleMediaType.getSubtype().endsWith(MediaTypeUtils.MEDIA_TYPE_STRUCTURED_SYNTAX_SUFFIX_JSON))
-		.map(MediaTypeUtils::withoutQualityParameters)
-		.filter(mediaType -> mediaType.getParameters().isEmpty())
-		.collect(Collectors.toList());
+        return MediaTypeUtils.getProducibleMediaTypes(resourceInfo).stream()
+    	        .filter(producibleMediaType -> producibleMediaType.getSubtype().endsWith(MediaTypeUtils.MEDIA_TYPE_STRUCTURED_SYNTAX_SUFFIX_JSON))
+    	        .map(MediaTypeUtils::withoutQualityParameters)
+    	        .filter(this::withPlainJsonLevelOfSpecificity)
+    	        .collect(Collectors.toList());
+    }
+
+    private boolean withPlainJsonLevelOfSpecificity(MediaType mediaType) {
+        return mediaType.getParameters().isEmpty();
     }
 }

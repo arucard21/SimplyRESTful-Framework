@@ -167,39 +167,39 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     }
 
     private void simulateSlowDataRetrieval() {
-	try {
-	    Thread.sleep(1000);
-	} catch (InterruptedException e) {
-	    e.printStackTrace();
-	}
+    	try {
+    	    Thread.sleep(1000);
+    	} catch (InterruptedException e) {
+    	    e.printStackTrace();
+    	}
     }
 
     private String createSortQuery(List<SortOrder> sort) {
-	return sort.stream()
-		.map(this::createSingleSortQueryField)
-		.collect(Collectors.joining(RSQL_JPA_SORT_QUERY_FIELD_DELIMITER));
+    	return sort.stream()
+    		.map(this::createSingleSortQueryField)
+    		.collect(Collectors.joining(RSQL_JPA_SORT_QUERY_FIELD_DELIMITER));
     }
 
     private String createSingleSortQueryField(SortOrder sort) {
-	String direction = sort.isAscending() ? RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING : RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
-	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER, sort.getField(), direction);
+    	String direction = sort.isAscending() ? RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING : RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
+    	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER, sort.getField(), direction);
     }
 
     private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
-	if (persistedResource.getSelf() == null && persistedResource.getUUID() == null) {
-	    throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
-	}
-	if (persistedResource.getSelf() == null) {
-	    persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI(uriInfo))
-		    .path(persistedResource.getUUID().toString()).build())
-			    .type(MediaTypeUtils.APPLICATION_HAL_JSON).profile(persistedResource.getProfile())
-			    .build());
-	}
-	if (persistedResource.getUUID() == null) {
-	    UUID id = UUID.fromString(getAbsoluteWebResourceURI(uriInfo)
-		    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
-	    persistedResource.setUUID(id);
-	}
-	return persistedResource;
+    	if (persistedResource.getSelf() == null && persistedResource.getUUID() == null) {
+    	    throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
+    	}
+    	if (persistedResource.getSelf() == null) {
+    	    persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI(uriInfo))
+    		    .path(persistedResource.getUUID().toString()).build())
+    			    .type(MediaTypeUtils.APPLICATION_HAL_JSON).profile(persistedResource.getProfile())
+    			    .build());
+    	}
+    	if (persistedResource.getUUID() == null) {
+    	    UUID id = UUID.fromString(getAbsoluteWebResourceURI(uriInfo)
+    		    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
+    	    persistedResource.setUUID(id);
+    	}
+    	return persistedResource;
     }
 }
