@@ -28,6 +28,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -39,6 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.SortOrder;
+import simplyrestful.api.framework.core.WebResourceUtils;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
 
 @Path("/resources")
@@ -47,6 +49,8 @@ import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEven
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
 public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
     private ExampleEntityDAO dao;
+    @Context
+    private ResourceInfo resourceInfo;
     @Context
     private UriInfo uriInfo;
 
@@ -117,12 +121,12 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 
     private void ensureSelfLinkPresent(ExampleResource persistedResource) {
 	if (persistedResource.getSelf() == null) {
-	    persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(getAbsoluteWebResourceURI(uriInfo))
+	    persistedResource.setSelf(new HALLink.Builder(UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo))
 		    .path(persistedResource.getUUID().toString()).build()).type(MediaTypeUtils.APPLICATION_HAL_JSON)
 			    .profile(persistedResource.getProfile()).build());
 	}
 	if (persistedResource.getUUID() == null) {
-	    UUID id = UUID.fromString(getAbsoluteWebResourceURI(uriInfo)
+	    UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)
 		    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
 	    persistedResource.setUUID(id);
 	}

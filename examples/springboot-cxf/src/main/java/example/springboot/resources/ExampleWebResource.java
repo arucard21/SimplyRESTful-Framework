@@ -34,6 +34,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -50,6 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.core.DefaultWebResource;
 import simplyrestful.api.framework.core.MediaTypeUtils;
 import simplyrestful.api.framework.core.SortOrder;
+import simplyrestful.api.framework.core.WebResourceUtils;
 import simplyrestful.api.framework.core.api.webresource.DefaultCollectionGetEventStream;
 
 @Named
@@ -67,6 +69,8 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
      */
     private Map<String, UUID> resourceMapping;
     private DataStore dataStore;
+    @Context
+    private ResourceInfo resourceInfo;
     @Context
     private UriInfo uriInfo;
 
@@ -213,19 +217,19 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	// create resource URI with new UUID and add it to the mapping
 	exampleResource.setSelf(createSelfLinkWithUUID(storedResource.getId(), exampleResource.getProfile()));
 	exampleResource.setEmbeddedResource(convertEmbeddedToResource(storedResource.getEmbedded()));
-	resourceMapping.put(getAbsoluteWebResourceURI(uriInfo).getPath(), storedResource.getId());
+	resourceMapping.put(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo).getPath(), storedResource.getId());
 	return exampleResource;
     }
 
     private ExampleEmbeddedResource convertEmbeddedToResource(StoredEmbeddedObject embedded) {
 	ExampleEmbeddedResource embRes = new ExampleEmbeddedResource();
 	embRes.setName(embedded.getName());
-	resourceMapping.put(getAbsoluteWebResourceURI(uriInfo).getPath(), embedded.getId());
+	resourceMapping.put(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo).getPath(), embedded.getId());
 	return embRes;
     }
 
     private HALLink createSelfLinkWithUUID(UUID id, URI resourceProfile) {
-	return new HALLink.Builder(getAbsoluteWebResourceURI(uriInfo, id)).type(MediaTypeUtils.APPLICATION_HAL_JSON)
+	return new HALLink.Builder(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, id)).type(MediaTypeUtils.APPLICATION_HAL_JSON)
 		.profile(resourceProfile).build();
     }
 }

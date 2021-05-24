@@ -34,14 +34,14 @@ public class DefaultWebResourceTest {
 
     @BeforeAll
     public static void addTestResources() {
-	testInstance = TestResource.testInstance(TEST_BASE_URI);
-	TestWebResource.TEST_RESOURCES.add(testInstance);
-	TestWebResource.TEST_RESOURCES.add(TestResource.random(TEST_BASE_URI));
+        testInstance = TestResource.testInstance(TEST_BASE_URI);
+        TestWebResource.TEST_RESOURCES.add(testInstance);
+        TestWebResource.TEST_RESOURCES.add(TestResource.random(TEST_BASE_URI));
     }
 
     @AfterAll
     public static void clearTestResources() {
-	TestWebResource.TEST_RESOURCES.clear();
+        TestWebResource.TEST_RESOURCES.clear();
     }
 
     @Mock
@@ -55,49 +55,52 @@ public class DefaultWebResourceTest {
 
     @Test
     public void endpoint_shouldCreateLinkWithCorrectMediaType() {
-	Assertions.assertEquals(MediaTypeUtils.APPLICATION_HAL_JSON,
-		testEndpoint.createLink(TEST_REQUEST_URI, MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
+        Assertions.assertEquals(MediaTypeUtils.APPLICATION_HAL_JSON, WebResourceUtils.createLink(TEST_REQUEST_URI,
+                MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
     }
 
     @Test
     public void endpoint_shouldCreateLinkWithCorrectProfile() {
-	Assertions.assertEquals(TestResource.TEST_RESOURCE_PROFILE_URI,
-		testEndpoint.createLink(TEST_REQUEST_URI, MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getProfile());
+        Assertions.assertEquals(TestResource.TEST_RESOURCE_PROFILE_URI, WebResourceUtils.createLink(TEST_REQUEST_URI,
+                MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getProfile());
     }
 
     @Test
     public void endpoint_shouldCreateLinkWithCorrectRequestURI() {
-	Assertions.assertEquals(TEST_REQUEST_URI, URI
-		.create(testEndpoint.createLink(TEST_REQUEST_URI, MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getHref()));
+        Assertions.assertEquals(TEST_REQUEST_URI, URI.create(WebResourceUtils.createLink(TEST_REQUEST_URI,
+                MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getHref()));
     }
 
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {
-	Assertions.assertThrows(NotFoundException.class, () -> testEndpoint.getHALResource(resourceInfo, uriInfo, httpHeaders, UUID.randomUUID()));
+        Assertions.assertThrows(NotFoundException.class,
+                () -> testEndpoint.getHALResource(resourceInfo, uriInfo, httpHeaders, UUID.randomUUID()));
     }
 
     @Test
     public void endpoint_shouldThrowClientErrorExceptionWhenResourceAlreadyExists_withPOSTonResource() {
-	Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
-	Assertions.assertThrows(ClientErrorException.class,
-		() -> testEndpoint.postHALResource(uriInfo, TestResource.testInstance(TEST_BASE_URI)));
+        Mockito.doReturn(TestWebResource.class).when(resourceInfo).getResourceClass();
+        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
+        Assertions.assertThrows(ClientErrorException.class,
+                () -> testEndpoint.postHALResource(resourceInfo, uriInfo, TestResource.testInstance(TEST_BASE_URI)));
     }
 
     @Test
     public void endpoint_shouldThrowBadRequestWhenIDDoesNotMatchResource_withPUTonResource() {
-	Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
-	Assertions.assertThrows(BadRequestException.class,
-		() -> testEndpoint.putHALResource(uriInfo, TestResource.TEST_RESOURCE_ID, TestResource.custom(TEST_BASE_URI, UUID.randomUUID())));
+        Mockito.doReturn(TestWebResource.class).when(resourceInfo).getResourceClass();
+        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
+        Assertions.assertThrows(BadRequestException.class, () -> testEndpoint.putHALResource(resourceInfo, uriInfo,
+                TestResource.TEST_RESOURCE_ID, TestResource.custom(TEST_BASE_URI, UUID.randomUUID())));
     }
 
     @Test
     public void endpoint_shouldRemoveResource_withDELETEonResource() {
-	Response deleteResponse = testEndpoint.deleteHALResource(TestResource.TEST_RESOURCE_ID);
-	Assertions.assertEquals(Status.NO_CONTENT.getStatusCode(), deleteResponse.getStatus());
+        Response deleteResponse = testEndpoint.deleteHALResource(TestResource.TEST_RESOURCE_ID);
+        Assertions.assertEquals(Status.NO_CONTENT.getStatusCode(), deleteResponse.getStatus());
     }
 
     @Test
     public void endpoint_shouldThrowNotFoundWhenResourceNonexisting_withDELETEonResource() {
-	Assertions.assertThrows(NotFoundException.class, () -> testEndpoint.deleteHALResource(UUID.randomUUID()));
+        Assertions.assertThrows(NotFoundException.class, () -> testEndpoint.deleteHALResource(UUID.randomUUID()));
     }
 }
