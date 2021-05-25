@@ -1,1 +1,1 @@
-filterClass: simplyrestful.api.framework.core.swagger.SimplyRESTfulOpenApiFilter
+filterClass: simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter

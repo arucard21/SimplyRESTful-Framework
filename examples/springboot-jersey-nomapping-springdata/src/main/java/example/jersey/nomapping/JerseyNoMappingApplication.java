@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
-import simplyrestful.api.framework.core.filters.JsonFieldsServletFilter;
+import simplyrestful.api.framework.filters.JsonFieldsServletFilter;
 
 /**
  * Run the API server with the example endpoint and resource.

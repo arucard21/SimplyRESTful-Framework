@@ -8,7 +8,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import simplyrestful.api.framework.core.MediaTypeUtils;
+import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALResource;
 
 public class TestResource extends HALResource {

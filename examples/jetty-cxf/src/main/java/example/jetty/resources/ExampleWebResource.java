@@ -37,11 +37,11 @@ import example.jetty.resources.dao.ExampleEntityDAO;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import simplyrestful.api.framework.core.DefaultWebResource;
-import simplyrestful.api.framework.core.MediaTypeUtils;
-import simplyrestful.api.framework.core.SortOrder;
-import simplyrestful.api.framework.core.WebResourceUtils;
-import simplyrestful.api.framework.core.webresource.api.implementation.DefaultCollectionGetEventStream;
+import simplyrestful.api.framework.DefaultWebResource;
+import simplyrestful.api.framework.MediaTypeUtils;
+import simplyrestful.api.framework.SortOrder;
+import simplyrestful.api.framework.WebResourceUtils;
+import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path("/resources")
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })

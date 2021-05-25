@@ -10,7 +10,7 @@ import org.glassfish.jersey.server.wadl.internal.WadlResource;
 
 import io.swagger.v3.core.model.ApiDescription;
 import io.swagger.v3.oas.models.Operation;
-import simplyrestful.api.framework.core.swagger.SimplyRESTfulOpenApiFilter;
+import simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter;
 
 public class NoWadlFilter extends SimplyRESTfulOpenApiFilter{
     private static final String PATH_ROOT_RELATIVE_START = "/";

@@ -25,10 +25,10 @@ import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.client.test.implementation.TestResource;
 import simplyrestful.api.framework.client.test.implementation.TestWebResource;
-import simplyrestful.api.framework.core.filters.UriCustomizer;
-import simplyrestful.api.framework.core.providers.JacksonHALJsonProvider;
-import simplyrestful.api.framework.core.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.core.servicedocument.WebResourceRoot;
+import simplyrestful.api.framework.filters.UriCustomizer;
+import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
+import simplyrestful.api.framework.providers.ObjectMapperProvider;
+import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 @SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
