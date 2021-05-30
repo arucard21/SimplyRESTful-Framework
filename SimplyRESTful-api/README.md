@@ -4,4 +4,4 @@
 
 A library containing the JAX-RS interface classes for SimplyRESTful APIs.
 
-This can be used to implement a compatible API or generate a client (e.g. according to the MicroProfile Rest Client 2.0 standard).
+This defines the interface for any SimplyRESTful API and can be used to implement a compatible API.
