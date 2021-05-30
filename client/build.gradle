@@ -23,12 +23,11 @@ dependencies {
 	api project(":SimplyRESTful-resources")
 	api project(":jaxrs-providers")
 	api group: "jakarta.json", name: "jakarta.json-api", version: jakartaJsonVersion
-	api group: "org.glassfish.jersey.core", name: "jersey-client", version: jerseyVersion
 	api group: "io.swagger.core.v3", name: "swagger-models", version: swaggerVersion
 	api group: "io.swagger.parser.v3", name: "swagger-parser", version: swaggerParserVersion
-	api group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion
 			
 	integrationTestImplementation project(":SimplyRESTful")
+	integrationTestImplementation group: "org.glassfish.jersey.core", name: "jersey-client", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework", name: "jersey-test-framework-core", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework.providers", name: "jersey-test-framework-provider-jetty", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion

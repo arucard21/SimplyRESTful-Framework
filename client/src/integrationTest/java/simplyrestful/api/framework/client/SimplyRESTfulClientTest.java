@@ -30,14 +30,14 @@ import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
-@SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
 public class SimplyRESTfulClientTest extends JerseyTest {
     private static final UUID UUID_NIL = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    private static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI.create("http://invalid-host/testresources/" + UUID_NIL.toString());
-    private static final URI INVALID_RESOURCE_URI_DIFFERENT_PATH = URI.create(TestWebResource.getBaseUri() + "/different/path/testresources/" + UUID_NIL.toString());
+    private static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI
+            .create("http://invalid-host/testresources/" + UUID_NIL.toString());
+    private static final URI INVALID_RESOURCE_URI_DIFFERENT_PATH = URI
+            .create(TestWebResource.getBaseUri() + "/different/path/testresources/" + UUID_NIL.toString());
     private static SimplyRESTfulClient<TestResource> simplyRESTfulClient;
-
     private static TestResource testResource;
     private static TestResource testResourceRandom;
 
@@ -52,148 +52,143 @@ public class SimplyRESTfulClientTest extends JerseyTest {
     @BeforeEach
     @Override
     public void setUp() throws Exception {
-	super.setUp();
-	configureSimplyRESTfulClient();
-	TestWebResource.setBaseUri(getBaseUri());
-	testResource = TestResource.testInstance();
-	testResourceRandom = TestResource.random();
+        super.setUp();
+        configureSimplyRESTfulClient();
+        TestWebResource.setBaseUri(getBaseUri());
+        testResource = TestResource.testInstance();
+        testResourceRandom = TestResource.random();
     }
 
     @AfterEach
     @Override
     public void tearDown() throws Exception {
-	super.tearDown();
+        super.tearDown();
     }
 
     public void configureSimplyRESTfulClient() {
-	simplyRESTfulClient = Assertions.assertDoesNotThrow(
-		() -> new SimplyRESTfulClientFactory<TestResource>(client()).newClient(getBaseUri(), TestResource.class));
-	Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
+        simplyRESTfulClient = Assertions.assertDoesNotThrow(() -> new SimplyRESTfulClientFactory<TestResource>(client())
+                .newClient(getBaseUri(), TestResource.class));
+        Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
     }
 
     @Override
     protected Application configure() {
-	ResourceConfig config = new ResourceConfig(
-		TestWebResource.class,
-		WebResourceRoot.class,
-		ObjectMapperProvider.class,
-		JacksonJsonProvider.class,
-		JacksonHALJsonProvider.class,
-		UriCustomizer.class,
-		OpenApiResource.class,
-		AcceptHeaderOpenApiResource.class);
-	config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
-	config.property(ServerProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
-	return config;
+        ResourceConfig config = new ResourceConfig(TestWebResource.class, WebResourceRoot.class,
+                ObjectMapperProvider.class, JacksonJsonProvider.class, JacksonHALJsonProvider.class,
+                UriCustomizer.class, OpenApiResource.class, AcceptHeaderOpenApiResource.class);
+        config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
+        config.property(ServerProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
+        return config;
     }
 
     @Test
     public void client_shouldDiscoverTheResourceURI_whenItIsCreated() {
-	Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.listResources(-1, -1, "", "", ""));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.listResources(-1, -1, "", "", ""));
     }
 
     @Test
     public void listResources_shouldReturnTestResources() {
-	List<TestResource> listOfResourceIdentifiers = simplyRESTfulClient.listResources(-1, -1, "", "", "");
-	Assertions.assertNotNull(listOfResourceIdentifiers);
-	Assertions.assertEquals(2, listOfResourceIdentifiers.size());
-	Assertions.assertTrue(listOfResourceIdentifiers.contains(testResource));
+        List<TestResource> listOfResourceIdentifiers = simplyRESTfulClient.listResources(-1, -1, "", "", "");
+        Assertions.assertNotNull(listOfResourceIdentifiers);
+        Assertions.assertEquals(2, listOfResourceIdentifiers.size());
+        Assertions.assertTrue(listOfResourceIdentifiers.contains(testResource));
     }
 
     @Test
     public void read_shouldReturnTestResource() {
-	TestResource actual = simplyRESTfulClient.read(TestResource.TEST_RESOURCE_ID);
-	Assertions.assertEquals(testResource, actual);
+        TestResource actual = simplyRESTfulClient.read(TestResource.TEST_RESOURCE_ID);
+        Assertions.assertEquals(testResource, actual);
     }
 
     @Test
     public void read_shouldReturnTestResource_whenAnNonExistingIdIsUsed() {
-	Assertions.assertThrows(NotFoundException.class, () -> simplyRESTfulClient.read(UUID_NIL));
+        Assertions.assertThrows(NotFoundException.class, () -> simplyRESTfulClient.read(UUID_NIL));
     }
 
     @Test
     public void read_shouldThrowNullPointerException_whenProvidingNullAsArgument() {
-	Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.read(null));
+        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.read(null));
     }
 
     @Test
     public void create_shouldReturnTheIdOfTheCreatedTestResource() {
-	UUID actual = simplyRESTfulClient.create(new TestResource());
-	Assertions.assertNotEquals(TestResource.TEST_RESOURCE_ID, actual);
+        UUID actual = simplyRESTfulClient.create(new TestResource());
+        Assertions.assertNotEquals(TestResource.TEST_RESOURCE_ID, actual);
     }
 
     @Test
     public void create_shouldThrowNullPointerException_whenProvidingNullAsArgument() {
-	Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.create(null));
+        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.create(null));
     }
 
     @Test
     public void exists_shouldReturnTrue_whenProvidingAnExistingIdAsArgument() {
-	Assertions.assertTrue(simplyRESTfulClient.exists(TestResource.TEST_RESOURCE_ID));
+        Assertions.assertTrue(simplyRESTfulClient.exists(TestResource.TEST_RESOURCE_ID));
     }
 
     @Test
     public void exists_shouldReturnFalse_whenProvidingAnNonExistingIdAsArgument() {
-	Assertions.assertFalse(simplyRESTfulClient.exists(UUID_NIL));
+        Assertions.assertFalse(simplyRESTfulClient.exists(UUID_NIL));
     }
 
     @Test
     public void exists_shouldReturnTrue_whenProvidingAnExistingResourceUriAsArgument() {
-	Assertions.assertTrue(simplyRESTfulClient.exists(TestResource.getResourceUri(TestResource.TEST_RESOURCE_ID)));
+        Assertions.assertTrue(simplyRESTfulClient.exists(TestResource.getResourceUri(TestResource.TEST_RESOURCE_ID)));
     }
 
     @Test
     public void exists_shouldReturnFalse_whenProvidingAnNonExistingResourceUriAsArgument() {
-	Assertions.assertFalse(simplyRESTfulClient.exists(TestResource.getResourceUri(UUID_NIL)));
+        Assertions.assertFalse(simplyRESTfulClient.exists(TestResource.getResourceUri(UUID_NIL)));
     }
 
     @Test
     public void update_shouldReturnWithoutExceptions_whenTheProvidedResourceRefersToAnExistingId() {
-	Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.update(testResource));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.update(testResource));
     }
 
     @Test
     public void update_shouldThrowIllegalArgumentException_whenTheProvidedResourceRefersToANonExistingId() {
-	Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(TestResource.withId(UUID_NIL)));
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> simplyRESTfulClient.update(TestResource.withId(UUID_NIL)));
     }
 
     @Test
     public void update_shouldThrowWebApplicationException_whenTheServerReturnsAnErrorResponse() {
-	Assertions.assertThrows(IllegalArgumentException.class,
-		() -> simplyRESTfulClient.update(TestResource.withId(TestWebResource.ERROR_UPDATE_RESOURCE_ID)));
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> simplyRESTfulClient.update(TestResource.withId(TestWebResource.ERROR_UPDATE_RESOURCE_ID)));
     }
 
     @Test
     public void update_shouldThrowNullPointerException_whenNullIsProvidedAsArgument() {
-	Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.update(null));
+        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.update(null));
     }
 
     @Test
     public void update_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentHostname() {
-	TestResource invalidResource = new TestResource();
-	invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_HOST).build());
-	Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
+        TestResource invalidResource = new TestResource();
+        invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_HOST).build());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
     }
 
     @Test
     public void update_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentPath() {
-	TestResource invalidResource = new TestResource();
-	invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_PATH).build());
-	Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
+        TestResource invalidResource = new TestResource();
+        invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_PATH).build());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
     }
 
     @Test
     public void delete_shouldReturnWithoutExceptions_whenAnExistingIdIsProvided() {
-	Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(TestResource.TEST_RESOURCE_ID));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(TestResource.TEST_RESOURCE_ID));
     }
 
     @Test
     public void delete_shouldThrowIllegalArgumentException_whenANonExistingIdIsProvided() {
-	Assertions.assertThrows(WebApplicationException.class, () -> simplyRESTfulClient.delete(UUID_NIL));
+        Assertions.assertThrows(WebApplicationException.class, () -> simplyRESTfulClient.delete(UUID_NIL));
     }
 
     @Test
     public void delete_shouldThrowNullPointerException_whenNullIsProvidedAsArgument() {
-	Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.delete(null));
+        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.delete(null));
     }
 }
