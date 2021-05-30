@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import simplyrestful.api.framework.queryparams.SortOrder;
+
 public class QueryParamUtils {
     private static final String QUERY_PARAM_VALUE_DELIMITER = ",";
     private static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
     private static final String HAL_LINKS_OBJECT_NAME = "_links";
-    private static final String SORT_ORDER_DELIMITER = ":";
-    private static final String SORT_ORDER_ASCENDING = "asc";
 
     /**
      * Strips the HAL structure from the provided field names.
@@ -69,7 +69,7 @@ public class QueryParamUtils {
     	return stripHALStructure(sortValues).stream()
     		.filter(sortValue -> !sortValue.isBlank())
     		.map(String::trim)
-    		.map(sortEntry -> new SortOrder(parseSortField(sortEntry), parseSortOrder(sortEntry)))
+    		.map(SortOrder::from)
     		.collect(Collectors.toList());
     }
 
@@ -77,24 +77,5 @@ public class QueryParamUtils {
     	return parameters.stream()
     		.flatMap(param -> Stream.of(param.split(QUERY_PARAM_VALUE_DELIMITER)))
     		.collect(Collectors.toList());
-    }
-
-    private static String parseSortField(String sortWithOrderDelimeter) {
-    	if (sortWithOrderDelimeter.contains(SORT_ORDER_DELIMITER)) {
-    	    return sortWithOrderDelimeter.split(SORT_ORDER_DELIMITER)[0];
-    	}
-    	else {
-    	    return sortWithOrderDelimeter;
-    	}
-    }
-
-    private static Boolean parseSortOrder(String sortWithOrderDelimeter) {
-    	if (sortWithOrderDelimeter.contains(SORT_ORDER_DELIMITER)) {
-    	    return Boolean.valueOf(sortWithOrderDelimeter.split(SORT_ORDER_DELIMITER)[1].equalsIgnoreCase(SORT_ORDER_ASCENDING));
-    	}
-    	else {
-    	    // No sort order defined, return true (ascending) by default
-    	    return true;
-    	}
     }
 }

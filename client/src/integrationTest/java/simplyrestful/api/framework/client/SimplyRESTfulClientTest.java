@@ -88,10 +88,12 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void listResources_shouldReturnTestResources() {
-        List<TestResource> listOfResourceIdentifiers = simplyRESTfulClient.listResources(-1, -1, "", "", "");
-        Assertions.assertNotNull(listOfResourceIdentifiers);
-        Assertions.assertEquals(2, listOfResourceIdentifiers.size());
-        Assertions.assertTrue(listOfResourceIdentifiers.contains(testResource));
+        List<TestResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, "", "", "");
+        Assertions.assertNotNull(listOfResources);
+        Assertions.assertEquals(2, listOfResources.size());
+        Assertions.assertTrue(listOfResources.contains(testResource));
+        Assertions.assertEquals(TestResource.ADDITIONAL_FIELD_TEST_VALUE, listOfResources.get(0).getAdditionalField());
+        Assertions.assertEquals(TestResource.ADDITIONAL_FIELD_TEST_VALUE, listOfResources.get(1).getAdditionalField());
     }
 
     @Test

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -35,11 +36,13 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.parser.OpenAPIV3Parser;
 import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
+import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
+    private static final String QUERY_PARAM_VALUE_DELIMITER = ",";
     private static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""
             + HALServiceDocument.PROFILE_STRING + "\"";
     private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
@@ -138,62 +141,87 @@ public class SimplyRESTfulClient<T extends HALResource> {
     }
 
     /**
-     * List the full API resource using the API's default paging configuration.
+     * List the API resources.
      *
-     * @param page     is the number of the page. If zero or negative, will not be
-     *                 included in the HTTP request.
-     * @param pageSize is the size of each page. If zero or negative, will not be
-     *                 included in the HTTP request.
-     * @return a list of API resources from the page corresponding to the provided
-     *         parameters.
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the size of a single page in this paginated collection of resources
+     * @param fields is a list that defines which fields should be retrieved.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted.
+     * @return a list of API resources from the page corresponding to the provided parameters.
      */
-    public List<T> listResources(int page, int pageSize, String fields, String query, String sort) {
-        return listResources(page, pageSize, fields, query, sort, null, null);
+    public List<T> listResources(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
+        return listResources(pageStart, pageSize, fields, query, sort, null, null);
     }
 
     /**
-     * List the full API resource using the API's default paging configuration.
+     * List the API resource with String-based values for fields and sort query parameters
      *
-     * @param page                      is the number of the page. If zero or
-     *                                  negative, will not be included in the HTTP
-     *                                  request.
-     * @param pageSize                  is the size of each page. If zero or
-     *                                  negative, will not be included in the HTTP
-     *                                  request.
-     * @param additionalHeaders         is the set of additional HTTP headers that
-     *                                  should be used in the request.
-     * @param additionalQueryParameters is the set of queryparameter that should be
-     *                                  used in the request
-     * @return a list of API resources from the page corresponding to the provided
-     *         parameters.
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the size of a single page in this paginated collection of resources
+     * @param fields is a comma-separated list that defines which fields should be retrieved.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a comma-separated list of field names on which the resources should be sorted, each in
+     * the form "field[:(asc|desc)]". You can omit the direction to use the default sort direction defined by the API.
+     * @return a list of API resources from the page corresponding to the provided parameters.
      */
-    public List<T> listResources(int page, int pageSize, String fields, String query, String sort,
+    public List<T> listResources(int pageStart, int pageSize, String fields, String query, String sort) {
+        return listResources(
+                pageStart,
+                pageSize,
+                List.of(fields.split(QUERY_PARAM_VALUE_DELIMITER)),
+                query,
+                Stream.of(sort.split(QUERY_PARAM_VALUE_DELIMITER)).map(SortOrder::from).collect(Collectors.toList()),
+                null,
+                null);
+    }
+
+    /**
+     * List the API resources while providing additional HTTP headers and query parameters.
+     *
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the size of a single page in this paginated collection of resources
+     * @param fields is a list that defines which fields should be retrieved.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted.
+     * @param additionalHeaders is the set of HTTP headers that should be added to the request.
+     * @param additionalQueryParameters is the set of query parameters that should be added to the request
+     * @return a list of API resources from the page corresponding to the provided parameters.
+     */
+    public List<T> listResources(
+            int page,
+            int pageSize,
+            List<String> fields,
+            String query,
+            List<SortOrder> sort,
             MultivaluedMap<String, Object> additionalHeaders,
             MultivaluedMap<String, Object> additionalQueryParameters) {
         discoverResourceUri(additionalHeaders);
-        return retrievePagedCollection(page, pageSize, fields, query, sort, additionalHeaders,
-                additionalQueryParameters).getItem();
+        return retrievePagedCollection(page, pageSize, fields, query, sort, additionalHeaders, additionalQueryParameters).getItem();
     }
 
     /**
      * Retrieve HAL Collection resource containing a page of API resources.
      *
-     * @param page            is the number of the page. If negative, will not be
-     *                        included in the HTTP request.
-     * @param pageSize        is the size of each page. If negative, will not be
-     *                        included in the HTTP request.
-     * @param compact         returns only a resource identifier, if true. If false,
-     *                        each resource will be entirely embedded in the list.
-     * @param headers         is the set of additional HTTP headers that should be
-     *                        used in the request.
-     * @param queryParameters is the set of queryparameter that should be used in
-     *                        the request
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the size of a single page in this paginated collection of resources
+     * @param fields is a list that defines which fields should be retrieved.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted.
+     * @param additionalHeaders is the set of HTTP headers that should be added to the request.
+     * @param additionalQueryParameters is the set of query parameters that should be added to the request
      * @return the entire collection resource that was retrieved, containing either
      *         resource identifiers or embedded resources.
      */
     @SuppressWarnings("unchecked")
-    private HALCollectionV2<T> retrievePagedCollection(int pageStart, int pageSize, String fields, String query,
-            String sort, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    private HALCollectionV2<T> retrievePagedCollection(
+            int pageStart,
+            int pageSize,
+            List<String> fields,
+            String query,
+            List<SortOrder> sort,
+            MultivaluedMap<String, Object> additionalHeaders,
+            MultivaluedMap<String, Object> additionalQueryParameters) {
         WebTarget target = client.target(resourceUriBuilder.build(""));
         if (pageStart >= 0) {
             target = target.queryParam(QUERY_PARAM_PAGE_START, pageStart);
@@ -201,23 +229,22 @@ public class SimplyRESTfulClient<T extends HALResource> {
         if (pageSize >= 0) {
             target = target.queryParam(QUERY_PARAM_PAGESIZE, pageSize);
         }
-        if (!fields.isBlank()) {
+        if (!fields.isEmpty()) {
             target = target.queryParam(QUERY_PARAM_FIELDS, fields);
         }
         if (!query.isBlank()) {
             target = target.queryParam(QUERY_PARAM_QUERY, query);
         }
-        if (!sort.isBlank()) {
+        if (!sort.isEmpty()) {
             target = target.queryParam(QUERY_PARAM_SORT, sort);
         }
-        configureAdditionalQueryParameters(target, queryParameters);
+        configureAdditionalQueryParameters(target, additionalQueryParameters);
         Builder request = target.request();
         request.accept(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
-        configureHttpHeaders(request, headers);
+        configureHttpHeaders(request, additionalHeaders);
         String nonDeserialized = request.get(String.class);
         HALCollectionV2<T> collection;
-        collection = (HALCollectionV2<T>) deserializeJsonWithGenerics(nonDeserialized,
-                new TypeReference<HALCollectionV2<BasicHALResource>>() {});
+        collection = (HALCollectionV2<T>) deserializeJsonWithGenerics(nonDeserialized, new TypeReference<HALCollectionV2<BasicHALResource>>() {});
         JsonObject embedded = Json.createReader(new StringReader(nonDeserialized)).readObject()
                 .getJsonObject(HAL_EMBEDDED_KEY);
         if (Objects.nonNull(embedded)) {

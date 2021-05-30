@@ -3,7 +3,7 @@ package simplyrestful.api.framework.api.crud;
 import java.util.List;
 import java.util.stream.Stream;
 
-import simplyrestful.api.framework.SortOrder;
+import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.HALResource;
 
 public interface DefaultStream<T extends HALResource> {

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import simplyrestful.api.framework.QueryParamUtils;
-import simplyrestful.api.framework.SortOrder;
+import simplyrestful.api.framework.queryparams.SortOrder;
 
 public class QueryParamUtilsTest {
     @Test

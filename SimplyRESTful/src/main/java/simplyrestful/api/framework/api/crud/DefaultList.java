@@ -2,7 +2,7 @@ package simplyrestful.api.framework.api.crud;
 
 import java.util.List;
 
-import simplyrestful.api.framework.SortOrder;
+import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.HALResource;
 
 public interface DefaultList<T extends HALResource> {

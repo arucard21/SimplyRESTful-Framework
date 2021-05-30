@@ -12,7 +12,7 @@ import javax.ws.rs.Produces;
 
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.MediaTypeUtils;
-import simplyrestful.api.framework.SortOrder;
+import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path("testresources")

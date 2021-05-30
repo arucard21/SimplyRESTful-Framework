@@ -45,19 +45,18 @@ public interface CollectionGet<T extends HALResource> {
      * <p>
      * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}.
      * </p>
-     * @param page      is the page number of the paginated collection of resources (for {@link HALCollectionV1} only)
+     * @param page is the page number of the paginated collection of resources (for {@link HALCollectionV1} only)
      * @param pageStart is the offset at which the requested page starts.
-     * @param pageSize  is the size of a single page in this paginated collection of
+     * @param pageSize is the size of a single page in this paginated collection of
      *                  resources (for both {@link HALCollectionV1} and {@link HALCollectionV2})
-     * @param compact   determines whether the resource in the collection only shows
+     * @param compact determines whether the resource in the collection only shows
      *                  its self-link (if true), or the entire resource (if false) (for {@link HALCollectionV1} only)
-     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience
-     * 			as it is already handled by the framework. It can be used to filter on these fields in the backend
-     * 			as well, e.g. to improve performance.
-     * @param query     is a FIQL query that defines how the resources should be
-     *                  filtered.
-     * @param sort      is a list of field names on which the resources should be
-     *                  sorted. This is only included for convenience as it is already handled by the framework.
+     * @param fields is a list that defines which fields should be retrieved. This is only included for convenience as
+     * it is already handled by the framework. It can be used to filter on these fields in the backend as well, e.g. to
+     * improve performance.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted. This is only included for convenience
+     * as it is already handled by the framework.
      * @return the paginated collection of resources.
      */
     @GET

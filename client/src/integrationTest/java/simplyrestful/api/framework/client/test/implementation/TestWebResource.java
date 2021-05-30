@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.MediaTypeUtils;
-import simplyrestful.api.framework.SortOrder;
 import simplyrestful.api.framework.client.SimplyRESTfulClientTest;
+import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
