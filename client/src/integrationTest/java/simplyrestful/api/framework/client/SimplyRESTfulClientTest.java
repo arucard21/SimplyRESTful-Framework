@@ -37,17 +37,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
             .create("http://invalid-host/testresources/" + UUID_NIL.toString());
     private static final URI INVALID_RESOURCE_URI_DIFFERENT_PATH = URI
             .create(TestWebResource.getBaseUri() + "/different/path/testresources/" + UUID_NIL.toString());
-    private static SimplyRESTfulClient<TestResource> simplyRESTfulClient;
-    private static TestResource testResource;
-    private static TestResource testResourceRandom;
-
-    public static TestResource getTestResource() {
-        return testResource;
-    }
-
-    public static TestResource getTestResourceRandom() {
-        return testResourceRandom;
-    }
+    private SimplyRESTfulClient<TestResource> simplyRESTfulClient;
 
     @BeforeEach
     @Override
@@ -55,8 +45,6 @@ public class SimplyRESTfulClientTest extends JerseyTest {
         super.setUp();
         configureSimplyRESTfulClient();
         TestWebResource.setBaseUri(getBaseUri());
-        testResource = TestResource.testInstance();
-        testResourceRandom = TestResource.random();
     }
 
     @AfterEach
@@ -91,7 +79,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
         List<TestResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, "", "", "");
         Assertions.assertNotNull(listOfResources);
         Assertions.assertEquals(2, listOfResources.size());
-        Assertions.assertTrue(listOfResources.contains(testResource));
+        Assertions.assertTrue(listOfResources.contains(TestResource.testInstance()));
         Assertions.assertEquals(TestResource.ADDITIONAL_FIELD_TEST_VALUE, listOfResources.get(0).getAdditionalField());
         Assertions.assertEquals(TestResource.ADDITIONAL_FIELD_TEST_VALUE, listOfResources.get(1).getAdditionalField());
     }
@@ -99,7 +87,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
     @Test
     public void read_shouldReturnTestResource() {
         TestResource actual = simplyRESTfulClient.read(TestResource.TEST_RESOURCE_ID);
-        Assertions.assertEquals(testResource, actual);
+        Assertions.assertEquals(TestResource.testInstance(), actual);
     }
 
     @Test
@@ -145,7 +133,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void update_shouldReturnWithoutExceptions_whenTheProvidedResourceRefersToAnExistingId() {
-        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.update(testResource));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.update(TestResource.testInstance()));
     }
 
     @Test

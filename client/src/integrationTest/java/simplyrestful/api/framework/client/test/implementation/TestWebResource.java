@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.MediaTypeUtils;
-import simplyrestful.api.framework.client.SimplyRESTfulClientTest;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
@@ -52,7 +51,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
     @Override
     public TestResource read(UUID resourceUUID) {
 	if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-	    return SimplyRESTfulClientTest.getTestResource();
+	    return TestResource.testInstance();
 	}
 	if (Objects.equals(resourceUUID, ERROR_READ_RESOURCE_ID)) {
 	    throw new InternalServerErrorException("Pretending that something went wrong on the server");
@@ -65,20 +64,20 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 	if (Objects.equals(resourceUUID, ERROR_UPDATE_RESOURCE_ID)) {
 	    throw new InternalServerErrorException("Pretending that something went wrong on the server");
 	}
-	return SimplyRESTfulClientTest.getTestResource();
+	return TestResource.testInstance();
     }
 
     @Override
     public TestResource delete(UUID resourceUUID) {
 	if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-	    return SimplyRESTfulClientTest.getTestResource();
+	    return TestResource.testInstance();
 	}
 	return null;
     }
 
     @Override
     public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
-	return Arrays.asList(SimplyRESTfulClientTest.getTestResource(), SimplyRESTfulClientTest.getTestResourceRandom());
+	return Arrays.asList(TestResource.testInstance(), TestResource.random());
     }
 
     @Override
@@ -88,7 +87,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 
     @Override
     public Stream<TestResource> stream(List<String> fields, String query, List<SortOrder> sort) {
-	return Stream.of(SimplyRESTfulClientTest.getTestResource(), SimplyRESTfulClientTest.getTestResourceRandom());
+	return Stream.of(TestResource.testInstance(), TestResource.random());
     }
 
     @Override
