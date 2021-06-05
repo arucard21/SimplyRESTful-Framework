@@ -1,4 +1,4 @@
-package example.jersey.nomapping.resources;
+package example.resources.jpa;
 
 import java.util.UUID;
 

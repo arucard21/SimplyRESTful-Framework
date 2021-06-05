@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import example.resources.jpa.ExampleResource;
+
 @Named
 public interface ExampleRepository extends PagingAndSortingRepository<ExampleResource, Long> {
 	Optional<ExampleResource> findByUuid(UUID uuid);

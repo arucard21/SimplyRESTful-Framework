@@ -35,6 +35,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import example.resources.jpa.ExampleComplexAttribute;
+import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

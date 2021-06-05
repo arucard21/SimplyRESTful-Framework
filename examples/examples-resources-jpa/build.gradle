@@ -1,0 +1,26 @@
+apply plugin: "java-library"
+apply plugin: "org.springframework.boot"
+
+repositories {
+	mavenCentral()
+}
+
+project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+application{
+	mainClassName = "example.jersey.nomapping.JerseyNoMappingApplication"
+}
+
+bootRun {
+    environment "server.port", "8888"
+    environment "SIMPLYRESTFUL_URI_HTTP_HEADER", "xoriginalurl"
+}
+
+dependencies {
+	api project(':SimplyRESTful-resources')
+	api group: "jakarta.persistence", name: "jakarta.persistence-api", version: jakartaPersistenceVersion
+	
+}
