@@ -2,6 +2,7 @@ package simplyrestful.api.framework.client;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -42,6 +43,7 @@ import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
+    private static final String ERROR_DISCOVER_RESOURCE_URI_REQUIRED = "This method can only be used after the resource URI has been discovered. This is done at every API request but you can trigger it manually by calling discoverResourceUri() directly";
     private static final String QUERY_PARAM_VALUE_DELIMITER = ",";
     private static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""
             + HALServiceDocument.PROFILE_STRING + "\"";
@@ -94,7 +96,9 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * Discover the resource URI for this client's API resource.
      *
      * In order to ensure that any authentication and authorization required to
-     * access the API is available, this discovery is done before
+     * access the API is available, this discovery is done just before any other
+     * API request should be made. The same authentication and authorization from
+     * that request will be used here, to discover the resource URI.
      *
      * This discovery is done by accessing the OpenAPI Specification document which
      * is linked in the HAL Service Document located at the root of the API
@@ -108,7 +112,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *                the request, containing any authentication and authorization
      *                headers needed to access the API.
      */
-    private void discoverResourceUri(MultivaluedMap<String, Object> headers) {
+    public void discoverResourceUri(MultivaluedMap<String, Object> headers) {
         if (resourceUriBuilder != null) {
             return;
         }
@@ -169,9 +173,11 @@ public class SimplyRESTfulClient<T extends HALResource> {
         return listResources(
                 pageStart,
                 pageSize,
-                List.of(fields.split(QUERY_PARAM_VALUE_DELIMITER)),
+                fields.isBlank() ? Collections.emptyList() :
+                    List.of(fields.split(QUERY_PARAM_VALUE_DELIMITER)),
                 query,
-                Stream.of(sort.split(QUERY_PARAM_VALUE_DELIMITER)).map(SortOrder::from).collect(Collectors.toList()),
+                sort.isBlank() ? Collections.emptyList() :
+                    Stream.of(sort.split(QUERY_PARAM_VALUE_DELIMITER)).map(SortOrder::from).collect(Collectors.toList()),
                 null,
                 null);
     }
@@ -298,27 +304,24 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * Retrieve a single API resource.
      *
-     * @param resourceId is the id of the resource.
+     * @param resourceUri is the URI identifier of the resource.
      * @return the API resource at the given URI.
      */
-    public T read(UUID resourceId) {
-        return read(resourceId, null, null);
+    public T read(URI resourceUri) {
+        return read(resourceUri, null, null);
     }
 
     /**
      * Retrieve a single API resource.
      *
-     * @param resourceId      is the id of the resource.
-     * @param headers         is the set of additional HTTP headers that should be
-     *                        used in the request.
-     * @param queryParameters is the set of queryparameter that should be used in
-     *                        the request
+     * @param resourceUri is the URI identifier of the resource.
+     * @param headers is the set of additional HTTP headers that should be used in the request.
+     * @param queryParameters is the set of query parameters that should be used in the request
      * @return the API resource at the given URI.
      */
-    public T read(UUID resourceId, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    public T read(URI resourceUri, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
         discoverResourceUri(headers);
-        URI resourceInstanceURI = resourceUriBuilder.build(resourceId.toString());
-        WebTarget target = client.target(resourceInstanceURI);
+        WebTarget target = client.target(resourceUri);
         configureAdditionalQueryParameters(target, queryParameters);
         Builder request = target.request();
         configureHttpHeaders(request, headers);
@@ -332,9 +335,9 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * If the provided resource contains a self link, it will be removed.
      *
      * @param resource is the new resource
-     * @return the id for the created resource, applicable to the provided base URI
+     * @return the URI identifier for the created resource.
      */
-    public UUID create(T resource) {
+    public URI create(T resource) {
         return create(resource, null, null);
     }
 
@@ -343,14 +346,12 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *
      * If the provided resource contains a self link, it will be removed.
      *
-     * @param resource        is the new resource
-     * @param headers         is the set of additional HTTP headers that should be
-     *                        used in the request.
-     * @param queryParameters is the set of queryparameter that should be used in
-     *                        the request
-     * @return the id for the created resource, applicable to the provided base URI
+     * @param resource is the new resource
+     * @param headers is the set of additional HTTP headers that should be used in the request.
+     * @param queryParameters is the set of query parameters that should be used in the request
+     * @return the URI identifier for the created resource.
      */
-    public UUID create(T resource, MultivaluedMap<String, Object> headers,
+    public URI create(T resource, MultivaluedMap<String, Object> headers,
             MultivaluedMap<String, Object> queryParameters) {
         discoverResourceUri(headers);
         if (resource.getSelf() != null) {
@@ -365,9 +366,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
             if (!Objects.equals(201, response.getStatus())) {
                 throw new WebApplicationException(response);
             }
-            String location = response.getHeaderString(HttpHeaders.LOCATION);
-            URI relativizedURI = resourceUriBuilder.build("").relativize(URI.create(location));
-            return UUID.fromString(relativizedURI.getPath());
+            return URI.create(response.getHeaderString(HttpHeaders.LOCATION));
         }
     }
 
@@ -383,14 +382,11 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * Update an existing API resource.
      *
-     * @param resource        is the updated resource
-     * @param headers         is the set of additional HTTP headers that should be
-     *                        used in the request.
-     * @param queryParameters is the set of query parameters that should be used in
-     *                        the request
+     * @param resource is the updated resource
+     * @param headers is the set of additional HTTP headers that should be used in the request.
+     * @param queryParameters is the set of query parameters that should be used in the request
      */
-    public void update(T resource, MultivaluedMap<String, Object> headers,
-            MultivaluedMap<String, Object> queryParameters) {
+    public void update(T resource, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
         discoverResourceUri(headers);
         URI resourceInstanceURI = URI.create(resource.getSelf().getHref());
         if (!exists(resourceInstanceURI, headers, queryParameters)) {
@@ -403,26 +399,6 @@ public class SimplyRESTfulClient<T extends HALResource> {
         Response response = request.put(Entity.entity(resource, resourceMediaType));
         if (!Objects.equals(response.getStatusInfo(), Status.OK)) {
             throw new WebApplicationException(response);
-        }
-    }
-
-    /**
-     * Validates that the given URI refers to to the web resource that is served.
-     *
-     * The URI should have the same host as the web resource being server. Its path
-     * should also be relative to the root of the web resource's path.
-     *
-     * @param resourceInstanceURI is the URI that is required to be valid.
-     * @param headers             is the set of additional HTTP headers that should
-     *                            be used in the request.
-     * @param queryParameters     is the set of query parameters that should be used
-     *                            in the request
-     */
-    private void validateResourceUri(URI resourceInstanceURI) {
-        if (Objects.isNull(resourceInstanceURI)
-                || !resourceUriBuilder.build("").getHost().equals(resourceInstanceURI.getHost())
-                || resourceUriBuilder.build("").relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
-            throw new IllegalArgumentException(ERROR_INVALID_RESOURCE_URI);
         }
     }
 
@@ -557,5 +533,54 @@ public class SimplyRESTfulClient<T extends HALResource> {
             return false;
         }
         throw new WebApplicationException(response);
+    }
+
+    /**
+     * Validates that the given URI refers to to the web resource that is served.
+     *
+     * The URI should have the same host as the web resource being server. Its path
+     * should also be relative to the root of the web resource's path.
+     *
+     * @param resourceInstanceURI is the URI that is required to be valid.
+     * @param headers             is the set of additional HTTP headers that should
+     *                            be used in the request.
+     * @param queryParameters     is the set of query parameters that should be used
+     *                            in the request
+     */
+    private void validateResourceUri(URI resourceInstanceURI) {
+        if (Objects.isNull(resourceInstanceURI)
+                || !resourceUriBuilder.build("").getHost().equals(resourceInstanceURI.getHost())
+                || resourceUriBuilder.build("").relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
+            throw new IllegalArgumentException(ERROR_INVALID_RESOURCE_URI);
+        }
+    }
+
+    /**
+     * Create the resource URI from the UUID part of the URI identifier.
+     *
+     * @param resourceId is the UUID part of the URI identifier.
+     * @return the full URI identifier for the resource, based on the discovered resource URI.
+     */
+    public URI createResourceUriFromUuid(UUID resourceId) {
+        checkResourceUriDiscovered();
+        return resourceUriBuilder.build(resourceId);
+    }
+
+    /**
+     * Parse the resource UUID from the URI identifier.
+     *
+     * @param resourceUri is the URI identifier for the resource.
+     * @return the UUID part of the URI identifier.
+     */
+    public UUID createResourceUuidFromUri(URI resourceUri) {
+        checkResourceUriDiscovered();
+        URI relativizedURI = resourceUriBuilder.build("").relativize(resourceUri);
+        return UUID.fromString(relativizedURI.getPath());
+    }
+
+    private void checkResourceUriDiscovered() {
+        if(resourceUriBuilder == null) {
+            throw new IllegalStateException(ERROR_DISCOVER_RESOURCE_URI_REQUIRED);
+        }
     }
 }

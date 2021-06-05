@@ -86,13 +86,15 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void read_shouldReturnTestResource() {
-        TestResource actual = simplyRESTfulClient.read(TestResource.TEST_RESOURCE_ID);
+        simplyRESTfulClient.discoverResourceUri(null);
+        TestResource actual = simplyRESTfulClient.read(simplyRESTfulClient.createResourceUriFromUuid(TestResource.TEST_RESOURCE_ID));
         Assertions.assertEquals(TestResource.testInstance(), actual);
     }
 
     @Test
     public void read_shouldReturnTestResource_whenAnNonExistingIdIsUsed() {
-        Assertions.assertThrows(NotFoundException.class, () -> simplyRESTfulClient.read(UUID_NIL));
+        simplyRESTfulClient.discoverResourceUri(null);
+        Assertions.assertThrows(NotFoundException.class, () -> simplyRESTfulClient.read(simplyRESTfulClient.createResourceUriFromUuid(UUID_NIL)));
     }
 
     @Test
@@ -102,8 +104,8 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void create_shouldReturnTheIdOfTheCreatedTestResource() {
-        UUID actual = simplyRESTfulClient.create(new TestResource());
-        Assertions.assertNotEquals(TestResource.TEST_RESOURCE_ID, actual);
+        URI createdResourceLocation = simplyRESTfulClient.create(new TestResource());
+        Assertions.assertNotEquals(TestResource.TEST_RESOURCE_ID, simplyRESTfulClient.createResourceUuidFromUri(createdResourceLocation));
     }
 
     @Test
