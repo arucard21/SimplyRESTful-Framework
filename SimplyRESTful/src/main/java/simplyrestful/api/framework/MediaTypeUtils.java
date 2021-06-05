@@ -13,13 +13,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 public class MediaTypeUtils {
+    private static final String ERROR_PREMATCHING_NOT_SUPPORTED = "This method must be called after JAX-RS matching is done. It cannot be called from a @PreMatching JAX-RS filter, use getAllProducibleMediaTypes() instead";
     private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE = 0; // Example: */*
     private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
     private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS = 2; // Example: application/json
@@ -186,6 +189,37 @@ public class MediaTypeUtils {
     }
 
     /**
+     * Return all producible media types for the entire API.
+     *
+     * This will check the same annotation inheritance as JAX-RS to accurately determine
+     * which media types can be produced.
+     *
+     * @param configuration is the JAX-RS Configuration Context object that contains, among other things, which web
+     * resource classes have been registered.
+     * @return the list of media types that can be produced. May be empty but never null.
+     * @throws IllegalStateException if multiple implemented interfaces provide @Produces annotations for this method.
+     */
+    public static List<MediaType> getAllProducibleMediaTypes(Configuration configuration) {
+        List<Class<?>> webResourceClasses = Stream.concat(configuration.getClasses().stream(), configuration.getInstances().stream().map(Object::getClass))
+                .filter(webResourceClass -> webResourceClass.getAnnotation(Path.class) != null)
+                .collect(Collectors.toList());
+        List<MediaType> allProducibleMediaTypes = new ArrayList<>();
+        for (Class<?> webResourceClass : webResourceClasses) {
+            for (Method jaxrsMethod : webResourceClass.getMethods()) {
+                List<MediaType> producibleMediaTypes = getProducibleMediaTypesFromMethod(jaxrsMethod);
+                if(producibleMediaTypes.isEmpty()) {
+                    producibleMediaTypes = getProducibleMediaTypesFromSuperClassOrInterfaces(jaxrsMethod);
+                    if(producibleMediaTypes.isEmpty()) {
+                        producibleMediaTypes = getProducibleMediaTypesFromClass(webResourceClass);
+                    }
+                }
+                allProducibleMediaTypes.addAll(producibleMediaTypes);
+            }
+        }
+        return allProducibleMediaTypes.stream().distinct().collect(Collectors.toList());
+    }
+
+    /**
      * Return all producible media types for a request.
      *
      * This will check the same annotation inheritance as JAX-RS to accurately determine
@@ -196,6 +230,9 @@ public class MediaTypeUtils {
      * @throws IllegalStateException if multiple implemented interfaces provide @Produces annotations for this method.
      */
     public static List<MediaType> getProducibleMediaTypes(ResourceInfo resourceInfo) {
+        if(resourceInfo.getResourceMethod() == null && resourceInfo.getResourceClass() == null) {
+            throw new IllegalStateException(ERROR_PREMATCHING_NOT_SUPPORTED);
+        }
         List<MediaType> producibleMediaTypes = getProducibleMediaTypesFromMethod(resourceInfo.getResourceMethod());
         if(!producibleMediaTypes.isEmpty()) {
             return producibleMediaTypes;
