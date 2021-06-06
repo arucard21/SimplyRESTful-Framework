@@ -1,10 +1,5 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin: 'java-library'
 apply plugin: 'org.unbroken-dome.test-sets'
-
-repositories {
-	mavenCentral()
-}
 
 project.description = "A generic client that can be used with any SimplyRESTful API"
 
@@ -13,11 +8,15 @@ targetCompatibility = JavaVersion.VERSION_11
 
 testSets {
     integrationTest
-    e2eTest
+    e2eTest { extendsFrom integrationTest }
 }
 
 tasks.withType(Test){
 	useJUnitPlatform()
+}
+
+repositories {
+	mavenCentral()
 }
 
 dependencies {
@@ -27,13 +26,13 @@ dependencies {
 	api group: "io.swagger.core.v3", name: "swagger-models", version: swaggerVersion
 	api group: "io.swagger.parser.v3", name: "swagger-parser", version: swaggerParserVersion
 			
-	testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
-	testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
-	testImplementation group: "org.junit.platform", name: "junit-platform-launcher", version: junitPlatformVersion
-	testImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
-	testImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
 
 	integrationTestImplementation project(":SimplyRESTful")
+	integrationTestImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
+	integrationTestImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
+	integrationTestImplementation group: "org.junit.platform", name: "junit-platform-launcher", version: junitPlatformVersion
+	integrationTestImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
+	integrationTestImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
 	integrationTestImplementation group: "org.glassfish.jersey.core", name: "jersey-client", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework", name: "jersey-test-framework-core", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework.providers", name: "jersey-test-framework-provider-jetty", version: jerseyVersion

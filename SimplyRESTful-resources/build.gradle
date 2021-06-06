@@ -1,0 +1,36 @@
+apply plugin: "java-library"
+
+project.description = "The core API resources used in SimplyRESTful APIs"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api group: "io.openapitools.jackson.dataformat", name: "jackson-dataformat-hal", version: jacksonDataformatHalVersion
+    api group: "io.openapitools.hal", name: "swagger-hal", version: swaggerHalVersion
+
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
+    testImplementation group: "org.junit.platform", name: "junit-platform-launcher", version: junitPlatformVersion
+    testImplementation group: "org.glassfish.jersey.containers", name: "jersey-container-servlet", version: jerseyVersion
+    testImplementation group: "nl.jqno.equalsverifier", name: "equalsverifier", version: equalsVerifierVersion
+}
+
+publishing{
+    publications{
+        mavenJava(MavenPublication){
+            pom {
+                licenses {
+                    license {
+                        name = 'GNU Lesser General Public License'
+                        url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+                    }
+                }
+            }
+        }
+    }
+}

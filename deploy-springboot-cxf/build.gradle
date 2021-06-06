@@ -1,0 +1,32 @@
+apply plugin: "java-library"
+
+project.description = "Easily deploy your SimplyRESTful API using Apache CXF with Spring Boot"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(":SimplyRESTful")
+    api group: "org.apache.cxf", name: "cxf-spring-boot-starter-jaxrs", version: cxfVersion
+    api group: "org.apache.cxf", name: "cxf-rt-rs-service-description-openapi-v3", version: cxfVersion
+    api group: "org.apache.cxf", name: "cxf-rt-rs-extension-search", version: cxfVersion
+}
+
+publishing{
+    publications{
+        mavenJava(MavenPublication){
+            pom {
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+}

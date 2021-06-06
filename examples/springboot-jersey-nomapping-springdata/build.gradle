@@ -1,3 +1,4 @@
+apply plugin: 'application'
 apply plugin: "org.springframework.boot"
 
 repositories {
@@ -10,7 +11,7 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 application{
-	mainClassName = "example.jersey.nomapping.JerseyNoMappingApplication"
+	mainClass = "example.jersey.nomapping.JerseyNoMappingApplication"
 }
 
 bootRun {

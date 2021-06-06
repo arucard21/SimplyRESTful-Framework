@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
@@ -21,7 +19,6 @@ import example.resources.jpa.ExampleResource;
  * This e2e test requires the example API from "examples/springboot-jersey-nomapping-springdata" to be running
  *
  */
-@ExtendWith(MockitoExtension.class)
 public class SimplyRESTfulClientApiTest {
 //    private static final UUID UUID_NIL = UUID.fromString("00000000-0000-0000-0000-000000000000");
 //    private static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI

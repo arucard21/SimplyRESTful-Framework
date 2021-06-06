@@ -195,7 +195,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @return a list of API resources from the page corresponding to the provided parameters.
      */
     public List<T> listResources(
-            int page,
+            int pageStart,
             int pageSize,
             List<String> fields,
             String query,
@@ -203,7 +203,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
             MultivaluedMap<String, Object> additionalHeaders,
             MultivaluedMap<String, Object> additionalQueryParameters) {
         discoverResourceUri(additionalHeaders);
-        return retrievePagedCollection(page, pageSize, fields, query, sort, additionalHeaders, additionalQueryParameters).getItem();
+        return retrievePagedCollection(pageStart, pageSize, fields, query, sort, additionalHeaders, additionalQueryParameters).getItem();
     }
 
     /**
