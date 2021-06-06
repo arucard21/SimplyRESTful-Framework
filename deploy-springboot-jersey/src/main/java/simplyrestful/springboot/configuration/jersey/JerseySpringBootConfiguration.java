@@ -22,19 +22,20 @@ import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 public class JerseySpringBootConfiguration implements ResourceConfigCustomizer {
     @Override
     public void customize(ResourceConfig config) {
-	config.register(WebResourceRoot.class);
-	config.register(ObjectMapperProvider.class);
-	config.register(JacksonHALJsonProvider.class);
-	config.register(JacksonJsonProvider.class);
-	config.register(UriCustomizer.class);
-	config.register(AcceptHeaderModifier.class);
-	config.register(OpenApiResource.class);
-	config.register(AcceptHeaderOpenApiResource.class);
-	config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
+        config.register(WebResourceRoot.class);
+        config.register(ObjectMapperProvider.class);
+        config.register(JacksonHALJsonProvider.class);
+        config.register(JacksonJsonProvider.class);
+        config.register(UriCustomizer.class);
+        config.register(AcceptHeaderModifier.class);
+        config.register(OpenApiResource.class);
+        config.register(AcceptHeaderOpenApiResource.class);
+        config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
+        config.property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
     }
 
     @Bean
     public TomcatConnectorCustomizer http2UpgradeProtocol() {
-	return (connector -> connector.addUpgradeProtocol(new Http2Protocol()));
+        return (connector -> connector.addUpgradeProtocol(new Http2Protocol()));
     }
 }

@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,7 +26,6 @@ public class ExampleResource extends HALResource {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @JsonIgnore
-    @NotNull
     private UUID uuid;
     private String description;
     @OneToOne(cascade = CascadeType.ALL)

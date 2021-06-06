@@ -55,8 +55,8 @@ public class AcceptHeaderModifier implements ContainerRequestFilter {
     		    modifiedAcceptableMediaTypes.stream(),
     		    customJsonMediaTypesWithQ.stream())
     		    .collect(Collectors.toList());
+    	    requestContext.getHeaders().put(HttpHeaders.ACCEPT, modifiedAcceptableMediaTypes);
     	}
-    	requestContext.getHeaders().put(HttpHeaders.ACCEPT, modifiedAcceptableMediaTypes);
     }
 
     /**

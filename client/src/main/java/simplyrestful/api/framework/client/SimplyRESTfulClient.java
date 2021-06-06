@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -24,6 +25,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+
+import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -65,6 +68,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
     private final MediaType resourceMediaType;
     private final Client client;
     private UriBuilder resourceUriBuilder;
+    private int totalAmountOfLastRetrievedCollection;
 
     SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
         this.baseApiUri = baseApiUri;
@@ -258,7 +262,12 @@ public class SimplyRESTfulClient<T extends HALResource> {
                     .map(jsonValue -> deserializeJson(jsonValue.toString(), resourceClass)).filter(Objects::nonNull)
                     .collect(Collectors.toList()));
         }
+        this.totalAmountOfLastRetrievedCollection = collection.getTotal();
         return collection;
+    }
+
+    public int getTotalAmountOfLastRetrievedCollection() {
+        return this.totalAmountOfLastRetrievedCollection;
     }
 
     private void configureAdditionalQueryParameters(WebTarget target, MultivaluedMap<String, Object> queryParameters) {
@@ -302,6 +311,26 @@ public class SimplyRESTfulClient<T extends HALResource> {
     }
 
     /**
+     * Retrieve a single API resource referenced with a HALLink.
+     *
+     * @param resourceLink is the URI identifier of the resource.
+     * @return the API resource at the given URI.
+     */
+    public T read(HALLink resourceLink) {
+        return read(resourceLink, null, null);
+    }
+
+    /**
+     * Retrieve a single API resource referenced with a HALLink.
+     *
+     * @param resourceLink is the URI identifier of the resource.
+     * @return the API resource at the given URI.
+     */
+    public T read(HALLink resourceLink, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+        return read(URI.create(resourceLink.getHref()), headers, queryParameters);
+    }
+
+    /**
      * Retrieve a single API resource.
      *
      * @param resourceUri is the URI identifier of the resource.
@@ -321,6 +350,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      */
     public T read(URI resourceUri, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
         discoverResourceUri(headers);
+        validateResourceUri(resourceUri);
         WebTarget target = client.target(resourceUri);
         configureAdditionalQueryParameters(target, queryParameters);
         Builder request = target.request();
@@ -363,6 +393,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
         configureHttpHeaders(request, headers);
         Entity<T> halJsonEntity = Entity.entity(resource, resourceMediaType);
         try (Response response = request.post(halJsonEntity)) {
+            System.err.println(response.readEntity(String.class));
             if (!Objects.equals(201, response.getStatus())) {
                 throw new WebApplicationException(response);
             }
@@ -403,34 +434,56 @@ public class SimplyRESTfulClient<T extends HALResource> {
     }
 
     /**
+     * Remove an API resource referenced with a HALLink.
+     *
+     * @param resourceLink is the id of the resource
+     */
+    public void delete(HALLink resourceLink) {
+        delete(resourceLink, null, null);
+    }
+
+    /**
+     * Remove an API resource referenced with a HALLink.
+     *
+     * @param resourceLink is the id of the resource
+     */
+    public void delete(HALLink resourceLink, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+        delete(URI.create(resourceLink.getHref()), headers, queryParameters);
+    }
+
+
+    /**
      * Remove an API resource.
      *
-     * @param resourceId is the id of the resource
+     * @param resourceUri is the id of the resource
      */
-    public void delete(UUID resourceId) {
-        delete(resourceId, null, null);
+    public void delete(URI resourceUri) {
+        delete(resourceUri, null, null);
     }
 
     /**
      * Remove an API resource.
      *
-     * @param resourceId      is the id of the resource
-     * @param headers         is the set of additional HTTP headers that should be
-     *                        used in the request.
-     * @param queryParameters is the set of query parameters that should be used in
-     *                        the request
+     * @param resourceUri is the URI identifier of the resource
+     * @param headers is the set of additional HTTP headers that should be used in the request.
+     * @param queryParameters is the set of query parameters that should be used in the request
      */
-    public void delete(UUID resourceId, MultivaluedMap<String, Object> headers,
+    public void delete(URI resourceUri, MultivaluedMap<String, Object> headers,
             MultivaluedMap<String, Object> queryParameters) {
         discoverResourceUri(headers);
-        URI resourceInstanceURI = resourceUriBuilder.build(resourceId.toString());
-        WebTarget target = client.target(resourceInstanceURI);
+        validateResourceUri(resourceUri);
+        WebTarget target = client.target(resourceUri);
         configureAdditionalQueryParameters(target, queryParameters);
         Builder request = target.request();
         configureHttpHeaders(request, headers);
         Response response = request.delete();
         if (!Objects.equals(response.getStatusInfo(), Status.NO_CONTENT)) {
-            throw new WebApplicationException(response);
+            switch (response.getStatus()) {
+            case HttpStatus.SC_NOT_FOUND:
+                throw new NotFoundException(response);
+            default:
+                throw new WebApplicationException(response);
+            }
         }
     }
 
@@ -446,81 +499,59 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *         provided action.
      */
     public WebTarget hypermediaControl(HALLink action) {
-        return client.target(action.getHref());
+        return client.target(URI.create(action.getHref()));
     }
 
     /**
-     * Check whether a resource the given id exists on the server.
+     * Check whether a resource with the given URI, referenced with a HALLink, exists on the server.
      *
-     * @param resourceId is the id of the resource that should be checked.
-     * @return true iff the resource exists on the server, false if it does not
-     *         exist.
-     * @throws WebApplicationException if the client cannot confirm that the
-     *                                 resource either exists or does not exist. Is
-     *                                 likely caused by an error returned by the
-     *                                 server.
+     * @param resourceLink is the URI of the resource that should be checked.
+     * @return true iff the resource exists on the server, false if it does not exist.
+     * @throws WebApplicationException if the client cannot confirm that the resource either
+     * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(UUID resourceId) {
-        return exists(resourceId, null, null);
+    public boolean exists(HALLink resourceLink) {
+        return exists(resourceLink, null, null);
     }
 
     /**
-     * Check whether a resource the given id exists on the server.
+     * Check whether a resource with the given URI, referenced with a HALLink, exists on the server.
      *
-     * @param resourceId      is the id of the resource that should be checked.
-     * @param headers         is the set of additional HTTP headers that should be
-     *                        used in the request.
-     * @param queryParameters is the set of query parameters that should be used in
-     *                        the request
-     * @return true iff the resource exists on the server, false if it does not
-     *         exist.
-     * @throws WebApplicationException if the client cannot confirm that the
-     *                                 resource either exists or does not exist. Is
-     *                                 likely caused by an error returned by the
-     *                                 server.
+     * @param resourceLink is the URI of the resource that should be checked.
+     * @return true iff the resource exists on the server, false if it does not exist.
+     * @throws WebApplicationException if the client cannot confirm that the resource either
+     * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(UUID resourceId, MultivaluedMap<String, Object> headers,
-            MultivaluedMap<String, Object> queryParameters) {
-        discoverResourceUri(headers);
-        URI resourceInstanceURI = resourceUriBuilder.build(resourceId.toString());
-        return exists(resourceInstanceURI, headers, queryParameters);
+    public boolean exists(HALLink resourceLink, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+        return exists(URI.create(resourceLink.getHref()), headers, queryParameters);
     }
 
     /**
      * Check whether a resource with the given URI exists on the server.
      *
-     * @param resourceInstanceURI is the URI of the resource that should be checked.
-     * @return true iff the resource exists on the server, false if it does not
-     *         exist.
-     * @throws WebApplicationException if the client cannot confirm that the
-     *                                 resource either exists or does not exist. Is
-     *                                 likely caused by an error returned by the
-     *                                 server.
+     * @param resourceUri is the URI of the resource that should be checked.
+     * @return true iff the resource exists on the server, false if it does not exist.
+     * @throws WebApplicationException if the client cannot confirm that the resource either
+     * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(URI resourceInstanceURI) {
-        return exists(resourceInstanceURI, null, null);
+    public boolean exists(URI resourceUri) {
+        return exists(resourceUri, null, null);
     }
 
     /**
      * Check whether a resource with the given URI exists on the server.
      *
-     * @param resourceInstanceURI is the URI of the resource that should be checked.
-     * @param headers             is the set of additional HTTP headers that should
-     *                            be used in the request.
-     * @param queryParameters     is the set of query parameters that should be used
-     *                            in the request
-     * @return true iff the resource exists on the server, false if it does not
-     *         exist.
-     * @throws WebApplicationException if the client cannot confirm that the
-     *                                 resource either exists or does not exist. Is
-     *                                 likely caused by an error returned by the
-     *                                 server.
+     * @param resourceUri is the URI of the resource that should be checked.
+     * @param headers is the set of additional HTTP headers that should be used in the request.
+     * @param queryParameters is the set of query parameters that should be used in the request.
+     * @return true iff the resource exists on the server, false if it does not exist.
+     * @throws WebApplicationException if the client cannot confirm that the resource either
+     * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(URI resourceInstanceURI, MultivaluedMap<String, Object> headers,
-            MultivaluedMap<String, Object> queryParameters) {
+    public boolean exists(URI resourceUri, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
         discoverResourceUri(headers);
-        validateResourceUri(resourceInstanceURI);
-        WebTarget target = client.target(resourceInstanceURI);
+        validateResourceUri(resourceUri);
+        WebTarget target = client.target(resourceUri);
         configureAdditionalQueryParameters(target, queryParameters);
         Builder request = target.request();
         configureHttpHeaders(request, headers);
@@ -548,9 +579,11 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *                            in the request
      */
     private void validateResourceUri(URI resourceInstanceURI) {
-        if (Objects.isNull(resourceInstanceURI)
-                || !resourceUriBuilder.build("").getHost().equals(resourceInstanceURI.getHost())
-                || resourceUriBuilder.build("").relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
+        if (Objects.isNull(resourceInstanceURI)) {
+            throw new NullPointerException();
+        }
+        if (!resourceUriBuilder.build("").getHost().equals(resourceInstanceURI.getHost()) ||
+                resourceUriBuilder.build("").relativize(resourceInstanceURI).equals(resourceInstanceURI)) {
             throw new IllegalArgumentException(ERROR_INVALID_RESOURCE_URI);
         }
     }

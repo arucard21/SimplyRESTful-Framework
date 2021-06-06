@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ResourceConfig;
@@ -57,6 +56,7 @@ public class SimplyRESTfulClientTest extends JerseyTest {
         simplyRESTfulClient = Assertions.assertDoesNotThrow(() -> new SimplyRESTfulClientFactory<TestResource>(client())
                 .newClient(getBaseUri(), TestResource.class));
         Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
+        simplyRESTfulClient.discoverResourceUri(null);
     }
 
     @Override
@@ -86,20 +86,18 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void read_shouldReturnTestResource() {
-        simplyRESTfulClient.discoverResourceUri(null);
         TestResource actual = simplyRESTfulClient.read(simplyRESTfulClient.createResourceUriFromUuid(TestResource.TEST_RESOURCE_ID));
         Assertions.assertEquals(TestResource.testInstance(), actual);
     }
 
     @Test
     public void read_shouldReturnTestResource_whenAnNonExistingIdIsUsed() {
-        simplyRESTfulClient.discoverResourceUri(null);
         Assertions.assertThrows(NotFoundException.class, () -> simplyRESTfulClient.read(simplyRESTfulClient.createResourceUriFromUuid(UUID_NIL)));
     }
 
     @Test
     public void read_shouldThrowNullPointerException_whenProvidingNullAsArgument() {
-        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.read(null));
+        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.read((URI) null));
     }
 
     @Test
@@ -115,12 +113,12 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void exists_shouldReturnTrue_whenProvidingAnExistingIdAsArgument() {
-        Assertions.assertTrue(simplyRESTfulClient.exists(TestResource.TEST_RESOURCE_ID));
+        Assertions.assertTrue(simplyRESTfulClient.exists(simplyRESTfulClient.createResourceUriFromUuid(TestResource.TEST_RESOURCE_ID)));
     }
 
     @Test
     public void exists_shouldReturnFalse_whenProvidingAnNonExistingIdAsArgument() {
-        Assertions.assertFalse(simplyRESTfulClient.exists(UUID_NIL));
+        Assertions.assertFalse(simplyRESTfulClient.exists(simplyRESTfulClient.createResourceUriFromUuid(UUID_NIL)));
     }
 
     @Test
@@ -171,16 +169,16 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void delete_shouldReturnWithoutExceptions_whenAnExistingIdIsProvided() {
-        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(TestResource.TEST_RESOURCE_ID));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(simplyRESTfulClient.createResourceUriFromUuid(TestResource.TEST_RESOURCE_ID)));
     }
 
     @Test
-    public void delete_shouldThrowIllegalArgumentException_whenANonExistingIdIsProvided() {
-        Assertions.assertThrows(WebApplicationException.class, () -> simplyRESTfulClient.delete(UUID_NIL));
+    public void delete_shouldThrowNotFoundException_whenANonExistingIdIsProvided() {
+        Assertions.assertThrows(NotFoundException.class, () -> simplyRESTfulClient.delete(simplyRESTfulClient.createResourceUriFromUuid(UUID_NIL)));
     }
 
     @Test
     public void delete_shouldThrowNullPointerException_whenNullIsProvidedAsArgument() {
-        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.delete(null));
+        Assertions.assertThrows(NullPointerException.class, () -> simplyRESTfulClient.delete((URI) null));
     }
 }
