@@ -1,4 +1,4 @@
-import { SimplyRESTfulClient } from './simplyrestful-client.ts'
+import { SimplyRESTfulClient } from '../src/simplyrestful-client.ts'
 
 test('discoverApi is called correctly', () => {
     console.log = jest.fn();
