@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:integration": "jest --config jest.config.integration.js"
   },
   "files": [
     "/dist"
@@ -26,5 +27,8 @@
     "@babel/preset-typescript": "^7.14.5",
     "babel-jest": "^27.0.2",
     "jest": "^27.0.4"
+  },
+  "dependencies": {
+    "hal-types": "^1.7.4"
   }
 }
