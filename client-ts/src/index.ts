@@ -1,0 +1,1 @@
+export { SimplyRESTfulClient } from './simplyrestful-client'
