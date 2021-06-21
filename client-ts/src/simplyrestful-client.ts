@@ -15,7 +15,22 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         this.resourceProfile = resourceProfile;
     }
 
-    async discoverApi(httpHeaders: Map<string, string>) {
+    /*
+     Manually set the resource URI template. 
+
+     This disables discovering it automatically based on the OpenAPI Specification.
+     Changes to the resource URI will not be detected automatically.
+     This is only provided as a fallback mechanism, using the discovery mechanism is 
+     recommended (which happens automatically if this method is never used).
+     */
+    setResourceUriTemplate(resourceUriTemplate : string){
+        this.resourceUriTemplate = resourceUriTemplate;
+    }
+
+    async discoverApi(httpHeaders: Headers) {
+        if(!!this.resourceUriTemplate){
+            return;
+        }
         // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
         // See https://github.com/jefflau/jest-fetch-mock/pull/193
         const openapiSpecUrl = await fetch(this.baseApiUri.toString()).then(response => {
@@ -48,14 +63,45 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         }
     }
 
-    async list(pageStart: number, pageSize: number, fields: List<string> , query: string, sort: List<{field: string, ascending: boolean}>, httpHeaders: Map<string, string>, queryParameters: Map<string, string>) : List<T> {
-        if(!this.resourceUriTemplate){
-            await this.discoverApi(httpHeaders);
-        }
+    async list(pageStart: number, pageSize: number, fields: List<string> , query: string, sort: List<{field: string, ascending: boolean}>, httpHeaders: Headers, additionalQueryParameters: URLSearchParams) : List<T> {
+        await this.discoverApi(httpHeaders);
         const resourceListUri = this.resolveResourceUriTemplate();
+
+        let searchParams = new URLSearchParams();
+        if(!!pageStart){
+            searchParams.append("pageStart", pageStart);
+        }
+        if(!!pageSize){
+            searchParams.append("pageSize", pageSize);
+        }
+        if(!!fields){
+            searchParams.append("fields", fields);
+        }
+        if(!!query){
+            searchParams.append("query", query);
+        }
+        if(!!sort){
+            let sortParameters = [];
+            sort.forEach(field => {
+                sortParameters.push(`${field.name}:${field.ascending ? "asc" : "desc"}`);
+            });
+            searchParams.append("sort", sortParameters);
+        }
+        if(!!additionalQueryParameters){
+            additionalQueryParameters.forEach( (paramValue, paramName) => {
+                searchParams.append(paramName, paramValue);
+            });
+        }
+        resourceListUri.search = searchParams;
+
+        if(!httpHeaders){
+            httpHeaders = new Headers();
+        }
+        httpHeaders.append("Accept", "application/hal+json; profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\"");
+
         // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
         // See https://github.com/jefflau/jest-fetch-mock/pull/193
-        return fetch(resourceListUri.toString()).then(response => {
+        return fetch(resourceListUri.toString(), {headers: httpHeaders}).then(response => {
             if(!response.ok){
                 throw new Error("failed to read");
             }
@@ -69,13 +115,18 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         })
     }
 
-    async read(resourceIdentifier: URL, httpHeaders: Map<string, string>, queryParameters: Map<string, string>) : T {
-        if(!this.resourceUriTemplate){
-            await this.discoverApi(httpHeaders);
+    async read(resourceIdentifier: URL, httpHeaders: Headers, queryParameters: URLSearchParams) : T {
+        await this.discoverApi(httpHeaders);
+        resourceIdentifier.search = queryParameters;
+
+        if(!httpHeaders){
+            httpHeaders = new Headers();
         }
+        httpHeaders.append("Accept", "application/hal+json");
+
         // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
         // See https://github.com/jefflau/jest-fetch-mock/pull/193
-        return fetch(resourceIdentifier.toString()).then(response => {
+        return fetch(resourceIdentifier.toString(), {headers: httpHeaders}).then(response => {
             if(!response.ok){
                 throw new Error("failed to read");
             }
@@ -83,12 +134,10 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         })
     }
 
-    async readWithUuid(resourceUuid: v4, httpHeaders: Map<string, string>, queryParameters: Map<string, string>) : T {
-        if(!this.resourceUriTemplate){
-            await this.discoverApi(httpHeaders);
-        }
+    async readWithUuid(resourceUuid: v4, httpHeaders: Headers, queryParameters: URLSearchParams) : T {
+        await this.discoverApi(httpHeaders);
         const resourceUri = this.resolveResourceUriTemplate(resourceUuid);
-        return this.read(resourceUri);
+        return this.read(resourceUri, httpHeaders, queryParameters);
     }
 
     private resolveResourceUriTemplate(resourceUuid: v4): URL {

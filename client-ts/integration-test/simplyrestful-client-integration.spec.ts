@@ -12,6 +12,10 @@ beforeAll(() => {
         new URL("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1"));
 });
 
+beforeEach(() => {
+    fetchMock.resetMocks();
+});
+
 test('Running API against which to run integration tests is available', async () => {
     fetch(new URL("http://localhost:8888")).then(response => expect(response.ok).toBeTruthy())
 });
@@ -21,17 +25,38 @@ test('discoverApi correctly discovers the resource URI for this resource', async
     expect(exampleResourceClient.resourceUriTemplate).toBe("http://localhost:8888/resources/{id}");
 });
 
-// FIXME The UUID in the URL in the running example API changes after every restart. This should read the URL from the list of resources (when implemented)
+test('list correctly retrieves the list of resources', async () => {
+    expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(-1);
+    
+    const listOfResources : List<ExampleResource> = await exampleResourceClient.list();
+    
+    expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(3);
+    expect(listOfResources.length).toBe(3);
+    expect(listOfResources[0].description).toBe("This is test resource 0");
+    expect(listOfResources[0].complexAttribute.name).toBe("complex attribute of test resource 0");
+    expect(listOfResources[1].description).toBe("This is test resource 1");
+    expect(listOfResources[1].complexAttribute.name).toBe("complex attribute of test resource 1");
+    expect(listOfResources[2].description).toBe("This is test resource 2");
+    expect(listOfResources[2].complexAttribute.name).toBe("complex attribute of test resource 2");
+});
+
 test('read with URL correctly retrieves the resource', async () => {
-    const retrieved : ExampleResource = await exampleResourceClient.read(new URL("http://localhost:8888/resources/c6ec9365-e8d9-44ad-b264-acab82d6dffe"));
+    const listOfResources : List<ExampleResource> = await exampleResourceClient.list();
+    expect(listOfResources.length).toBeGreaterThan(0);
+    const resourceIdentifierFirstResource = new URL(listOfResources[0]._links.self.href);
+    const retrieved : ExampleResource = await exampleResourceClient.read(resourceIdentifierFirstResource);
     
     expect(retrieved.description).toBe("This is test resource 0");
     expect(retrieved.complexAttribute.name).toBe("complex attribute of test resource 0");
 });
 
-// FIXME The UUID in the running example API changes after every restart. This should read the UUID from the list of resources (when implemented)
 test('read with UUID correctly retrieves the resource', async () => {
-    const retrieved : ExampleResource = await exampleResourceClient.readWithUuid(uuidParse("c6ec9365-e8d9-44ad-b264-acab82d6dffe"));
+    const listOfResources : List<ExampleResource> = await exampleResourceClient.list();
+    expect(listOfResources.length).toBeGreaterThan(0);
+    const resourceIdentifierFirstResource = new URL(listOfResources[0]._links.self.href);
+    const resourceUuidFirstResource = resourceIdentifierFirstResource.pathname.split("/").pop();
+
+    const retrieved : ExampleResource = await exampleResourceClient.readWithUuid(uuidParse(resourceUuidFirstResource));
     
     expect(retrieved.description).toBe("This is test resource 0");
     expect(retrieved.complexAttribute.name).toBe("complex attribute of test resource 0");
