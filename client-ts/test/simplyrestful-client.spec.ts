@@ -9,7 +9,6 @@ let testResourceClient : SimplyRESTfulClient<TestResource>;
 beforeAll(() => {
     fetchMock.enableMocks();
     testResourceClient = new SimplyRESTfulClient(
-        TestResource,
         new URL("http://localhost"),
         new URL("https://arucard21.github.io/SimplyRESTful-Framework/TestResource/v1"));
 });
@@ -42,7 +41,7 @@ test('discoverApi correctly discovers the resource URI for this resource', async
 });
 
 test('read with URL correctly retrieves the resource', async () => {
-    let mockResource = new TestResource();
+    let mockResource: TestResource = {};
     const additionalFieldValue = "test value";
     mockResource.additionalField = additionalFieldValue;
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
@@ -54,7 +53,7 @@ test('read with URL correctly retrieves the resource', async () => {
 });
 
 test('read with UUID correctly retrieves the resource', async () => {
-    let mockResource = new TestResource();
+    let mockResource: TestResource = {};
     const additionalFieldValue = "test value";
     mockResource.additionalField = additionalFieldValue;
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";

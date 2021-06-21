@@ -1,8 +1,8 @@
 import { HalResource } from 'hal-types';
 
-export class ExampleResource implements HalResource<string, any> {
+type ExampleResource<T extends HalResource<string, unknown> = HalResource<string, unknown>> = {
     description : string;
     complexAttribute : {
         name : string;
     };
-}
+} & T;

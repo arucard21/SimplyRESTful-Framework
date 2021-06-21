@@ -1,5 +1,5 @@
 import { HalResource } from 'hal-types';
 
-export class TestResource implements HalResource<string, any> {
+type TestResource<T extends HalResource<string, unknown> = HalResource<string, unknown>> = {
     additionalField : string;
-}
+} & T;

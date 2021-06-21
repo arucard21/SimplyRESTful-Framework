@@ -2,15 +2,13 @@ import { OpenAPIV3 } from "openapi-types";
 import { stringify as uuidStringify } from 'uuid';
 
 export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
-    private resourceTypeName : string;
     private baseApiUri : URL;
     private resourceProfile : URL;
     private resourceMediaType : string;
     private resourceUriTemplate : string;
     totalAmountOfLastRetrievedCollection : number = -1;
 
-    constructor(resourceType : T&Function, baseApiUri : URL, resourceProfile : URL) {
-        this.resourceTypeName = resourceType.name;
+    constructor(baseApiUri : URL, resourceProfile : URL) {
         this.baseApiUri = baseApiUri;
         this.resourceMediaType = "application/hal+json";
         this.resourceProfile = resourceProfile;
@@ -49,7 +47,22 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         }
     }
 
-    async read(resourceIdentifier: URL, httpHeaders: Map<string, string>) : T {
+    async list(pageStart: number, pageSize: number, fields: List<string> , query: string, sort: List<{field: string, ascending: boolean}>, httpHeaders: Map<string, string>, queryParameters: Map<string, string>) : List<T> {
+        if(!this.resourceUriTemplate){
+            await this.discoverApi(httpHeaders);
+        }
+        const resourceListUri = this.resolveResourceUriTemplate();
+        // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
+        // See https://github.com/jefflau/jest-fetch-mock/pull/193
+        return fetch(resourceListUri.toString()).then(response => {
+            if(!response.ok){
+                throw new Error("failed to read");
+            }
+            return response.json(); // TODO as HalCollectionV2; 
+        })
+    }
+
+    async read(resourceIdentifier: URL, httpHeaders: Map<string, string>, queryParameters: Map<string, string>) : T {
         if(!this.resourceUriTemplate){
             await this.discoverApi(httpHeaders);
         }
@@ -63,11 +76,15 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         })
     }
 
-    async readWithUuid(resourceUuid: v4, httpHeaders: Map<string, string>) : T {
+    async readWithUuid(resourceUuid: v4, httpHeaders: Map<string, string>, queryParameters: Map<string, string>) : T {
         if(!this.resourceUriTemplate){
             await this.discoverApi(httpHeaders);
         }
-        const resourceUri = this.resourceUriTemplate.replace(/{[^}]*}/, uuidStringify(resourceUuid))
-        return this.read(new URL(resourceUri));
+        const resourceUri = this.resolveResourceUriTemplate(resourceUuid);
+        return this.read(resourceUri);
+    }
+
+    private resolveResourceUriTemplate(resourceUuid: v4): URL {
+        return new URL(this.resourceUriTemplate.replace(/{[^}]*}/, uuidStringify(resourceUuid)));
     }
 }
