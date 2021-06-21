@@ -116,7 +116,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *                the request, containing any authentication and authorization
      *                headers needed to access the API.
      */
-    public void discoverResourceUri(MultivaluedMap<String, Object> headers) {
+    public void discoverResourceUri(MultivaluedMap<String, String> headers) {
         if (resourceUriBuilder != null) {
             return;
         }
@@ -204,8 +204,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
             List<String> fields,
             String query,
             List<SortOrder> sort,
-            MultivaluedMap<String, Object> additionalHeaders,
-            MultivaluedMap<String, Object> additionalQueryParameters) {
+            MultivaluedMap<String, String> additionalHeaders,
+            MultivaluedMap<String, String> additionalQueryParameters) {
         discoverResourceUri(additionalHeaders);
         return retrievePagedCollection(pageStart, pageSize, fields, query, sort, additionalHeaders, additionalQueryParameters).getItem();
     }
@@ -230,8 +230,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
             List<String> fields,
             String query,
             List<SortOrder> sort,
-            MultivaluedMap<String, Object> additionalHeaders,
-            MultivaluedMap<String, Object> additionalQueryParameters) {
+            MultivaluedMap<String, String> additionalHeaders,
+            MultivaluedMap<String, String> additionalQueryParameters) {
         WebTarget target = client.target(resourceUriBuilder.build(""));
         if (pageStart >= 0) {
             target = target.queryParam(QUERY_PARAM_PAGE_START, pageStart);
@@ -270,16 +270,16 @@ public class SimplyRESTfulClient<T extends HALResource> {
         return this.totalAmountOfLastRetrievedCollection;
     }
 
-    private void configureAdditionalQueryParameters(WebTarget target, MultivaluedMap<String, Object> queryParameters) {
+    private void configureAdditionalQueryParameters(WebTarget target, MultivaluedMap<String, String> queryParameters) {
         if (Objects.isNull(queryParameters)) {
             return;
         }
-        for (Entry<String, List<Object>> queryParameter : queryParameters.entrySet()) {
+        for (Entry<String, List<String>> queryParameter : queryParameters.entrySet()) {
             target.queryParam(queryParameter.getKey(), queryParameter.getValue().toArray());
         }
     }
 
-    private void configureHttpHeaders(Builder request, MultivaluedMap<String, Object> headers) {
+    private void configureHttpHeaders(Builder request, MultivaluedMap<String, String> headers) {
         if (Objects.isNull(headers)) {
             return;
         }
@@ -326,7 +326,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @param resourceLink is the URI identifier of the resource.
      * @return the API resource at the given URI.
      */
-    public T read(HALLink resourceLink, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    public T read(HALLink resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         return read(URI.create(resourceLink.getHref()), headers, queryParameters);
     }
 
@@ -348,7 +348,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @param queryParameters is the set of query parameters that should be used in the request
      * @return the API resource at the given URI.
      */
-    public T read(URI resourceUri, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    public T read(URI resourceUri, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
         validateResourceUri(resourceUri);
         WebTarget target = client.target(resourceUri);
@@ -381,8 +381,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @param queryParameters is the set of query parameters that should be used in the request
      * @return the URI identifier for the created resource.
      */
-    public URI create(T resource, MultivaluedMap<String, Object> headers,
-            MultivaluedMap<String, Object> queryParameters) {
+    public URI create(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
         if (resource.getSelf() != null) {
             resource.setSelf(null);
@@ -417,7 +416,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @param headers is the set of additional HTTP headers that should be used in the request.
      * @param queryParameters is the set of query parameters that should be used in the request
      */
-    public void update(T resource, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    public void update(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
         URI resourceInstanceURI = URI.create(resource.getSelf().getHref());
         if (!exists(resourceInstanceURI, headers, queryParameters)) {
@@ -447,7 +446,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *
      * @param resourceLink is the id of the resource
      */
-    public void delete(HALLink resourceLink, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    public void delete(HALLink resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         delete(URI.create(resourceLink.getHref()), headers, queryParameters);
     }
 
@@ -468,8 +467,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @param headers is the set of additional HTTP headers that should be used in the request.
      * @param queryParameters is the set of query parameters that should be used in the request
      */
-    public void delete(URI resourceUri, MultivaluedMap<String, Object> headers,
-            MultivaluedMap<String, Object> queryParameters) {
+    public void delete(URI resourceUri, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
         validateResourceUri(resourceUri);
         WebTarget target = client.target(resourceUri);
@@ -522,7 +520,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @throws WebApplicationException if the client cannot confirm that the resource either
      * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(HALLink resourceLink, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    public boolean exists(HALLink resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         return exists(URI.create(resourceLink.getHref()), headers, queryParameters);
     }
 
@@ -548,7 +546,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @throws WebApplicationException if the client cannot confirm that the resource either
      * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(URI resourceUri, MultivaluedMap<String, Object> headers, MultivaluedMap<String, Object> queryParameters) {
+    public boolean exists(URI resourceUri, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
         validateResourceUri(resourceUri);
         WebTarget target = client.target(resourceUri);
