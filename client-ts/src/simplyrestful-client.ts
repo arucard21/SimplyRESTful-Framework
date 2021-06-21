@@ -1,5 +1,6 @@
 import { OpenAPIV3 } from "openapi-types";
 import { stringify as uuidStringify } from 'uuid';
+import { HalCollectionV2 } from './HalCollectionV2.ts'
 
 export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
     private baseApiUri : URL;
@@ -58,7 +59,13 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
             if(!response.ok){
                 throw new Error("failed to read");
             }
-            return response.json(); // TODO as HalCollectionV2; 
+            return response.json() as HalCollectionV2;
+        }).then(collection => {
+            this.totalAmountOfLastRetrievedCollection = !collection.total ? -1 : collection.total;
+            if(!collection._embedded || !collection._embedded.item){
+                return [];
+            }
+            return collection._embedded.item;
         })
     }
 
@@ -85,6 +92,9 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
     }
 
     private resolveResourceUriTemplate(resourceUuid: v4): URL {
+        if(!resourceUuid){
+            return new URL(this.resourceUriTemplate.replace(/{[^}]*}/, ""));    
+        }
         return new URL(this.resourceUriTemplate.replace(/{[^}]*}/, uuidStringify(resourceUuid)));
     }
 }
