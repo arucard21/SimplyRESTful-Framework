@@ -103,7 +103,7 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         // See https://github.com/jefflau/jest-fetch-mock/pull/193
         return fetch(resourceListUri.toString(), {headers: httpHeaders}).then(response => {
             if(!response.ok){
-                throw new Error("failed to read");
+                throw new Error(`Failed to list the resource at ${resourceListUri}`);
             }
             return response.json() as HalCollectionV2;
         }).then(collection => {
@@ -115,6 +115,30 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         })
     }
 
+    async create(resource: T, httpHeaders: Headers, queryParameters: URLSearchParams) : URL {
+        await this.discoverApi(httpHeaders);
+        const resourceListUri = this.resolveResourceUriTemplate();
+        resourceListUri.search = queryParameters;
+
+        if(!httpHeaders){
+            httpHeaders = new Headers();
+        }
+        httpHeaders.append("Content-Type", `application/hal+json;profile="${this.resourceProfile}"`);
+
+        // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
+        // See https://github.com/jefflau/jest-fetch-mock/pull/193
+        return fetch(resourceListUri.toString(), {method: "POST", headers: httpHeaders, body: JSON.stringify(resource)}).then(response => {
+            if(response.status !== 201){
+                throw new Error("Failed to create the new resource");
+            }
+            const locationOfCreatedResource = response.headers.get("Location");
+            if(!locationOfCreatedResource) {
+                throw new Error("Resource seems to have been created but no location was returned. Please report this to the maintainers of the API");
+            }
+            return new URL(locationOfCreatedResource);
+        })
+    }
+
     async read(resourceIdentifier: URL, httpHeaders: Headers, queryParameters: URLSearchParams) : T {
         await this.discoverApi(httpHeaders);
         resourceIdentifier.search = queryParameters;
@@ -122,15 +146,35 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         if(!httpHeaders){
             httpHeaders = new Headers();
         }
-        httpHeaders.append("Accept", "application/hal+json");
+        httpHeaders.append("Accept", `application/hal+json;profile="${this.resourceProfile}"`);
 
         // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
         // See https://github.com/jefflau/jest-fetch-mock/pull/193
         return fetch(resourceIdentifier.toString(), {headers: httpHeaders}).then(response => {
             if(!response.ok){
-                throw new Error("failed to read");
+                throw new Error(`Failed to read the resource at ${resourceIdentifier}`);
             }
             return response.json() as T;
+        })
+    }
+
+    async delete(resourceIdentifier: URL, httpHeaders: Headers, queryParameters: URLSearchParams) {
+        await this.discoverApi(httpHeaders);
+        resourceIdentifier.search = queryParameters;
+
+        if(!httpHeaders){
+            httpHeaders = new Headers();
+        }
+
+        // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
+        // See https://github.com/jefflau/jest-fetch-mock/pull/193
+        return fetch(resourceIdentifier.toString(), {method: "DELETE", headers: httpHeaders}).then(response => {
+            if(response.status !== 204){
+                if (response.status === 404){
+                    throw new Error(`Resource at ${resourceIdentifier} could not be found`);
+                }
+                throw new Error(`Failed to delete the resource at ${resourceIdentifier}`);
+            }
         })
     }
 
