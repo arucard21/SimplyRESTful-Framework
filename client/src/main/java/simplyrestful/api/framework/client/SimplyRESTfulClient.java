@@ -26,8 +26,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.http.HttpStatus;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -474,11 +472,11 @@ public class SimplyRESTfulClient<T extends HALResource> {
         Builder request = target.request();
         configureHttpHeaders(request, headers);
         Response response = request.delete();
-        if (!Objects.equals(response.getStatusInfo(), Status.NO_CONTENT)) {
-            switch (response.getStatus()) {
-            case HttpStatus.SC_NOT_FOUND:
+        if (response.getStatus() != Status.NO_CONTENT.getStatusCode()) {
+            if (response.getStatus() == Status.NOT_FOUND.getStatusCode()) {
                 throw new NotFoundException(response);
-            default:
+            }
+            else {
                 throw new WebApplicationException(response);
             }
         }
