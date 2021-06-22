@@ -392,7 +392,6 @@ public class SimplyRESTfulClient<T extends HALResource> {
         configureHttpHeaders(request, headers);
         Entity<T> halJsonEntity = Entity.entity(resource, resourceMediaType);
         try (Response response = request.post(halJsonEntity)) {
-            System.err.println(response.readEntity(String.class));
             if (!Objects.equals(201, response.getStatus())) {
                 throw new WebApplicationException(response);
             }
