@@ -16,28 +16,24 @@ import io.openapitools.jackson.dataformat.hal.JacksonHALModule;
 @Provider
 @Produces(JacksonHALJsonProvider.MEDIA_TYPE_APPLICATION_HAL_JSON)
 @Consumes(JacksonHALJsonProvider.MEDIA_TYPE_APPLICATION_HAL_JSON)
-public class JacksonHALJsonProvider extends JacksonJsonProvider{
+public class JacksonHALJsonProvider extends JacksonJsonProvider {
     public static final String MEDIA_TYPE_APPLICATION_HAL_JSON = "application/hal+json";
     public static final JacksonHALModule JACKSON_HAL_MODULE = new JacksonHALModule();
 
     public JacksonHALJsonProvider() {
-	super();
-	modifyDefaultMapperForHALJson();
+        this(null, BASIC_ANNOTATIONS);
     }
 
     public JacksonHALJsonProvider(Annotations[] annotationsToUse) {
-	super(annotationsToUse);
-	modifyDefaultMapperForHALJson();
+        this(null, annotationsToUse);
     }
 
     public JacksonHALJsonProvider(ObjectMapper mapper) {
-	super(mapper);
-	modifyConfiguredMapperForHALJson();
+        this(mapper == null ? mapper : mapper.registerModule(JACKSON_HAL_MODULE), BASIC_ANNOTATIONS);
     }
 
     public JacksonHALJsonProvider(ObjectMapper mapper, Annotations[] annotationsToUse) {
-	super(mapper, annotationsToUse);
-	modifyConfiguredMapperForHALJson();
+        super(mapper == null ? mapper : mapper.registerModule(JACKSON_HAL_MODULE), annotationsToUse);
     }
 
     /**
@@ -48,20 +44,11 @@ public class JacksonHALJsonProvider extends JacksonJsonProvider{
      * mapper allows the original mapper to still be used for plain JSON output.
      */
     @Override
-    protected ObjectMapper _locateMapperViaProvider(Class<?> type, MediaType mediaType)
-    {
-	ObjectMapper mapper = super._locateMapperViaProvider(type, mediaType);
-	if(mapper == null) {
-	    return null;
-	}
-	return mapper.copy();
-    }
-
-    private void modifyDefaultMapperForHALJson() {
-        _mapperConfig.setMapper(_mapperConfig.getDefaultMapper().registerModule(JACKSON_HAL_MODULE));
-    }
-
-    private void modifyConfiguredMapperForHALJson() {
-        _mapperConfig.setMapper(_mapperConfig.getConfiguredMapper().registerModule(JACKSON_HAL_MODULE));
+    protected ObjectMapper _locateMapperViaProvider(Class<?> type, MediaType mediaType) {
+        ObjectMapper mapper = super._locateMapperViaProvider(type, mediaType);
+        if (mapper == null) {
+            return null;
+        }
+        return mapper.copy().registerModule(JACKSON_HAL_MODULE);
     }
 }
