@@ -68,17 +68,19 @@ public class HALCollectionV2Builder<T extends HALResource> {
     }
 
     public HALCollectionV2<T> build(MediaType type) {
-	HALCollectionV2<T> collection = new HALCollectionV2<T>();
-	setResourceSelfMediaTypeSimilarToCollectionMediaType(type);
-	collection.setItem(this.resources);
-	collection.setSelf(createLink(requestURI, type, collection.getProfile()));
-	if(this.collectionSize != null) {
-		collection.setTotal(this.collectionSize);
-	}
-	if (shouldIncludeNavigation()) {
-	    includeNavigation(collection);
-	}
-	return collection;
+    	HALCollectionV2<T> collection = new HALCollectionV2<T>();
+    	collection.setSelf(createLink(requestURI, type, collection.getProfile()));
+
+    	setResourceSelfMediaTypeSimilarToCollectionMediaType(type);
+    	collection.setItem(this.resources);
+
+    	if(this.collectionSize != null) {
+    		collection.setTotal(this.collectionSize);
+    	}
+    	if (shouldIncludeNavigation()) {
+    	    includeNavigation(collection);
+    	}
+    	return collection;
     }
 
     /**
@@ -91,19 +93,22 @@ public class HALCollectionV2Builder<T extends HALResource> {
      * @param type is the media type of the collection
      */
     private void setResourceSelfMediaTypeSimilarToCollectionMediaType(MediaType type) {
-	MediaType resourceType;
-	URI resourceProfile;
-	T resourceFromList = this.resources.stream().findAny().orElseThrow();
-	if(MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.isCompatible(type)) {
-	    resourceType = MediaTypeUtils.APPLICATION_HAL_JSON_TYPE;
-	    resourceProfile = resourceFromList.getProfile();
-	}
-	else {
-	    resourceType = resourceFromList.getCustomJsonMediaType();
-	    resourceProfile = null;
-	}
-	this.resources.stream().forEach(resource -> resource.setSelf(
-		createLink(URI.create(resource.getSelf().getHref()), resourceType, resourceProfile)));
+        if(this.resources.isEmpty()) {
+            return;
+        }
+    	MediaType resourceType;
+    	URI resourceProfile;
+    	T resourceFromList = this.resources.stream().findAny().orElseThrow();
+    	if(MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.isCompatible(type)) {
+    	    resourceType = MediaTypeUtils.APPLICATION_HAL_JSON_TYPE;
+    	    resourceProfile = resourceFromList.getProfile();
+    	}
+    	else {
+    	    resourceType = resourceFromList.getCustomJsonMediaType();
+    	    resourceProfile = null;
+    	}
+    	this.resources.stream().forEach(resource -> resource.setSelf(
+    		createLink(URI.create(resource.getSelf().getHref()), resourceType, resourceProfile)));
     }
 
     private void includeNavigation(HALCollectionV2<T> collection) {
