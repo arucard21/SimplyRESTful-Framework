@@ -1,6 +1,7 @@
 package example.resources.jpa;
 
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -30,46 +31,55 @@ public class ExampleResource extends HALResource {
     private String description;
     @OneToOne(cascade = CascadeType.ALL)
     private ExampleComplexAttribute complexAttribute;
+    private ZonedDateTime dateTime;
 
     public long getId() {
-	return id;
+        return id;
     }
 
     public void setId(long id) {
-	this.id = id;
+        this.id = id;
     }
 
     public UUID getUUID() {
-	return uuid;
+        return uuid;
     }
 
     public void setUUID(UUID uuid) {
-	this.uuid = uuid;
+        this.uuid = uuid;
     }
 
     public String getDescription() {
-	return description;
+        return description;
     }
 
     public void setDescription(String description) {
-	this.description = description;
+        this.description = description;
     }
 
     public ExampleComplexAttribute getComplexAttribute() {
-	return complexAttribute;
+        return complexAttribute;
     }
 
     public void setComplexAttribute(ExampleComplexAttribute complexAttribute) {
-	this.complexAttribute = complexAttribute;
+        this.complexAttribute = complexAttribute;
     }
 
     @Override
     public URI getProfile() {
-	return URI.create(EXAMPLE_PROFILE_STRING);
+        return URI.create(EXAMPLE_PROFILE_STRING);
     }
 
     @Override
     public MediaType getCustomJsonMediaType() {
-	return MediaType.valueOf(EXAMPLE_MEDIA_TYPE_JSON);
+        return MediaType.valueOf(EXAMPLE_MEDIA_TYPE_JSON);
+    }
+
+    public ZonedDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(ZonedDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 }

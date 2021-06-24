@@ -19,6 +19,8 @@
 package example.jersey.nomapping.resources;
 
 import java.net.URI;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -89,6 +91,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
        	    	ExampleComplexAttribute complexAttribute = new ExampleComplexAttribute();
        	    	complexAttribute.setName("complex attribute of test resource "+ i);
        	    	resource.setComplexAttribute(complexAttribute);
+       	    	resource.setDateTime(ZonedDateTime.now(ZoneOffset.UTC));
        	    	repo.save(resource);
        	    }
 	}

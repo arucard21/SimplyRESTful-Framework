@@ -16,24 +16,25 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Provider
 @Produces(MediaType.WILDCARD)
 @Consumes(MediaType.WILDCARD)
-public class ObjectMapperProvider implements ContextResolver<ObjectMapper>{
+public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
     private final ObjectMapper mapper;
 
     public ObjectMapperProvider() {
-	this.mapper = createMapper();
+        this.mapper = createMapper();
     }
 
     @Override
     public ObjectMapper getContext(Class<?> type) {
-	return mapper;
+        return mapper;
     }
 
     private ObjectMapper createMapper() {
-	ObjectMapper jsonObjectMapper = new ObjectMapper();
-	jsonObjectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-	jsonObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
-	jsonObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-	jsonObjectMapper.setSerializationInclusion(Include.NON_EMPTY);
+        ObjectMapper jsonObjectMapper = new ObjectMapper();
+        jsonObjectMapper.findAndRegisterModules();
+        jsonObjectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        jsonObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
+        jsonObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        jsonObjectMapper.setSerializationInclusion(Include.NON_EMPTY);
         return jsonObjectMapper;
     }
 }
