@@ -48,7 +48,6 @@ import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.filters.AcceptHeaderModifier;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
-import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
@@ -145,7 +144,6 @@ public class ServerBuilder {
         providers.addAll(Arrays.asList(
         		ValidationExceptionMapper.class,
         		MultipartProvider.class,
-        		ObjectMapperProvider.class,
         		JacksonHALJsonProvider.class,
         		JacksonJsonProvider.class,
         		UriCustomizer.class,
