@@ -34,6 +34,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -47,6 +48,7 @@ import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
+import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
@@ -210,5 +212,12 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     	    persistedResource.setUUID(id);
     	}
     	return persistedResource;
+    }
+
+    @Override
+    public HALCollection<ExampleResource> listHALResources(ResourceInfo resourceInfo, UriInfo uriInfo,
+            HttpHeaders httpHeaders, int page, int pageStart, int pageSize, boolean compact, List<String> fields,
+            String query, List<String> sort) {
+        return DefaultWebResource.super.listHALResources(resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact, fields, query, sort);
     }
 }

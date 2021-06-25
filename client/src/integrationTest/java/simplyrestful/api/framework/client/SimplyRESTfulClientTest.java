@@ -61,9 +61,15 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        ResourceConfig config = new ResourceConfig(TestWebResource.class, WebResourceRoot.class,
-                ObjectMapperProvider.class, JacksonJsonProvider.class, JacksonHALJsonProvider.class,
-                UriCustomizer.class, OpenApiResource.class, AcceptHeaderOpenApiResource.class);
+        ResourceConfig config = new ResourceConfig(
+                TestWebResource.class,
+                WebResourceRoot.class,
+                ObjectMapperProvider.class,
+                JacksonJsonProvider.class,
+                JacksonHALJsonProvider.class,
+                UriCustomizer.class,
+                OpenApiResource.class,
+                AcceptHeaderOpenApiResource.class);
         config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
         config.property(ServerProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
         return config;

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -206,21 +207,14 @@ public class MediaTypeUtils {
         List<MediaType> allProducibleMediaTypes = new ArrayList<>();
         for (Class<?> webResourceClass : webResourceClasses) {
             for (Method jaxrsMethod : webResourceClass.getMethods()) {
-                List<MediaType> producibleMediaTypes = getProducibleMediaTypesFromMethod(jaxrsMethod);
-                if(producibleMediaTypes.isEmpty()) {
-                    producibleMediaTypes = getProducibleMediaTypesFromSuperClassOrInterfaces(jaxrsMethod);
-                    if(producibleMediaTypes.isEmpty()) {
-                        producibleMediaTypes = getProducibleMediaTypesFromClass(webResourceClass);
-                    }
-                }
-                allProducibleMediaTypes.addAll(producibleMediaTypes);
+                allProducibleMediaTypes.addAll(getProducibleMediaTypes(webResourceClass, jaxrsMethod));
             }
         }
         return allProducibleMediaTypes.stream().distinct().collect(Collectors.toList());
     }
 
     /**
-     * Return all producible media types for a request.
+     * Return all producible media types for a specific request.
      *
      * This will check the same annotation inheritance as JAX-RS to accurately determine
      * which media types can be produced.
@@ -233,22 +227,41 @@ public class MediaTypeUtils {
         if(resourceInfo.getResourceMethod() == null && resourceInfo.getResourceClass() == null) {
             throw new IllegalStateException(ERROR_PREMATCHING_NOT_SUPPORTED);
         }
-        List<MediaType> producibleMediaTypes = getProducibleMediaTypesFromMethod(resourceInfo.getResourceMethod());
+        return getProducibleMediaTypes(resourceInfo.getResourceClass(), resourceInfo.getResourceMethod());
+    }
+
+    /**
+     * Return all producible media types for a specific method.
+     *
+     * This will check the same annotation inheritance as JAX-RS to accurately determine
+     * which media types can be produced.
+     *
+     * @param resourceClass is the web resource class that defines the JAX-RS API.
+     * @param method is the method for which we want to discover all producible media types.
+     * @return the list of media types that can be produced. May be empty but never null.
+     * @throws IllegalStateException if multiple implemented interfaces provide @Produces annotations for this method.
+     */
+    public static List<MediaType> getProducibleMediaTypes(Class<?> resourceClass, Method method) {
+        List<MediaType> producibleMediaTypes = getDeclaredProducibleMediaTypesFromMethod(method);
         if(!producibleMediaTypes.isEmpty()) {
             return producibleMediaTypes;
         }
-        producibleMediaTypes = getProducibleMediaTypesFromSuperClassOrInterfaces(resourceInfo.getResourceMethod());
+        producibleMediaTypes = getDeclaredProducibleMediaTypesFromSuperClass(method.getDeclaringClass().getSuperclass(), method);
         if(!producibleMediaTypes.isEmpty()) {
             return producibleMediaTypes;
         }
-        producibleMediaTypes = getProducibleMediaTypesFromClass(resourceInfo.getResourceClass());
+        producibleMediaTypes = getDeclaredProducibleMediaTypesFromInterfaces(method.getDeclaringClass().getInterfaces(), method);
+        if(!producibleMediaTypes.isEmpty()) {
+            return producibleMediaTypes;
+        }
+        producibleMediaTypes = getDeclaredProducibleMediaTypesFromClass(resourceClass);
         if(!producibleMediaTypes.isEmpty()) {
             return producibleMediaTypes;
         }
         return Collections.emptyList();
     }
 
-    private static List<MediaType> getProducibleMediaTypesFromMethod(Method method) {
+    private static List<MediaType> getDeclaredProducibleMediaTypesFromMethod(Method method) {
         List<Produces> producesAnnotations = List.of(method.getDeclaredAnnotationsByType(Produces.class));
         return producesAnnotations.stream()
                 .flatMap(produces -> Stream.of(produces.value()))
@@ -256,7 +269,7 @@ public class MediaTypeUtils {
                 .collect(Collectors.toList());
     }
 
-    private static List<MediaType> getProducibleMediaTypesFromClass(Class<?> resourceClass) {
+    private static List<MediaType> getDeclaredProducibleMediaTypesFromClass(Class<?> resourceClass) {
         List<Produces> producesAnnotations = List.of(resourceClass.getAnnotationsByType(Produces.class));
         return producesAnnotations.stream()
                 .flatMap(produces -> Stream.of(produces.value()))
@@ -264,37 +277,53 @@ public class MediaTypeUtils {
                 .collect(Collectors.toList());
     }
 
-    private static List<MediaType> getProducibleMediaTypesFromSuperClassOrInterfaces(Method method) {
-        Class<?> declaringClass = method.getDeclaringClass();
-        Class<?> superClass = declaringClass.getSuperclass();
-        if (superClass != null) {
-            try {
-                List<MediaType> superClassMediaTypes = getProducibleMediaTypesFromMethod(
-                        superClass.getDeclaredMethod(method.getName(), method.getParameterTypes()));
-                if(!superClassMediaTypes.isEmpty()) {
-                    return superClassMediaTypes;
-                }
-            } catch (NoSuchMethodException e) { /* Super class did not contain the method so no further need to check it */ }
+    private static List<MediaType> getDeclaredProducibleMediaTypesFromSuperClass(Class<?> superClass, Method method) {
+        if(superClass == null) {
+            return Collections.emptyList();
         }
-      List<Map<String,List<MediaType>>> producibleMediaTypesPerInterface = Stream.of(declaringClass.getInterfaces())
-                .map(iface -> Stream.of(iface.getMethods())
-                        .filter(ifaceMethod -> ifaceMethod.getName().equals(method.getName()) && Arrays.equals(ifaceMethod.getParameterTypes(), method.getParameterTypes()))
-                        .findFirst())
-                .filter(ifaceMethodOptional -> ifaceMethodOptional.isPresent())
-                .map(ifaceMethod -> ifaceMethod.get())
-                .map(ifaceMethod -> Collections.singletonMap(ifaceMethod.getDeclaringClass().getName(), getProducibleMediaTypesFromMethod(ifaceMethod)))
+        try {
+            List<MediaType> superClassMediaTypes = getDeclaredProducibleMediaTypesFromMethod(
+                    superClass.getDeclaredMethod(method.getName(), method.getParameterTypes()));
+            if (!superClassMediaTypes.isEmpty()) {
+                return superClassMediaTypes;
+            }
+        } catch (NoSuchMethodException e) {/* Super class did not contain the method so no further need to check it */ }
+        return getDeclaredProducibleMediaTypesFromSuperClass(superClass.getSuperclass(), method);
+    }
+
+    private static List<MediaType> getDeclaredProducibleMediaTypesFromInterfaces(Class<?>[] interfaceClasses, Method method) {
+        if(interfaceClasses == null || interfaceClasses.length == 0) {
+            return Collections.emptyList();
+        }
+        List<List<MediaType>> producibleMediaTypesFromInterfaces = Stream.of(interfaceClasses)
+                .map(interfaceClass -> getDeclaredProducibleMediaTypesFromInterface(interfaceClass, method))
+                .filter(mediaTypeList -> !mediaTypeList.isEmpty())
                 .distinct()
                 .collect(Collectors.toList());
-        if(producibleMediaTypesPerInterface.size() == 1) {
-            return producibleMediaTypesPerInterface.get(0).values().stream().findFirst().orElseThrow();
+        if (producibleMediaTypesFromInterfaces.isEmpty()) {
+            return Collections.emptyList();
+        }
+        else if (producibleMediaTypesFromInterfaces.size() == 1) {
+            return producibleMediaTypesFromInterfaces.get(0);
         }
         else {
-            if(producibleMediaTypesPerInterface.isEmpty()) {
-                return Collections.emptyList();
-            }
-            else {
-                throw new IllegalStateException("Multiple interfaces provide JAX-RS annotations for this method");
-            }
+            throw new IllegalStateException("Multiple interfaces provide JAX-RS annotations for this method");
         }
+    }
+
+    private static List<MediaType> getDeclaredProducibleMediaTypesFromInterface(Class<?> interfaceClass, Method method) {
+        Optional<Method> interfaceMethodOptional = Stream.of(interfaceClass.getMethods())
+                .filter(ifaceMethod -> ifaceMethod.getName().equals(method.getName())
+                        && Arrays.equals(ifaceMethod.getParameterTypes(), method.getParameterTypes()))
+                .findFirst();
+        if(interfaceMethodOptional.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Method interfaceMethod = interfaceMethodOptional.get();
+        List<MediaType> producibleMediaTypes = getDeclaredProducibleMediaTypesFromMethod(interfaceMethod);
+        if(!producibleMediaTypes.isEmpty()) {
+            return producibleMediaTypes;
+        }
+        return getDeclaredProducibleMediaTypesFromInterfaces(interfaceClass.getInterfaces(), method);
     }
 }

@@ -20,18 +20,13 @@ import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
-@OpenAPIDefinition(
-    tags = {
-	    @Tag(name = "Test Resources")
-    }
-)
-@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
-@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" +TestResource.TEST_RESOURCE_PROFILE +"\"")
-public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource>{
+@OpenAPIDefinition(tags = { @Tag(name = "Test Resources") })
+@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.TEST_RESOURCE_PROFILE + "\"")
+@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.TEST_RESOURCE_PROFILE + "\"")
+public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource> {
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();
     public static final UUID ERROR_UPDATE_RESOURCE_ID = UUID.randomUUID();
-
     private static URI baseUri;
 
     public static URI getBaseUri() {
@@ -39,59 +34,59 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
     }
 
     public static void setBaseUri(URI baseUri) {
-	TestWebResource.baseUri = baseUri;
+        TestWebResource.baseUri = baseUri;
     }
 
     @Override
     public TestResource create(TestResource resource, UUID resourceUUID) {
-	// The provided resource is not actually stored anywhere in this test API.
-	return resource;
+        // The provided resource is not actually stored anywhere in this test API.
+        return resource;
     }
 
     @Override
     public TestResource read(UUID resourceUUID) {
-	if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-	    return TestResource.testInstance();
-	}
-	if (Objects.equals(resourceUUID, ERROR_READ_RESOURCE_ID)) {
-	    throw new InternalServerErrorException("Pretending that something went wrong on the server");
-	}
-	return null;
+        if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
+            return TestResource.testInstance();
+        }
+        if (Objects.equals(resourceUUID, ERROR_READ_RESOURCE_ID)) {
+            throw new InternalServerErrorException("Pretending that something went wrong on the server");
+        }
+        return null;
     }
 
     @Override
     public TestResource update(TestResource resource, UUID resourceUUID) {
-	if (Objects.equals(resourceUUID, ERROR_UPDATE_RESOURCE_ID)) {
-	    throw new InternalServerErrorException("Pretending that something went wrong on the server");
-	}
-	return TestResource.testInstance();
+        if (Objects.equals(resourceUUID, ERROR_UPDATE_RESOURCE_ID)) {
+            throw new InternalServerErrorException("Pretending that something went wrong on the server");
+        }
+        return TestResource.testInstance();
     }
 
     @Override
     public TestResource delete(UUID resourceUUID) {
-	if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
-	    return TestResource.testInstance();
-	}
-	return null;
+        if (Objects.equals(resourceUUID, TestResource.TEST_RESOURCE_ID)) {
+            return TestResource.testInstance();
+        }
+        return null;
     }
 
     @Override
     public List<TestResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
-	return Arrays.asList(TestResource.testInstance(), TestResource.random());
+        return Arrays.asList(TestResource.testInstance(), TestResource.random());
     }
 
     @Override
     public int count(String query) {
-	return 2;
+        return 2;
     }
 
     @Override
     public Stream<TestResource> stream(List<String> fields, String query, List<SortOrder> sort) {
-	return Stream.of(TestResource.testInstance(), TestResource.random());
+        return Stream.of(TestResource.testInstance(), TestResource.random());
     }
 
     @Override
     public boolean exists(UUID resourceUUID) {
-	return this.read(resourceUUID) != null;
+        return this.read(resourceUUID) != null;
     }
 }
