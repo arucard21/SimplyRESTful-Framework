@@ -109,13 +109,22 @@ test('list correctly sets the paging query parameters', async () => {
 
 test('list correctly sets the HTTP headers', async () => {
     const headers = new Headers({"header1": "value1", "header2": "value2"});
-    const expectedHeaders = new Headers({"header1": "value1", "header2": "value2", "Accept": "application/hal+json; profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\""});
+    const expectedHeaders = new Headers({"header1": "value1", "header2": "value2", "Accept": "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\""});
     fetchMock.mockResponse(JSON.stringify({}));
     const retrievedListOfResources : List<TestResource> = await testResourceClient.list(undefined, undefined, undefined, undefined, undefined, headers, undefined);
     expect(fetchMock.mock.calls[0][1]).toHaveProperty("headers", expectedHeaders);
 });
 
-test('read with URL correctly retrieves the resource', async () => {
+test('create correctly creates the resource', async () => {
+    const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
+    const additionalFieldValue = "test value";
+    fetchMock.mockResponse(null, {status: 201, headers: {Location: selfLink}});
+    const newResource : TestResource = {additionalField: additionalFieldValue}
+    const newResourceUri : URL = await testResourceClient.create(newResource);
+    expect(newResourceUri.toString()).toBe(selfLink);
+});
+
+test('read correctly retrieves the resource when provided with a URL', async () => {
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     const additionalFieldValue = "test value";
     fetchMock.mockResponse(JSON.stringify({_links: {self: {href: selfLink}}, additionalField: additionalFieldValue }));
@@ -124,11 +133,32 @@ test('read with URL correctly retrieves the resource', async () => {
     expect(retrievedResource._links.self.href).toBe(selfLink);
 });
 
-test('read with UUID correctly retrieves the resource', async () => {
+test('read correctly retrieves the resource when provided with a UUID', async () => {
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     const additionalFieldValue = "test value";
     fetchMock.mockResponse(JSON.stringify({_links: {self: {href: selfLink}}, additionalField: additionalFieldValue }));
     const retrievedResource : TestResource = await testResourceClient.readWithUuid(uuidParse("00000000-0000-0000-0000-000000000000"));
     expect(retrievedResource.additionalField).toBe(additionalFieldValue);
     expect(retrievedResource._links.self.href).toBe(selfLink);
+});
+
+test('update correctly updates the resource', async () => {
+    const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
+    const additionalFieldValue = "test value";
+    fetchMock.mockResponse(null, {status: 201, headers: {Location: selfLink}});
+    const newResource : TestResource = {_links: {self: {href: selfLink}}, additionalField: additionalFieldValue}
+    await expect(testResourceClient.update(newResource)).resolves.not.toThrow();
+    const expectedHeaders = new Headers({"Content-Type": "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/TestResource/v1\""});
+    expect(fetchMock.mock.calls[0][0]).toBe(selfLink);
+    expect(fetchMock.mock.calls[0][1]).toHaveProperty("headers", expectedHeaders);
+});
+
+test('delete correctly deletes the resource', async () => {
+    const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
+    const additionalFieldValue = "test value";
+    fetchMock.mockResponse(null, {status: 204, headers: {Location: selfLink}});
+    const newResource : TestResource = {_links: {self: {href: selfLink}}, additionalField: additionalFieldValue};
+    await expect(testResourceClient.delete(new URL(selfLink))).resolves.not.toThrow();
+    const expectedHeaders = new Headers({"Content-Type": "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/TestResource/v1\""});
+    expect(fetchMock.mock.calls[0][0]).toBe(selfLink);
 });

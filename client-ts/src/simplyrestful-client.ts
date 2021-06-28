@@ -97,7 +97,7 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         if(!httpHeaders){
             httpHeaders = new Headers();
         }
-        httpHeaders.append("Accept", "application/hal+json; profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\"");
+        httpHeaders.append("Accept", "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\"");
 
         // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
         // See https://github.com/jefflau/jest-fetch-mock/pull/193
@@ -184,10 +184,6 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
                 if (response.status === 404){
                     throw new Error(`Resource at ${resourceIdentifier} could not be found`);
                 }
-                console.log(response.status);
-                console.log(response.text);
-                
-                
                 throw new Error(`Failed to update the resource at ${resourceIdentifier}`);
             }
         })
