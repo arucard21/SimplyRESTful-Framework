@@ -118,7 +118,9 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
     async create(resource: T, httpHeaders: Headers, queryParameters: URLSearchParams) : URL {
         await this.discoverApi(httpHeaders);
         const resourceListUri = this.resolveResourceUriTemplate();
-        resourceListUri.search = queryParameters;
+        if(!!queryParameters){
+            resourceIdentifier.search = queryParameters;
+        }
 
         if(!httpHeaders){
             httpHeaders = new Headers();
@@ -141,7 +143,9 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
 
     async read(resourceIdentifier: URL, httpHeaders: Headers, queryParameters: URLSearchParams) : T {
         await this.discoverApi(httpHeaders);
-        resourceIdentifier.search = queryParameters;
+        if(!!queryParameters){
+            resourceIdentifier.search = queryParameters;
+        }
 
         if(!httpHeaders){
             httpHeaders = new Headers();
@@ -158,9 +162,42 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         })
     }
 
+    async update(resource: T, httpHeaders: Headers, queryParameters: URLSearchParams) {
+        await this.discoverApi(httpHeaders);
+        let resourceIdentifier : URL = new URL(resource?._links?.self?.href);
+        if(!resourceIdentifier){
+            throw Error("The update failed because the resource does not contain a valid self link.")
+        }
+        if(!!queryParameters){
+            resourceIdentifier.search = queryParameters;
+        }
+
+        if(!httpHeaders){
+            httpHeaders = new Headers();
+        }
+        httpHeaders.append("Content-Type", `application/hal+json;profile="${this.resourceProfile}"`);
+
+        // FIXME the ".toString()" part in fetch can be removed once a new jest-fetch-mock release is available (after 2021-03-31).
+        // See https://github.com/jefflau/jest-fetch-mock/pull/193
+        return fetch(resourceIdentifier.toString(), {method: "PUT", headers: httpHeaders, body: JSON.stringify(resource)}).then(response => {
+            if(!response.ok){
+                if (response.status === 404){
+                    throw new Error(`Resource at ${resourceIdentifier} could not be found`);
+                }
+                console.log(response.status);
+                console.log(response.text);
+                
+                
+                throw new Error(`Failed to update the resource at ${resourceIdentifier}`);
+            }
+        })
+    }
+
     async delete(resourceIdentifier: URL, httpHeaders: Headers, queryParameters: URLSearchParams) {
         await this.discoverApi(httpHeaders);
-        resourceIdentifier.search = queryParameters;
+        if(!!queryParameters){
+            resourceIdentifier.search = queryParameters;
+        }
 
         if(!httpHeaders){
             httpHeaders = new Headers();
@@ -184,10 +221,16 @@ export class SimplyRESTfulClient<T extends HalResource<string, unknown>> {
         return this.read(resourceUri, httpHeaders, queryParameters);
     }
 
+    async deleteWithUuid(resourceUuid: v4, httpHeaders: Headers, queryParameters: URLSearchParams) : T {
+        await this.discoverApi(httpHeaders);
+        const resourceUri = this.resolveResourceUriTemplate(resourceUuid);
+        return this.delete(resourceUri, httpHeaders, queryParameters);
+    }
+
     private resolveResourceUriTemplate(resourceUuid: v4): URL {
         if(!resourceUuid){
-            return new URL(this.resourceUriTemplate.replace(/{[^}]*}/, ""));    
+            return new URL(this.resourceUriTemplate.replace(/{id}/, ""));    
         }
-        return new URL(this.resourceUriTemplate.replace(/{[^}]*}/, uuidStringify(resourceUuid)));
+        return new URL(this.resourceUriTemplate.replace(/{id}/, uuidStringify(resourceUuid)));
     }
 }
