@@ -1,6 +1,7 @@
-import { HalResource, HalLink } from 'hal-types';
+import { HALResource } from './HALResource';
+import { HalLink } from 'hal-types';
 
-type HalCollectionV2<T extends HalResource<string, unknown> = HalResource<string, unknown>> = {
+export type HalCollectionV2<T extends HALResource> = {
     total: number;
     _links: {
         first: HalLink,
@@ -9,6 +10,6 @@ type HalCollectionV2<T extends HalResource<string, unknown> = HalResource<string
         next: HalLink;
     };
     _embedded: {
-        item: HalResource[];
+        item: T[];
     };
 } & T;

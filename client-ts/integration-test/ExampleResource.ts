@@ -1,8 +1,8 @@
-import { HalResource } from 'hal-types';
+import { HALResource } from './../src/HALResource';
 
-type ExampleResource<T extends HalResource<string, unknown> = HalResource<string, unknown>> = {
-    description : string;
-    complexAttribute : {
-        name : string;
+export type ExampleResource<T extends HALResource = HALResource> = {
+    description: string;
+    complexAttribute: {
+        name: string;
     };
 } & T;
