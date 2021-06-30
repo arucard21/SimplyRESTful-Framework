@@ -58,17 +58,19 @@ export class SimplyRESTfulClient<T extends HALResource> {
     }
 
     private async configureResourceUriTemplate(this: this, openApiSpecification: OpenAPIV3.Document): Promise<void> {
-        for (const path in openApiSpecification.paths) {
-            if (!!path && openApiSpecification?.paths[path]?.get) {
-                const content = (openApiSpecification?.paths[path]?.get?.responses?.default as OpenAPIV3.ResponseObject)?.content;
-                const mediaType = `${this.resourceMediaType};profile="${this.resourceProfile}"`;
-                for (const contentType in content) {
-                    const contentTypeNoSpaces = contentType.replace(" ", "");
-                    if (contentTypeNoSpaces === mediaType) {
-                        this.resourceUriTemplate = decodeURI(new URL(path, this.baseApiUri).toString());
-                    }
-                }
-            }
+        for (const [path, pathItem] of Object.entries(openApiSpecification.paths)) {
+			if(!pathItem){
+				continue;
+			}
+			const content = (pathItem.get?.responses?.default as OpenAPIV3.ResponseObject)?.content;
+			const mediaType = `${this.resourceMediaType};profile="${this.resourceProfile}"`;
+			for (const contentType in content) {
+				const contentTypeNoSpaces = contentType.replace(" ", "");
+				if (contentTypeNoSpaces === mediaType) {
+					this.resourceUriTemplate = decodeURI(new URL(path, this.baseApiUri).toString());
+					return;
+				}
+			}
         }
     }
 
