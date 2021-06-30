@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { HALResource } from './HALResource';
-import { HalCollectionV2 } from './HalCollectionV2'
+import { HalCollectionV2 } from './HalCollectionV2';
 import { SortOrder } from './SortOrder';
 
 export class SimplyRESTfulClient<T extends HALResource> {
