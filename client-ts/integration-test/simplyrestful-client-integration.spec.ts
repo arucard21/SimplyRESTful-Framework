@@ -2,12 +2,13 @@ import { SimplyRESTfulClient } from '../src/simplyrestful-client';
 import { ExampleResource } from './ExampleResource';
 import fetchMock from 'jest-fetch-mock';
 
+const hostname = "http://localhost:8888/";
 let exampleResourceClient: SimplyRESTfulClient<ExampleResource>;
 
 beforeAll(() => {
     fetchMock.disableMocks()
     exampleResourceClient = new SimplyRESTfulClient(
-        new URL("http://localhost:8888"),
+        new URL(hostname),
         new URL("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1"));
 });
 
@@ -16,12 +17,13 @@ beforeEach(() => {
 });
 
 test('Running API against which to run integration tests is available', async () => {
-    fetch("http://localhost:8888").then(response => expect(response.ok).toBeTruthy())
+	await expect(fetch(hostname)).resolves.not.toThrow();
+	await expect(fetch(hostname).then(response => response.ok)).resolves.toBeTruthy();
 });
 
 test('discoverApi correctly discovers the resource URI for this resource', async () => {
     await exampleResourceClient.discoverApi();
-    expect(exampleResourceClient.resourceUriTemplate).toBe("http://localhost:8888/resources/{id}");
+    expect(exampleResourceClient.resourceUriTemplate).toBe(`${hostname}resources/{id}`);
 });
 
 test('list correctly retrieves the list of resources', async () => {
