@@ -1,6 +1,6 @@
 # SimplyRESTful TypeScript Client
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
-![npm](https://img.shields.io/npm/v/simplyrestful-client?style=plastic)
+[![npm](https://img.shields.io/npm/v/simplyrestful-client?style=plastic)](https://www.npmjs.com/package/simplyrestful-client)
 
 A TypeScript/JavaScript client library for programmatic access to any SimplyRESTful API.
 
