@@ -166,6 +166,22 @@ test('list correctly retrieves the list of resources', async () => {
     expect(fetchMock.mock.calls[0][0]).toBe("http://localhost/testresources/");
 });
 
+test('list correctly retrieves the list of resources when the collection is empty', async () => {
+    const total = 0;
+
+    fetchMock.mockResponse(JSON.stringify(
+        {
+            total: total,
+            _embedded: {
+                item: []
+            }
+        }));
+    const retrievedListOfResources: TestResource[] = await testResourceClient.list();
+
+    expect(testResourceClient.totalAmountOfLastRetrievedCollection).toBe(total);
+    expect(fetchMock.mock.calls[0][0]).toBe("http://localhost/testresources/");
+});
+
 test('list correctly sets the paging query parameters', async () => {
     const resourceListUri = "http://localhost/testresources/";
     const pageStart = 10;

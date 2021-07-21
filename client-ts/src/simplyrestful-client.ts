@@ -118,7 +118,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
                 }
                 return response.json();
             }).then((collection: HalCollectionV2<T>) => {
-                this.totalAmountOfLastRetrievedCollection = !collection.total ? -1 : collection.total;
+                this.totalAmountOfLastRetrievedCollection = typeof collection.total === 'number' ? collection.total : -1;
                 if (!collection._embedded || !collection._embedded.item) {
                     return [];
                 }
