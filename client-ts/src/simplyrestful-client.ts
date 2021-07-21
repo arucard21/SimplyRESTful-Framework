@@ -67,12 +67,14 @@ export class SimplyRESTfulClient<T extends HALResource> {
 			for (const contentType in content) {
 				const contentTypeNoSpaces = contentType.replace(" ", "");
 				if (contentTypeNoSpaces === mediaType) {
-					this.resourceUriTemplate = decodeURI(new URL(path, this.baseApiUri).toString());
+					const resourceUri : URL = this.baseApiUri;
+					resourceUri.pathname = this.joinPath(resourceUri.pathname, path);
+					this.resourceUriTemplate = decodeURI(resourceUri.toString());
 					return;
 				}
 			}
         }
-    }
+	}
 
     async list(pageStart?: number, pageSize?: number, fields?: string[], query?: string, sort?: SortOrder[], httpHeaders?: Headers, additionalQueryParameters?: URLSearchParams): Promise<T[]> {
         return this.discoverApi(httpHeaders).then(() => {
@@ -240,5 +242,17 @@ export class SimplyRESTfulClient<T extends HALResource> {
             return new URL(this.resourceUriTemplate.replace(/{id}/, ""));
         }
         return new URL(this.resourceUriTemplate.replace(/{id}/, resourceUuid));
-    }
+	}
+
+	private joinPath(basePath: string, joinPath: string) : string {
+		if(joinPath.startsWith('/')){
+			joinPath = joinPath.slice(1);
+		}
+		if(basePath.endsWith('/')){
+			return basePath + joinPath;
+		}
+		else{
+			return basePath + '/' + joinPath;
+		}
+	}
 }

@@ -61,6 +61,49 @@ test('discoverApi correctly discovers the resource URI for this resource', async
     expect(fetchMock.mock.calls[1][0]).toBe(openApiUri);
 });
 
+test('discoverApi correctly discovers the resource URI for this resource when the API root has a base path', async () => {
+	const baseUriWithBasePath = "http://localhost/some/base/path/";
+    const openApiUri = "http://localhost/some/base/path/openapi.json";
+    const testResourceClientWithDiscovery = new SimplyRESTfulClient(
+        new URL(baseUriWithBasePath),
+        new URL(testResourceProfile));
+    fetchMock.mockResponses(
+        [
+            JSON.stringify({
+                _links: {
+                    describedBy: {
+                        href: openApiUri
+                    }
+                }
+            }),
+            { status: 200 }
+        ],
+        [
+            JSON.stringify({
+                paths: {
+                    "/discoveredtestresources/{id}": {
+                        get: {
+                            responses: {
+                                default: {
+                                    content: {
+                                        "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/TestResource/v1\"": {
+                                            schema: {}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }),
+            { status: 200 }
+        ]);
+    await testResourceClientWithDiscovery.discoverApi();
+    expect(testResourceClientWithDiscovery.resourceUriTemplate).toBe("http://localhost/some/base/path/discoveredtestresources/{id}");
+    expect(fetchMock.mock.calls[0][0]).toBe(baseUriWithBasePath);
+    expect(fetchMock.mock.calls[1][0]).toBe(openApiUri);
+});
+
 test('discoverApi throws an error when the API can not be accessed', async () => {
     const testResourceClientWithDiscovery = new SimplyRESTfulClient(
         new URL(baseUri),
