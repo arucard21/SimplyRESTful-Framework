@@ -40,7 +40,10 @@ export class SimplyRESTfulClient<T extends HALResource> {
     private async retrieveServiceDocument(this: this, httpHeaders?: Headers): Promise<URL> {
         return fetch(this.baseApiUri.toString(), { headers: httpHeaders }).then(async response => {
             if (!response.ok) {
-                throw new Error(`The client could not access the API at ${this.baseApiUri}`);
+				return response.text().then(body => {
+					throw new Error(
+						`The client could not access the API at ${this.baseApiUri}.\nThe API returned status ${response.status} with message:\n${body}`);
+				});
             }
             return response.json().then(serviceDocument => {
                 return new URL(serviceDocument["_links"]["describedBy"]["href"]);
@@ -51,7 +54,10 @@ export class SimplyRESTfulClient<T extends HALResource> {
     private async retrieveOpenApiSpecification(openApiSpecificationUrl: URL, httpHeaders?: Headers): Promise<OpenAPIV3.Document> {
         return fetch(openApiSpecificationUrl.toString(), { headers: httpHeaders }).then(async response => {
             if (!response.ok) {
-                throw new Error(`The client could not retrieve the OpenAPI Specification document at ${openApiSpecificationUrl}`);
+				return response.text().then(body => {
+					throw new Error(
+						`The client could not retrieve the OpenAPI Specification document at ${openApiSpecificationUrl}.\nThe API returned status ${response.status} with message:\n${body}`);
+				});
             }
             return response.json().then((openApiSpecification: OpenAPIV3.Document) => openApiSpecification);
         });
@@ -114,7 +120,10 @@ export class SimplyRESTfulClient<T extends HALResource> {
 
             return fetch(resourceListUri.toString(), { headers: httpHeaders }).then(response => {
                 if (!response.ok) {
-                    throw new Error(`Failed to list the resource at ${resourceListUri}`);
+					return response.text().then(body => {
+						throw new Error(
+							`Failed to list the resource at ${resourceListUri}.\nThe API returned status ${response.status} with message:\n${body}`);
+					});
                 }
                 return response.json();
             }).then((collection: HalCollectionV2<T>) => {
@@ -141,7 +150,10 @@ export class SimplyRESTfulClient<T extends HALResource> {
 
             return fetch(resourceListUri.toString(), { method: "POST", headers: httpHeaders, body: JSON.stringify(resource) }).then(response => {
                 if (response.status !== 201) {
-                    throw new Error("Failed to create the new resource");
+					return response.text().then(body => {
+						throw new Error(
+							`Failed to create the new resource.\nThe API returned status ${response.status} with message:\n${body}`);
+					});
                 }
                 const locationOfCreatedResource = response.headers.get("Location");
                 if (!locationOfCreatedResource) {
@@ -165,7 +177,10 @@ export class SimplyRESTfulClient<T extends HALResource> {
 
             return fetch(resourceIdentifier.toString(), { headers: httpHeaders }).then(response => {
                 if (!response.ok) {
-                    throw new Error(`Failed to read the resource at ${resourceIdentifier}`);
+					return response.text().then(body => {
+						throw new Error(
+							`Failed to read the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
+					});
                 }
                 return response.json();
             })
@@ -190,10 +205,14 @@ export class SimplyRESTfulClient<T extends HALResource> {
 
             return fetch(resourceIdentifier.toString(), { method: "PUT", headers: httpHeaders, body: JSON.stringify(resource) }).then(response => {
                 if (!response.ok) {
+
                     if (response.status === 404) {
                         throw new Error(`Resource at ${resourceIdentifier} could not be found`);
-                    }
-                    throw new Error(`Failed to update the resource at ${resourceIdentifier}`);
+					}
+					return response.text().then(body => {
+						throw new Error(
+							`Failed to update the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
+					});
                 }
             })
         });
@@ -213,8 +232,11 @@ export class SimplyRESTfulClient<T extends HALResource> {
                 if (response.status !== 204) {
                     if (response.status === 404) {
                         throw new Error(`Resource at ${resourceIdentifier} could not be found`);
-                    }
-                    throw new Error(`Failed to delete the resource at ${resourceIdentifier}`);
+					}
+					return response.text().then(body => {
+						throw new Error(
+							`Failed to delete the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
+					});
                 }
             })
         });
