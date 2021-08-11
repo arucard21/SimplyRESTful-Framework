@@ -125,7 +125,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
 							`Failed to list the resource at ${resourceListUri}.\nThe API returned status ${response.status} with message:\n${body}`);
 					});
                 }
-                return response.json();
+                return response.json() as Promise<HalCollectionV2<T>>;
             }).then((collection: HalCollectionV2<T>) => {
                 this.totalAmountOfLastRetrievedCollection = typeof collection.total === 'number' ? collection.total : -1;
                 if (!collection._embedded || !collection._embedded.item) {
@@ -182,8 +182,8 @@ export class SimplyRESTfulClient<T extends HALResource> {
 							`Failed to read the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
 					});
                 }
-                return response.json();
-            })
+				return response.json() as Promise<T>;
+            });
         });
     }
 
@@ -218,7 +218,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
         });
     }
 
-    async delete(resourceIdentifier: URL, httpHeaders?: Headers, queryParameters?: URLSearchParams) {
+    async delete(resourceIdentifier: URL, httpHeaders?: Headers, queryParameters?: URLSearchParams) : Promise<boolean> {
         return this.discoverApi(httpHeaders).then(() => {
             if (!!queryParameters) {
                 resourceIdentifier.search = queryParameters.toString();
@@ -237,7 +237,10 @@ export class SimplyRESTfulClient<T extends HALResource> {
 						throw new Error(
 							`Failed to delete the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
 					});
-                }
+				}
+				else {
+					return true;
+				}
             })
         });
     }

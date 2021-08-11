@@ -14,12 +14,12 @@ For the API resource in the SimplyRESTful API you wish to access, create a TypeS
 ```TypeScript
 import { HALResource } from 'simplyrestful-client';
 
-export type ExampleResource<T extends HALResource = HALResource> = {
+export type ExampleResource = HALResource & {
     name: string;
     someAttribute: {
         attributeName: string;
     };
-} & T;
+}
 ```
 Create the SimplyRESTful client for that API resource, using the type you created.
 ```TypeScript

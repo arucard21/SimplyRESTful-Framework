@@ -262,9 +262,9 @@ test('create throws an error when the location is not returned', async () => {
 test('read correctly retrieves the resource when provided with a URL', async () => {
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     const additionalFieldValue = "test value";
-    fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue }));
+    fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue}));
     const retrievedResource: TestResource = await testResourceClient.read(new URL("http://localhost/testresources/00000000-0000-0000-0000-000000000000"));
-    expect(retrievedResource.additionalField).toBe(additionalFieldValue);
+	expect(retrievedResource.additionalField).toBe(additionalFieldValue);
     expect(retrievedResource._links.self.href).toBe(selfLink);
 });
 
@@ -285,6 +285,19 @@ test('read throws an error when a bad request is made (HTTP 400 status)', async 
     await expect(testResourceClient.read(new URL(resourceUri))).rejects.toThrow(
 		`Failed to read the resource at ${resourceUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
+});
+
+// FIXME: The Date is deserialized to string by TypeScript instead of to a Date object
+// json2typescript cannot be used because it does not work with generics (See https://github.com/AppVision-GmbH/json2typescript/issues/8)
+test.skip('read correctly retrieves the resource and deserializes a Date property', async () => {
+    const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
+    const additionalFieldValue = "test value";
+    fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue, someDate: '2021-01-01T09:00:00Z' }));
+    const retrievedResource: TestResource = await testResourceClient.read(new URL("http://localhost/testresources/00000000-0000-0000-0000-000000000000"));
+	expect(retrievedResource.additionalField).toBe(additionalFieldValue);
+	expect(retrievedResource.someDate.toString()).toBe('2021-01-01T09:00:00Z');
+	// expect(typeof retrievedResource.someDate).toBe('Date');
+    expect(retrievedResource._links.self.href).toBe(selfLink);
 });
 
 test('update correctly updates the resource', async () => {
