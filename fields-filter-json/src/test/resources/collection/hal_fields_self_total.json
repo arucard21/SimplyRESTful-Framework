@@ -1,0 +1,10 @@
+{
+    "_links": {
+        "self": {
+            "href": "http://localhost:8888/resources",
+            "type": "application/hal+json",
+            "profile": "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2"
+        }
+    },
+    "total": 3
+}

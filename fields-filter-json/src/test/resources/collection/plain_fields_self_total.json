@@ -1,0 +1,7 @@
+{
+  "self": {
+    "href": "http://localhost:8888/resources",
+    "type": "application/x.simplyrestful-halcollection-v2+json"
+  },
+  "total": 3
+}
