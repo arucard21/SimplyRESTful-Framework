@@ -14,6 +14,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class JsonFieldsFilterTest {
+    private static final String ARRAY_ORIGINAL_PLAIN_JSON = "/array/plain_original.json";
+    private static final String ARRAY_ORIGINAL_HAL_JSON = "/array/hal_original.json";
     private static final String COLLECTION_ORIGINAL_PLAIN_JSON = "/collection/plain_original.json";
     private static final String COLLECTION_ORIGINAL_HAL_JSON = "/collection/hal_original.json";
     private static final String RESOURCE_ORIGINAL_PLAIN_JSON = "/resource/plain_original.json";
@@ -31,6 +33,20 @@ public class JsonFieldsFilterTest {
                 Arguments.of(COLLECTION_ORIGINAL_HAL_JSON, COLLECTION_ORIGINAL_HAL_JSON, null),
                 Arguments.of(RESOURCE_ORIGINAL_PLAIN_JSON, RESOURCE_ORIGINAL_PLAIN_JSON, null),
                 Arguments.of(RESOURCE_ORIGINAL_HAL_JSON, RESOURCE_ORIGINAL_HAL_JSON, null),
+                Arguments.of(ARRAY_ORIGINAL_PLAIN_JSON, ARRAY_ORIGINAL_PLAIN_JSON, null),
+                Arguments.of(ARRAY_ORIGINAL_HAL_JSON, ARRAY_ORIGINAL_HAL_JSON, null),
+                Arguments.of(
+                        ARRAY_ORIGINAL_PLAIN_JSON,
+                        "/array/plain_fields_dateTime.json",
+                        List.of("dateTime")),
+                Arguments.of(
+                        ARRAY_ORIGINAL_PLAIN_JSON,
+                        "/array/plain_fields_description_self.type_complexAttribute.name.json",
+                        List.of("description", "self.type", "complexAttribute.name")),
+                Arguments.of(
+                        ARRAY_ORIGINAL_PLAIN_JSON,
+                        "/array/plain_fields_self.href.json",
+                        List.of("self.href")),
                 Arguments.of(
                         COLLECTION_ORIGINAL_PLAIN_JSON,
                         "/collection/plain_fields_item.description_item.complexAttribute.name.json",
@@ -49,7 +65,17 @@ public class JsonFieldsFilterTest {
                         List.of("_links.self", "_links.first", "_embedded.item")),
                 Arguments.of(COLLECTION_ORIGINAL_HAL_JSON,
                         "/collection/hal_fields_links.self_total.json",
-                        List.of("_links.self", "total")));
+                        List.of("_links.self", "total")),
+                Arguments.of(RESOURCE_ORIGINAL_HAL_JSON,
+                        "/resource/hal_fields_complexAttribute_dateTime.json",
+                        List.of("complexAttribute", "dateTime")),
+                Arguments.of(RESOURCE_ORIGINAL_HAL_JSON,
+                        "/resource/hal_fields_links.self.href_links.self.profile.json",
+                        List.of("_links.self.href", "_links.self.profile")),
+                Arguments.of(RESOURCE_ORIGINAL_HAL_JSON,
+                        "/resource/hal_fields_links.self.profile.json",
+                        List.of("_links.self.profile"))
+                );
     }
 
     @ParameterizedTest

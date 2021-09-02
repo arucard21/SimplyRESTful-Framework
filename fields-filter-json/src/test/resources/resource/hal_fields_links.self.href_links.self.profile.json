@@ -1,0 +1,8 @@
+{
+    "_links": {
+        "self": {
+            "href": "http://localhost:8888/resources/4a73604f-a242-43dc-b949-2cb3be7bffe7",
+            "profile": "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1"
+        }
+    }
+}

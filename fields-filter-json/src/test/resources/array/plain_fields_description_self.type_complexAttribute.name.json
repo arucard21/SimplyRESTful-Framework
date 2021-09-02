@@ -1,0 +1,29 @@
+[
+	{
+		"self": {
+			"type": "application/x.testresource-v1+json"
+		},
+		"description": "This is test resource 0",
+		"complexAttribute": {
+			"name": "complex attribute of test resource 0"
+		}
+	},
+	{
+		"self": {
+			"type": "application/x.testresource-v1+json"
+		},
+		"description": "This is test resource 1",
+		"complexAttribute": {
+			"name": "complex attribute of test resource 1"
+		}
+	},
+	{
+		"self": {
+			"type": "application/x.testresource-v1+json"
+		},
+		"description": "This is test resource 2",
+		"complexAttribute": {
+			"name": "complex attribute of test resource 2"
+		}
+	}
+]
