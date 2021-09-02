@@ -150,16 +150,17 @@ public class JsonFieldsFilter {
             generator.writeEnd();
         }
         if (isObject && hasNext) {
+            // check if still inside an array but not at the end of that array
             if (arrayPath.isEmpty() || !arrayPath.peek().equals(currentPath)) {
                 moveCurrentPathUpOneLevel();
-            }
-            if (currentPath.equals(untilPath)) {
-                resetIncludeState();
             }
         }
         if (!isObject) {
             arrayPath.pop();
             moveCurrentPathUpOneLevel();
+        }
+        if (currentPath.equals(untilPath)) {
+            resetIncludeState();
         }
     }
 
