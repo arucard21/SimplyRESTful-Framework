@@ -31,8 +31,25 @@ public class JsonFieldsFilterTest {
                 Arguments.of(COLLECTION_ORIGINAL_HAL_JSON, COLLECTION_ORIGINAL_HAL_JSON, null),
                 Arguments.of(RESOURCE_ORIGINAL_PLAIN_JSON, RESOURCE_ORIGINAL_PLAIN_JSON, null),
                 Arguments.of(RESOURCE_ORIGINAL_HAL_JSON, RESOURCE_ORIGINAL_HAL_JSON, null),
-                Arguments.of(COLLECTION_ORIGINAL_PLAIN_JSON, "/collection/plain_fields_self_total.json", List.of("self", "total")),
-                Arguments.of(COLLECTION_ORIGINAL_HAL_JSON, "/collection/hal_fields_self_total.json", List.of("_links.self", "total")));
+                Arguments.of(
+                        COLLECTION_ORIGINAL_PLAIN_JSON,
+                        "/collection/plain_fields_item.description_item.complexAttribute.name.json",
+                        List.of("item.description", "item.complexAttribute.name")),
+                Arguments.of(COLLECTION_ORIGINAL_PLAIN_JSON,
+                        "/collection/plain_fields_self_first_item.json",
+                        List.of("self", "first", "item")),
+                Arguments.of(COLLECTION_ORIGINAL_PLAIN_JSON,
+                        "/collection/plain_fields_self_total.json",
+                        List.of("self", "total")),
+                Arguments.of(COLLECTION_ORIGINAL_HAL_JSON,
+                        "/collection/hal_fields_embedded.item.description_embedded.item.complexAttribute.name.json",
+                        List.of("_embedded.item.description", "_embedded.item.complexAttribute.name")),
+                Arguments.of(COLLECTION_ORIGINAL_HAL_JSON,
+                        "/collection/hal_fields_links.self_links.first_embedded.item.json",
+                        List.of("_links.self", "_links.first", "_embedded.item")),
+                Arguments.of(COLLECTION_ORIGINAL_HAL_JSON,
+                        "/collection/hal_fields_links.self_total.json",
+                        List.of("_links.self", "total")));
     }
 
     @ParameterizedTest
