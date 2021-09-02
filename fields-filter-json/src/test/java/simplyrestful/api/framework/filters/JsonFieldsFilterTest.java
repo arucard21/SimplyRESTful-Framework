@@ -31,7 +31,7 @@ public class JsonFieldsFilterTest {
                 Arguments.of(COLLECTION_ORIGINAL_HAL_JSON, COLLECTION_ORIGINAL_HAL_JSON, null),
                 Arguments.of(RESOURCE_ORIGINAL_PLAIN_JSON, RESOURCE_ORIGINAL_PLAIN_JSON, null),
                 Arguments.of(RESOURCE_ORIGINAL_HAL_JSON, RESOURCE_ORIGINAL_HAL_JSON, null),
-//                Arguments.of(COLLECTION_ORIGINAL_PLAIN_JSON, "/collection/plain_fields_self_total.json", List.of("self", "total")),
+                Arguments.of(COLLECTION_ORIGINAL_PLAIN_JSON, "/collection/plain_fields_self_total.json", List.of("self", "total")),
                 Arguments.of(COLLECTION_ORIGINAL_HAL_JSON, "/collection/hal_fields_self_total.json", List.of("_links.self", "total")));
     }
 

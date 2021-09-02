@@ -15,10 +15,29 @@ import javax.json.stream.JsonParser;
 
 public class JsonFieldsFilter {
     public static final String FIELDS_NESTING_SEPARATOR = ".";
-    private String skipUntilPath = null;
-    private String keepUntilPath = null;
-    private Stack<String> arrayPath = new Stack<>();
+    /**
+     * Tracks the current path in the original JSON structure, in dot-separated form (e.g. "top.inner.deepest")
+     */
     private String currentPath = "";
+    /**
+     * Tracks whether to include the current part of the JSON structure.
+     */
+    private boolean include = false;
+    /**
+     * Tracks until which path to include or exclude the JSON structure.
+     *
+     * May be null, in which case there is no explicit inclusion or exclusion defined yet.
+     * Usually occurs at the start or end of a JSON structure.
+     */
+    private String untilPath = null;
+    /**
+     * Tracks the path of any array currently being iterated through.
+     *
+     * Since arrays may be nested inside other arrays, this tracks the entire stack of
+     * arrays. This variable will always reflect the path of the current array inside
+     * which the parser is iterating. If not inside an array, the stack will be empty.
+     */
+    private Stack<String> arrayPath = new Stack<>();
 
     /**
      * Filter the fields in the provided JSON object according to the provided list
@@ -54,22 +73,17 @@ public class JsonFieldsFilter {
                 case KEY_NAME:
                     String currentKey = parser.getString();
                     moveCurrentPathDownOneLevel(currentKey);
-                    if (pathToFields.contains(currentPath) || keepUntilPath != null) {
+                    if (pathToFields.contains(currentPath) || include) {
                         generator.writeKey(currentKey);
                         if (fields.contains(currentPath)) {
-                            if (skipUntilPath != null) {
-                                throw new IllegalStateException(
-                                        "The filter cannot be in skip state when moving into keep state");
-                            }
-                            keepUntilPath = movePathUpOneLevel(currentPath);
+                            include = true;
+                            untilPath = movePathUpOneLevel(currentPath);
                         }
-                    } else {
-                        if (keepUntilPath != null) {
-                            throw new IllegalStateException(
-                                    "The filter cannot be in keep state when moving into skip state");
-                        }
-                        if (skipUntilPath == null) {
-                            skipUntilPath = movePathUpOneLevel(currentPath);
+                    }
+                    else {
+                        if (noExplicitInclusion()) {
+                            include = false;
+                            untilPath = movePathUpOneLevel(currentPath);
                         }
                     }
                     break;
@@ -119,7 +133,7 @@ public class JsonFieldsFilter {
     }
 
     private void writeStart(JsonGenerator generator, boolean isObject) {
-        if (skipUntilPath == null || keepUntilPath != null) {
+        if (include || noExplicitInclusion()) {
             if (isObject) {
                 generator.writeStartObject();
             } else {
@@ -132,18 +146,15 @@ public class JsonFieldsFilter {
     }
 
     private void writeEnd(JsonGenerator generator, boolean isObject, boolean hasNext) {
-        if (skipUntilPath == null || keepUntilPath != null) {
+        if (include || noExplicitInclusion()) {
             generator.writeEnd();
         }
         if (isObject && hasNext) {
             if (arrayPath.isEmpty() || !arrayPath.peek().equals(currentPath)) {
                 moveCurrentPathUpOneLevel();
             }
-            if (currentPath.equals(skipUntilPath)) {
-                skipUntilPath = null;
-            }
-            if (currentPath.equals(keepUntilPath)) {
-                keepUntilPath = null;
+            if (currentPath.equals(untilPath)) {
+                resetIncludeState();
             }
         }
         if (!isObject) {
@@ -153,7 +164,7 @@ public class JsonFieldsFilter {
     }
 
     private <T> void writeValue(JsonGenerator generator, T value) {
-        if (skipUntilPath == null || keepUntilPath != null) {
+        if (include || noExplicitInclusion()) {
             if (value == null) {
                 generator.writeNull();
             }
@@ -166,11 +177,8 @@ public class JsonFieldsFilter {
             }
         }
         moveCurrentPathUpOneLevel();
-        if (currentPath.equals(skipUntilPath)) {
-            skipUntilPath = null;
-        }
-        if (currentPath.equals(keepUntilPath)) {
-            keepUntilPath = null;
+        if (currentPath.equals(untilPath)) {
+            resetIncludeState();
         }
     }
 
@@ -190,5 +198,14 @@ public class JsonFieldsFilter {
         String[] newPath = path.split(Pattern.quote(FIELDS_NESTING_SEPARATOR));
         return newPath.length == 1 ? ""
                 : String.join(FIELDS_NESTING_SEPARATOR, Arrays.copyOf(newPath, newPath.length - 1));
+    }
+
+    private void resetIncludeState() {
+        untilPath = null;
+        include = false;
+    }
+
+    private boolean noExplicitInclusion() {
+        return untilPath == null;
     }
 }
