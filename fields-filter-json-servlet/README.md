@@ -4,6 +4,4 @@
 
 A Servlet Filter that can filter a JSON response based on fields provided in a query parameter.
 
-The Servlet filter can be registered directly or through resource scanning. In the latter case, the filter is configured to apply to all requests though it only applies the filter if the response contains a JSON-compatible media type and the `fields` query parameter is provided.
-
-This is still experimental. The underlying filter (fields-filter-json) still requires more testing to ensure its reliability.
+The Servlet filter can be registered through resource scanning, simply by adding this library as dependency. The filter is configured for all requests but it only applies the filter if the response contains a JSON-compatible media type and a `fields` query parameter is provided.
