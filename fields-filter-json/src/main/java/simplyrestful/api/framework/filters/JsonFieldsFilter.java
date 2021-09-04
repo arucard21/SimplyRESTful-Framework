@@ -8,13 +8,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 
 public class JsonFieldsFilter {
-    public static final String FIELDS_NESTING_SEPARATOR = ".";
+    private static final String FIELDS_NESTING_SEPARATOR = ".";
+    private static final String FIELDS_NESTING_SEPARATOR_INTERNAL = "\u001F";
+    private static final String FIELDS_ESCAPED_DOT = "\\.";
+    private static final String FIELDS_ESCAPED_DOT_PLACEHOLDER = "\u0000";
+    private static final String FIELDS_ESCAPED_DOT_INTERNAL = ".";
+
     /**
      * Tracks the current path in the original JSON structure, in dot-separated form (e.g. "top.inner.deepest")
      */
@@ -58,7 +64,8 @@ public class JsonFieldsFilter {
         if (fields == null || fields.isEmpty()) {
             return originalJson;
         }
-        List<String> pathToFields = generateAllPathsToProvidedFields(fields);
+        List<String> internalFields = convertToInternalDelimiterAndUnescapeDots(fields);
+        List<String> pathToFields = generateAllPathsToProvidedFields(internalFields);
         StringWriter jsonWriter = new StringWriter();
         try (JsonParser parser = Json.createParser(new StringReader(originalJson));
                 JsonGenerator generator = Json.createGenerator(jsonWriter)) {
@@ -75,7 +82,7 @@ public class JsonFieldsFilter {
                     moveCurrentPathDownOneLevel(currentKey);
                     if (pathToFields.contains(currentPath) || include) {
                         generator.writeKey(currentKey);
-                        if (fields.contains(currentPath)) {
+                        if (internalFields.contains(currentPath)) {
                             include = true;
                             untilPath = movePathUpOneLevel(currentPath);
                         }
@@ -117,16 +124,24 @@ public class JsonFieldsFilter {
         }
     }
 
+    private List<String> convertToInternalDelimiterAndUnescapeDots(List<String> fields) {
+        return fields.stream()
+                .map(field -> field.replace(Pattern.quote(FIELDS_ESCAPED_DOT), FIELDS_ESCAPED_DOT_PLACEHOLDER))
+                .map(field -> field.replace(FIELDS_NESTING_SEPARATOR, FIELDS_NESTING_SEPARATOR_INTERNAL))
+                .map(field -> field.replace(FIELDS_ESCAPED_DOT_PLACEHOLDER, FIELDS_ESCAPED_DOT_INTERNAL))
+                .collect(Collectors.toList());
+    }
+
     private List<String> generateAllPathsToProvidedFields(List<String> fields) {
         List<String> pathToFields = new ArrayList<>();
         for (String field : fields) {
-            String[] fieldPathItems = field.split(Pattern.quote(FIELDS_NESTING_SEPARATOR));
+            String[] fieldPathItems = field.split(FIELDS_NESTING_SEPARATOR_INTERNAL);
             for (int i = 0; i < fieldPathItems.length; i++) {
                 String[] pathToField = new String[i + 1];
                 for (int j = 0; j <= i; j++) {
                     pathToField[j] = fieldPathItems[j];
                 }
-                pathToFields.add(String.join(FIELDS_NESTING_SEPARATOR, pathToField));
+                pathToFields.add(String.join(FIELDS_NESTING_SEPARATOR_INTERNAL, pathToField));
             }
         }
         return pathToFields;
@@ -188,7 +203,7 @@ public class JsonFieldsFilter {
 
     private void moveCurrentPathDownOneLevel(String nameOfNextLevel) {
         currentPath = currentPath.isBlank() ? nameOfNextLevel
-                : currentPath + FIELDS_NESTING_SEPARATOR + nameOfNextLevel;
+                : currentPath + FIELDS_NESTING_SEPARATOR_INTERNAL + nameOfNextLevel;
     }
 
     private void moveCurrentPathUpOneLevel() {
@@ -199,9 +214,9 @@ public class JsonFieldsFilter {
         if (path == null || path.isBlank()) {
             throw new IllegalStateException("Cannot move the path up one level since it is already at the root.");
         }
-        String[] newPath = path.split(Pattern.quote(FIELDS_NESTING_SEPARATOR));
+        String[] newPath = path.split(FIELDS_NESTING_SEPARATOR_INTERNAL);
         return newPath.length == 1 ? ""
-                : String.join(FIELDS_NESTING_SEPARATOR, Arrays.copyOf(newPath, newPath.length - 1));
+                : String.join(FIELDS_NESTING_SEPARATOR_INTERNAL, Arrays.copyOf(newPath, newPath.length - 1));
     }
 
     private void resetIncludeState() {

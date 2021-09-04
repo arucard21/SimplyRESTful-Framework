@@ -1,0 +1,382 @@
+{
+	"openapi": "3.0.1",
+	"tags": [
+		{
+			"name": "Example Resources"
+		}
+	],
+	"paths": {
+		"/resources/{id}": {
+			"get": {
+				"description": "Retrieve a single resource",
+				"operationId": "getHALResource",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "The identifier for the resource",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					}
+				],
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1\"": {
+								"schema": {
+									"$ref": "#/components/schemas/HALResource"
+								}
+							},
+							"application/x.testresource-v1+json": {
+								"schema": {
+									"$ref": "#/components/schemas/HALResource"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"description": "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK.",
+				"operationId": "putHALResource",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "The UUID part of the identifier for the resource",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					}
+				],
+				"requestBody": {
+					"description": "The resource to be updated",
+					"content": {
+						"application/hal+json; profile=\"https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1\"": {
+							"schema": {
+								"$ref": "#/components/schemas/HALResource"
+							}
+						},
+						"application/x.testresource-v1+json": {
+							"schema": {
+								"$ref": "#/components/schemas/HALResource"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1\"": {
+								
+							},
+							"application/x.testresource-v1+json": {
+								
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"description": "Delete a single resource",
+				"operationId": "deleteHALResource",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "The UUID part of the identifier for the resource",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					}
+				],
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1\"": {
+								
+							},
+							"application/x.testresource-v1+json": {
+								
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources": {
+			"get": {
+				"description": "Get a stream of resources",
+				"operationId": "streamHALResources",
+				"parameters": [
+					{
+						"name": "fields",
+						"in": "query",
+						"description": "The fields that should be retrieved",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"default": "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self"
+							}
+						}
+					},
+					{
+						"name": "query",
+						"in": "query",
+						"description": "The FIQL query according to which the resources should be filtered",
+						"schema": {
+							"type": "string",
+							"default": ""
+						}
+					},
+					{
+						"name": "sort",
+						"in": "query",
+						"description": "The fields on which the resources should be sorted",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"default": ""
+							}
+						}
+					}
+				],
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"text/event-stream": {
+								
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"description": "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated",
+				"operationId": "postHALResource",
+				"requestBody": {
+					"description": "resource",
+					"content": {
+						"application/hal+json; profile=\"https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1\"": {
+							"schema": {
+								"$ref": "#/components/schemas/HALResource"
+							}
+						},
+						"application/x.testresource-v1+json": {
+							"schema": {
+								"$ref": "#/components/schemas/HALResource"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1\"": {
+								
+							},
+							"application/x.testresource-v1+json": {
+								
+							}
+						}
+					}
+				}
+			}
+		},
+		"/": {
+			"get": {
+				"description": "Provide a service document that describes the service and links to the OpenAPI Specification",
+				"operationId": "getServiceDocument",
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"application/hal+json": {
+								"schema": {
+									"$ref": "#/components/schemas/HALServiceDocument"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"HALLink": {
+				"type": "object",
+				"properties": {
+					"href": {
+						"type": "string"
+					},
+					"templated": {
+						"type": "boolean"
+					},
+					"type": {
+						"type": "string"
+					},
+					"deprecation": {
+						"type": "string",
+						"format": "url"
+					},
+					"name": {
+						"type": "string"
+					},
+					"profile": {
+						"type": "string",
+						"format": "uri"
+					},
+					"title": {
+						"type": "string"
+					},
+					"hreflang": {
+						"type": "string"
+					},
+					"seen": {
+						"type": "string"
+					}
+				}
+			},
+			"HALCollectionV2": {
+				"type": "object",
+				"properties": {
+					"total": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"_links": {
+						"type": "object",
+						"properties": {
+							"self": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"first": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"last": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"prev": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"next": {
+								"$ref": "#/components/schemas/HALLink"
+							}
+						}
+					},
+					"_embedded": {
+						"type": "object",
+						"properties": {
+							"item": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/HALResource"
+								}
+							}
+						}
+					}
+				}
+			},
+			"HALCollectionV1": {
+				"type": "object",
+				"properties": {
+					"total": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"_links": {
+						"type": "object",
+						"properties": {
+							"self": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"first": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"last": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"prev": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"next": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"item": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/HALLink"
+								}
+							}
+						}
+					},
+					"_embedded": {
+						"type": "object",
+						"properties": {
+							"item": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/HALResource"
+								}
+							}
+						}
+					},
+					"pageSize": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"page": {
+						"type": "integer",
+						"format": "int64"
+					}
+				}
+			},
+			"HALCollectionExampleResource": {
+				"type": "object",
+				"properties": {
+					"_links": {
+						"type": "object",
+						"properties": {
+							"self": {
+								"$ref": "#/components/schemas/HALLink"
+							}
+						}
+					}
+				}
+			},
+			"HALServiceDocument": {
+				"type": "object",
+				"properties": {
+					"_links": {
+						"type": "object",
+						"properties": {
+							"self": {
+								"$ref": "#/components/schemas/HALLink"
+							},
+							"describedBy": {
+								"$ref": "#/components/schemas/HALLink"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

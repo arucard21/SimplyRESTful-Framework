@@ -1,0 +1,53 @@
+{
+  "paths": {
+    "/resources": {
+      "get": {
+        "description": "Get a stream of resources",
+        "operationId": "streamHALResources",
+        "parameters": [
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "The fields that should be retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "default": "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self"
+              }
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The FIQL query according to which the resources should be filtered",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The fields on which the resources should be sorted",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "default": ""
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "text/event-stream": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

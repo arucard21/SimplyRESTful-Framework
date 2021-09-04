@@ -18,6 +18,7 @@ public class JsonFieldsFilterTest {
     private static final String ARRAY_ORIGINAL_HAL_JSON = "/array/hal_original.json";
     private static final String COLLECTION_ORIGINAL_PLAIN_JSON = "/collection/plain_original.json";
     private static final String COLLECTION_ORIGINAL_HAL_JSON = "/collection/hal_original.json";
+    private static final String OPENAPI_ORIGINAL_JSON = "/openapi/original.json";
     private static final String RESOURCE_ORIGINAL_PLAIN_JSON = "/resource/plain_original.json";
     private static final String RESOURCE_ORIGINAL_HAL_JSON = "/resource/hal_original.json";
 
@@ -29,12 +30,13 @@ public class JsonFieldsFilterTest {
 
     private static Stream<Arguments> getAllTestConfigurations(){
         return Stream.of(
-                Arguments.of(COLLECTION_ORIGINAL_PLAIN_JSON, COLLECTION_ORIGINAL_PLAIN_JSON, null),
-                Arguments.of(COLLECTION_ORIGINAL_HAL_JSON, COLLECTION_ORIGINAL_HAL_JSON, null),
-                Arguments.of(RESOURCE_ORIGINAL_PLAIN_JSON, RESOURCE_ORIGINAL_PLAIN_JSON, null),
-                Arguments.of(RESOURCE_ORIGINAL_HAL_JSON, RESOURCE_ORIGINAL_HAL_JSON, null),
                 Arguments.of(ARRAY_ORIGINAL_PLAIN_JSON, ARRAY_ORIGINAL_PLAIN_JSON, null),
                 Arguments.of(ARRAY_ORIGINAL_HAL_JSON, ARRAY_ORIGINAL_HAL_JSON, null),
+                Arguments.of(COLLECTION_ORIGINAL_PLAIN_JSON, COLLECTION_ORIGINAL_PLAIN_JSON, null),
+                Arguments.of(COLLECTION_ORIGINAL_HAL_JSON, COLLECTION_ORIGINAL_HAL_JSON, null),
+                Arguments.of(OPENAPI_ORIGINAL_JSON, OPENAPI_ORIGINAL_JSON, null),
+                Arguments.of(RESOURCE_ORIGINAL_PLAIN_JSON, RESOURCE_ORIGINAL_PLAIN_JSON, null),
+                Arguments.of(RESOURCE_ORIGINAL_HAL_JSON, RESOURCE_ORIGINAL_HAL_JSON, null),
                 Arguments.of(
                         ARRAY_ORIGINAL_PLAIN_JSON,
                         "/array/plain_fields_dateTime.json",
@@ -66,6 +68,18 @@ public class JsonFieldsFilterTest {
                 Arguments.of(COLLECTION_ORIGINAL_HAL_JSON,
                         "/collection/hal_fields_links.self_total.json",
                         List.of("_links.self", "total")),
+                Arguments.of(OPENAPI_ORIGINAL_JSON,
+                        "/openapi/fields_openapi_tags.json",
+                        List.of("openapi", "tags")),
+                Arguments.of(OPENAPI_ORIGINAL_JSON,
+                        "/openapi/fields_paths.resources.get.json",
+                        List.of("paths./resources.get")),
+                Arguments.of(OPENAPI_ORIGINAL_JSON,
+                        "/openapi/fields_paths.json",
+                        List.of("paths")),
+                Arguments.of(OPENAPI_ORIGINAL_JSON,
+                        "/openapi/fields_tags.json",
+                        List.of("tags")),
                 Arguments.of(RESOURCE_ORIGINAL_HAL_JSON,
                         "/resource/hal_fields_complexAttribute_dateTime.json",
                         List.of("complexAttribute", "dateTime")),
