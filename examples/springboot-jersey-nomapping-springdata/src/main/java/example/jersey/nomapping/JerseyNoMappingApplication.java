@@ -19,9 +19,7 @@ public class JerseyNoMappingApplication {
     }
 
     @Bean
-    public FilterRegistrationBean<JsonFieldsServletFilter> jsonFieldsFilter() {
-        FilterRegistrationBean<JsonFieldsServletFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new JsonFieldsServletFilter());
-        return registrationBean;
+    public FilterRegistrationBean<JsonFieldsServletFilter> registerJsonFieldsFilter() {
+        return new FilterRegistrationBean<JsonFieldsServletFilter>(new JsonFieldsServletFilter());
     }
 }
