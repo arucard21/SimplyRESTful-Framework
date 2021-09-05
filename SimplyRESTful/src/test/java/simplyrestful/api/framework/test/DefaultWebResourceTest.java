@@ -1,6 +1,7 @@
 package simplyrestful.api.framework.test;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.BadRequestException;
@@ -27,6 +28,7 @@ import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
+import simplyrestful.api.framework.webresource.api.ResourceGet;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultWebResourceTest {
@@ -76,7 +78,7 @@ public class DefaultWebResourceTest {
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {
         Assertions.assertThrows(NotFoundException.class,
-                () -> testEndpoint.getHALResource(resourceInfo, uriInfo, httpHeaders, UUID.randomUUID()));
+                () -> testEndpoint.getHALResource(resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
     }
 
     @Test

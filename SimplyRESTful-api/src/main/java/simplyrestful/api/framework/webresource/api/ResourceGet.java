@@ -1,11 +1,14 @@
 package simplyrestful.api.framework.webresource.api;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -14,6 +17,8 @@ import javax.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.resources.HALResource;
 
 public interface ResourceGet<T extends HALResource> {
+    public static final String QUERY_PARAM_FIELDS_DEFAULT = "all";
+
     /**
      * Retrieve a resource.
      *
@@ -34,5 +39,8 @@ public interface ResourceGet<T extends HALResource> {
 	    HttpHeaders httpHeaders,
 	    @PathParam("id")
 	    @NotNull
-	    UUID id);
+	    UUID id,
+	    @QueryParam(CollectionGet.QUERY_PARAM_FIELDS)
+        @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)
+        List<String> fields);
 }

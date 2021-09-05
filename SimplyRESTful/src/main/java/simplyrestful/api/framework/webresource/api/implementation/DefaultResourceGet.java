@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +31,9 @@ public interface DefaultResourceGet<T extends HALResource> extends ResourceGet<T
 	    UriInfo uriInfo,
 	    HttpHeaders httpHeaders,
 	    @Parameter(description = "The identifier for the resource", required = true)
-	    UUID id) {
+	    UUID id,
+	    @Parameter(description = "The fields that should be retrieved", required = false)
+        List<String> fields) {
         T resource = Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
         MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
         if (MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.isCompatible(selected)) {
