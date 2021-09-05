@@ -1,0 +1,13 @@
+{
+	"paths": {
+		"/resources/{id}": {
+			"get": {
+				"parameters": [
+					{
+						"name": "id"
+					}
+				]
+			}
+		}
+	}
+}
