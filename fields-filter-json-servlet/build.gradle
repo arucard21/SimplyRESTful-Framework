@@ -17,6 +17,8 @@ dependencies {
 	api project(":fields-filter-json")
 	api group: "jakarta.servlet", name: "jakarta.servlet-api", version: jakartaServletVersion
 	api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
+	api group: "org.springframework.boot", name: "spring-boot", version: springBootVersion
+	api group: "org.springframework.boot", name: "spring-boot-autoconfigure", version: springBootVersion
 }
 
 publishing{
