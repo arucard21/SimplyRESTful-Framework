@@ -56,6 +56,11 @@ public class OffsetBasedPageRequest implements Pageable {
     }
 
     @Override
+    public Pageable withPage(int pageNumber) {
+        return new OffsetBasedPageRequest(pageNumber, pageSize, sort);
+    }
+
+    @Override
     public boolean hasPrevious() {
         return pageOffset > pageSize;
     }
