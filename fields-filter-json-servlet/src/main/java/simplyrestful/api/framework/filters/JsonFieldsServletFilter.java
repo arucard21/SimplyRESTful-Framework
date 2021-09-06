@@ -33,23 +33,19 @@ public class JsonFieldsServletFilter extends HttpFilter {
             filter = true;
         }
         String[] parameterValues = request.getParameterValues(QUERY_PARAM_FIELDS);
-        List<String> fields = parameterValues == null ? null
+        List<String> fields = parameterValues == null ? List.of()
                 : Stream.of(parameterValues)
                         .flatMap(oneOrMoreParams -> Stream.of(oneOrMoreParams.split(FIELDS_PARAMS_SEPARATOR)))
                         .map(param -> param.trim()).collect(Collectors.toList());
-        if (fields == null || fields.isEmpty() || fields.contains(FIELDS_VALUE_ALL)) {
+        if (fields.isEmpty() || fields.contains(FIELDS_VALUE_ALL)) {
             filter = false;
         }
-        String originalResponse = wrappedResponse.toString();
-        if(filter) {
-            String fieldFilteredJson = new JsonFieldsFilter().filterFieldsInJson(originalResponse, fields);
-            response.setContentLength(fieldFilteredJson.getBytes().length);
-            response.getWriter().write(fieldFilteredJson);
+        String jsonResponse = wrappedResponse.toString();
+        if (filter) {
+            jsonResponse = new JsonFieldsFilter().filterFieldsInJson(jsonResponse, fields);
         }
-        else {
-            response.setContentLength(originalResponse.getBytes().length);
-            response.getWriter().write(originalResponse);
-        }
+        response.setContentLength(jsonResponse.getBytes().length);
+        response.getWriter().write(jsonResponse);
     }
 
     private boolean isJson(String contentType) {
