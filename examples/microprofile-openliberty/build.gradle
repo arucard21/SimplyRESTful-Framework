@@ -1,0 +1,45 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.io.openliberty.tools:ci.gradle:${openlibertyPluginVersion}"
+  }
+}
+
+apply plugin: 'war'
+apply plugin: "io.openliberty.tools.gradle.Liberty"
+
+def projectName = 'microprofile-openliberty'
+
+description = "MicroProfile Starter example"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+war {
+    archiveName = projectName + '.war'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    providedCompile group: "org.eclipse.microprofile", name: "microprofile", version: microprofileVersion
+}
+
+/*
+ext  {
+    liberty.server.var.'default.http.port' = '9080'
+    liberty.server.var.'project.name' = projectName
+    liberty.server.var.'app.context.root' = '/'
+}
+*/
+

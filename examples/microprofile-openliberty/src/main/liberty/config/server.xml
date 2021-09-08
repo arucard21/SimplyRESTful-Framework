@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="${project.name}">
+    <featureManager>
+        <feature>microProfile-4.1</feature>
+    </featureManager>
+
+    <httpEndpoint id="defaultHttpEndpoint" httpPort="9080"/>
+
+    <webApplication location="${project.name}.war" contextRoot="/">
+        <classloader apiTypeVisibility="+third-party" />
+    </webApplication>
+
+    <mpMetrics authentication="false"/>
+</server>
