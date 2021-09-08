@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="${project.name}">
-    <featureManager>
-        <feature>microProfile-4.1</feature>
-    </featureManager>
+	<featureManager>
+		<feature>microProfile-4.1</feature>
+		<feature>jpa-2.2</feature>
+	</featureManager>
 
-    <httpEndpoint id="defaultHttpEndpoint" httpPort="9080"/>
+	<variable name="default.http.port" defaultValue="9080" />
 
-    <webApplication location="${project.name}.war" contextRoot="/">
-        <classloader apiTypeVisibility="+third-party" />
-    </webApplication>
+	<httpEndpoint id="defaultHttpEndpoint"
+		httpPort="${default.http.port}" />
 
-    <mpMetrics authentication="false"/>
+	<webApplication location="${project.name}.war"
+		contextRoot="/">
+		<classloader apiTypeVisibility="+third-party" />
+	</webApplication>
+
+	<mpMetrics authentication="false" />
+
+	<!-- Derby Library Configuration -->
+	<library id="derbyJDBCLib">
+		<fileset dir="${shared.resource.dir}/" includes="derby*.jar" />
+	</library>
+
+	<!-- Datasource Configuration -->
+	<dataSource id="eventjpadatasource"
+		jndiName="jdbc/eventjpadatasource">
+		<jdbcDriver libraryRef="derbyJDBCLib" />
+		<properties.derby.embedded
+			databaseName="EventDB" createDatabase="create" />
+	</dataSource>
+
 </server>

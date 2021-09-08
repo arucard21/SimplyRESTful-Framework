@@ -6,6 +6,6 @@ import javax.ws.rs.core.Application;
 /**
  *
  */
-@ApplicationPath("/data")
+@ApplicationPath("/")
 public class MicroprofileopenlibertyRestApplication extends Application {
 }

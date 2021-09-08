@@ -33,13 +33,14 @@ repositories {
 
 dependencies {
     providedCompile group: "org.eclipse.microprofile", name: "microprofile", version: microprofileVersion
+    implementation project(':SimplyRESTful')
+    implementation project(':examples:examples-resources-jpa')
+    implementation group: "jakarta.platform", name: "jakarta.jakartaee-web-api", version: "8.0.0"
+    //implementation group: "org.apache.derby", name: "derby", version: "10.15.2.0"
+    implementation group: "org.glassfish", name: "jakarta.json", version: "1.1.6"
 }
 
-/*
-ext  {
-    liberty.server.var.'default.http.port' = '9080'
-    liberty.server.var.'project.name' = projectName
-    liberty.server.var.'app.context.root' = '/'
+ext {
+    liberty.server.var.'default.http.port' = '9999'
 }
-*/
 
