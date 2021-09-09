@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.filters;
+package simplyrestful.api.framework.servlet.filters;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,6 +12,8 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import simplyrestful.api.framework.filters.JsonFieldsFilter;
 
 @Named
 @WebFilter("*")

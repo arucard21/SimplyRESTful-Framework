@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.filters;
+package simplyrestful.api.framework.servlet.filters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;

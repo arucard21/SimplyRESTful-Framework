@@ -6,7 +6,7 @@ import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import simplyrestful.api.framework.filters.JsonFieldsServletFilter;
+import simplyrestful.api.framework.servlet.filters.JsonFieldsServletFilter;
 
 @Configuration
 public class JsonFieldsServletFilterConfiguration {
