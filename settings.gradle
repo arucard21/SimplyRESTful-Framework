@@ -3,6 +3,7 @@ pluginManagement {
         id 'org.springframework.boot' version springBootVersion
         id "com.github.ben-manes.versions" version versionsPluginVersion
         id 'org.unbroken-dome.test-sets' version testsetsPluginVersion
+        id "io.quarkus" version quarkusPluginVersion
     }
 }
 
@@ -21,5 +22,6 @@ include "examples:jetty-cxf"
 include "examples:springboot-cxf"
 include "examples:springboot-jersey-nomapping-springdata"
 include "examples:microprofile-openliberty"
+include "examples:microprofile-quarkus"
 include "client"
 rootProject.name = "SimplyRESTful-Framework"
