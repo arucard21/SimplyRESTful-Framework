@@ -221,34 +221,42 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     }
 
     private ExampleResource dataStoreCreate(ExampleResource resource) {
+//        return dao.create(resource);
         return datastore.put(resource.getUUID(), resource);
     }
 
     private Optional<ExampleResource> dataStoreFindByUuid(UUID resourceUUID) {
+//        return dao.findByUuid(resourceUUID);
         return Optional.ofNullable(datastore.get(resourceUUID));
     }
 
     private ExampleResource dataStoreUpdate(ExampleResource resource) {
+//        return dao.update(resource);
         return datastore.put(resource.getUUID(), resource);
     }
 
     private void dataStoreDelete(ExampleResource previousValue) {
+//        dao.delete(previousValue);
         datastore.remove(previousValue.getUUID());
     }
 
     private List<ExampleResource> dataStoreFindAll() {
+//        return dao.findAll();
         return datastore.values().stream().collect(Collectors.toList());
     }
 
     private Stream<ExampleResource> dataStoreStreamAll() {
+//        return dao.streamAll();
         return datastore.values().stream();
     }
 
     private boolean dataStoreExistsByUuid(UUID resourceUUID) {
+//        return dao.existsByUuid(resourceUUID);
         return datastore.containsKey(resourceUUID);
     }
 
     private int dataStoreCount() {
+//        return dao.count();
         return datastore.size();
     }
 }
