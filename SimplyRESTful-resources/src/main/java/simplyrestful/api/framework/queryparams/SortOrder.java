@@ -41,7 +41,7 @@ public class SortOrder {
 
     private static Boolean parseSortOrder(String sortWithOrderDelimeter) {
         if (sortWithOrderDelimeter.contains(SortOrder.DELIMITER)) {
-            return sortWithOrderDelimeter.split(SortOrder.DELIMITER)[1].equalsIgnoreCase(SortOrder.ASCENDING);
+            return !sortWithOrderDelimeter.split(SortOrder.DELIMITER)[1].equalsIgnoreCase(SortOrder.DESCENDING);
         }
         else {
             // No sort order defined, return true (ascending) by default
