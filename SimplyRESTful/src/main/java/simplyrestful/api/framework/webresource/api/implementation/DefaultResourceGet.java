@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.UriInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import simplyrestful.api.framework.MediaTypeUtils;
+import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultRead;
 import simplyrestful.api.framework.resources.HALResource;
@@ -27,14 +29,16 @@ public interface DefaultResourceGet<T extends HALResource> extends ResourceGet<T
      */
     @Operation(description = "Retrieve a single resource")
     default T getHALResource(
-	    ResourceInfo resourceInfo,
-	    UriInfo uriInfo,
-	    HttpHeaders httpHeaders,
-	    @Parameter(description = "The identifier for the resource", required = true)
-	    UUID id,
-	    @Parameter(description = "The fields that should be retrieved", required = false)
-        List<String> fields) {
-        T resource = Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
+    		ContainerRequestContext requestContext,
+		    ResourceInfo resourceInfo,
+		    UriInfo uriInfo,
+		    HttpHeaders httpHeaders,
+		    @Parameter(description = "The identifier for the resource", required = true)
+		    UUID id,
+		    @Parameter(description = "The fields that should be retrieved", required = false)
+	        List<String> fields) {
+    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
+    	T resource = Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
         MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
         if (MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.isCompatible(selected)) {
             resource.setSelf(

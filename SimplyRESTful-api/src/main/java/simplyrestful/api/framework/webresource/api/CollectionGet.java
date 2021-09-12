@@ -6,6 +6,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -45,6 +46,10 @@ public interface CollectionGet<T extends HALResource> {
      * <p>
      * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}.
      * </p>
+     * @param requestContext is a JAX-RS context object.
+     * @param resourceInfo is a JAX-RS context object.
+     * @param uriInfo is a JAX-RS context object.
+     * @param httpHeaders is a JAX-RS context object.
      * @param page is the page number of the paginated collection of resources (for {@link HALCollectionV1} only)
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize is the size of a single page in this paginated collection of
@@ -66,31 +71,33 @@ public interface CollectionGet<T extends HALResource> {
 	HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
 	})
     HALCollection<T> listHALResources(
-	    @Context
-	    ResourceInfo resourceInfo,
-	    @Context
-	    UriInfo uriInfo,
-	    @Context
-	    HttpHeaders httpHeaders,
-	    @QueryParam(V1_QUERY_PARAM_PAGE)
-        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
-        int page,
-        @QueryParam(QUERY_PARAM_PAGE_START)
-	    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
-	    int pageStart,
-	    @QueryParam(QUERY_PARAM_PAGE_SIZE)
-	    @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
-	    int pageSize,
-	    @QueryParam(V1_QUERY_PARAM_COMPACT)
-        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
-        boolean compact,
-        @QueryParam(QUERY_PARAM_FIELDS)
-	    @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)
-	    List<String> fields,
-	    @QueryParam(QUERY_PARAM_QUERY)
-	    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
-	    String query,
-	    @QueryParam(QUERY_PARAM_SORT)
-	    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
-	    List<String> sort);
+    		@Context
+    		ContainerRequestContext requestContext,
+    		@Context
+		    ResourceInfo resourceInfo,
+		    @Context
+		    UriInfo uriInfo,
+		    @Context
+		    HttpHeaders httpHeaders,
+		    @QueryParam(V1_QUERY_PARAM_PAGE)
+	        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
+	        int page,
+	        @QueryParam(QUERY_PARAM_PAGE_START)
+		    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
+		    int pageStart,
+		    @QueryParam(QUERY_PARAM_PAGE_SIZE)
+		    @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
+		    int pageSize,
+		    @QueryParam(V1_QUERY_PARAM_COMPACT)
+	        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
+	        boolean compact,
+	        @QueryParam(QUERY_PARAM_FIELDS)
+		    @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)
+		    List<String> fields,
+		    @QueryParam(QUERY_PARAM_QUERY)
+		    @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
+		    String query,
+		    @QueryParam(QUERY_PARAM_SORT)
+		    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
+		    List<String> sort);
 }

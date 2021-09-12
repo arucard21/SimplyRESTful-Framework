@@ -3,6 +3,7 @@ package simplyrestful.api.framework.webresource.api.implementation;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -49,54 +50,56 @@ public interface DefaultCollectionGet<T extends HALResource> extends CollectionG
 			    implementation = HALCollectionV1.class))
     })
     default HALCollection<T> listHALResources(
-	    ResourceInfo resourceInfo,
-	    UriInfo uriInfo,
-	    HttpHeaders httpHeaders,
-	    @Parameter(description  = "The page to be shown", required = false)
-        int page,
-        @Parameter(description = "The page to be shown", required = false)
-	    int pageStart,
-	    @Parameter(description = "The amount of resources shown on each page", required = false)
-	    int pageSize,
-	    @Parameter(description = "Provide minimal information for each resource", required = false)
-        boolean compact,
-        @Parameter(description = "The fields that should be retrieved", required = false)
-	    List<String> fields,
-	    @Parameter(description = "The FIQL query according to which the resources should be filtered", required = false)
-	    String query,
-	    @Parameter(description = "The fields on which the resources should be sorted", required = false)
-	    List<String> sort) {
-	MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
+    		ContainerRequestContext requestContext,
+		    ResourceInfo resourceInfo,
+		    UriInfo uriInfo,
+		    HttpHeaders httpHeaders,
+		    @Parameter(description  = "The page to be shown", required = false)
+	        int page,
+	        @Parameter(description = "The page to be shown", required = false)
+		    int pageStart,
+		    @Parameter(description = "The amount of resources shown on each page", required = false)
+		    int pageSize,
+		    @Parameter(description = "Provide minimal information for each resource", required = false)
+	        boolean compact,
+	        @Parameter(description = "The fields that should be retrieved", required = false)
+		    List<String> fields,
+		    @Parameter(description = "The FIQL query according to which the resources should be filtered", required = false)
+		    String query,
+		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
+		    List<String> sort) {
+    	MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
+    	QueryParamUtils.configureFieldsDefault(requestContext, QueryParamUtils.stripHALStructure(fields));
 
-	if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
-	    int calculatedPageStart = (page -1) * pageSize;
-	    if(compact) {
-		fields = Collections.singletonList(QUERY_PARAM_FIELDS_DEFAULT);
+		if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
+		    int calculatedPageStart = (page -1) * pageSize;
+		    if(compact) {
+			fields = Collections.singletonList(QUERY_PARAM_FIELDS_DEFAULT);
+		    }
+		    return HALCollectionV1Builder.fromPartial(
+			    this.list(
+				    calculatedPageStart,
+				    pageSize,
+				    QueryParamUtils.stripHALStructure(fields),
+				    QueryParamUtils.stripHALStructure(query),
+				    QueryParamUtils.parseSort(sort)),
+			    uriInfo.getRequestUri(),
+			    this.count(QueryParamUtils.stripHALStructure(query)))
+			    .page(page)
+			    .maxPageSize(pageSize)
+			    .compact(compact)
+			    .build();
+		}
+		return HALCollectionV2Builder.from(
+			this.list(
+				pageStart,
+				pageSize,
+				QueryParamUtils.stripHALStructure(fields),
+				QueryParamUtils.stripHALStructure(query),
+				QueryParamUtils.parseSort(sort)),
+			uriInfo.getRequestUri())
+			.withNavigation(pageStart, pageSize)
+			.collectionSize(this.count(QueryParamUtils.stripHALStructure(query)))
+			.build(selected);
 	    }
-	    return HALCollectionV1Builder.fromPartial(
-		    this.list(
-			    calculatedPageStart,
-			    pageSize,
-			    QueryParamUtils.stripHALStructure(fields),
-			    QueryParamUtils.stripHALStructure(query),
-			    QueryParamUtils.parseSort(sort)),
-		    uriInfo.getRequestUri(),
-		    this.count(QueryParamUtils.stripHALStructure(query)))
-		    .page(page)
-		    .maxPageSize(pageSize)
-		    .compact(compact)
-		    .build();
-	}
-	return HALCollectionV2Builder.from(
-		this.list(
-			pageStart,
-			pageSize,
-			QueryParamUtils.stripHALStructure(fields),
-			QueryParamUtils.stripHALStructure(query),
-			QueryParamUtils.parseSort(sort)),
-		uriInfo.getRequestUri())
-		.withNavigation(pageStart, pageSize)
-		.collectionSize(this.count(QueryParamUtils.stripHALStructure(query)))
-		.build(selected);
-    }
 }

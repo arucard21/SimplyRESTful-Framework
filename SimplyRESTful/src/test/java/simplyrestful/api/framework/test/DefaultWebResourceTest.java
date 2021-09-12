@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -49,6 +50,8 @@ public class DefaultWebResourceTest {
     }
 
     @Mock
+    private ContainerRequestContext requestContext;
+    @Mock
     private ResourceInfo resourceInfo;
     @Mock
     private UriInfo uriInfo;
@@ -78,7 +81,7 @@ public class DefaultWebResourceTest {
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {
         Assertions.assertThrows(NotFoundException.class,
-                () -> testEndpoint.getHALResource(resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
+                () -> testEndpoint.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
     }
 
     @Test

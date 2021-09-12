@@ -43,6 +43,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -258,34 +259,36 @@ public class ExampleWebResource
     HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
     })
     public HALCollection<ExampleResource> listHALResources(
-        @Context
-        ResourceInfo resourceInfo,
-        @Context
-        UriInfo uriInfo,
-        @Context
-        HttpHeaders httpHeaders,
-        @QueryParam(V1_QUERY_PARAM_PAGE)
-        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
-        int page,
-        @QueryParam(QUERY_PARAM_PAGE_START)
-        @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
-        int pageStart,
-        @QueryParam(QUERY_PARAM_PAGE_SIZE)
-        @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
-        int pageSize,
-        @QueryParam(V1_QUERY_PARAM_COMPACT)
-        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
-        boolean compact,
-        @QueryParam(QUERY_PARAM_FIELDS)
-        @DefaultValue(CollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
-        List<String> fields,
-        @QueryParam(QUERY_PARAM_QUERY)
-        @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
-        String query,
-        @QueryParam(QUERY_PARAM_SORT)
-        @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
-        List<String> sort) {
-        return DefaultWebResource.super.listHALResources(resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact,
+    		@Context
+    		ContainerRequestContext requestContext,
+	        @Context
+	        ResourceInfo resourceInfo,
+	        @Context
+	        UriInfo uriInfo,
+	        @Context
+	        HttpHeaders httpHeaders,
+	        @QueryParam(V1_QUERY_PARAM_PAGE)
+	        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
+	        int page,
+	        @QueryParam(QUERY_PARAM_PAGE_START)
+	        @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
+	        int pageStart,
+	        @QueryParam(QUERY_PARAM_PAGE_SIZE)
+	        @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
+	        int pageSize,
+	        @QueryParam(V1_QUERY_PARAM_COMPACT)
+	        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
+	        boolean compact,
+	        @QueryParam(QUERY_PARAM_FIELDS)
+	        @DefaultValue(CollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
+	        List<String> fields,
+	        @QueryParam(QUERY_PARAM_QUERY)
+	        @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
+	        String query,
+	        @QueryParam(QUERY_PARAM_SORT)
+	        @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
+	        List<String> sort) {
+        return DefaultWebResource.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact,
                 fields, query, sort);
     }
 
@@ -293,20 +296,22 @@ public class ExampleWebResource
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
     public void streamHALResources(
-        @QueryParam(QUERY_PARAM_FIELDS)
-        @DefaultValue(CollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
-        List<String> fields,
-        @QueryParam(QUERY_PARAM_QUERY)
-        @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
-        String query,
-        @QueryParam(QUERY_PARAM_SORT)
-        @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
-        List<String> sort,
-        @Context
-        SseEventSink eventSink,
-        @Context
-        Sse sse) {
-        DefaultCollectionGetEventStream.super.streamHALResources(fields, query, sort, eventSink, sse);
+    		@Context
+    		ContainerRequestContext requestContext,
+	        @QueryParam(QUERY_PARAM_FIELDS)
+	        @DefaultValue(CollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
+	        List<String> fields,
+	        @QueryParam(QUERY_PARAM_QUERY)
+	        @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
+	        String query,
+	        @QueryParam(QUERY_PARAM_SORT)
+	        @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
+	        List<String> sort,
+	        @Context
+	        SseEventSink eventSink,
+	        @Context
+	        Sse sse) {
+        DefaultCollectionGetEventStream.super.streamHALResources(requestContext, fields, query, sort, eventSink, sse);
     }
 
     @Override
@@ -326,19 +331,21 @@ public class ExampleWebResource
     @Path("/{id}")
     @GET
     public ExampleResource getHALResource(
-        @Context
-        ResourceInfo resourceInfo,
-        @Context
-        UriInfo uriInfo,
-        @Context
-        HttpHeaders httpHeaders,
-        @PathParam("id")
-        @NotNull
-        UUID id,
-        @QueryParam(CollectionGet.QUERY_PARAM_FIELDS)
-        @DefaultValue(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)
-        List<String> fields) {
-        return DefaultWebResource.super.getHALResource(resourceInfo, uriInfo, httpHeaders, id, fields);
+    		@Context
+    		ContainerRequestContext requestContext,
+	        @Context
+	        ResourceInfo resourceInfo,
+	        @Context
+	        UriInfo uriInfo,
+	        @Context
+	        HttpHeaders httpHeaders,
+	        @PathParam("id")
+	        @NotNull
+	        UUID id,
+	        @QueryParam(CollectionGet.QUERY_PARAM_FIELDS)
+	        @DefaultValue(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)
+	        List<String> fields) {
+        return DefaultWebResource.super.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
     }
 
     @Override

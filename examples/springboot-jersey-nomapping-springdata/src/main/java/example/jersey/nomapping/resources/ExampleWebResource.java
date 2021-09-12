@@ -32,6 +32,7 @@ import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -76,6 +77,8 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     ResourceInfo resourceInfo;
     @Context
     UriInfo uriInfo;
+    @Context
+    ContainerRequestContext requestContext;
 
     @Inject
     public ExampleWebResource(ExampleRepository repo) {
@@ -212,9 +215,9 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     }
 
     @Override
-    public HALCollection<ExampleResource> listHALResources(ResourceInfo resourceInfo, UriInfo uriInfo,
+    public HALCollection<ExampleResource> listHALResources(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo,
             HttpHeaders httpHeaders, int page, int pageStart, int pageSize, boolean compact, List<String> fields,
             String query, List<String> sort) {
-        return DefaultWebResource.super.listHALResources(resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact, fields, query, sort);
+        return DefaultWebResource.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact, fields, query, sort);
     }
 }
