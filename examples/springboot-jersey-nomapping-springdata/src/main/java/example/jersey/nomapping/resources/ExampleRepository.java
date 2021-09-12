@@ -8,6 +8,7 @@ import javax.inject.Named;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -19,5 +20,6 @@ public interface ExampleRepository extends PagingAndSortingRepository<ExampleRes
 	boolean existsByUuid(UUID uuid);
 	Page<ExampleResource> findAll(Specification<ExampleResource> spec, Pageable pageable);
 	Stream<ExampleResource> findAll(Specification<ExampleResource> spec);
+	Stream<ExampleResource> findAll(Specification<ExampleResource> spec, Sort sort);
 	long count(Specification<ExampleResource> spec);
 }

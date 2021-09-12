@@ -38,6 +38,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
+
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
@@ -64,10 +67,6 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
     MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"",
     ExampleResource.EXAMPLE_MEDIA_TYPE_JSON})
 public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
-    private static final String RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER = ",";
-    private static final String RSQL_JPA_SORT_QUERY_FIELD_DELIMITER = ";";
-    private static final String RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING = "asc";
-    private static final String RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING = "desc";
     private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
     private static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
     private static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
@@ -151,15 +150,15 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     @Override
     public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
 	List<ExampleResource> retrievedPage = repo.findAll(
-		RSQLJPASupport.<ExampleResource>toSpecification(query).and(RSQLJPASupport.toSort(createSortQuery(sort))),
-		new OffsetBasedPageRequest(pageStart, pageSize))
+		RSQLJPASupport.<ExampleResource>toSpecification(query),
+		new OffsetBasedPageRequest(pageStart, pageSize, map(sort)))
 		.getContent();
 	return retrievedPage.stream().map(resource -> ensureSelfLinkAndUUIDPresent(resource)).collect(Collectors.toList());
     }
 
     @Override
     public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
-	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query).and(RSQLJPASupport.toSort(createSortQuery(sort))))
+	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query), map(sort))
 		.map(resource -> {
 		    simulateSlowDataRetrieval();
 		    return resource;
@@ -185,15 +184,13 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
     	}
     }
 
-    private String createSortQuery(List<SortOrder> sort) {
-    	return sort.stream()
-    		.map(this::createSingleSortQueryField)
-    		.collect(Collectors.joining(RSQL_JPA_SORT_QUERY_FIELD_DELIMITER));
-    }
-
-    private String createSingleSortQueryField(SortOrder sort) {
-    	String direction = sort.isAscending() ? RSQL_JPA_SORT_QUERY_DIRECTION_ASCENDING : RSQL_JPA_SORT_QUERY_DIRECTION_DESCENDING;
-    	return String.join(RSQL_JPA_SORT_QUERY_DIRECTION_DELIMITER, sort.getField(), direction);
+    private Sort map(List<SortOrder> sort) {
+        if (sort == null || sort.isEmpty()) {
+            return Sort.unsorted();
+        }
+        return Sort.by(sort.stream()
+                .map(sortOrder -> sortOrder.isAscending() ? Order.asc(sortOrder.getField()) : Order.desc(sortOrder.getField()))
+                .collect(Collectors.toList()));
     }
 
     private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
