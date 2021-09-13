@@ -12,9 +12,9 @@ public class QueryParamUtils {
     private static final String QUERY_PARAM_VALUE_DELIMITER = ",";
     private static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
     private static final String HAL_LINKS_OBJECT_NAME = "_links";
-	private static final String FIELDS_PROVIDED_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.provided";
-	private static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
-	private static final String FIELDS_PARAMS_SEPARATOR = ",";
+    private static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
+	private static final String FIELDS_PARAM_NAME = "fields";
+	private static final String FIELDS_PARAM_SEPARATOR = ",";
 
 	/**
 	 * Set the default value for the list of fields as request property as fields override.
@@ -32,12 +32,12 @@ public class QueryParamUtils {
     	if (!fieldsQueryParamProvided(requestContext)) {
     		requestContext.setProperty(
     				FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY,
-    				String.join(FIELDS_PARAMS_SEPARATOR, fieldsDefaults));
+    				String.join(FIELDS_PARAM_SEPARATOR, fieldsDefaults));
     	}
     }
 
     private static boolean fieldsQueryParamProvided(ContainerRequestContext requestContext) {
-		return requestContext.getPropertyNames().contains(FIELDS_PROVIDED_REQUEST_CONTEXT_PROPERTY);
+    	return requestContext.getUriInfo().getQueryParameters().containsKey(FIELDS_PARAM_NAME);
 	}
 
     /**

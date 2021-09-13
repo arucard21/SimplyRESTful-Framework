@@ -10,6 +10,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -80,6 +81,8 @@ public class DefaultWebResourceTest {
 
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {
+    	Mockito.when(requestContext.getUriInfo()).thenReturn(uriInfo);
+    	Mockito.when(uriInfo.getQueryParameters()).thenReturn(new MultivaluedHashMap<>());
         Assertions.assertThrows(NotFoundException.class,
                 () -> testEndpoint.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
     }

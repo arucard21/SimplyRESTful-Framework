@@ -22,7 +22,6 @@ public class JsonFieldsServletFilter extends HttpFilter {
     private static final long serialVersionUID = 6825636135376615562L;
     private static final String MEDIA_TYPE_JSON = "application/json";
     private static final String MEDIA_TYPE_STRUCTURE_SUFFIX_JSON = "+json";
-    public static final String FIELDS_PROVIDED_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.provided";
     public static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
     public static final String QUERY_PARAM_FIELDS = "fields";
     public static final String FIELDS_PARAMS_SEPARATOR = ",";
@@ -32,9 +31,6 @@ public class JsonFieldsServletFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         boolean filter = false;
-        if (request.getParameter(QUERY_PARAM_FIELDS) != null) {
-        	request.setAttribute(FIELDS_PROVIDED_REQUEST_CONTEXT_PROPERTY, true);
-        }
         CharResponseWrapper wrappedResponse = new CharResponseWrapper(response);
         super.doFilter(request, wrappedResponse, chain);
         if (isJson(wrappedResponse.getContentType())) {
