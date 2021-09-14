@@ -1,6 +1,7 @@
 package simplyrestful.api.framework.servlet.filters;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +32,20 @@ public class JsonFieldsServletFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         boolean filter = false;
+        /**
+         * FIXME This allows an EventStream to stream its events by not applying the fields filter.
+         * However, this is done whenever the client includes "text/event-stream" in its Accept header.
+         * If this is included with low priority along with other JSON-based media types, this may cause
+         * the servlet to return a JSON-based media type instead of an EventStream. In that case, that
+         * JSON-based media type will not have this field filter applied either.
+         *
+         * Until this can be implemented properly, clients should only include "text/event-stream" in
+         * their Accept header if that's actually what they want in their response.
+         */
+        if(clientRequestsEventStream(request)) {
+        	super.doFilter(request, response, chain);
+        	return;
+        }
         CharResponseWrapper wrappedResponse = new CharResponseWrapper(response);
         super.doFilter(request, wrappedResponse, chain);
         if (isJson(wrappedResponse.getContentType())) {
@@ -73,4 +88,12 @@ public class JsonFieldsServletFilter extends HttpFilter {
         }
         return false;
     }
+
+	private boolean clientRequestsEventStream(HttpServletRequest request) {
+		String acceptValue = String.join(",", Collections.list(request.getHeaders("Accept")));
+		if (acceptValue.contains("text/event-stream")) {
+			return true;
+		}
+		return false;
+	}
 }
