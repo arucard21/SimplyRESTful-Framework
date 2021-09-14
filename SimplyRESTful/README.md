@@ -22,10 +22,16 @@ For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Pl
 ```Java
 public class MyResource extends HALResource {  
   public static final String PROFILE = "https://api.example.com/resources/my-resource/v1";
+  public static final String MEDIA_TYPE_JSON = "application/x.myresource-v1+json";
 
   @Override
   public URI getProfile() {
     return URI.create(PROFILE);
+  }
+  
+  @Override
+  public MediaType getCustomJsonMediaType(){
+  	return MediaType.valueOf(MEDIA_TYPE_JSON);
   }
 
   // Add the rest of your resource as well
@@ -49,7 +55,7 @@ public class MyWebResource extends DefaultWebResource<MyResource>{
   public MyResource delete(UUID resourceUUID){/* Add your implementation*/}
 
   @Override
-  public MyResource list(long pageNumber, long pageSize){/* Add your implementation*/}
+  public MyResource list(long pageNumber, long pageSize, List<String> fields, String query, List<SortOrder> sort){/* Add your implementation*/}
 }
 ```
 In this Web Resource, you can now implement the `create()`, `read()`, `update()`, `delete()` and `list()` methods to connect to your backend as needed. Though you should mostly implement these methods as you would expect, there are some things to keep in mind.
@@ -64,16 +70,26 @@ In this Web Resource, you can now implement the `create()`, `read()`, `update()`
 You can configure your JAX-RS framework manually, as described below, or you can use one of the convenience deploy libraries provided by the framework (see the [main README](/../..) for more details).
 
 In your JAX-RS framework, register:
-* a `JacksonJsonProvider` instance that uses `HALMapper` (`io.openapitools.jackson.dataformat.hal.HALMapper`) as `ObjectMapper` (to correctly serialize and deserialize our HAL+JSON documents).
+* the `JacksonJsonProvider` class (to correctly serialize and deserialize our plain JSON documents).
 ```Java
 // Example for Jersey (in ResourceConfig)
-register(new JacksonJsonProvider(new HALMapper()));
+register(JacksonJsonProvider.class);
 ```
-* the Swagger classes (to generate a `swagger.json` document).
+* the `JacksonHalJsonProvider` class (to correctly serialize and deserialize our HAL+JSON documents).
 ```Java
 // Example for Jersey (in ResourceConfig)
-register(ApiListingResource.class);
-register(SwaggerSerializers.class);
+register(JacksonHalJsonProvider.class);
+```
+* the Swagger classes (to generate the OpenAPI Specification document).
+```Java
+// Example for Jersey (in ResourceConfig)
+register(OpenApiResource.class);
+register(AcceptHeaderOpenApiResource.class);
+```
+* the `UriCustomizer` class (optional, allows the original URL used by the client to be retrieved from an HTTP header and used in the API when creating links).
+```Java
+// Example for Jersey (in ResourceConfig)
+register(UriCustomizer.class);
 ```
 * the [`WebResourceRoot`](src/main/java/simplyrestful/api/framework/core/servicedocument/WebResourceRoot.java) class (to provide the ServiceDocument at the root of your API).
 ```Java
