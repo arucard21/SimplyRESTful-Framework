@@ -7,9 +7,9 @@ plugins{
 //Shared configuration for all projects (root, library and example projects) including ones with a custom build.gradle
 configure(allprojects){
     apply plugin: "eclipse"
-    
+
     group = 'com.github.arucard21.simplyrestful'
-    version = '0.17.5'
+    version = '0.18.0'
 }
 
 // Publishing configuration for all library projects (excluding root and example projects)
@@ -17,12 +17,12 @@ configure(subprojects - project(":examples").allprojects){
     apply plugin: 'java'
 	apply plugin: 'maven-publish'
 	apply plugin: 'signing'
-	
+
 	java {
     	withJavadocJar()
     	withSourcesJar()
 	}
-	
+
 	publishing{
 		publications{
 			mavenJava(MavenPublication){
@@ -33,13 +33,13 @@ configure(subprojects - project(":examples").allprojects){
 						packaging = 'jar'
 						description = project.description
 						url = 'https://github.com/arucard21/SimplyRESTful-Framework'
-	
+
 						scm {
 							connection = 'scm:git:git://github.com:arucard21/SimplyRESTful-Framework.git'
 							developerConnection = 'scm:git:ssh://github.com:arucard21/SimplyRESTful-Framework.git'
 							url = 'https://github.com/arucard21/SimplyRESTful-Framework'
 						}
-	
+
 						developers {
 							developer {
 								name = 'Riaas Mokiem'
@@ -51,7 +51,7 @@ configure(subprojects - project(":examples").allprojects){
 				}
 			}
 		}
-		
+
 		repositories{
 			maven{
 				def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
@@ -64,7 +64,7 @@ configure(subprojects - project(":examples").allprojects){
 			}
 		}
 	}
-	
+
 	signing {
 		sign publishing.publications.mavenJava
 	}
