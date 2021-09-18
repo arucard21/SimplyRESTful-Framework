@@ -4,10 +4,12 @@
 
 A framework for creating a RESTful API.
 
-This framework provides a default implementation of a JAX-RS Web Resource (sometimes called an endpoint) that maps the more complicated [HTTP](https://tools.ietf.org/html/rfc7231)-compliant access to simpler [CRUDL](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) functions. This has the benefit of providing standards-compliant as well as consistent behavior for your API without needing to understand the complexity of standards like HTTP. As API developer you only have to implement CRUDL functions which are much simpler and more concretely defined.
+This framework provides a default implementation of a JAX-RS Web Resource (sometimes called an endpoint) that maps the more complicated [HTTP](https://tools.ietf.org/html/rfc7231)-compliant access to simpler [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) functions. This has the benefit of providing standards-compliant as well as consistent behavior for your API without needing to understand the complexity of standards like HTTP. As API developer you only have to implement CRUD functions which are much simpler and more concretely defined. This level of consistency in the API also allows for additional convenience and features to be implemented generically, with little to no effort required from the API developer to enable it.
 * The implementation is based on [JAX-RS](https://jakarta.ee/specifications/restful-ws/) and can be used with any JAX-RS framework.
-* It uses [HAL+JSON](https://tools.ietf.org/html/draft-kelly-json-hal-08) as media type that provides a standardized structure for your attributes, links, embedded resources and hypermedia controls (sometimes called actions).
-* The HTTP methods are mapped to simple CRUDL functions (Create, Read, Update, Delete and List). The exact details of how each of these methods should behave is provided in the accompanying javadoc.
+* It allows resources to be represented as either plain [JSON](https://tools.ietf.org/html/rfc8259), with a custom media type, or as [HAL+JSON](https://tools.ietf.org/html/draft-kelly-json-hal-08). The latter of which is specifically created for use in REST APIs and provides a standardized structure for your attributes, links, embedded resources and hypermedia controls (sometimes called actions).
+  * It only requires a single Java class for the resource and will use [Content Negotiation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation) to automatically serialize to either plain JSON or HAL+JSON using Jackson.
+  * If both representations are equally preferred, the API will default to plain JSON, as it the more familiar media type. However, the use of HAL+JSON is recommended as it is more suitable for REST APIs.
+* The HTTP methods are mapped to simple CRUD functions (Create, Read, Update, Delete and List by default). The exact details of how each of these methods should behave is provided in the accompanying javadoc.
 
 ## Usage
 ### Prerequisites
@@ -64,7 +66,10 @@ In this Web Resource, you can now implement the `create()`, `read()`, `update()`
 * Same as with `create()`, the `update()` method should return the exact resource that was updated.
 * Same as with `read()`, the `delete()` method should return `null` if it could not find the resource with the given ID.
 * The `list()` method works as expected and just returns a list of resources.
-* For improved performance, you should also override the `count()` and `exists()` methods with a more efficient implementation for your specific backend.
+  * The list should be filtered according to the `query` parameter, which is specified as a [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00) query.
+  * It should also be sorted according to the `sort` parameter, which is specified as an ordered list of fields, along with their sort direction.
+  * While the `fields` parameter can be used to restrict which fields are retrieved, it is optional. The fields filtering can be done outside of this implementation, unlike querying and sorting. This is implemented in the framework [as a Jakarta Servlet filter](/fields-filter-json-servlet).
+* For improved performance, you should also override the `count()` and `exists()` methods with a more efficient implementation for your specific backend. By default, it wil use the `list()` and `read()` methods, respectively, to provide this functionality.
 
 ### Configure your JAX-RS framework
 You can configure your JAX-RS framework manually, as described below, or you can use one of the convenience deploy libraries provided by the framework (see the [main README](/../..) for more details).
@@ -103,4 +108,8 @@ packages("com.name.of.my.root.package");
 ```
 
 ### Deploy your API
+If you registered the `UriCustomizer` class, you will need to provide `SIMPLYRESTFUL_URI_HTTP_HEADER` as environment variable with the HTTP header name containing the original URL as its value, e.g. `SIMPLYRESTFUL_URI_HTTP_HEADER=xoriginalurl` with the `xoriginalurl` HTTP header containing the absolute URL used by the client. 
+
 Deploy and run your SimplyRESTful API as you would any other JAX-RS API, e.g. [start your Jetty server](https://www.eclipse.org/jetty/documentation/current/startup.html) or [run your Spring Boot application](https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-running-your-application).
+
+The SimplyRESTful framework will ensure that there is a service document at the root of your deployed API as the main entry point to your API. This service document provides discoverable documentation, i.e. a link to the OpenAPI Specification where the API is described fully. You can then use the API as you normally would, or you can use one of the provided clients, in [Java](/client) or [TypeScript](/client-ts), to access the API more easily.
