@@ -68,17 +68,15 @@ public class JsonFieldsServletFilter extends HttpFilter {
     }
 
 	private List<String> parseFieldsParameter(HttpServletRequest request) {
-		String[] parameterValuesArray = Optional.ofNullable(request.getParameterValues(QUERY_PARAM_FIELDS)).orElse(new String[] {});
-		String fieldsParameter = String.join(FIELDS_PARAMS_SEPARATOR, parameterValuesArray);
-
+		String[] clientProvidedFields = Optional.ofNullable(request.getParameterValues(QUERY_PARAM_FIELDS)).orElse(new String[] {});
 		Object fieldsOverride = request.getAttribute(FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY);
-        if(fieldsOverride != null) {
-            fieldsParameter = String.valueOf(fieldsOverride);
-        }
-
-        return Stream.of(fieldsParameter.split(FIELDS_PARAMS_SEPARATOR))
-                        .map(param -> param.trim())
-                        .collect(Collectors.toList());
+		if (fieldsOverride != null) {
+			clientProvidedFields = new String[] {String.valueOf(fieldsOverride)};
+		}
+		return Stream.of(clientProvidedFields)
+				.flatMap(field -> Stream.of(field.split(FIELDS_PARAMS_SEPARATOR)))
+				.map(param -> param.trim())
+				.collect(Collectors.toList());
 	}
 
     private boolean isJson(String contentType) {
