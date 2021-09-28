@@ -7,13 +7,13 @@ let exampleResourceClient: SimplyRESTfulClient<ExampleResource>;
 
 beforeAll(() => {
     fetchMock.disableMocks()
-    exampleResourceClient = new SimplyRESTfulClient(
-        new URL(hostname),
-        new URL("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1"));
 });
 
 beforeEach(() => {
-    fetchMock.resetMocks();
+	fetchMock.resetMocks();
+	exampleResourceClient = new SimplyRESTfulClient(
+		new URL(hostname),
+		new URL("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1"));
 });
 
 test('Running API against which to run integration tests is available', async () => {
@@ -26,10 +26,25 @@ test('discoverApi correctly discovers the resource URI for this resource', async
     expect(exampleResourceClient.resourceUriTemplate).toBe(`${hostname}resources/{id}`);
 });
 
-test('list correctly retrieves the list of resources', async () => {
+test('list correctly retrieves the list of resources with the default fields visible', async () => {
     expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(-1);
 
     const listOfResources: ExampleResource[] = await exampleResourceClient.list();
+
+    expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(3);
+    expect(listOfResources.length).toBe(3);
+    expect(listOfResources[0].description).toBeUndefined();
+    expect(listOfResources[0].complexAttribute).toBeUndefined();
+    expect(listOfResources[1].description).toBeUndefined();
+    expect(listOfResources[1].complexAttribute).toBeUndefined();
+    expect(listOfResources[2].description).toBeUndefined();
+    expect(listOfResources[2].complexAttribute).toBeUndefined();
+});
+
+test('list correctly retrieves the list of resources when all fields are requested', async () => {
+    expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(-1);
+
+    const listOfResources: ExampleResource[] = await exampleResourceClient.list(undefined, undefined, ["all"], undefined, undefined, undefined, undefined);
 
     expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(3);
     expect(listOfResources.length).toBe(3);
