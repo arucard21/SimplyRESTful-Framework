@@ -69,7 +69,12 @@ public interface DefaultCollectionGet<T extends HALResource> extends CollectionG
 		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 		    List<String> sort) {
     	MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
-    	QueryParamUtils.configureFieldsDefault(requestContext, QueryParamUtils.stripHALStructure(fields));
+    	if(selected.equals(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON))) {
+    		QueryParamUtils.configureFieldsDefault(requestContext, QueryParamUtils.stripHALStructure(fields));
+    	}
+    	else {
+    		QueryParamUtils.configureFieldsDefault(requestContext, fields);
+    	}
 
 		if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
 		    int calculatedPageStart = (page -1) * pageSize;
