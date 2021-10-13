@@ -53,12 +53,12 @@ public class JsonFieldsServletFilter extends HttpFilter {
         }
 
         List<String> fields = parseFieldsParameter(request);
+        String jsonResponse = wrappedResponse.toString();
 
-        if (fields.isEmpty() || fields.contains(FIELDS_VALUE_ALL)) {
+        if (fields.isEmpty() || fields.contains(FIELDS_VALUE_ALL) || wrappedResponse.getStatus() != 200 || jsonResponse.isBlank()) {
             filter = false;
         }
 
-        String jsonResponse = wrappedResponse.toString();
         if (filter) {
             jsonResponse = new JsonFieldsFilter().filterFieldsInJson(jsonResponse, fields);
         }
