@@ -279,12 +279,30 @@ test('read throws an error when a bad request is made (HTTP 400 status)', async 
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
 });
 
-// FIXME: The Date is deserialized to string by TypeScript instead of to a Date object
-// json2typescript cannot be used because it does not work with generics (See https://github.com/AppVision-GmbH/json2typescript/issues/8)
-test('read correctly retrieves the resource but does not deserialize the Date property', async () => {
+test('read correctly retrieves the resource and correctly deserializes the JSON string data type property', async () => {
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     const additionalFieldValue = "test value";
-    fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue, someDate: '2021-01-01T09:00:00Z' }));
+    fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue, someNumber: 42, someDate: '2021-01-01T09:00:00Z' }));
+    const retrievedResource: TestResource = await testResourceClient.read("http://localhost/testresources/00000000-0000-0000-0000-000000000000");
+	expect(typeof retrievedResource.additionalField).toBe('string');
+	expect(retrievedResource.additionalField).toBe(additionalFieldValue);
+	expect(retrievedResource._links.self.href).toBe(selfLink);
+});
+
+test('read correctly retrieves the resource and correctly deserializes the JSON string number type property', async () => {
+    const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
+    const additionalFieldValue = "test value";
+    fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue, someNumber: 42, someDate: '2021-01-01T09:00:00Z' }));
+    const retrievedResource: TestResource = await testResourceClient.read("http://localhost/testresources/00000000-0000-0000-0000-000000000000");
+	expect(typeof retrievedResource.someNumber).toBe('number');
+	expect(retrievedResource.someNumber).toBe(42);
+	expect(retrievedResource._links.self.href).toBe(selfLink);
+});
+
+test('read correctly retrieves the resource but does not deserialize the non-JSON data type property Date', async () => {
+    const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
+    const additionalFieldValue = "test value";
+    fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue, someNumber: 42, someDate: '2021-01-01T09:00:00Z' }));
     const retrievedResource: TestResource = await testResourceClient.read("http://localhost/testresources/00000000-0000-0000-0000-000000000000");
 	expect(retrievedResource.additionalField).toBe(additionalFieldValue);
 	expect(typeof retrievedResource.someDate).not.toBe('Date');

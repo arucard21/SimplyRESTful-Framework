@@ -6,5 +6,6 @@ export type TestResource = HALResource & {
 		someLink?: HalLink;
 	};
 	additionalField?: string;
+	someNumber?: number;
 	someDate?: Date;
 }
