@@ -11,9 +11,7 @@ beforeAll(() => {
 
 beforeEach(() => {
 	fetchMock.resetMocks();
-	exampleResourceClient = new SimplyRESTfulClient(
-		new URL(hostname),
-		new URL("https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1"));
+	exampleResourceClient = new SimplyRESTfulClient(hostname, "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1");
 });
 
 test('Running API against which to run integration tests is available', async () => {
@@ -44,7 +42,7 @@ test('list correctly retrieves the list of resources with the default fields vis
 test('list correctly retrieves the list of resources when all fields are requested', async () => {
     expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(-1);
 
-    const listOfResources: ExampleResource[] = await exampleResourceClient.list(undefined, undefined, ["all"], undefined, undefined, undefined, undefined);
+    const listOfResources: ExampleResource[] = await exampleResourceClient.list({fields:["all"]});
 
     expect(exampleResourceClient.totalAmountOfLastRetrievedCollection).toBe(3);
     expect(listOfResources.length).toBe(3);
@@ -59,7 +57,7 @@ test('list correctly retrieves the list of resources when all fields are request
 test('create correctly creates the resource', async () => {
     const newResource: ExampleResource = { description: "This is a new resource", complexAttribute: { name: "complex attribute of the new resource" } };
 
-    const newResourceUri: URL = await exampleResourceClient.create(newResource);
+    const newResourceUri: string = await exampleResourceClient.create(newResource);
 
     const createdResource: ExampleResource = await exampleResourceClient.read(newResourceUri);
     expect(createdResource.description).toBe(createdResource.description);
@@ -71,7 +69,7 @@ test('create correctly creates the resource', async () => {
 test('read retrieves the resource when the URL is provided', async () => {
     const listOfResources: ExampleResource[] = await exampleResourceClient.list();
     expect(listOfResources.length).toBeGreaterThan(0);
-    const resourceIdentifierFirstResource = new URL(listOfResources[0]._links.self.href);
+    const resourceIdentifierFirstResource = listOfResources[0]._links.self.href;
     const retrieved: ExampleResource = await exampleResourceClient.read(resourceIdentifierFirstResource);
 
     expect(retrieved.description).toBe("This is test resource 0");
@@ -92,7 +90,7 @@ test('read correctly retrieves the resource when only the UUID is provided', asy
 
 test('update correctly updates the resource', async () => {
     const newResource: ExampleResource = { description: "This is a resource created for updating", complexAttribute: { name: "complex attribute of the new resource" } };
-    const newResourceUri: URL = await exampleResourceClient.create(newResource);
+    const newResourceUri: string = await exampleResourceClient.create(newResource);
     const createdResource: ExampleResource = await exampleResourceClient.read(newResourceUri);
     expect(createdResource.description).toBe("This is a resource created for updating")
     createdResource.description = "This is a resource that has been updated";
@@ -107,7 +105,7 @@ test('update correctly updates the resource', async () => {
 
 test('delete correctly deletes the resource', async () => {
     const toBeDeletedResource: ExampleResource = { description: "This is a resource created to be deleted", complexAttribute: { name: "complex attribute of the resource created to be deleted" } };
-    const toBeDeletedResourceUri: URL = await exampleResourceClient.create(toBeDeletedResource);
+    const toBeDeletedResourceUri: string = await exampleResourceClient.create(toBeDeletedResource);
     await expect(exampleResourceClient.read(toBeDeletedResourceUri)).resolves.not.toThrow();
 
     await expect(exampleResourceClient.delete(toBeDeletedResourceUri)).resolves.not.toThrow();
