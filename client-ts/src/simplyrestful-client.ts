@@ -4,13 +4,16 @@ import { HalCollectionV2 } from './HalCollectionV2';
 import { SortOrder } from './SortOrder';
 
 export class SimplyRESTfulClient<T extends HALResource> {
-    readonly baseApiUri: URL;
-    readonly resourceProfile: URL;
+	readonly dummyHostname = "placeholderforrelativeurl";
+	readonly dummyHost = "http://" + this.dummyHostname;
+
+    readonly baseApiUri: string;
+    readonly resourceProfile: string;
     readonly resourceMediaType: string;
     resourceUriTemplate: string | undefined;
     totalAmountOfLastRetrievedCollection: number = -1;
 
-    constructor(baseApiUri: URL, resourceProfile: URL) {
+    constructor(baseApiUri: string, resourceProfile: string) {
         this.baseApiUri = baseApiUri;
         this.resourceMediaType = "application/hal+json";
         this.resourceProfile = resourceProfile;
@@ -37,8 +40,8 @@ export class SimplyRESTfulClient<T extends HALResource> {
             .then(openApiSpecification => this.configureResourceUriTemplate(openApiSpecification));
     }
 
-    private async retrieveServiceDocument(this: this, httpHeaders?: Headers): Promise<URL> {
-        return fetch(this.baseApiUri.toString(), { headers: httpHeaders }).then(async response => {
+    private async retrieveServiceDocument(this: this, httpHeaders?: Headers): Promise<string> {
+        return fetch(this.baseApiUri, { headers: httpHeaders }).then(async response => {
             if (!response.ok) {
 				return response.text().then(body => {
 					throw new Error(
@@ -46,13 +49,13 @@ export class SimplyRESTfulClient<T extends HALResource> {
 				});
             }
             return response.json().then(serviceDocument => {
-                return new URL(serviceDocument["_links"]["describedBy"]["href"]);
+                return serviceDocument["_links"]["describedBy"]["href"];
             })
         });
     }
 
-    private async retrieveOpenApiSpecification(openApiSpecificationUrl: URL, httpHeaders?: Headers): Promise<OpenAPIV3.Document> {
-        return fetch(openApiSpecificationUrl.toString(), { headers: httpHeaders }).then(async response => {
+    private async retrieveOpenApiSpecification(openApiSpecificationUrl: string, httpHeaders?: Headers): Promise<OpenAPIV3.Document> {
+        return fetch(openApiSpecificationUrl, { headers: httpHeaders }).then(async response => {
             if (!response.ok) {
 				return response.text().then(body => {
 					throw new Error(
@@ -64,7 +67,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
     }
 
     private async configureResourceUriTemplate(this: this, openApiSpecification: OpenAPIV3.Document): Promise<void> {
-        for (const [path, pathItem] of Object.entries(openApiSpecification.paths)) {
+        for (const [discoveredPath, pathItem] of Object.entries(openApiSpecification.paths)) {
 			if(!pathItem){
 				continue;
 			}
@@ -73,18 +76,18 @@ export class SimplyRESTfulClient<T extends HALResource> {
 			for (const contentType in content) {
 				const contentTypeNoSpaces = contentType.replace(" ", "");
 				if (contentTypeNoSpaces === mediaType) {
-					const resourceUri : URL = this.baseApiUri;
-					resourceUri.pathname = this.joinPath(resourceUri.pathname, path);
-					this.resourceUriTemplate = decodeURI(resourceUri.toString());
+					const resourceUri : URL = this.createUrlFromRelativeOrAbsoluteUrlString(this.baseApiUri);
+					resourceUri.pathname = this.joinPath(resourceUri.pathname, discoveredPath);
+					this.resourceUriTemplate = decodeURI(this.getRelativeOrAbsoluteUrl(resourceUri));
 					return;
 				}
 			}
         }
 	}
 
-    async list(pageStart?: number, pageSize?: number, fields?: string[], query?: string, sort?: SortOrder[], httpHeaders?: Headers, additionalQueryParameters?: URLSearchParams): Promise<T[]> {
+	async list({pageStart, pageSize, fields, query, sort, httpHeaders, additionalQueryParameters} : {pageStart?: number, pageSize?: number, fields?: string[], query?: string, sort?: SortOrder[], httpHeaders?: Headers, additionalQueryParameters?: URLSearchParams} = {}): Promise<T[]> {
         return this.discoverApi(httpHeaders).then(() => {
-            const resourceListUri = this.resolveResourceUriTemplate();
+            const resourceListUri = this.createUrlFromRelativeOrAbsoluteUrlString(this.resolveResourceUriTemplate());
 
             let searchParams = new URLSearchParams();
             if (!!pageStart) {
@@ -118,7 +121,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
             }
             httpHeaders.append("Accept", "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\"");
 
-            return fetch(resourceListUri.toString(), { headers: httpHeaders }).then(response => {
+            return fetch(this.getRelativeOrAbsoluteUrl(resourceListUri), { headers: httpHeaders }).then(response => {
                 if (!response.ok) {
 					return response.text().then(body => {
 						throw new Error(
@@ -136,9 +139,9 @@ export class SimplyRESTfulClient<T extends HALResource> {
         });
     }
 
-    async create(resource: T, httpHeaders?: Headers, queryParameters?: URLSearchParams): Promise<URL> {
+    async create(resource: T, httpHeaders?: Headers, queryParameters?: URLSearchParams): Promise<string> {
         return this.discoverApi(httpHeaders).then(() => {
-            const resourceListUri = this.resolveResourceUriTemplate();
+            const resourceListUri = this.createUrlFromRelativeOrAbsoluteUrlString(this.resolveResourceUriTemplate());
             if (!!queryParameters) {
                 resourceListUri.search = queryParameters.toString();
             }
@@ -148,7 +151,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
             }
             httpHeaders.append("Content-Type", `application/hal+json;profile="${this.resourceProfile}"`);
 
-            return fetch(resourceListUri.toString(), { method: "POST", headers: httpHeaders, body: JSON.stringify(resource) }).then(response => {
+            return fetch(this.getRelativeOrAbsoluteUrl(resourceListUri), { method: "POST", headers: httpHeaders, body: JSON.stringify(resource) }).then(response => {
                 if (response.status !== 201) {
 					return response.text().then(body => {
 						throw new Error(
@@ -159,15 +162,16 @@ export class SimplyRESTfulClient<T extends HALResource> {
                 if (!locationOfCreatedResource) {
                     throw new Error("Resource seems to have been created but no location was returned. Please report this to the maintainers of the API");
                 }
-                return new URL(locationOfCreatedResource);
+                return locationOfCreatedResource;
             });
         });
     }
 
-    async read(resourceIdentifier: URL, httpHeaders?: Headers, queryParameters?: URLSearchParams): Promise<T> {
+    async read(resourceIdentifier: string, httpHeaders?: Headers, queryParameters?: URLSearchParams): Promise<T> {
         return this.discoverApi(httpHeaders).then(() => {
+			const resourceUri = this.createUrlFromRelativeOrAbsoluteUrlString(resourceIdentifier);
             if (!!queryParameters) {
-                resourceIdentifier.search = queryParameters.toString();
+                resourceUri.search = queryParameters.toString();
             }
 
             if (!httpHeaders) {
@@ -175,7 +179,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
             }
             httpHeaders.append("Accept", `application/hal+json;profile="${this.resourceProfile}"`);
 
-            return fetch(resourceIdentifier.toString(), { headers: httpHeaders }).then(response => {
+            return fetch(this.getRelativeOrAbsoluteUrl(resourceUri), { headers: httpHeaders }).then(response => {
                 if (!response.ok) {
 					return response.text().then(body => {
 						throw new Error(
@@ -193,7 +197,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
             if (!selfLink) {
                 throw Error("The update failed because the resource does not contain a valid self link.")
             }
-            let resourceIdentifier: URL = new URL(selfLink);
+            let resourceIdentifier: URL = this.createUrlFromRelativeOrAbsoluteUrlString(selfLink);
             if (!!queryParameters) {
                 resourceIdentifier.search = queryParameters.toString();
             }
@@ -203,32 +207,34 @@ export class SimplyRESTfulClient<T extends HALResource> {
             }
             httpHeaders.append("Content-Type", `application/hal+json;profile="${this.resourceProfile}"`);
 
-            return fetch(resourceIdentifier.toString(), { method: "PUT", headers: httpHeaders, body: JSON.stringify(resource) }).then(response => {
+			const uri : string = this.getRelativeOrAbsoluteUrl(resourceIdentifier);
+            return fetch(uri, { method: "PUT", headers: httpHeaders, body: JSON.stringify(resource) }).then(response => {
                 if (!response.ok) {
 
                     if (response.status === 404) {
-                        throw new Error(`Resource at ${resourceIdentifier} could not be found`);
+                        throw new Error(`Resource at ${uri} could not be found`);
 					}
 					return response.text().then(body => {
 						throw new Error(
-							`Failed to update the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
+							`Failed to update the resource at ${uri}.\nThe API returned status ${response.status} with message:\n${body}`);
 					});
                 }
             })
         });
     }
 
-    async delete(resourceIdentifier: URL, httpHeaders?: Headers, queryParameters?: URLSearchParams) : Promise<boolean> {
+    async delete(resourceIdentifier: string, httpHeaders?: Headers, queryParameters?: URLSearchParams) : Promise<boolean> {
         return this.discoverApi(httpHeaders).then(() => {
+			const resourceUri = this.createUrlFromRelativeOrAbsoluteUrlString(resourceIdentifier);
             if (!!queryParameters) {
-                resourceIdentifier.search = queryParameters.toString();
+                resourceUri.search = queryParameters.toString();
             }
 
             if (!httpHeaders) {
                 httpHeaders = new Headers();
             }
 
-            return fetch(resourceIdentifier.toString(), { method: "DELETE", headers: httpHeaders }).then(response => {
+            return fetch(this.getRelativeOrAbsoluteUrl(resourceUri), { method: "DELETE", headers: httpHeaders }).then(response => {
                 if (response.status !== 204) {
                     if (response.status === 404) {
                         throw new Error(`Resource at ${resourceIdentifier} could not be found`);
@@ -252,21 +258,21 @@ export class SimplyRESTfulClient<T extends HALResource> {
         });
     }
 
-    async deleteWithUuid(resourceUuid: string, httpHeaders?: Headers, queryParameters?: URLSearchParams): Promise<void> {
+    async deleteWithUuid(resourceUuid: string, httpHeaders?: Headers, queryParameters?: URLSearchParams): Promise<boolean> {
         return this.discoverApi(httpHeaders).then(() => {
             const resourceUri = this.resolveResourceUriTemplate(resourceUuid);
             return this.delete(resourceUri, httpHeaders, queryParameters);
         });
     }
 
-    private resolveResourceUriTemplate(resourceUuid?: string): URL {
+    private resolveResourceUriTemplate(resourceUuid?: string): string {
         if (!this.resourceUriTemplate) {
             throw new Error("The client needs to discover the resource URI template from the API before this method can be used. Use discoverApi() first.");
         }
         if (!resourceUuid) {
-            return new URL(this.resourceUriTemplate.replace(/{id}/, ""));
+            return this.resourceUriTemplate.replace(/{id}/, "");
         }
-        return new URL(this.resourceUriTemplate.replace(/{id}/, resourceUuid));
+        return this.resourceUriTemplate.replace(/{id}/, resourceUuid);
 	}
 
 	private joinPath(basePath: string, joinPath: string) : string {
@@ -279,5 +285,16 @@ export class SimplyRESTfulClient<T extends HALResource> {
 		else{
 			return basePath + '/' + joinPath;
 		}
+	}
+
+	private createUrlFromRelativeOrAbsoluteUrlString(url: string) : URL {
+		return new URL(url, this.dummyHost);
+	}
+
+	private getRelativeOrAbsoluteUrl(url: URL) : string {
+		if(url.hostname === this.dummyHostname){
+			return url.pathname;
+		}
+		return url.toString();
 	}
 }

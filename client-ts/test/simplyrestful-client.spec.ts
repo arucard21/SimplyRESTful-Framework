@@ -1,6 +1,7 @@
 import { SimplyRESTfulClient } from '../src/simplyrestful-client';
 import { TestResource } from './TestResource';
 import fetchMock from 'jest-fetch-mock';
+import { JsonConvert } from 'json2typescript';
 
 let testResourceClient: SimplyRESTfulClient<TestResource>;
 const baseUri = "http://localhost/";
@@ -9,9 +10,7 @@ const testResourceMediaType = `application/hal+json;profile="${testResourceProfi
 
 beforeAll(() => {
     fetchMock.enableMocks();
-    testResourceClient = new SimplyRESTfulClient(
-        new URL(baseUri),
-        new URL(testResourceProfile));
+    testResourceClient = new SimplyRESTfulClient(baseUri, testResourceProfile);
     testResourceClient.setResourceUriTemplate("http://localhost/testresources/{id}");
 });
 
@@ -21,9 +20,7 @@ beforeEach(() => {
 
 test('discoverApi correctly discovers the resource URI for this resource', async () => {
     const openApiUri = "http://localhost/openapi.json";
-    const testResourceClientWithDiscovery = new SimplyRESTfulClient(
-        new URL(baseUri),
-        new URL(testResourceProfile));
+    const testResourceClientWithDiscovery = new SimplyRESTfulClient(baseUri, testResourceProfile);
     fetchMock.mockResponses(
         [
             JSON.stringify({
@@ -64,9 +61,7 @@ test('discoverApi correctly discovers the resource URI for this resource', async
 test('discoverApi correctly discovers the resource URI for this resource when the API root has a base path', async () => {
 	const baseUriWithBasePath = "http://localhost/some/base/path/";
     const openApiUri = "http://localhost/some/base/path/openapi.json";
-    const testResourceClientWithDiscovery = new SimplyRESTfulClient(
-        new URL(baseUriWithBasePath),
-        new URL(testResourceProfile));
+    const testResourceClientWithDiscovery = new SimplyRESTfulClient(baseUriWithBasePath, testResourceProfile);
     fetchMock.mockResponses(
         [
             JSON.stringify({
@@ -107,9 +102,7 @@ test('discoverApi correctly discovers the resource URI for this resource when th
 test('discoverApi throws an error when the API can not be accessed', async () => {
 	const errorStatus = 500;
 	const errorMessage = 'Something went wrong';
-    const testResourceClientWithDiscovery = new SimplyRESTfulClient(
-        new URL(baseUri),
-        new URL(testResourceProfile));
+    const testResourceClientWithDiscovery = new SimplyRESTfulClient(baseUri, testResourceProfile);
     fetchMock.mockResponseOnce(errorMessage, { status: errorStatus });
     await expect(testResourceClientWithDiscovery.discoverApi()).rejects.toThrow(
 		`The client could not access the API at ${baseUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
@@ -120,9 +113,7 @@ test('discoverApi throws an error when the OpenAPI Specification URI can not be 
 	const errorStatus = 500;
 	const errorMessage = 'Something went wrong';
     const openApiUri = "http://localhost/openapi.json";
-    const testResourceClientWithDiscovery = new SimplyRESTfulClient(
-        new URL(baseUri),
-        new URL(testResourceProfile));
+    const testResourceClientWithDiscovery = new SimplyRESTfulClient(baseUri, testResourceProfile);
     fetchMock.mockResponses(
         [
             JSON.stringify({
@@ -185,7 +176,8 @@ test('list correctly retrieves the list of resources when the collection is empt
     const retrievedListOfResources: TestResource[] = await testResourceClient.list();
 
     expect(testResourceClient.totalAmountOfLastRetrievedCollection).toBe(total);
-    expect(fetchMock.mock.calls[0][0]).toBe("http://localhost/testresources/");
+	expect(fetchMock.mock.calls[0][0]).toBe("http://localhost/testresources/");
+	expect(retrievedListOfResources.length).toBe(0);
 });
 
 test('list correctly sets the paging query parameters', async () => {
@@ -198,7 +190,7 @@ test('list correctly sets the paging query parameters', async () => {
     const additional = new URLSearchParams({ "param1": "value1", "param2": "value2" });
 
     fetchMock.mockResponse(JSON.stringify({}));
-    const retrievedListOfResources: TestResource[] = await testResourceClient.list(pageStart, pageSize, fields, query, sort, undefined, additional);
+    const retrievedListOfResources: TestResource[] = await testResourceClient.list({pageStart: pageStart, pageSize: pageSize, fields: fields, query: query, sort: sort, additionalQueryParameters: additional});
 
     const actualUri = fetchMock.mock.calls[0][0] as string;
     expect(actualUri).toContain(resourceListUri);
@@ -223,7 +215,7 @@ test('list correctly sets the HTTP headers', async () => {
     const headers = new Headers({ "header1": "value1", "header2": "value2" });
     const expectedHeaders = new Headers({ "header1": "value1", "header2": "value2", "Accept": "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\"" });
     fetchMock.mockResponse(JSON.stringify({}));
-    const retrievedListOfResources: TestResource[] = await testResourceClient.list(undefined, undefined, undefined, undefined, undefined, headers, undefined);
+    const retrievedListOfResources: TestResource[] = await testResourceClient.list({httpHeaders: headers});
     expect(fetchMock.mock.calls[0][1]).toHaveProperty("headers", expectedHeaders);
 });
 
@@ -240,8 +232,8 @@ test('create correctly creates the resource', async () => {
     const additionalFieldValue = "test value";
     fetchMock.mockResponse(null, { status: 201, headers: { Location: selfLink } });
     const newResource: TestResource = { additionalField: additionalFieldValue };
-    const newResourceUri: URL = await testResourceClient.create(newResource);
-    expect(newResourceUri.toString()).toBe(selfLink);
+    const newResourceUri: string = await testResourceClient.create(newResource);
+    expect(newResourceUri).toBe(selfLink);
     expect(fetchMock.mock.calls[0][0]).toBe("http://localhost/testresources/");
 });
 
@@ -263,7 +255,7 @@ test('read correctly retrieves the resource when provided with a URL', async () 
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     const additionalFieldValue = "test value";
     fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue}));
-    const retrievedResource: TestResource = await testResourceClient.read(new URL("http://localhost/testresources/00000000-0000-0000-0000-000000000000"));
+    const retrievedResource: TestResource = await testResourceClient.read("http://localhost/testresources/00000000-0000-0000-0000-000000000000");
 	expect(retrievedResource.additionalField).toBe(additionalFieldValue);
     expect(retrievedResource._links.self.href).toBe(selfLink);
 });
@@ -282,22 +274,23 @@ test('read throws an error when a bad request is made (HTTP 400 status)', async 
 	const errorMessage = 'Something went wrong';
     const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     fetchMock.mockResponse(errorMessage, { status: errorStatus });
-    await expect(testResourceClient.read(new URL(resourceUri))).rejects.toThrow(
+    await expect(testResourceClient.read(resourceUri)).rejects.toThrow(
 		`Failed to read the resource at ${resourceUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
 });
 
 // FIXME: The Date is deserialized to string by TypeScript instead of to a Date object
 // json2typescript cannot be used because it does not work with generics (See https://github.com/AppVision-GmbH/json2typescript/issues/8)
-test.skip('read correctly retrieves the resource and deserializes a Date property', async () => {
+test('read correctly retrieves the resource but does not deserialize the Date property', async () => {
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     const additionalFieldValue = "test value";
     fetchMock.mockResponse(JSON.stringify({ _links: { self: { href: selfLink } }, additionalField: additionalFieldValue, someDate: '2021-01-01T09:00:00Z' }));
-    const retrievedResource: TestResource = await testResourceClient.read(new URL("http://localhost/testresources/00000000-0000-0000-0000-000000000000"));
+    const retrievedResource: TestResource = await testResourceClient.read("http://localhost/testresources/00000000-0000-0000-0000-000000000000");
 	expect(retrievedResource.additionalField).toBe(additionalFieldValue);
-	expect(retrievedResource.someDate.toString()).toBe('2021-01-01T09:00:00Z');
-	// expect(typeof retrievedResource.someDate).toBe('Date');
-    expect(retrievedResource._links.self.href).toBe(selfLink);
+	expect(typeof retrievedResource.someDate).not.toBe('Date');
+	expect(typeof retrievedResource.someDate).toBe('string');
+	expect(retrievedResource.someDate).toBe('2021-01-01T09:00:00Z');
+	expect(retrievedResource._links.self.href).toBe(selfLink);
 });
 
 test('update correctly updates the resource', async () => {
@@ -332,7 +325,7 @@ test('update throws an error when the resource can not be found (HTTP 404 status
 test('delete correctly deletes the resource when provided with a URL', async () => {
     const selfLink = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     fetchMock.mockResponse(null, { status: 204, headers: { Location: selfLink } });
-    await expect(testResourceClient.delete(new URL(selfLink))).resolves.not.toThrow();
+    await expect(testResourceClient.delete(selfLink)).resolves.not.toThrow();
     expect(fetchMock.mock.calls[0][0]).toBe(selfLink);
 });
 
@@ -348,7 +341,7 @@ test('delete throws an error when a bad request is made (HTTP 400 status)', asyn
 	const errorMessage = 'Something went wrong';
     const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     fetchMock.mockResponse(errorMessage, { status: errorStatus });
-    await expect(testResourceClient.delete(new URL(resourceUri))).rejects.toThrow(
+    await expect(testResourceClient.delete(resourceUri)).rejects.toThrow(
 		`Failed to delete the resource at ${resourceUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
 });
@@ -356,6 +349,6 @@ test('delete throws an error when a bad request is made (HTTP 400 status)', asyn
 test('delete throws an error when the resource can not be found (HTTP 404 status)', async () => {
     const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
     fetchMock.mockResponse(null, { status: 404 });
-    await expect(testResourceClient.delete(new URL(resourceUri))).rejects.toThrow(" could not be found");
+    await expect(testResourceClient.delete(resourceUri)).rejects.toThrow(" could not be found");
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
 });
