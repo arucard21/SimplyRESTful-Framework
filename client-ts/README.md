@@ -9,6 +9,8 @@ This client library provides TS/JS-based programmatic access to any SimplyRESTfu
 * It requires only the TypeScript classes of the API resources (at runtime).
 * The HTTP-based API access is mapped to simpler [CRUDL](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete)-based access.
 
+The client uses TypeScript types to describe the API resources and deserializes them to their JSON data types (e.g. `object`, `string`, `number`, etc.). Non-JSON data types (e.g. `Date`, `URL` or custom classes) are not deserialized fully, they are kept as their JSON data type. Mapping the JSON data to these data types would need to be done in your own project, outside of this client. The client cannot know about all of these classes nor how to map them correctly.
+
 ## Usage
 For the API resource in the SimplyRESTful API you wish to access, create a TypeScript type that extends the `HALResource` type provided by `simplyrestful-client`.
 ```TypeScript
