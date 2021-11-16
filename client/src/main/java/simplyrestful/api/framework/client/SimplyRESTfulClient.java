@@ -133,9 +133,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
                     .map(MediaType::valueOf).anyMatch(mediaType -> mediaType.equals(resourceMediaType));
             if (matchingMediaType) {
                 String resourcePath = pathEntry.getKey();
-                resourceUriBuilder = UriBuilder.fromUri(openApiSpecification.getServers().get(0).getUrl())
-                        .scheme(baseApiUri.getScheme()).host(baseApiUri.getHost()).userInfo(baseApiUri.getUserInfo())
-                        .port(baseApiUri.getPort()).path(resourcePath);
+                resourceUriBuilder = UriBuilder.fromUri(baseApiUri).path(resourcePath);
                 break;
             }
         }
