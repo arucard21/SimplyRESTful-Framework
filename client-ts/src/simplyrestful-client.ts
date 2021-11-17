@@ -293,7 +293,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
 
 	private getRelativeOrAbsoluteUrl(url: URL) : string {
 		if(url.hostname === this.dummyHostname){
-			return url.pathname;
+			return url.pathname + url.search;
 		}
 		return url.toString();
 	}

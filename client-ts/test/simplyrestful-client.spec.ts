@@ -211,6 +211,41 @@ test('list correctly sets the paging query parameters', async () => {
     expect(actualSearchParams.get("param2")).toBe("value2");
 });
 
+test('list correctly sets the paging query parameters when a relative URL is provided', async () => {
+	const resourceListUri = "/testrelativeresources";
+	const relativeApiUri = "";
+	const clientWithRelativeUri = new SimplyRESTfulClient(relativeApiUri, testResourceProfile);
+	clientWithRelativeUri.setResourceUriTemplate("/testrelativeresources/{id}");
+
+    const pageStart = 10;
+    const pageSize = 100;
+    const fields = ["fieldA", "fieldB"];
+    const query = "fieldA==valueA,(fieldB==ValueB;fieldB==ValueC)";
+    const sort = [{ fieldName: "fieldA", ascending: true }, { fieldName: "fieldD", ascending: false }];
+    const additional = new URLSearchParams({ "param1": "value1", "param2": "value2" });
+
+    fetchMock.mockResponse(JSON.stringify({}));
+    const retrievedListOfResources: TestResource[] = await clientWithRelativeUri.list({pageStart: pageStart, pageSize: pageSize, fields: fields, query: query, sort: sort, additionalQueryParameters: additional});
+
+	const actualUri : string = fetchMock.mock.calls[0][0] as string;
+	expect(actualUri).toContain(resourceListUri);
+    const actualSearchParams: URLSearchParams = new URL(actualUri, 'http://placeholderforrelativeurl').searchParams;
+    expect(actualSearchParams.has("pageStart")).toBeTruthy();
+    expect(parseInt(actualSearchParams.get("pageStart"))).toEqual(pageStart);
+    expect(actualSearchParams.has("pageSize")).toBeTruthy();
+    expect(parseInt(actualSearchParams.get("pageSize"))).toEqual(pageSize);
+    expect(actualSearchParams.has("fields")).toBeTruthy();
+    expect(actualSearchParams.get("fields")).toBe(fields.join(","));
+    expect(actualSearchParams.has("query")).toBeTruthy();
+    expect(actualSearchParams.get("query")).toBe(query);
+    expect(actualSearchParams.has("sort")).toBeTruthy();
+    expect(actualSearchParams.get("sort")).toBe("fieldA:asc,fieldD:desc");
+    expect(actualSearchParams.has("param1")).toBeTruthy();
+    expect(actualSearchParams.get("param1")).toBe("value1");
+    expect(actualSearchParams.has("param2")).toBeTruthy();
+    expect(actualSearchParams.get("param2")).toBe("value2");
+});
+
 test('list correctly sets the HTTP headers', async () => {
     const headers = new Headers({ "header1": "value1", "header2": "value2" });
     const expectedHeaders = new Headers({ "header1": "value1", "header2": "value2", "Accept": "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\"" });
