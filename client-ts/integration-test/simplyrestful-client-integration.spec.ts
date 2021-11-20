@@ -19,6 +19,10 @@ test('Running API against which to run integration tests is available', async ()
 	await expect(fetch(hostname).then(response => response.ok)).resolves.toBeTruthy();
 });
 
+test('Integration tests cannot use relative base URI since fetch has no host against which to resolve it (which it does in a browser)', async () => {
+	await expect(fetch("")).rejects.toThrow(new TypeError("Only absolute URLs are supported"));
+});
+
 test('discoverApi correctly discovers the resource URI for this resource', async () => {
     await exampleResourceClient.discoverApi();
     expect(exampleResourceClient.resourceUriTemplate).toBe(`${hostname}resources/{id}`);

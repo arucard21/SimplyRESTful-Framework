@@ -58,6 +58,47 @@ test('discoverApi correctly discovers the resource URI for this resource', async
     expect(fetchMock.mock.calls[1][0]).toBe(openApiUri);
 });
 
+test('discoverApi correctly discovers the resource URI for this resource when the API base URI is relative', async () => {
+	const relativeBaseUri = "";
+	const openApiUri = "http://localhost/openapi.json";
+    const testResourceClientWithDiscovery = new SimplyRESTfulClient(relativeBaseUri, testResourceProfile);
+    fetchMock.mockResponses(
+        [
+            JSON.stringify({
+                _links: {
+                    describedBy: {
+                        href: openApiUri
+                    }
+                }
+            }),
+            { status: 200 }
+        ],
+        [
+            JSON.stringify({
+                paths: {
+                    "/discoveredtestresources/{id}": {
+                        get: {
+                            responses: {
+                                default: {
+                                    content: {
+                                        "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/TestResource/v1\"": {
+                                            schema: {}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }),
+            { status: 200 }
+        ]);
+    await testResourceClientWithDiscovery.discoverApi();
+    expect(testResourceClientWithDiscovery.resourceUriTemplate).toBe("/discoveredtestresources/{id}");
+    expect(fetchMock.mock.calls[0][0]).toBe(relativeBaseUri);
+    expect(fetchMock.mock.calls[1][0]).toBe(openApiUri);
+});
+
 test('discoverApi correctly discovers the resource URI for this resource when the API root has a base path', async () => {
 	const baseUriWithBasePath = "http://localhost/some/base/path/";
     const openApiUri = "http://localhost/some/base/path/openapi.json";
@@ -96,6 +137,47 @@ test('discoverApi correctly discovers the resource URI for this resource when th
     await testResourceClientWithDiscovery.discoverApi();
     expect(testResourceClientWithDiscovery.resourceUriTemplate).toBe("http://localhost/some/base/path/discoveredtestresources/{id}");
     expect(fetchMock.mock.calls[0][0]).toBe(baseUriWithBasePath);
+    expect(fetchMock.mock.calls[1][0]).toBe(openApiUri);
+});
+
+test('discoverApi correctly discovers the resource URI for this resource when the API root has a base path and the API base URI is relative', async () => {
+	const relativeBaseUriWithBasePath = "some/base/path/";
+    const openApiUri = "http://localhost/some/base/path/openapi.json";
+    const testResourceClientWithDiscovery = new SimplyRESTfulClient(relativeBaseUriWithBasePath, testResourceProfile);
+    fetchMock.mockResponses(
+        [
+            JSON.stringify({
+                _links: {
+                    describedBy: {
+                        href: openApiUri
+                    }
+                }
+            }),
+            { status: 200 }
+        ],
+        [
+            JSON.stringify({
+                paths: {
+                    "/discoveredtestresources/{id}": {
+                        get: {
+                            responses: {
+                                default: {
+                                    content: {
+                                        "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/TestResource/v1\"": {
+                                            schema: {}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }),
+            { status: 200 }
+        ]);
+    await testResourceClientWithDiscovery.discoverApi();
+    expect(testResourceClientWithDiscovery.resourceUriTemplate).toBe("/some/base/path/discoveredtestresources/{id}");
+    expect(fetchMock.mock.calls[0][0]).toBe(relativeBaseUriWithBasePath);
     expect(fetchMock.mock.calls[1][0]).toBe(openApiUri);
 });
 
@@ -211,8 +293,8 @@ test('list correctly sets the paging query parameters', async () => {
     expect(actualSearchParams.get("param2")).toBe("value2");
 });
 
-test('list correctly sets the paging query parameters when a relative URL is provided', async () => {
-	const resourceListUri = "/testrelativeresources";
+test('list correctly sets the paging query parameters when a relative base API URI is provided', async () => {
+	const resourceListUri = "/testrelativeresources/";
 	const relativeApiUri = "";
 	const clientWithRelativeUri = new SimplyRESTfulClient(relativeApiUri, testResourceProfile);
 	clientWithRelativeUri.setResourceUriTemplate("/testrelativeresources/{id}");
@@ -228,8 +310,9 @@ test('list correctly sets the paging query parameters when a relative URL is pro
     const retrievedListOfResources: TestResource[] = await clientWithRelativeUri.list({pageStart: pageStart, pageSize: pageSize, fields: fields, query: query, sort: sort, additionalQueryParameters: additional});
 
 	const actualUri : string = fetchMock.mock.calls[0][0] as string;
-	expect(actualUri).toContain(resourceListUri);
-    const actualSearchParams: URLSearchParams = new URL(actualUri, 'http://placeholderforrelativeurl').searchParams;
+	const actualUrl = new URL(actualUri, 'http://placeholderforrelativeurl')
+	expect(actualUrl.pathname).toBe(resourceListUri);
+    const actualSearchParams: URLSearchParams = actualUrl.searchParams;
     expect(actualSearchParams.has("pageStart")).toBeTruthy();
     expect(parseInt(actualSearchParams.get("pageStart"))).toEqual(pageStart);
     expect(actualSearchParams.has("pageSize")).toBeTruthy();
