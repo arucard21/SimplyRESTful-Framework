@@ -3,7 +3,6 @@ pluginManagement {
         id 'org.springframework.boot' version springBootVersion
         id "com.github.ben-manes.versions" version versionsPluginVersion
         id 'org.unbroken-dome.test-sets' version testsetsPluginVersion
-        id "io.quarkus" version quarkusPluginVersion
     }
 }
 

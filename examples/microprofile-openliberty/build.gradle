@@ -5,7 +5,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.io.openliberty.tools:ci.gradle:${openlibertyPluginVersion}"
+    classpath "gradle.plugin.io.openliberty.tools:ci.gradle:3.3"
   }
 }
 
@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    providedCompile group: "org.eclipse.microprofile", name: "microprofile", version: microprofileVersion
+    providedCompile group: "org.eclipse.microprofile", name: "microprofile", version: "4.1"
     implementation project(':SimplyRESTful')
     implementation project(':examples:examples-resources-jpa')
     implementation group: "jakarta.platform", name: "jakarta.jakartaee-web-api", version: "8.0.0"
