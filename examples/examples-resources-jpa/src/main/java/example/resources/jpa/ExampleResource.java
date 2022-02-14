@@ -23,21 +23,21 @@ public class ExampleResource extends HALResource {
     public static final String EXAMPLE_PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1";
     @JsonIgnore
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     @JsonIgnore
+    @Column(columnDefinition = "uuid") // necessary for h2 database, otherwise it will default to binary(16) which doesn't seem to work
     private UUID uuid;
     private String description;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private ExampleComplexAttribute complexAttribute;
     private ZonedDateTime dateTime;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

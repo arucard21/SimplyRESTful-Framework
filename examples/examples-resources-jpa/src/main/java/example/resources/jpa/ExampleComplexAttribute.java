@@ -1,7 +1,5 @@
 package example.resources.jpa;
 
-import java.util.UUID;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,9 +12,17 @@ public class ExampleComplexAttribute {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@JsonIgnore
-	private UUID id;
+	private Long id;
 
 	private String name;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
