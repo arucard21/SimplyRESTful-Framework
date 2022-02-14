@@ -1,6 +1,7 @@
 import { SimplyRESTfulClient } from '../src/simplyrestful-client';
 import { ExampleResource } from './ExampleResource';
 import fetchMock from 'jest-fetch-mock';
+import { NotFoundError } from '../src/Errors';
 
 const hostname = "http://localhost:8888/";
 let exampleResourceClient: SimplyRESTfulClient<ExampleResource>;
@@ -108,11 +109,17 @@ test('update correctly updates the resource', async () => {
 });
 
 test('delete correctly deletes the resource', async () => {
+	expect.assertions(4);
     const toBeDeletedResource: ExampleResource = { description: "This is a resource created to be deleted", complexAttribute: { name: "complex attribute of the resource created to be deleted" } };
     const toBeDeletedResourceUri: string = await exampleResourceClient.create(toBeDeletedResource);
     await expect(exampleResourceClient.read(toBeDeletedResourceUri)).resolves.not.toThrow();
 
     await expect(exampleResourceClient.delete(toBeDeletedResourceUri)).resolves.not.toThrow();
-
-    await expect(exampleResourceClient.read(toBeDeletedResourceUri)).rejects.toThrow("Failed to read the resource at");
+	try {
+		await exampleResourceClient.read(toBeDeletedResourceUri)
+	}
+	catch(error) {
+		expect(error).toBeInstanceOf(NotFoundError);
+		expect(error.cause.message).toContain("Failed to read the resource at");
+	}
 });

@@ -2,6 +2,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { HALResource } from './HALResource';
 import { HalCollectionV2 } from './HalCollectionV2';
 import { SortOrder } from './SortOrder';
+import { WebApplicationError, BadRequestError, NotFoundError } from './Errors';
 
 export class SimplyRESTfulClient<T extends HALResource> {
 	readonly dummyHostname = "placeholderforrelativeurl";
@@ -44,8 +45,9 @@ export class SimplyRESTfulClient<T extends HALResource> {
         return fetch(this.baseApiUri, { headers: httpHeaders }).then(async response => {
             if (!response.ok) {
 				return response.text().then(body => {
-					throw new Error(
-						`The client could not access the API at ${this.baseApiUri}.\nThe API returned status ${response.status} with message:\n${body}`);
+					throw WebApplicationError.fromResponse(
+						response,
+						new Error(`The client could not access the API at ${this.baseApiUri}.\nThe API returned status ${response.status} with message:\n${body}`));
 				});
             }
             return response.json().then(serviceDocument => {
@@ -58,8 +60,9 @@ export class SimplyRESTfulClient<T extends HALResource> {
         return fetch(openApiSpecificationUrl, { headers: httpHeaders }).then(async response => {
             if (!response.ok) {
 				return response.text().then(body => {
-					throw new Error(
-						`The client could not retrieve the OpenAPI Specification document at ${openApiSpecificationUrl}.\nThe API returned status ${response.status} with message:\n${body}`);
+					throw WebApplicationError.fromResponse(
+						response,
+						new Error(`The client could not retrieve the OpenAPI Specification document at ${openApiSpecificationUrl}.\nThe API returned status ${response.status} with message:\n${body}`));
 				});
             }
             return response.json().then((openApiSpecification: OpenAPIV3.Document) => openApiSpecification);
@@ -124,8 +127,9 @@ export class SimplyRESTfulClient<T extends HALResource> {
             return fetch(this.getRelativeOrAbsoluteUrl(resourceListUri), { headers: httpHeaders }).then(response => {
                 if (!response.ok) {
 					return response.text().then(body => {
-						throw new Error(
-							`Failed to list the resource at ${resourceListUri}.\nThe API returned status ${response.status} with message:\n${body}`);
+						throw WebApplicationError.fromResponse(
+							response,
+							new Error(`Failed to list the resource at ${resourceListUri}.\nThe API returned status ${response.status} with message:\n${body}`));
 					});
                 }
                 return response.json() as Promise<HalCollectionV2<T>>;
@@ -154,8 +158,9 @@ export class SimplyRESTfulClient<T extends HALResource> {
             return fetch(this.getRelativeOrAbsoluteUrl(resourceListUri), { method: "POST", headers: httpHeaders, body: JSON.stringify(resource) }).then(response => {
                 if (response.status !== 201) {
 					return response.text().then(body => {
-						throw new Error(
-							`Failed to create the new resource.\nThe API returned status ${response.status} with message:\n${body}`);
+						throw WebApplicationError.fromResponse(
+							response,
+							new Error(`Failed to create the new resource.\nThe API returned status ${response.status} with message:\n${body}`));
 					});
                 }
                 const locationOfCreatedResource = response.headers.get("Location");
@@ -182,8 +187,9 @@ export class SimplyRESTfulClient<T extends HALResource> {
             return fetch(this.getRelativeOrAbsoluteUrl(resourceUri), { headers: httpHeaders }).then(response => {
                 if (!response.ok) {
 					return response.text().then(body => {
-						throw new Error(
-							`Failed to read the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
+						throw WebApplicationError.fromResponse(
+							response,
+							new Error(`Failed to read the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`));
 					});
                 }
 				return response.json() as Promise<T>;
@@ -195,7 +201,7 @@ export class SimplyRESTfulClient<T extends HALResource> {
         return this.discoverApi(httpHeaders).then(() => {
             const selfLink = resource?._links?.self?.href;
             if (!selfLink) {
-                throw Error("The update failed because the resource does not contain a valid self link.")
+                throw new BadRequestError(undefined, new Error("The update failed because the resource does not contain a valid self link."));
             }
             let resourceIdentifier: URL = this.createUrlFromRelativeOrAbsoluteUrlString(selfLink);
             if (!!queryParameters) {
@@ -212,11 +218,12 @@ export class SimplyRESTfulClient<T extends HALResource> {
                 if (!response.ok) {
 
                     if (response.status === 404) {
-                        throw new Error(`Resource at ${uri} could not be found`);
+                        throw new NotFoundError(undefined, new Error(`Resource at ${uri} could not be found`), response);
 					}
 					return response.text().then(body => {
-						throw new Error(
-							`Failed to update the resource at ${uri}.\nThe API returned status ${response.status} with message:\n${body}`);
+						throw WebApplicationError.fromResponse(
+							response,
+							new Error(`Failed to update the resource at ${uri}.\nThe API returned status ${response.status} with message:\n${body}`));
 					});
                 }
             })
@@ -237,11 +244,12 @@ export class SimplyRESTfulClient<T extends HALResource> {
             return fetch(this.getRelativeOrAbsoluteUrl(resourceUri), { method: "DELETE", headers: httpHeaders }).then(response => {
                 if (response.status !== 204) {
                     if (response.status === 404) {
-                        throw new Error(`Resource at ${resourceIdentifier} could not be found`);
+                        throw new NotFoundError(undefined, new Error(`Resource at ${resourceIdentifier} could not be found`));
 					}
 					return response.text().then(body => {
-						throw new Error(
-							`Failed to delete the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`);
+						throw WebApplicationError.fromResponse(
+							response,
+							new Error(`Failed to delete the resource at ${resourceIdentifier}.\nThe API returned status ${response.status} with message:\n${body}`));
 					});
 				}
 				else {
