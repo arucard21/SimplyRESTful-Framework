@@ -1,16 +1,7 @@
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "gradle.plugin.io.openliberty.tools:ci.gradle:3.3"
-  }
+plugins {
+	id "war"
+	id "io.openliberty.tools.gradle.Liberty" version "3.3"
 }
-
-apply plugin: 'war'
-apply plugin: "io.openliberty.tools.gradle.Liberty"
 
 def projectName = 'microprofile-openliberty'
 
