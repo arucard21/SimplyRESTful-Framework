@@ -109,7 +109,7 @@ test('update correctly updates the resource', async () => {
 });
 
 test('delete correctly deletes the resource', async () => {
-	expect.assertions(4);
+	expect.assertions(5);
     const toBeDeletedResource: ExampleResource = { description: "This is a resource created to be deleted", complexAttribute: { name: "complex attribute of the resource created to be deleted" } };
     const toBeDeletedResourceUri: string = await exampleResourceClient.create(toBeDeletedResource);
     await expect(exampleResourceClient.read(toBeDeletedResourceUri)).resolves.not.toThrow();
@@ -120,6 +120,7 @@ test('delete correctly deletes the resource', async () => {
 	}
 	catch(error) {
 		expect(error).toBeInstanceOf(NotFoundError);
+		expect(error.status).toBe(404);
 		expect(error.cause.message).toContain("Failed to read the resource at");
 	}
 });

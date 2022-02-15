@@ -188,12 +188,13 @@ test('discoverApi throws an error when the API can not be accessed', async () =>
 	const errorMessage = 'Something went wrong';
     const testResourceClientWithDiscovery = new SimplyRESTfulClient(baseUri, testResourceProfile);
 	fetchMock.mockResponseOnce(errorMessage, { status: errorStatus });
-	expect.assertions(3);
+	expect.assertions(4);
 	try {
 		await testResourceClientWithDiscovery.discoverApi()
 	}
 	catch(error) {
 		expect(error).toBeInstanceOf(InternalServerError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toBe(`The client could not access the API at ${baseUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
 	}
     expect(fetchMock.mock.calls[0][0]).toBe(baseUri);
@@ -218,12 +219,13 @@ test('discoverApi throws an error when the OpenAPI Specification URI can not be 
         [
             errorMessage, { status: errorStatus }
 		]);
-	expect.assertions(4);
+	expect.assertions(5);
 	try {
 		await testResourceClientWithDiscovery.discoverApi()
 	}
 	catch(error) {
 		expect(error).toBeInstanceOf(BadGatewayError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toBe(`The client could not retrieve the OpenAPI Specification document at ${openApiUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
 	}
     expect(fetchMock.mock.calls[0][0]).toBe(baseUri);
@@ -355,12 +357,13 @@ test('list throws an error when a bad request is made (HTTP 400 status)', async 
 	const errorStatus = 400;
 	const errorMessage = 'Something went wrong';
 	fetchMock.mockResponse(errorMessage, { status: errorStatus });
-	expect.assertions(2);
+	expect.assertions(3);
 	try {
 		await testResourceClient.list()
 	}
 	catch(error) {
 		expect(error).toBeInstanceOf(BadRequestError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toBe(`Failed to list the resource at ${baseUri}testresources/.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
 	}
 });
@@ -379,12 +382,13 @@ test('create throws an error when a bad request is made (HTTP 403 status)', asyn
 	const errorStatus = 403;
 	const errorMessage = 'Something went wrong';
 	fetchMock.mockResponse(errorMessage, { status: errorStatus });
-	expect.assertions(2);
+	expect.assertions(3);
 	try {
 		await testResourceClient.create(null)
 	}
 	catch(error) {
 		expect(error).toBeInstanceOf(ForbiddenError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toBe(`Failed to create the new resource.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
 	}
 });
@@ -418,12 +422,13 @@ test('read throws an error when a bad request is made (HTTP 404 status)', async 
 	const errorMessage = 'Something went wrong';
     const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
 	fetchMock.mockResponse(errorMessage, { status: errorStatus });
-	expect.assertions(3);
+	expect.assertions(4);
 	try {
 		await testResourceClient.read(resourceUri)
 	}
 	catch(error) {
 		expect(error).toBeInstanceOf(NotFoundError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toBe(`Failed to read the resource at ${resourceUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
 	}
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
@@ -478,26 +483,29 @@ test('update throws an error when a bad request is made (HTTP 415 status)', asyn
 	const errorMessage = 'Something went wrong';
     const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
 	fetchMock.mockResponse(errorMessage, { status: errorStatus });
-	expect.assertions(3);
+	expect.assertions(4);
 	try {
 		await testResourceClient.update({ _links: { self: { href: resourceUri } } })
 	}
 	catch(error){
 		expect(error).toBeInstanceOf(NotSupportedError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toBe(`Failed to update the resource at ${resourceUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
 	}
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
 });
 
 test('update throws an error when the resource can not be found (HTTP 404 status)', async () => {
-    const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
-	fetchMock.mockResponse(null, { status: 404 });
-	expect.assertions(3);
+	const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
+	const errorStatus = 404;
+	fetchMock.mockResponse(null, { status: errorStatus });
+	expect.assertions(4);
 	try {
 		await testResourceClient.update({ _links: { self: { href: resourceUri } } })
 	}
 	catch(error){
 		expect(error).toBeInstanceOf(NotFoundError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toContain(" could not be found");
 	}
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
@@ -522,26 +530,29 @@ test('delete throws an error when a bad request is made (HTTP 406 status)', asyn
 	const errorMessage = 'Something went wrong';
     const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
 	fetchMock.mockResponse(errorMessage, { status: errorStatus });
-	expect.assertions(3);
+	expect.assertions(4);
 	try {
 		await testResourceClient.delete(resourceUri);
 	}
 	catch(error) {
 		expect(error).toBeInstanceOf(NotAcceptableError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toBe(`Failed to delete the resource at ${resourceUri}.\nThe API returned status ${errorStatus} with message:\n${errorMessage}`);
 	}
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
 });
 
 test('delete throws an error when the resource can not be found (HTTP 404 status)', async () => {
+	const errorStatus = 404;
     const resourceUri = "http://localhost/testresources/00000000-0000-0000-0000-000000000000";
-	fetchMock.mockResponse(null, { status: 404 });
-	expect.assertions(3);
+	fetchMock.mockResponse(null, { status: errorStatus });
+	expect.assertions(4);
 	try {
 		await testResourceClient.delete(resourceUri)
 	}
 	catch(error){
 		expect(error).toBeInstanceOf(NotFoundError);
+		expect(error.status).toBe(errorStatus);
 		expect(error.cause.message).toContain(" could not be found");
 	}
     expect(fetchMock.mock.calls[0][0]).toBe(resourceUri);
