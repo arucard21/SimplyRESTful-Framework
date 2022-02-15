@@ -21,8 +21,8 @@ export function fromResponse(response: Response, cause?: Error){
 }
 
 export function fromStatus(status: number, location?: string, message?: string, cause?: Error, response?: Response): WebApplicationError {
-	if (status < 300){
-		throw new Error("Status code below 300 does not imply an error");
+	if (status < 300 || status >= 600){
+		throw new Error("Status codes that are not in the ranges 3xx, 4xx or 5xx do not imply an error");
 	}
 	if (status < 400){
 		if (!location){
@@ -82,6 +82,9 @@ export class WebApplicationError extends CustomError {
 		public response?: Response
 	) {
 		super(message);
+		if (status < 300 || status >= 600){
+			throw new Error("Status code for error must be in the 3xx, 4xx or 5xx range");
+		}
 	}
 }
 
