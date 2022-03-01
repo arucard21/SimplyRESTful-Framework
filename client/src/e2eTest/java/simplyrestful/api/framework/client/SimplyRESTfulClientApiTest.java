@@ -1,6 +1,8 @@
 package simplyrestful.api.framework.client;
 
 import java.net.URI;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
+import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
 /**
  * This e2e test requires the example API from "examples/springboot-jersey-nomapping-springdata" to be running
@@ -43,9 +46,22 @@ public class SimplyRESTfulClientApiTest {
 
     @Test
     public void listResources_shouldReturnListOfResources() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, "", "", "");
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(null, null, null);
         Assertions.assertNotNull(listOfResources);
         Assertions.assertEquals(simplyRESTfulClient.getTotalAmountOfLastRetrievedCollection(), listOfResources.size());
+    }
+
+    @Test
+    public void listResources_shouldReturnListOfResourcesWithAllFields_whenFieldsIsAll() {
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(DefaultCollectionGet.QUERY_PARAM_FIELDS_ALL), null, null);
+        Assertions.assertNotNull(listOfResources);
+        Assertions.assertEquals(simplyRESTfulClient.getTotalAmountOfLastRetrievedCollection(), listOfResources.size());
+        Assertions.assertNotNull(listOfResources.get(0));
+        Assertions.assertNotNull(listOfResources.get(0).getSelf());
+        Assertions.assertNotNull(listOfResources.get(0).getDescription());
+        Assertions.assertNotNull(listOfResources.get(0).getDateTime());
+        Assertions.assertNotNull(listOfResources.get(0).getComplexAttribute());
+        Assertions.assertNotNull(listOfResources.get(0).getComplexAttribute().getName());
     }
 
     @Test
@@ -65,11 +81,13 @@ public class SimplyRESTfulClientApiTest {
         Assertions.assertNotNull(createdResource.getSelf().getHref());
         Assertions.assertFalse(createdResource.getSelf().getHref().isBlank());
         Assertions.assertEquals(createdResourceLocation, URI.create(createdResource.getSelf().getHref()));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(createdResourceLocation));
+        Assertions.assertFalse(simplyRESTfulClient.exists(createdResourceLocation));
     }
 
     @Test
     public void read_shouldReturnTheResource() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, Collections.emptyList(), "", Collections.emptyList());
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(DefaultCollectionGet.QUERY_PARAM_FIELDS_ALL), "", Collections.emptyList());
         ExampleResource resourceFromList = listOfResources.get(0);
         ExampleResource resourceFromOwnWebResource = simplyRESTfulClient.read(URI.create(resourceFromList.getSelf().getHref()));
         Assertions.assertEquals(resourceFromList.getSelf(), resourceFromOwnWebResource.getSelf());
@@ -86,7 +104,7 @@ public class SimplyRESTfulClientApiTest {
 
     @Test
     public void update_shouldUpdateTheResource() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, Collections.emptyList(), "", Collections.emptyList());
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(DefaultCollectionGet.QUERY_PARAM_FIELDS_ALL), "", Collections.emptyList());
         String modifiedDescription = "modified description";
         String modifiedComplexAttributeName = "modified name of complex attribute";
         ExampleResource modifiedResource = listOfResources.get(0);
@@ -102,8 +120,18 @@ public class SimplyRESTfulClientApiTest {
 
     @Test
     public void delete_shouldRemoveTheResource() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, Collections.emptyList(), "", Collections.emptyList());
-        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(listOfResources.get(0).getSelf()));
-        Assertions.assertFalse(simplyRESTfulClient.exists(URI.create(listOfResources.get(0).getSelf().getHref())));
+    	ExampleResource resource = new ExampleResource();
+        String description = "This is test resource";
+        resource.setDescription(description);
+        ExampleComplexAttribute complexAttribute = new ExampleComplexAttribute();
+        String complexAttributeName = "complex attribute of test resource";
+        complexAttribute.setName(complexAttributeName);
+        resource.setComplexAttribute(complexAttribute);
+        resource.setDateTime(ZonedDateTime.now(ZoneOffset.UTC));
+        URI createdResourceLocation = simplyRESTfulClient.create(resource);
+
+        Assertions.assertTrue(simplyRESTfulClient.exists(createdResourceLocation));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(createdResourceLocation));
+        Assertions.assertFalse(simplyRESTfulClient.exists(createdResourceLocation));
     }
 }
