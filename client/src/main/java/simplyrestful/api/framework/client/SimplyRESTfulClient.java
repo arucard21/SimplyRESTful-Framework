@@ -147,6 +147,43 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * List the API resources.
      *
+     * @return a list of API resources from the default page corresponding to the default parameters.
+     */
+    public List<T> listResources() {
+    	return listResources(-1, -1, Collections.emptyList(), "", Collections.emptyList(), null, null);
+    }
+
+    /**
+     * List the API resources for a given page.
+     *
+     * @param pageStart is the offset at which the requested page starts.
+     * @param pageSize is the size of a single page in this paginated collection of resources
+     * @return a list of API resources from the page corresponding to the provided parameters.
+     */
+    public List<T> listResources(
+            int pageStart,
+            int pageSize) {
+    	return listResources(pageStart, pageSize, Collections.emptyList(), "", Collections.emptyList(), null, null);
+    }
+
+    /**
+     * List the first page of API resources with the given filtering and sorting.
+     *
+     * @param fields is a list that defines which fields should be retrieved.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted.
+     * @return a list of API resources from the page corresponding to the provided parameters.
+     */
+    public List<T> listResources(
+            List<String> fields,
+            String query,
+            List<SortOrder> sort) {
+    	return listResources(-1, -1, fields, query, sort, null, null);
+    }
+
+    /**
+     * List the API resources.
+     *
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize is the size of a single page in this paginated collection of resources
      * @param fields is a list that defines which fields should be retrieved.
@@ -185,7 +222,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
     /**
      * List the API resources while providing additional HTTP headers and query parameters.
      *
-     * @param pageStart is the offset at which the requested page starts.
+     * @param pageStart is the offset at which the requested page starts. Can be -1
      * @param pageSize is the size of a single page in this paginated collection of resources
      * @param fields is a list that defines which fields should be retrieved.
      * @param query is a FIQL query that defines how the resources should be filtered.
@@ -203,7 +240,15 @@ public class SimplyRESTfulClient<T extends HALResource> {
             MultivaluedMap<String, String> additionalHeaders,
             MultivaluedMap<String, String> additionalQueryParameters) {
         discoverResourceUri(additionalHeaders);
-        return retrievePagedCollection(pageStart, pageSize, fields, query, sort, additionalHeaders, additionalQueryParameters).getItem();
+        return retrievePagedCollection(
+        		pageStart,
+        		pageSize,
+        		fields == null ? Collections.emptyList() : fields,
+        		query == null ? "" : query,
+        		sort == null ? Collections.emptyList() : sort,
+        		additionalHeaders,
+        		additionalQueryParameters)
+        		.getItem();
     }
 
     /**
@@ -236,13 +281,13 @@ public class SimplyRESTfulClient<T extends HALResource> {
             target = target.queryParam(QUERY_PARAM_PAGESIZE, pageSize);
         }
         if (!fields.isEmpty()) {
-            target = target.queryParam(QUERY_PARAM_FIELDS, fields);
+            target = target.queryParam(QUERY_PARAM_FIELDS, fields.toArray());
         }
         if (!query.isBlank()) {
             target = target.queryParam(QUERY_PARAM_QUERY, query);
         }
         if (!sort.isEmpty()) {
-            target = target.queryParam(QUERY_PARAM_SORT, sort);
+            target = target.queryParam(QUERY_PARAM_SORT, sort.toArray());
         }
         configureAdditionalQueryParameters(target, additionalQueryParameters);
         Builder request = target.request();
