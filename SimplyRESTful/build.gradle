@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    api project(":SimplyRESTful-api")
+	api project(":SimplyRESTful-resources")
     api project(":jaxrs-providers")
     api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
     api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion

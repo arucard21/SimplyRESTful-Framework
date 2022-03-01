@@ -10,7 +10,7 @@ import io.openapitools.jackson.dataformat.hal.HALLink;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALResource;
-import simplyrestful.api.framework.webresource.api.CollectionGet;
+import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
 @Deprecated(since = "0.12.0")
 public class HALCollectionV1Builder<T extends HALResource> {
@@ -20,9 +20,9 @@ public class HALCollectionV1Builder<T extends HALResource> {
 	protected final URI requestURI;
 	protected final boolean fromFull;
 	protected final long collectionSize;
-	protected long page = Long.valueOf(CollectionGet.V1_QUERY_PARAM_PAGE_DEFAULT);
-	protected long maxPageSize = Long.valueOf(CollectionGet.QUERY_PARAM_PAGE_SIZE_DEFAULT);
-	protected boolean compact = Boolean.valueOf(CollectionGet.V1_QUERY_PARAM_COMPACT_DEFAULT);
+	protected long page = Long.valueOf(DefaultCollectionGet.V1_QUERY_PARAM_PAGE_DEFAULT);
+	protected long maxPageSize = Long.valueOf(DefaultCollectionGet.QUERY_PARAM_PAGE_SIZE_DEFAULT);
+	protected boolean compact = Boolean.valueOf(DefaultCollectionGet.V1_QUERY_PARAM_COMPACT_DEFAULT);
 
 	public static <T extends HALResource> HALCollectionV1Builder<T> fromFull(List<T> resources, URI requestURI) {
 		return new HALCollectionV1Builder<T>(resources, requestURI, resources.size(), true);
@@ -101,7 +101,7 @@ public class HALCollectionV1Builder<T extends HALResource> {
 
 	protected HALLink createHALLinkFromURIWithModifiedPageNumber(URI requestURI, int pageNumber){
 		UriBuilder hrefBuilder = UriBuilder.fromUri(requestURI);
-		hrefBuilder.replaceQueryParam(CollectionGet.V1_QUERY_PARAM_PAGE, pageNumber);
+		hrefBuilder.replaceQueryParam(DefaultCollectionGet.V1_QUERY_PARAM_PAGE, pageNumber);
 		HALLink link = new HALLink.Builder(hrefBuilder.build()).build();
 		return link;
 	}

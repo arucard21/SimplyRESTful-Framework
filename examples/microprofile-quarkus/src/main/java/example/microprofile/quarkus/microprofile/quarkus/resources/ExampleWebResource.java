@@ -68,9 +68,9 @@ import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
-import simplyrestful.api.framework.webresource.api.CollectionGet;
-import simplyrestful.api.framework.webresource.api.ResourceGet;
+import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
+import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceGet;
 
 @SuppressWarnings("deprecation")
 @RequestScoped
@@ -280,7 +280,7 @@ public class ExampleWebResource
 	        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
 	        boolean compact,
 	        @QueryParam(QUERY_PARAM_FIELDS)
-	        @DefaultValue(CollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
+	        @DefaultValue(DefaultCollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
 	        List<String> fields,
 	        @QueryParam(QUERY_PARAM_QUERY)
 	        @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
@@ -299,7 +299,7 @@ public class ExampleWebResource
     		@Context
     		ContainerRequestContext requestContext,
 	        @QueryParam(QUERY_PARAM_FIELDS)
-	        @DefaultValue(CollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
+	        @DefaultValue(DefaultCollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
 	        List<String> fields,
 	        @QueryParam(QUERY_PARAM_QUERY)
 	        @DefaultValue(QUERY_PARAM_QUERY_DEFAULT)
@@ -342,8 +342,8 @@ public class ExampleWebResource
 	        @PathParam("id")
 	        @NotNull
 	        UUID id,
-	        @QueryParam(CollectionGet.QUERY_PARAM_FIELDS)
-	        @DefaultValue(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)
+	        @QueryParam(DefaultCollectionGet.QUERY_PARAM_FIELDS)
+	        @DefaultValue(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)
 	        List<String> fields) {
         return DefaultWebResource.super.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
     }

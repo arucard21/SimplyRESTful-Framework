@@ -30,7 +30,7 @@ import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
-import simplyrestful.api.framework.webresource.api.ResourceGet;
+import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceGet;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultWebResourceTest {
@@ -84,7 +84,7 @@ public class DefaultWebResourceTest {
     	Mockito.when(requestContext.getUriInfo()).thenReturn(uriInfo);
     	Mockito.when(uriInfo.getQueryParameters()).thenReturn(new MultivaluedHashMap<>());
         Assertions.assertThrows(NotFoundException.class,
-                () -> testEndpoint.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(ResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
+                () -> testEndpoint.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
     }
 
     @Test
