@@ -28,19 +28,15 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
-@SuppressWarnings("deprecation")
 public class WebResourceIntegrationTest extends JerseyTest {
     private static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
     private static final String WEB_RESOURCE_PATH = "testresources";
-    private static final String QUERY_PARAM_COMPACT = "compact";
-    private static final MediaType MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON);
     private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
     private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
     private TestResource testInstance;
@@ -116,39 +112,6 @@ public class WebResourceIntegrationTest extends JerseyTest {
         HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
         Assertions.assertEquals(2, collection.getTotal());
         Assertions.assertTrue(collection.getItem().contains(testInstance));
-    }
-
-    @Test
-    @Deprecated(since="0.12.0")
-    public void webResource_shouldReturnHALV1CollectionWithLinkedResourcesByDefault_whenV1IsRequested() {
-    	Response response = target()
-    		.path(WEB_RESOURCE_PATH)
-    		.request()
-    		.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
-    		.get();
-    	Assertions.assertEquals(200, response.getStatus());
-    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE, response.getMediaType());
-
-    	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
-    	Assertions.assertEquals(2, collection.getTotal());
-    	Assertions.assertTrue(collection.getItem().contains(testInstance.getSelf()));
-    }
-
-    @Test
-    @Deprecated(since="0.12.0")
-    public void webResource_shouldReturnHALV1CollectionWithEmbeddedResources_whenV1IsRequestedAndCompactIsFalse() {
-    	Response response = target()
-    		.path(WEB_RESOURCE_PATH)
-    		.queryParam(QUERY_PARAM_COMPACT, Boolean.toString(false))
-    		.request()
-    		.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
-    		.get();
-    	Assertions.assertEquals(200, response.getStatus());
-    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE, response.getMediaType());
-
-    	HALCollectionV1<TestResource> collection = response.readEntity(new GenericType<HALCollectionV1<TestResource>>() {});
-    	Assertions.assertEquals(2, collection.getTotal());
-    	Assertions.assertTrue(collection.getItemEmbedded().contains(testInstance));
     }
 
     @Test

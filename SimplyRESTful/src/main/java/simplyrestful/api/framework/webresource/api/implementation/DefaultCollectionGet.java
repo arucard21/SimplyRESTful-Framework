@@ -1,6 +1,5 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -23,10 +22,8 @@ import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultCount;
 import simplyrestful.api.framework.api.crud.DefaultList;
-import simplyrestful.api.framework.hal.HALCollectionV1Builder;
 import simplyrestful.api.framework.hal.HALCollectionV2Builder;
 import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.resources.HALResource;
 
@@ -57,19 +54,13 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 
     /**
      * Retrieve the paginated collection of resources.
-     * <p>
-     * Unless stated otherwise, these parameters can only be used with {@link HALCollectionV2}.
-     * </p>
+     *
      * @param requestContext is a JAX-RS context object.
      * @param resourceInfo is a JAX-RS context object.
      * @param uriInfo is a JAX-RS context object.
      * @param httpHeaders is a JAX-RS context object.
-     * @param page is the page number of the paginated collection of resources (for {@link HALCollectionV1} only)
      * @param pageStart is the offset at which the requested page starts.
-     * @param pageSize is the size of a single page in this paginated collection of
-     *                  resources (for both {@link HALCollectionV1} and {@link HALCollectionV2})
-     * @param compact determines whether the resource in the collection only shows
-     *                  its self-link (if true), or the entire resource (if false) (for {@link HALCollectionV1} only)
+     * @param pageSize is the size of a single page in this paginated collection of resources
      * @param fields is a list that defines which fields should be retrieved. This is only included for convenience as
      * it is already handled by the framework. It can be used to filter on these fields in the backend as well, e.g. to
      * improve performance.
@@ -81,8 +72,7 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
     @GET
     @Produces({
 	HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
-	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9",
-	HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
+	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9"
 	})
     @Operation(description = "Get a list of resources")
     @ApiResponse(content = {
@@ -93,11 +83,7 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 	    @Content(
 		    mediaType = HALCollectionV2.MEDIA_TYPE_JSON,
 		    schema = @Schema(
-			    implementation = HALCollectionV2.class)),
-	    @Content(
-		    mediaType = HALCollectionV1.MEDIA_TYPE_HAL_JSON,
-		    schema = @Schema(
-			    implementation = HALCollectionV1.class))
+			    implementation = HALCollectionV2.class))
     })
     default HALCollection<T> listHALResources(
     		@Context
@@ -108,11 +94,7 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 		    UriInfo uriInfo,
 		    @Context
 		    HttpHeaders httpHeaders,
-		    @QueryParam(V1_QUERY_PARAM_PAGE)
-	        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
-		    @Parameter(description  = "The page to be shown", required = false)
-	        int page,
-	        @QueryParam(QUERY_PARAM_PAGE_START)
+		    @QueryParam(QUERY_PARAM_PAGE_START)
 		    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
 	        @Parameter(description = "The page to be shown", required = false)
 		    int pageStart,
@@ -120,11 +102,7 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 		    @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
 		    @Parameter(description = "The amount of resources shown on each page", required = false)
 		    int pageSize,
-		    @QueryParam(V1_QUERY_PARAM_COMPACT)
-	        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
-		    @Parameter(description = "Provide minimal information for each resource", required = false)
-	        boolean compact,
-	        @QueryParam(QUERY_PARAM_FIELDS)
+		    @QueryParam(QUERY_PARAM_FIELDS)
 		    @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)
 		    @Parameter(description = "The fields that should be retrieved", required = false)
 		    List<String> fields,
@@ -143,26 +121,6 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
     	else {
     		QueryParamUtils.configureFieldsDefault(requestContext, fields);
     	}
-
-		if(selected.equals(MediaType.valueOf(HALCollectionV1.MEDIA_TYPE_HAL_JSON))) {
-		    int calculatedPageStart = (page -1) * pageSize;
-		    if(compact) {
-			fields = Collections.singletonList(QUERY_PARAM_FIELDS_DEFAULT);
-		    }
-		    return HALCollectionV1Builder.fromPartial(
-			    this.list(
-				    calculatedPageStart,
-				    pageSize,
-				    QueryParamUtils.stripHALStructure(fields),
-				    QueryParamUtils.stripHALStructure(query),
-				    QueryParamUtils.parseSort(sort)),
-			    uriInfo.getRequestUri(),
-			    this.count(QueryParamUtils.stripHALStructure(query)))
-			    .page(page)
-			    .maxPageSize(pageSize)
-			    .compact(compact)
-			    .build();
-		}
 		return HALCollectionV2Builder.from(
 			this.list(
 				pageStart,

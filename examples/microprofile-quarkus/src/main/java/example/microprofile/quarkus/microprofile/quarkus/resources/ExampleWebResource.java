@@ -66,13 +66,11 @@ import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.resources.HALCollectionV1;
 import simplyrestful.api.framework.resources.HALCollectionV2;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceGet;
 
-@SuppressWarnings("deprecation")
 @RequestScoped
 @Path("/resources")
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })
@@ -255,8 +253,7 @@ public class ExampleWebResource
     @GET
     @Produces({
     HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
-    HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9",
-    HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
+    HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9"
     })
     public HALCollection<ExampleResource> listHALResources(
     		@Context
@@ -267,18 +264,12 @@ public class ExampleWebResource
 	        UriInfo uriInfo,
 	        @Context
 	        HttpHeaders httpHeaders,
-	        @QueryParam(V1_QUERY_PARAM_PAGE)
-	        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
-	        int page,
 	        @QueryParam(QUERY_PARAM_PAGE_START)
 	        @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
 	        int pageStart,
 	        @QueryParam(QUERY_PARAM_PAGE_SIZE)
 	        @DefaultValue(QUERY_PARAM_PAGE_SIZE_DEFAULT)
 	        int pageSize,
-	        @QueryParam(V1_QUERY_PARAM_COMPACT)
-	        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
-	        boolean compact,
 	        @QueryParam(QUERY_PARAM_FIELDS)
 	        @DefaultValue(DefaultCollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
 	        List<String> fields,
@@ -288,8 +279,7 @@ public class ExampleWebResource
 	        @QueryParam(QUERY_PARAM_SORT)
 	        @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	        List<String> sort) {
-        return DefaultWebResource.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact,
-                fields, query, sort);
+        return DefaultWebResource.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, pageStart, pageSize, fields, query, sort);
     }
 
     @Override
