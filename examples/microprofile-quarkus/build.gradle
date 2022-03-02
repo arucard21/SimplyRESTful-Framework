@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'io.quarkus' version "2.5.2.Final"
+    id 'io.quarkus' version "2.7.2.Final"
 }
 
 repositories {
@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation enforcedPlatform(group: "io.quarkus", name: "quarkus-bom", version: "2.5.2.Final")
+    implementation enforcedPlatform(group: "io.quarkus", name: "quarkus-bom", version: "2.7.2.Final")
     implementation project(':SimplyRESTful')
     implementation project(':fields-filter-json-servlet')
     implementation project(':examples:examples-resources-jpa')
@@ -18,10 +18,10 @@ dependencies {
     //implementation group: "io.quarkus", name:"quarkus-resteasy-jackson"
     implementation group: "io.quarkus", name:"quarkus-hibernate-orm-panache"
     implementation group: "io.quarkus", name:"quarkus-jdbc-h2"
-    implementation group: "com.h2database", name: "h2", version: "2.0.202"
-    implementation group: "io.github.perplexhub", name: "rsql-jpa", version: "5.0.19"
-    implementation group: "org.glassfish", name: "jakarta.json", version: "1.1.6"
-    implementation group: "org.threeten", name: "threetenbp", version: "1.5.2"
+    implementation group: "com.h2database", name: "h2", version: h2Version
+    implementation group: "io.github.perplexhub", name: "rsql-jpa", version: rsqlJpaVersion
+    implementation group: "org.glassfish", name: "jakarta.json", version: jakartaJsonVersion
+    implementation group: "org.threeten", name: "threetenbp", version: threetenVersion
 }
 
 description = "Example project for a SimplyRESTful API using MicroProfile-compliant Quarkus libraries"
