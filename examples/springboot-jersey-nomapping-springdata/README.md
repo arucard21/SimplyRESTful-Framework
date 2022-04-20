@@ -6,3 +6,10 @@ Example on how to create a SimplyRESTful API using the `deploy-springboot-jersey
 In this example, the API is created with Jersey on Apache Tomcat using Spring Boot. The Web Resource requires almost no implementation. The resources are stored directly in a database using a DAO (Data Access Object) and a Spring Data Repository that also require almost no implementation.
 
 You can run this example by executing the main class in `JerseyNoMappingApplication.java`.
+
+These environment variables are recommended (but not required)
+
+```
+server.port=8888
+SIMPLYRESTFUL_URI_HTTP_HEADER=xoriginalurl
+```
