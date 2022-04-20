@@ -1,42 +1,37 @@
 package simplyrestful.api.framework.servlet.filters;
 
 import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-
+import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 public class CharResponseWrapper extends HttpServletResponseWrapper {
-    private CharArrayWriter output;
+    private ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
 
     public String toString() {
-        return output.toString();
+        return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
     }
 
     public CharResponseWrapper(HttpServletResponse response) {
         super(response);
-        output = new CharArrayWriter();
     }
 
     @Override
     public PrintWriter getWriter() {
-        return new PrintWriter(output);
+        return new PrintWriter(outputStream);
     }
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStream() {
-            private OutputStream outputStream = new ByteArrayOutputStream(1024);
 
             @Override
             public void write(int b) throws IOException {
                 outputStream.write(b);
-                output.write(b);
             }
 
             @Override

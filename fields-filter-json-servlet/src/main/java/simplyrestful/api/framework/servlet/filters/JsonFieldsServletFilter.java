@@ -1,6 +1,7 @@
 package simplyrestful.api.framework.servlet.filters;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class JsonFieldsServletFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         boolean filter = false;
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         /**
          * FIXME This allows an EventStream to stream its events by not applying the fields filter.
          * However, this is done whenever the client includes "text/event-stream" in its Accept header.
