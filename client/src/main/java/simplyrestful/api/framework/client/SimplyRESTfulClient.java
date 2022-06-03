@@ -44,22 +44,21 @@ import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 public class SimplyRESTfulClient<T extends HALResource> {
-    private static final String ERROR_DISCOVER_RESOURCE_URI_REQUIRED = "This method can only be used after the resource URI has been discovered. This is done at every API request but you can trigger it manually by calling discoverResourceUri() directly";
-    private static final String QUERY_PARAM_VALUE_DELIMITER = ",";
-    private static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""
-            + HALServiceDocument.PROFILE_STRING + "\"";
-    private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
-    private static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
-    private static final String HAL_ITEM_KEY = "item";
-    private static final String HAL_EMBEDDED_KEY = "_embedded";
-    private static final String HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE = "profile";
-    private static final String MEDIA_TYPE_HAL_JSON_TYPE = "application";
-    private static final String MEDIA_TYPE_HAL_JSON_SUBTYPE = "hal+json";
-    private static final String QUERY_PARAM_PAGE_START = "pageStart";
-    private static final String QUERY_PARAM_PAGESIZE = "pageSize";
-    private static final String QUERY_PARAM_FIELDS = "fields";
-    private static final String QUERY_PARAM_QUERY = "query";
-    private static final String QUERY_PARAM_SORT = "sort";
+	public static final String ERROR_DISCOVER_RESOURCE_URI_REQUIRED = "This method can only be used after the resource URI has been discovered. This is done at every API request but you can trigger it manually by calling discoverResourceUri() directly";
+	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
+	public static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""+ HALServiceDocument.PROFILE_STRING + "\"";
+	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
+	public static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
+	public static final String HAL_ITEM_KEY = "item";
+	public static final String HAL_EMBEDDED_KEY = "_embedded";
+	public static final String HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE = "profile";
+	public static final String MEDIA_TYPE_HAL_JSON_TYPE = "application";
+	public static final String MEDIA_TYPE_HAL_JSON_SUBTYPE = "hal+json";
+	public static final String QUERY_PARAM_PAGE_START = "pageStart";
+	public static final String QUERY_PARAM_PAGESIZE = "pageSize";
+	public static final String QUERY_PARAM_FIELDS = "fields";
+	public static final String QUERY_PARAM_QUERY = "query";
+	public static final String QUERY_PARAM_SORT = "sort";
     private final Class<T> resourceClass;
     private final URI baseApiUri;
     private final String resourceProfile;

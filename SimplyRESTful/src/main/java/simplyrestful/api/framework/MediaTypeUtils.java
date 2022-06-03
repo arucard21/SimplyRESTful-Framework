@@ -23,11 +23,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 public class MediaTypeUtils {
-    private static final String ERROR_PREMATCHING_NOT_SUPPORTED = "This method must be called after JAX-RS matching is done. It cannot be called from a @PreMatching JAX-RS filter, use getAllProducibleMediaTypes() instead";
-    private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE = 0; // Example: */*
-    private static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
-    private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS = 2; // Example: application/json
-    private static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS = 3; // Example: application/hal+json;profile="https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2"
+	public static final String ERROR_PREMATCHING_NOT_SUPPORTED = "This method must be called after JAX-RS matching is done. It cannot be called from a @PreMatching JAX-RS filter, use getAllProducibleMediaTypes() instead";
+	public static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE = 0; // Example: */*
+	public static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
+	public static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITHOUT_PARAMETERS = 2; // Example: application/json
+	public static final int MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS = 3; // Example: application/hal+json;profile="https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2"
     public static final String MEDIA_TYPE_PARAMETER_QUALITY_SERVER = "qs";
     public static final String MEDIA_TYPE_PARAMETER_QUALITY_CLIENT = "q";
 
@@ -64,7 +64,7 @@ public class MediaTypeUtils {
         return selectMediaType(getProducibleMediaTypes(resourceInfo), httpHeaders.getAcceptableMediaTypes());
     }
 
-    private static MediaType selectMediaType(List<MediaType> producibleMediaTypes, List<MediaType> acceptableMediaTypes) {
+    public static MediaType selectMediaType(List<MediaType> producibleMediaTypes, List<MediaType> acceptableMediaTypes) {
         List<MediaType> selectedMediaTypes = new ArrayList<>();
         for(MediaType acceptableMediaType : acceptableMediaTypes) {
             for(MediaType producibleMediaType : producibleMediaTypes) {
@@ -129,7 +129,7 @@ public class MediaTypeUtils {
         return new MediaType(selectedMediaType.getType(), selectedMediaType.getSubtype(), parametersWithoutQAndQS);
     }
 
-    private static boolean isConcreteMediaType(MediaType selectedMediaType) {
+    public static boolean isConcreteMediaType(MediaType selectedMediaType) {
         if(!selectedMediaType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) &&
         	!selectedMediaType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD)) {
             return true;
@@ -137,7 +137,7 @@ public class MediaTypeUtils {
         return false;
     }
 
-    private static MediaType getMostSpecificMediaType(MediaType acceptableMediaType, MediaType producibleMediaType) {
+    public static MediaType getMostSpecificMediaType(MediaType acceptableMediaType, MediaType producibleMediaType) {
         int clientSpecificity = determineMediaTypeSpecificity(acceptableMediaType);
         int serverSpecificity = determineMediaTypeSpecificity(producibleMediaType);
         if(clientSpecificity == MEDIA_TYPE_SPECIFICITY_CONCRETE_TYPE_WITH_PARAMETERS && clientSpecificity == serverSpecificity) {
@@ -173,7 +173,7 @@ public class MediaTypeUtils {
      * @param mediaType is the media type for which to determine specificity
      * @return the specificity of the media type (higher is more specific)
      */
-    private static int determineMediaTypeSpecificity(MediaType mediaType) {
+    public static int determineMediaTypeSpecificity(MediaType mediaType) {
         String type = mediaType.getType();
         String subType = mediaType.getSubtype();
         Map<String, String> parameters = mediaType.getParameters();
@@ -261,7 +261,7 @@ public class MediaTypeUtils {
         return Collections.emptyList();
     }
 
-    private static List<MediaType> getDeclaredProducibleMediaTypesFromMethod(Method method) {
+    public static List<MediaType> getDeclaredProducibleMediaTypesFromMethod(Method method) {
         List<Produces> producesAnnotations = List.of(method.getDeclaredAnnotationsByType(Produces.class));
         return producesAnnotations.stream()
                 .flatMap(produces -> Stream.of(produces.value()))
@@ -269,7 +269,7 @@ public class MediaTypeUtils {
                 .collect(Collectors.toList());
     }
 
-    private static List<MediaType> getDeclaredProducibleMediaTypesFromClass(Class<?> resourceClass) {
+    public static List<MediaType> getDeclaredProducibleMediaTypesFromClass(Class<?> resourceClass) {
         List<Produces> producesAnnotations = List.of(resourceClass.getAnnotationsByType(Produces.class));
         return producesAnnotations.stream()
                 .flatMap(produces -> Stream.of(produces.value()))
@@ -277,7 +277,7 @@ public class MediaTypeUtils {
                 .collect(Collectors.toList());
     }
 
-    private static List<MediaType> getDeclaredProducibleMediaTypesFromSuperClass(Class<?> superClass, Method method) {
+    public static List<MediaType> getDeclaredProducibleMediaTypesFromSuperClass(Class<?> superClass, Method method) {
         if(superClass == null) {
             return Collections.emptyList();
         }
@@ -291,7 +291,7 @@ public class MediaTypeUtils {
         return getDeclaredProducibleMediaTypesFromSuperClass(superClass.getSuperclass(), method);
     }
 
-    private static List<MediaType> getDeclaredProducibleMediaTypesFromInterfaces(Class<?>[] interfaceClasses, Method method) {
+    public static List<MediaType> getDeclaredProducibleMediaTypesFromInterfaces(Class<?>[] interfaceClasses, Method method) {
         if(interfaceClasses == null || interfaceClasses.length == 0) {
             return Collections.emptyList();
         }
@@ -311,7 +311,7 @@ public class MediaTypeUtils {
         }
     }
 
-    private static List<MediaType> getDeclaredProducibleMediaTypesFromInterface(Class<?> interfaceClass, Method method) {
+    public static List<MediaType> getDeclaredProducibleMediaTypesFromInterface(Class<?> interfaceClass, Method method) {
         Optional<Method> interfaceMethodOptional = Stream.of(interfaceClass.getMethods())
                 .filter(ifaceMethod -> ifaceMethod.getName().equals(method.getName())
                         && Arrays.equals(ifaceMethod.getParameterTypes(), method.getParameterTypes()))

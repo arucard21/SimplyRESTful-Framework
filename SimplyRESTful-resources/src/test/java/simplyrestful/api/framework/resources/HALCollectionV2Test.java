@@ -16,10 +16,10 @@ import nl.jqno.equalsverifier.Warning;
 import simplyrestful.api.framework.resources.test.TestResourceWithEquals;
 
 public class HALCollectionV2Test {
-	private static final String TEST_COLLECTION_HREF_1 = "local://docs/resources/testcollection/1";
-	private static final String TEST_COLLECTION_HREF_2 = "local://docs/resources/testcollection/2";
-	private static final String TEST_COLLECTION_PAGE_BASE = "local://docs/resources/testcollection/2?page=";
-	private static final URI requestURI = URI.create("local://resources/testresources/");
+	public static final String TEST_COLLECTION_HREF_1 = "local://docs/resources/testcollection/1";
+	public static final String TEST_COLLECTION_HREF_2 = "local://docs/resources/testcollection/2";
+	public static final String TEST_COLLECTION_PAGE_BASE = "local://docs/resources/testcollection/2?page=";
+	public static final URI requestURI = URI.create("local://resources/testresources/");
 
 	private HALCollectionV2<TestResourceWithEquals> testCollection;
 	private HALCollectionV2<TestResourceWithEquals> testCollectionSame;
@@ -60,7 +60,7 @@ public class HALCollectionV2Test {
 		testCollectionDifferent.setPrev(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"2").profile(testCollectionDifferent.getProfile()).build());
 		testCollectionDifferent.setNext(new HALLink.Builder(TEST_COLLECTION_PAGE_BASE+"4").profile(testCollectionDifferent.getProfile()).build());
 	}
-	
+
 	@Test
 	public void equalsContract() {
 	    EqualsVerifier.forClass(HALCollectionV2.class)

@@ -30,7 +30,7 @@ public class SortOrder {
         return new SortOrder(parseSortField(sortOrder), parseSortOrder(sortOrder));
     }
 
-    private static String parseSortField(String sortWithOrderDelimeter) {
+    public static String parseSortField(String sortWithOrderDelimeter) {
         if (sortWithOrderDelimeter.contains(SortOrder.DELIMITER)) {
             return sortWithOrderDelimeter.split(SortOrder.DELIMITER)[0];
         }
@@ -39,7 +39,7 @@ public class SortOrder {
         }
     }
 
-    private static Boolean parseSortOrder(String sortWithOrderDelimeter) {
+    public static Boolean parseSortOrder(String sortWithOrderDelimeter) {
         if (sortWithOrderDelimeter.contains(SortOrder.DELIMITER)) {
             return !sortWithOrderDelimeter.split(SortOrder.DELIMITER)[1].equalsIgnoreCase(SortOrder.DESCENDING);
         }

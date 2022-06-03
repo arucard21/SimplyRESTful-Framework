@@ -31,10 +31,10 @@ import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 @ExtendWith(MockitoExtension.class)
 public class SimplyRESTfulClientTest extends JerseyTest {
-    private static final UUID UUID_NIL = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    private static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI
+    public static final UUID UUID_NIL = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI
             .create("http://invalid-host/testresources/" + UUID_NIL.toString());
-    private static final URI INVALID_RESOURCE_URI_DIFFERENT_PATH = URI
+    public static final URI INVALID_RESOURCE_URI_DIFFERENT_PATH = URI
             .create(TestWebResource.getBaseUri() + "/different/path/testresources/" + UUID_NIL.toString());
     private SimplyRESTfulClient<TestResource> simplyRESTfulClient;
 

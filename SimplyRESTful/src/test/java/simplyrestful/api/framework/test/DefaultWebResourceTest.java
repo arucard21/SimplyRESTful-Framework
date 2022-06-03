@@ -34,9 +34,9 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultResourc
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultWebResourceTest {
-    private static final URI TEST_BASE_URI = URI.create("local://testhost/");
-    private static final URI TEST_REQUEST_URI = TEST_BASE_URI.resolve("testresources");
-    private static TestResource testInstance;
+	public static final URI TEST_BASE_URI = URI.create("local://testhost/");
+	public static final URI TEST_REQUEST_URI = TEST_BASE_URI.resolve("testresources");
+	public static TestResource testInstance;
 
     @BeforeAll
     public static void addTestResources() {

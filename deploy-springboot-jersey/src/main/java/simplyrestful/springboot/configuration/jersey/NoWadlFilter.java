@@ -13,7 +13,7 @@ import io.swagger.v3.oas.models.Operation;
 import simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter;
 
 public class NoWadlFilter extends SimplyRESTfulOpenApiFilter{
-    private static final String PATH_ROOT_RELATIVE_START = "/";
+	public static final String PATH_ROOT_RELATIVE_START = "/";
 
     /**
      * Remove the documentation for the WADL feature (which is still included even when it is disabled in Jersey).
@@ -30,7 +30,7 @@ public class NoWadlFilter extends SimplyRESTfulOpenApiFilter{
 	    String path = paths[0].value();
 	    String rootRelativePath = (path.startsWith(PATH_ROOT_RELATIVE_START)) ? path : PATH_ROOT_RELATIVE_START + path;
 	    if (api.getPath().startsWith(rootRelativePath)){
-		return Optional.empty();		
+		return Optional.empty();
 	    }
 	}
 	return super.filterOperation(operation, api, params, cookies, headers);

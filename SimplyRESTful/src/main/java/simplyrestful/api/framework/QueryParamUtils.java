@@ -9,12 +9,12 @@ import javax.ws.rs.container.ContainerRequestContext;
 import simplyrestful.api.framework.queryparams.SortOrder;
 
 public class QueryParamUtils {
-    private static final String QUERY_PARAM_VALUE_DELIMITER = ",";
-    private static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
-    private static final String HAL_LINKS_OBJECT_NAME = "_links";
-    private static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
-	private static final String FIELDS_PARAM_NAME = "fields";
-	private static final String FIELDS_PARAM_SEPARATOR = ",";
+	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
+	public static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
+	public static final String HAL_LINKS_OBJECT_NAME = "_links";
+	public static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
+	public static final String FIELDS_PARAM_NAME = "fields";
+	public static final String FIELDS_PARAM_SEPARATOR = ",";
 
 	/**
 	 * Set the default value for the list of fields as request property as fields override.
@@ -36,7 +36,7 @@ public class QueryParamUtils {
     	}
     }
 
-    private static boolean fieldsQueryParamProvided(ContainerRequestContext requestContext) {
+    public static boolean fieldsQueryParamProvided(ContainerRequestContext requestContext) {
     	return requestContext.getUriInfo().getQueryParameters().containsKey(FIELDS_PARAM_NAME);
 	}
 
@@ -102,7 +102,7 @@ public class QueryParamUtils {
     		.collect(Collectors.toList());
     }
 
-    private static List<String> flattenQueryParameters(List<String> parameters){
+    public static List<String> flattenQueryParameters(List<String> parameters){
     	return parameters.stream()
     		.flatMap(param -> Stream.of(param.split(QUERY_PARAM_VALUE_DELIMITER)))
     		.collect(Collectors.toList());

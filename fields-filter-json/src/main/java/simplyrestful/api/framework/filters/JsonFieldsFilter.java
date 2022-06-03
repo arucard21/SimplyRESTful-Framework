@@ -15,11 +15,11 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 
 public class JsonFieldsFilter {
-    private static final String FIELDS_NESTING_SEPARATOR = ".";
-    private static final String FIELDS_NESTING_SEPARATOR_INTERNAL = "\u001F";
-    private static final String FIELDS_ESCAPED_DOT = "\\.";
-    private static final String FIELDS_ESCAPED_DOT_PLACEHOLDER = "\u0000";
-    private static final String FIELDS_ESCAPED_DOT_INTERNAL = ".";
+	public static final String FIELDS_NESTING_SEPARATOR = ".";
+	public static final String FIELDS_NESTING_SEPARATOR_INTERNAL = "\u001F";
+	public static final String FIELDS_ESCAPED_DOT = "\\.";
+	public static final String FIELDS_ESCAPED_DOT_PLACEHOLDER = "\u0000";
+	public static final String FIELDS_ESCAPED_DOT_INTERNAL = ".";
 
     /**
      * Tracks the current path in the original JSON structure, in dot-separated form (e.g. "top.inner.deepest")

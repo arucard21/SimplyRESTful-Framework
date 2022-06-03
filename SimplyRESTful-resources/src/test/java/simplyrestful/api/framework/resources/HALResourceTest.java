@@ -10,8 +10,8 @@ import nl.jqno.equalsverifier.Warning;
 import simplyrestful.api.framework.resources.test.TestResourceWithEquals;
 
 public class HALResourceTest{
-	private static final String TEST_RESOURCE_HREF_1 = "local://docs/resources/testresource/1";
-	private static final String TEST_RESOURCE_HREF_2 = "local://docs/resources/testresource/2";
+	public static final String TEST_RESOURCE_HREF_1 = "local://docs/resources/testresource/1";
+	public static final String TEST_RESOURCE_HREF_2 = "local://docs/resources/testresource/2";
 
 	private HALResource testResource;
 	private HALResource testResourceSame;
@@ -28,7 +28,7 @@ public class HALResourceTest{
 		testResourceDifferent = new TestResourceWithEquals();
 		testResourceDifferent.setSelf(new HALLink.Builder(TEST_RESOURCE_HREF_2).profile(testResourceDifferent.getProfile()).build());
 	}
-	
+
 	@Test
 	public void equalsContract() {
 	    EqualsVerifier.forClass(HALResource.class)

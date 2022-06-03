@@ -13,7 +13,7 @@ import simplyrestful.api.framework.resources.HALResource;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
 public class HALCollectionV2Builder<T extends HALResource> {
-    private static final int START_OF_FIRST_PAGE = 0;
+	public static final int START_OF_FIRST_PAGE = 0;
     private final List<T> resources;
     private final URI requestURI;
     private Integer collectionSize;

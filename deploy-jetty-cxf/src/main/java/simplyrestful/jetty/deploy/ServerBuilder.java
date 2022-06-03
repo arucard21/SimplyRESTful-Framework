@@ -62,7 +62,7 @@ import simplyrestful.api.framework.servicedocument.WebResourceRoot;
  *
  */
 public class ServerBuilder {
-	private static final Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.APIServer");
+	private static final Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.ServerBuilder");
 	private String address = "http://localhost:9000";
 	private List<Class<? extends DefaultWebResource<? extends HALResource>>> webResources = new ArrayList<>();
 	private List<Object> providers = new ArrayList<>();

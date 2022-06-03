@@ -35,10 +35,10 @@ import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 public class WebResourceIntegrationTest extends JerseyTest {
-    private static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
-    private static final String WEB_RESOURCE_PATH = "testresources";
-    private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
-    private static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
+    public static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
+    public static final String WEB_RESOURCE_PATH = "testresources";
+    public static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
+    public static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
     private TestResource testInstance;
     private TestResource testInstanceWithRandomId;
 

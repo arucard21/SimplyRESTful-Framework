@@ -34,21 +34,16 @@ import simplyrestful.api.framework.resources.HALResource;
  * collection resource in plain JSON format, using a custom JSON media type.
  */
 public interface DefaultCollectionGet<T extends HALResource> extends DefaultList<T>, DefaultCount {
-	public static final String V1_QUERY_PARAM_PAGE = "page";
-    public static final String V1_QUERY_PARAM_COMPACT = "compact";
-    public static final String QUERY_PARAM_PAGE_START = "pageStart";
+	public static final String QUERY_PARAM_PAGE_START = "pageStart";
     public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
     public static final String QUERY_PARAM_FIELDS = "fields";
     public static final String QUERY_PARAM_QUERY = "query";
     public static final String QUERY_PARAM_SORT = "sort";
 
     public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
-    public static final String V1_QUERY_PARAM_PAGE_DEFAULT = "1";
     public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
-    public static final String V1_QUERY_PARAM_COMPACT_DEFAULT = "true";
     public static final String QUERY_PARAM_FIELDS_DEFAULT = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self";
     public static final String QUERY_PARAM_FIELDS_ALL= "all";
-    public static final String QUERY_PARAM_FIELDS_COMPACT = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_links.item._links.self";
     public static final String QUERY_PARAM_QUERY_DEFAULT = "";
     public static final String QUERY_PARAM_SORT_DEFAULT = "";
 

@@ -14,13 +14,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class JsonFieldsFilterTest {
-    private static final String ARRAY_ORIGINAL_PLAIN_JSON = "/array/plain_original.json";
-    private static final String ARRAY_ORIGINAL_HAL_JSON = "/array/hal_original.json";
-    private static final String COLLECTION_ORIGINAL_PLAIN_JSON = "/collection/plain_original.json";
-    private static final String COLLECTION_ORIGINAL_HAL_JSON = "/collection/hal_original.json";
-    private static final String OPENAPI_ORIGINAL_JSON = "/openapi/original.json";
-    private static final String RESOURCE_ORIGINAL_PLAIN_JSON = "/resource/plain_original.json";
-    private static final String RESOURCE_ORIGINAL_HAL_JSON = "/resource/hal_original.json";
+	public static final String ARRAY_ORIGINAL_PLAIN_JSON = "/array/plain_original.json";
+	public static final String ARRAY_ORIGINAL_HAL_JSON = "/array/hal_original.json";
+	public static final String COLLECTION_ORIGINAL_PLAIN_JSON = "/collection/plain_original.json";
+	public static final String COLLECTION_ORIGINAL_HAL_JSON = "/collection/hal_original.json";
+	public static final String OPENAPI_ORIGINAL_JSON = "/openapi/original.json";
+	public static final String RESOURCE_ORIGINAL_PLAIN_JSON = "/resource/plain_original.json";
+	public static final String RESOURCE_ORIGINAL_HAL_JSON = "/resource/hal_original.json";
 
     private static JsonStructure loadTestJson(String testJson) {
         InputStream collectionStream = JsonFieldsFilterTest.class.getResourceAsStream(testJson);

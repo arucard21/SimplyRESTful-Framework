@@ -20,9 +20,9 @@ import simplyrestful.api.framework.filters.JsonFieldsFilter;
 @Named
 @WebFilter("*")
 public class JsonFieldsServletFilter extends HttpFilter {
-    private static final long serialVersionUID = 6825636135376615562L;
-    private static final String MEDIA_TYPE_JSON = "application/json";
-    private static final String MEDIA_TYPE_STRUCTURE_SUFFIX_JSON = "+json";
+	private static final long serialVersionUID = 6825636135376615562L;
+	public static final String MEDIA_TYPE_JSON = "application/json";
+	public static final String MEDIA_TYPE_STRUCTURE_SUFFIX_JSON = "+json";
     public static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
     public static final String QUERY_PARAM_FIELDS = "fields";
     public static final String FIELDS_PARAMS_SEPARATOR = ",";

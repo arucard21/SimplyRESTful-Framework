@@ -81,9 +81,9 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultResourc
         ExampleResource.EXAMPLE_MEDIA_TYPE_JSON })
 public class ExampleWebResource
         implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
-    private static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
-    private static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
-    private static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
+	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
+	public static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
+	public static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
     @Inject
     ExampleRepository repo;
     @Context
