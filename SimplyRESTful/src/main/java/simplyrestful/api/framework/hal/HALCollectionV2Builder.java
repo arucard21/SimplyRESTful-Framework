@@ -27,16 +27,14 @@ public class HALCollectionV2Builder<T extends HALResource> {
      * @param requestURI is the request URI used to request this collection from the API.
      * @return the builder object.
      */
-    public static <T extends HALResource> HALCollectionV2Builder<T> from(
-	    List<T> resources,
-	    URI requestURI) {
-	return new HALCollectionV2Builder<T>(resources, requestURI);
-    }
+	public static <T extends HALResource> HALCollectionV2Builder<T> from(List<T> resources, URI requestURI) {
+		return new HALCollectionV2Builder<T>(resources, requestURI);
+	}
 
-    private HALCollectionV2Builder(List<T> resources, URI requestURI) {
-	this.resources = resources;
-	this.requestURI = requestURI;
-    }
+	private HALCollectionV2Builder(List<T> resources, URI requestURI) {
+		this.resources = resources;
+		this.requestURI = requestURI;
+	}
 
     /**
      * Include navigation links (first, last, prev, next) in the collection.
@@ -47,11 +45,11 @@ public class HALCollectionV2Builder<T extends HALResource> {
      * @param pageSize is the maximum size of each page.
      * @return this builder object.
      */
-    public HALCollectionV2Builder<T> withNavigation(int pageStart, int pageSize){
-	this.pageStart = pageStart;
-	this.pageSize = pageSize;
-	return this;
-    }
+	public HALCollectionV2Builder<T> withNavigation(int pageStart, int pageSize) {
+		this.pageStart = pageStart;
+		this.pageSize = pageSize;
+		return this;
+	}
 
     /**
      * Specify the size of the entire collection.
@@ -62,10 +60,10 @@ public class HALCollectionV2Builder<T extends HALResource> {
      * @param collectionSize is the size of the entire collection
      * @return this build object.
      */
-    public HALCollectionV2Builder<T> collectionSize(int collectionSize){
-	this.collectionSize = collectionSize;
-	return this;
-    }
+	public HALCollectionV2Builder<T> collectionSize(int collectionSize) {
+		this.collectionSize = collectionSize;
+		return this;
+	}
 
     public HALCollectionV2<T> build(MediaType type) {
     	HALCollectionV2<T> collection = new HALCollectionV2<T>();
@@ -107,59 +105,65 @@ public class HALCollectionV2Builder<T extends HALResource> {
     	    resourceType = resourceFromList.getCustomJsonMediaType();
     	    resourceProfile = null;
     	}
-    	this.resources.stream().forEach(resource -> resource.setSelf(
-    		createLink(URI.create(resource.getSelf().getHref()), resourceType, resourceProfile)));
+		this.resources.stream().forEach(resource -> {
+			URI selfLink = UriBuilder.fromUri(resource.getSelf().getHref())
+					.replaceQuery(null)
+					.replaceMatrix(null)
+					.fragment(null)
+					.build();
+			resource.setSelf(createLink(selfLink, resourceType, resourceProfile));
+		});
     }
 
     private void includeNavigation(HALCollectionV2<T> collection) {
-	collection.setFirst(createHALLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE));
-	if (this.pageStart > 0) {
-	    int startofPrevPage = this.pageStart - this.pageSize;
-	    if (startofPrevPage >= 0) {
-		collection.setPrev(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage));
-	    }
-	}
-	if (this.collectionSize != null) {
-	    int startofLastPage = calculateStartOfLastPage();
-	    collection.setLast(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofLastPage));
-	    if (this.pageStart < startofLastPage) {
-		int startOfNextPage = this.pageStart + this.pageSize;
-		if (startOfNextPage <= startofLastPage) {
-		    collection.setNext(createHALLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage));
+		collection.setFirst(createHALLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE));
+		if (this.pageStart > 0) {
+		    int startofPrevPage = this.pageStart - this.pageSize;
+		    if (startofPrevPage >= 0) {
+			collection.setPrev(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage));
+		    }
 		}
-	    }
-	}
+		if (this.collectionSize != null) {
+		    int startofLastPage = calculateStartOfLastPage();
+		    collection.setLast(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofLastPage));
+		    if (this.pageStart < startofLastPage) {
+			int startOfNextPage = this.pageStart + this.pageSize;
+			if (startOfNextPage <= startofLastPage) {
+			    collection.setNext(createHALLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage));
+			}
+		    }
+		}
     }
 
     private boolean shouldIncludeNavigation() {
-	return this.pageStart != null && this.pageSize != null;
+    	return this.pageStart != null && this.pageSize != null;
     }
 
     private int calculateStartOfLastPage() {
-	int numberOfPages = Math.floorDiv(collectionSize, this.pageSize);
-	if (numberOfPages > 0 && (this.collectionSize % this.pageSize) == 0) {
-	    numberOfPages--;
-	}
-	return numberOfPages * this.pageSize;
+    	int numberOfPages = Math.floorDiv(collectionSize, this.pageSize);
+		if (numberOfPages > 0 && (this.collectionSize % this.pageSize) == 0) {
+		    numberOfPages--;
+		}
+		return numberOfPages * this.pageSize;
     }
 
     protected HALLink createHALLinkFromURIWithModifiedPageOffset(URI requestURI, int pageStart) {
-	URI modifiedUri = UriBuilder.fromUri(requestURI)
-		.replaceQueryParam(DefaultCollectionGet.QUERY_PARAM_PAGE_START, pageStart)
-		.build();
-	return new HALLink.Builder(modifiedUri).build();
+		URI modifiedUri = UriBuilder.fromUri(requestURI)
+			.replaceQueryParam(DefaultCollectionGet.QUERY_PARAM_PAGE_START, pageStart)
+			.build();
+		return new HALLink.Builder(modifiedUri).build();
     }
 
     protected HALLink createLink(URI collectionUri, MediaType collectionType, URI collectionProfileUri) {
-	HALLink.Builder builder = new HALLink.Builder(collectionUri);
-	if(collectionType.isCompatible(MediaTypeUtils.APPLICATION_HAL_JSON_TYPE)) {
-	    builder
-	    .type(MediaTypeUtils.APPLICATION_HAL_JSON)
-	    .profile(collectionProfileUri);
-	}
-	else {
-	    builder.type(collectionType.toString());
-	}
-	return builder.build();
+		HALLink.Builder builder = new HALLink.Builder(collectionUri);
+		if(collectionType.isCompatible(MediaTypeUtils.APPLICATION_HAL_JSON_TYPE)) {
+		    builder
+		    .type(MediaTypeUtils.APPLICATION_HAL_JSON)
+		    .profile(collectionProfileUri);
+		}
+		else {
+		    builder.type(collectionType.toString());
+		}
+		return builder.build();
     }
 }
