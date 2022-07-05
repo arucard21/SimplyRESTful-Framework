@@ -9,7 +9,7 @@ configure(allprojects){
     apply plugin: "eclipse"
 
     group = 'com.github.arucard21.simplyrestful'
-    version = '0.18.4'
+    version = '0.19.0'
 
 	// Force using the fixed log4j dependency to avoid false positives (only non-vulnerable log4j-api dependency is used)
 	configurations.all {
