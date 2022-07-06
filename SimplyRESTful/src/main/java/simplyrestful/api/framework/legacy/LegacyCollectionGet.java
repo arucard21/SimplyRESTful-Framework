@@ -69,9 +69,9 @@ public interface LegacyCollectionGet<T extends HALResource> extends DefaultList<
      */
     @GET
     @Produces({
-	HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.2",
-	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.4",
-	HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.9"
+	HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
+	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9",
+	HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
 	})
     @Operation(description = "Get a list of resources")
     @ApiResponse(content = {
