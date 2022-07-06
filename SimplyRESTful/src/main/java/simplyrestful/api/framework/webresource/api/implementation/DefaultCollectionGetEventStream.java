@@ -26,7 +26,7 @@ public interface DefaultCollectionGetEventStream<T extends HALResource> extends 
      * Retrieve the collection of resources as a stream of events (as server-sent events).
      * <p>
      * This uses
-     * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events}">server-sent events (SSE)</a>
+     * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">server-sent events (SSE)</a>
      * to send each resource in the collection as an Event to the API consumer.
      * </p>
      * @param requestContext is a JAX-RS context object.
