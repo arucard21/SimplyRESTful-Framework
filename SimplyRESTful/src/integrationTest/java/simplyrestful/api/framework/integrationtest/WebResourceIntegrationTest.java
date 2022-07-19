@@ -37,6 +37,8 @@ import simplyrestful.api.framework.test.implementation.TestWebResource;
 public class WebResourceIntegrationTest extends JerseyTest {
     public static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
     public static final String WEB_RESOURCE_PATH = "testresources";
+	public static final String MEDIA_TYPE_LEGACY_COLLECTION_V1 = "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1\"";
+    public static final MediaType MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE = MediaType.valueOf(MEDIA_TYPE_LEGACY_COLLECTION_V1);
     public static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
     public static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
     private TestResource testInstance;
@@ -112,6 +114,16 @@ public class WebResourceIntegrationTest extends JerseyTest {
         HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
         Assertions.assertEquals(2, collection.getTotal());
         Assertions.assertTrue(collection.getItem().contains(testInstance));
+    }
+
+    @Test
+    public void webResource_shouldReturn406NotAcceptable_whenHALV1IsRequested() {
+        Response response = target()
+        	.path(WEB_RESOURCE_PATH)
+        	.request()
+        	.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
+        	.get();
+        Assertions.assertEquals(406, response.getStatus());
     }
 
     @Test

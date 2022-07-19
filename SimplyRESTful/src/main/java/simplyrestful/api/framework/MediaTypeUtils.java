@@ -66,12 +66,17 @@ public class MediaTypeUtils {
 
     public static MediaType selectMediaType(List<MediaType> producibleMediaTypes, List<MediaType> acceptableMediaTypes) {
         List<MediaType> selectedMediaTypes = new ArrayList<>();
-        for(MediaType acceptableMediaType : acceptableMediaTypes) {
-            for(MediaType producibleMediaType : producibleMediaTypes) {
-        	if(acceptableMediaType.isCompatible(producibleMediaType)) {
-        	    selectedMediaTypes.add(getMostSpecificMediaType(acceptableMediaType, producibleMediaType));
+        if(acceptableMediaTypes == null || acceptableMediaTypes.isEmpty()) {
+        	selectedMediaTypes = producibleMediaTypes.stream().collect(Collectors.toList());
+        }
+        else {
+        	for(MediaType acceptableMediaType : acceptableMediaTypes) {
+        		for(MediaType producibleMediaType : producibleMediaTypes) {
+        			if(acceptableMediaType.isCompatible(producibleMediaType) && compatibleParameters(acceptableMediaType, producibleMediaType)) {
+        				selectedMediaTypes.add(getMostSpecificMediaType(acceptableMediaType, producibleMediaType));
+        			}
+        		}
         	}
-            }
         }
         if(selectedMediaTypes.isEmpty()) {
             throw new NotAcceptableException();
@@ -83,18 +88,61 @@ public class MediaTypeUtils {
         	.reversed());
         for(MediaType selectedMediaType : selectedMediaTypes) {
             if(isConcreteMediaType(selectedMediaType)) {
-        	return withoutQualityParameters(selectedMediaType);
+            	return withoutQualityParameters(selectedMediaType);
             }
             if((selectedMediaType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) ||
         	    selectedMediaType.getType().equals(MediaType.APPLICATION_OCTET_STREAM_TYPE.getType())) &&
         	    selectedMediaType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD)) {
-        	return MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            	return MediaType.APPLICATION_OCTET_STREAM_TYPE;
             }
         }
         throw new NotAcceptableException();
     }
 
-    public static MediaType addQualityParameters(MediaType mediaType, double q, double qs) {
+    /**
+     * Check if the parameters of a media type are compatible with another.
+     *
+     * The media type parameters are considered compatible if the other media type contains all of
+     * the same parameters with the same values. Even if additional media type parameters are present
+     * in the other media type.
+     *
+     * The quality parameters q (and its server counterpart, qs) are ignored.
+     *
+     * So the position of the provided method arguments matters.
+     *
+     * @param mediaType is the media type for which we want to check compatibility.
+     * @param otherMediaType is the media type against which we want to check compatibility.
+     * @return true iff the parameters of mediaType are compatible with those of otherMediaType.
+     */
+    public static boolean compatibleParameters(MediaType mediaType, MediaType otherMediaType) {
+    	Map<String, String> parameters = mediaType.getParameters();
+    	Map<String, String> otherParameters = otherMediaType.getParameters();
+    	if(parameters.isEmpty()) {
+    		return true;
+    	}
+    	if(otherParameters.isEmpty()) {
+    		// the media type has parameters that the other media type does not. It is more specific,
+    		// so it is should not be considered compatible.
+     		return false;
+    	}
+    	for(Entry<String, String> parameter: parameters.entrySet()) {
+    		String parameterName = parameter.getKey();
+    		if(parameterName.equalsIgnoreCase("q") || parameterName.equalsIgnoreCase("qs")) {
+    			continue;
+    		}
+    		String parameterValue = parameter.getValue();
+    		String otherParameterValue = otherParameters.get(parameterName);
+    		if(otherParameterValue == null) {
+    			return false;
+    		}
+    		if(!parameterValue.equalsIgnoreCase(otherParameterValue)) {
+    			return false;
+    		}
+    	}
+		return true;
+	}
+
+	public static MediaType addQualityParameters(MediaType mediaType, double q, double qs) {
         return addQSParameter(addQParameter(mediaType, q), qs);
     }
 
