@@ -104,11 +104,9 @@ public class MediaTypeUtils {
      *
      * The media type parameters are considered compatible if the other media type contains all of
      * the same parameters with the same values. Even if additional media type parameters are present
-     * in the other media type.
+     * in the other media type. So the position of the provided method arguments matters.
      *
-     * The quality parameters q (and its server counterpart, qs) are ignored.
-     *
-     * So the position of the provided method arguments matters.
+     * The quality parameters q and its server counterpart, qs, are ignored.
      *
      * @param mediaType is the media type for which we want to check compatibility.
      * @param otherMediaType is the media type against which we want to check compatibility.
