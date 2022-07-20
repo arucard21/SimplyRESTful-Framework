@@ -10,19 +10,37 @@
 		<br>
 		This documentation is for version 2 of the HALCollection resource.
 	</p> 
+	<h2>Media Types</h2> 
 	<ul>
-		<li>Media Types: 
+		<li>
+			<code>application/hal+json; profile=https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2</code>
 			<ul>
-				<li><code>application/hal+json; profile=https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2</code></li>
-				<li><code>application/x.simplyrestful-halcollection-v2+json</code> (default)</li>
+				<li>This is the HAL+JSON representation of the collection</li>
 			</ul>
 		</li>
-		
+		<li>
+			<code>application/x.simplyrestful-halcollection-v2+json</code> (default)
+			<ul>
+				<li>This is the plain JSON representation of the collection</li>
+			</ul>
+		</li>
+	</ul>
+	<h2>Media type parameters</h2>
+	<p>The following media type parameters can be used to influence the behavior of the HALCollection resource.</p>
+	<ul>
+		<li>
+		<code>item-type</code>: contains the media type of the items in the collection. When used in the Accept HTTP header, this should be included in the HTTP Content Negotiation so the collection will return items with that media type.
+			<ul>
+				<li>This is intended for negotiating different versions or variations of a resource that can be represented as both HAL+JSON and plain JSON.</li>
+				<li>Due to technical limitations, The plain JSON representation of the collection cannot represent items with a HAL+JSON media type correctly. Nor can the HAL+JSON representation represent plain JSON media types correctly. Requesting this will result in a 406 Not Acceptable HTTP status code.</li>
+				<li>If this parameter is omitted, the item will use its default media type for HAL+JSON if the collection is represented as HAL+JSON. It will use the default plain JSON media type if the collection is represented as plain JSON.</li>
+			</ul>
+		</li>
 	</ul>
 	<h2>HTTP headers</h2>
 	<p>The following HTTP headers can be used to influence the behavior of the HALCollection resource.</p>
 	<ul>
-		<li><code>Accept</code>: contains a list of the preferred media types for the HALCollection. This is a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept">standard HTTP header</a> and can be used to request a specific version of the HALCollection resource, or a specific type of representation (e.g. plain JSON). The media types that can be used here are provided in the specification section, at the top of this documentation page (and that of the previous version of this resource). If this HTTP header is not provided, the default media type will be used to represent the HALCollection resource.</li>
+		<li><code>Accept</code>: contains a list of the preferred media types for the HALCollection. This is a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept">standard HTTP header</a> and can be used to request a specific version of the HALCollection resource, or a specific type of representation (e.g. plain JSON). The media types that can be used here are provided in the specification section, at the top of this documentation page. If this HTTP header is not provided, the default media type will be used to represent the HALCollection resource.</li>
 	</ul>
 	<h2>Query parameters</h2>
 	<p>The following query parameters can be used to influence the behavior of the HALCollection resource.</p>
