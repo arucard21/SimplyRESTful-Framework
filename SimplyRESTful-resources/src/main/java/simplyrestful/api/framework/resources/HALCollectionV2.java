@@ -16,6 +16,7 @@ public class HALCollectionV2<T extends HALResource> extends HALCollection<T> {
     public static final String PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2";
     public static final String MEDIA_TYPE_HAL_JSON = "application/hal+json;profile=\""+PROFILE_STRING+"\"";
     public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-halcollection-v2+json";
+    public static final String MEDIA_TYPE_PARAMETER_ITEM_TYPE = "item-type";
 
     private int total;
     @Link
