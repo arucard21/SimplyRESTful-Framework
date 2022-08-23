@@ -9,8 +9,8 @@
 		The HALCollection resource is a collection resource, one which contains multiple resources of a specific type, based on <a href="https://tools.ietf.org/html/draft-kelly-json-hal">HAL+JSON</a>. The HALCollection resource provides a single page of the collection of resources that you wish to retrieve. This resource can be represented as either HAL+JSON or plain JSON.<br>
 		<br>
 		This documentation is for version 2 of the HALCollection resource.
-	</p> 
-	<h2>Media Types</h2> 
+	</p>
+	<h2>Media Types</h2>
 	<ul>
 		<li>
 			<code>application/hal+json; profile=https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2</code>
@@ -32,8 +32,8 @@
 		<code>item-type</code>: contains the media type of the items in the collection. When used in the Accept HTTP header, this should be included in the HTTP Content Negotiation so the collection will return items with that media type.
 			<ul>
 				<li>This is intended for negotiating different versions or variations of a resource that can be represented as both HAL+JSON and plain JSON.</li>
-				<li>Due to technical limitations, The plain JSON representation of the collection cannot represent items with a HAL+JSON media type correctly. Nor can the HAL+JSON representation represent plain JSON media types correctly. Requesting this will result in a 406 Not Acceptable HTTP status code.</li>
-				<li>If this parameter is omitted, the item will use its default media type for HAL+JSON if the collection is represented as HAL+JSON. It will use the default plain JSON media type if the collection is represented as plain JSON.</li>
+				<li>Due to technical limitations, The plain JSON representation of the collection can only represent items with a plain JSON media type correctly. And the HAL+JSON representation can only represent HAL+JSON media types correctly. Requesting otherwise will result in a 406 Not Acceptable HTTP status code.</li>
+				<li>If this parameter is omitted, its value will be equivalent to the wildcard media type, */*, and the item will use the default media type with the same format as used for the collection.</li>
 			</ul>
 		</li>
 	</ul>
