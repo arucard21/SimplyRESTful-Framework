@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import simplyrestful.api.framework.MediaTypeUtils;
+import simplyrestful.api.framework.resources.HALCollectionV2;
 
 public class MediaTypeUtilsTest {
     private static final MediaType MEDIATYPE_WITH_PARAMETER_V2 = MediaType.valueOf("application/hal+json;profile=\"http://some-host.local/resource-name/v2\"");
@@ -136,4 +137,30 @@ public class MediaTypeUtilsTest {
     			List.of(MEDIATYPE_WITH_PARAMETER_V2));
     	Assertions.assertEquals(MediaType.valueOf(MEDIATYPE_WITH_PARAMETER_V2.toString() + ";charset=UTF-8"), selected);
     }
+
+	@Test
+	public void validateItemTypeCompatibility_shouldNotThrowAnException_whenBothMediaTypesAreHALJSON() {
+		Assertions.assertDoesNotThrow(() -> MediaTypeUtils.validateItemTypeCompatibility(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON), MEDIATYPE_WITH_PARAMETER_V1));
+	}
+
+	@Test
+	public void validateItemTypeCompatibility_shouldNotThrowAnException_whenNeitherMediaTypeIsHALJSON() {
+		Assertions.assertDoesNotThrow(() -> MediaTypeUtils.validateItemTypeCompatibility(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON), MEDIATYPE_CUSTOM_NO_PARAMETER_V2));
+	}
+
+	@Test
+	public void validateItemTypeCompatibility_shouldNotThrowAnException_whenCollectionIsHALJSONButItemIsNot() {
+		NotAcceptableException exception = Assertions.assertThrows(
+				NotAcceptableException.class,
+				() -> MediaTypeUtils.validateItemTypeCompatibility(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON), MEDIATYPE_CUSTOM_NO_PARAMETER_V2));
+		Assertions.assertEquals(MediaTypeUtils.ERROR_PLAIN_ITEM_TYPE_NOT_COMPATIBLE, exception.getMessage());
+	}
+
+	@Test
+	public void validateItemTypeCompatibility_shouldNotThrowAnException_whenItemIsHALJSONButCollectionIsNot() {
+		NotAcceptableException exception = Assertions.assertThrows(
+				NotAcceptableException.class,
+				() -> MediaTypeUtils.validateItemTypeCompatibility(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON), MEDIATYPE_WITH_PARAMETER_V2));
+		Assertions.assertEquals(MediaTypeUtils.ERROR_HAL_JSON_ITEM_TYPE_NOT_COMPATIBLE, exception.getMessage());
+	}
 }

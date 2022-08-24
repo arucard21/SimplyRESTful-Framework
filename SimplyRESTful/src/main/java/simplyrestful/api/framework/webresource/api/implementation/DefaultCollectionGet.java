@@ -110,12 +110,9 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 		    List<String> sort) {
     	MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
-    	if(selected.equals(MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON))) {
-    		QueryParamUtils.configureFieldsDefault(requestContext, QueryParamUtils.stripHALStructure(fields));
-    	}
-    	else {
-    		QueryParamUtils.configureFieldsDefault(requestContext, fields);
-    	}
+    	MediaType itemType = MediaType.valueOf(selected.getParameters().getOrDefault(HALCollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE, MediaType.WILDCARD));
+    	MediaTypeUtils.validateItemTypeCompatibility(selected, itemType);
+    	QueryParamUtils.configureFieldsDefault(requestContext, MediaTypeUtils.isHALJSON(selected) ? fields : QueryParamUtils.stripHALStructure(fields));
 		return HALCollectionV2Builder.from(
 			this.list(
 				pageStart,
@@ -128,4 +125,6 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 			.collectionSize(this.count(QueryParamUtils.stripHALStructure(query)))
 			.build(selected);
 	    }
+
+
 }

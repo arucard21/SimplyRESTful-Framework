@@ -23,6 +23,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 public class MediaTypeUtils {
+	public static final String ERROR_HAL_JSON_ITEM_TYPE_NOT_COMPATIBLE = "The item-type cannot be a HAL+JSON media type inside a plain JSON collection.";
+	public static final String ERROR_PLAIN_ITEM_TYPE_NOT_COMPATIBLE = "The item-type cannot be a plain JSON media type inside a HAL+JSON collection.";
 	public static final String ERROR_PREMATCHING_NOT_SUPPORTED = "This method must be called after JAX-RS matching is done. It cannot be called from a @PreMatching JAX-RS filter, use getAllProducibleMediaTypes() instead";
 	public static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_TYPE = 0; // Example: */*
 	public static final int MEDIA_TYPE_SPECIFICITY_WILDCARD_SUBTYPE = 1; // Example: application/*
@@ -182,6 +184,23 @@ public class MediaTypeUtils {
         }
         return false;
     }
+
+	public static void validateItemTypeCompatibility(MediaType collectionType, MediaType itemType) {
+		if(!itemType.equals(MediaType.WILDCARD_TYPE)) {
+    		boolean collectionIsHALJSON = isHALJSON(collectionType);
+    		boolean itemIsHALJSON = isHALJSON(itemType);
+    		if (collectionIsHALJSON && !itemIsHALJSON) {
+    			throw new NotAcceptableException(ERROR_PLAIN_ITEM_TYPE_NOT_COMPATIBLE);
+    		}
+    		if (!collectionIsHALJSON && itemIsHALJSON) {
+    			throw new NotAcceptableException(ERROR_HAL_JSON_ITEM_TYPE_NOT_COMPATIBLE);
+    		}
+    	}
+	}
+
+	public static boolean isHALJSON(MediaType selected) {
+		return selected.getType().equals(TYPE_APPLICATION) && selected.getSubtype().equals(APPLICATION_HAL_JSON_SUBTYPE);
+	}
 
     public static MediaType getMostSpecificMediaType(MediaType acceptableMediaType, MediaType producibleMediaType) {
         int clientSpecificity = determineMediaTypeSpecificity(acceptableMediaType);
