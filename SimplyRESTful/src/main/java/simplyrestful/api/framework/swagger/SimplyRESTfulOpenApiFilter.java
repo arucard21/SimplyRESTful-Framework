@@ -13,6 +13,7 @@ import io.swagger.v3.core.model.ApiDescription;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.resources.HALResource;
@@ -39,18 +40,18 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 		if (responses == null || responses.isEmpty()) {
 			return Optional.of(operation);
 		}
-		if(!responses.containsKey(ApiResponses.DEFAULT)) {
-			return Optional.of(operation);
+		for(ApiResponse response : responses.values()) {
+			Content content = response.getContent();
+			if(content == null) {
+				continue;
+			}
+			Content modifiedContent = new Content();
+			for(Entry<String, io.swagger.v3.oas.models.media.MediaType> mediaTypeEntry: content.entrySet()) {
+				String modifiedMediaType = withoutQsParameter(mediaTypeEntry.getKey());
+				modifiedContent.addMediaType(modifiedMediaType, mediaTypeEntry.getValue());
+			}
+			response.setContent(modifiedContent);
 		}
-		Content openApiMediaTypes = responses.getDefault().getContent();
-		Content modifiedOpenApiMediaTypes = new Content();
-		openApiMediaTypes.entrySet().stream()
-				.collect(Collectors.toMap(
-						entry -> withoutQsParameter(entry.getKey()),
-						Entry::getValue, (duplicate1, duplicate2) -> duplicate1))
-				.forEach(modifiedOpenApiMediaTypes::addMediaType);
-
-		responses.getDefault().setContent(modifiedOpenApiMediaTypes);
 		return super.filterOperation(operation, api, params, cookies, headers);
 	}
 
