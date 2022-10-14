@@ -91,7 +91,7 @@ public interface LegacyCollectionGet<T extends HALResource> extends DefaultList<
 		    mediaType = HALCollectionV1.MEDIA_TYPE_HAL_JSON,
 		    schema = @Schema(
 			    implementation = HALCollectionV1.class))
-    })
+    }, description = "A collection that can contain any kind of API resource.")
     default HALCollection<T> listHALResources(
     		@Context
     		ContainerRequestContext requestContext,
