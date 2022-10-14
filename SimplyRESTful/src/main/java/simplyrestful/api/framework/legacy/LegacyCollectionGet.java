@@ -35,8 +35,12 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
  * It defaults to returning a v1 collection but allows requesting a v2 collection.
  *
  * @deprecated Use {@link DefaultCollectionGet} with the {@link HALCollectionV2} resource instead.
+ *
+ * The @Deprecated annotation is not used as this causes the OpenAPI Specification to consider
+ * everything that shares a path with this operation to be deprecated as well. However, only
+ * this interface and default implementation is deprecated, not the corresponding API method.
  */
-@Deprecated(since = "0.12.0")
+//@Deprecated(since = "0.12.0")
 public interface LegacyCollectionGet<T extends HALResource> extends DefaultList<T>, DefaultCount {
 	public static final String V1_QUERY_PARAM_PAGE = "page";
     public static final String V1_QUERY_PARAM_COMPACT = "compact";
