@@ -44,7 +44,6 @@ import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
 import io.openapitools.jackson.dataformat.hal.HALLink;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
@@ -58,9 +57,7 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultResourc
 
 @Named
 @Path("/resources")
-@OpenAPIDefinition(
-		tags = { @Tag(name = "Example Resources") }
-)
+@Tag(name = "Example Resources")
 @Produces({
 		MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"; qs=0.5",
 		ExampleResource.EXAMPLE_MEDIA_TYPE_JSON + "; qs=0.8" })
