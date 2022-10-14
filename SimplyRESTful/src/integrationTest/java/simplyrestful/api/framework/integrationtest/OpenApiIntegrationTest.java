@@ -7,6 +7,8 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -14,8 +16,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -64,8 +64,8 @@ public class OpenApiIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void openApi_shouldNotContainASchemaForTheHALResourceParent() {
-        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(HALResource.class.getSimpleName()));
+    public void openApi_shouldContainASchemaForTheHALResourceParent() {
+        Assertions.assertTrue(retrieveOpenAPI().getComponents().getSchemas().containsKey(HALResource.class.getSimpleName()));
     }
 
     @Test

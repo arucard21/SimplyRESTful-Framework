@@ -55,17 +55,15 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 	}
 
 	/**
-	 * Remove the schema that's detected for the {@link HALResource} and
-	 * {@link HALCollection} parent classes.
+	 * Remove the schema that's detected for the {@link HALCollection} parent class.
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
 			Map<String, List<String>> headers) {
-		String halResourceSchemaName = HALResource.class.getSimpleName();
 		String halCollectionSchemaName = HALCollection.class.getSimpleName() + HALResource.class.getSimpleName();
 		String schemaName = schema.getName();
-		if (schemaName.equals(halResourceSchemaName) || schemaName.equals(halCollectionSchemaName)) {
+		if (schemaName.equals(halCollectionSchemaName)) {
 			return Optional.empty();
 		}
 		return super.filterSchema(schema, params, cookies, headers);
