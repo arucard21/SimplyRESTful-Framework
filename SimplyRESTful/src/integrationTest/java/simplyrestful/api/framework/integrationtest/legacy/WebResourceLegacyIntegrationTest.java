@@ -5,6 +5,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -12,8 +14,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.integrationtest.WebResourceIntegrationTest;
@@ -81,6 +81,7 @@ public class WebResourceLegacyIntegrationTest extends JerseyTest {
     public void webResource_shouldReturnHALV1CollectionWithLinkedResourcesByDefault_whenV1IsRequested() {
     	Response response = target()
     		.path(WebResourceIntegrationTest.WEB_RESOURCE_PATH)
+    		.queryParam(QUERY_PARAM_COMPACT, true)
     		.request()
     		.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
     		.get();

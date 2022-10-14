@@ -1,6 +1,7 @@
 package simplyrestful.api.framework.integrationtest;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
@@ -79,7 +81,9 @@ public class OpenApiIntegrationTest extends JerseyTest {
                 .getPaths().values().stream()
                 .flatMap(pathItem -> pathItem.readOperations().stream())
                 .flatMap(operation -> operation.getResponses().values().stream())
-                .flatMap(apiResponse -> apiResponse.getContent().keySet().stream())
+                .map(ApiResponse::getContent)
+                .filter(Objects::nonNull)
+                .flatMap(content -> content.keySet().stream())
                 .map(MediaType::valueOf)
                 .flatMap(mediaType -> mediaType.getParameters().keySet().stream())
                 .collect(Collectors.toList());
