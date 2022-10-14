@@ -128,8 +128,12 @@ public class SimplyRESTfulClient<T extends HALResource> {
             if (Objects.isNull(getHttpMethod)) {
                 break;
             }
-            boolean matchingMediaType = getHttpMethod.getResponses().getDefault().getContent().keySet().stream()
-                    .map(MediaType::valueOf).anyMatch(mediaType -> mediaType.equals(resourceMediaType));
+            boolean matchingMediaType = getHttpMethod.getResponses().values().stream()
+            		.map(apiResponse -> apiResponse.getContent())
+            		.filter(Objects::nonNull)
+            		.flatMap(content -> content.keySet().stream())
+            		.map(MediaType::valueOf)
+            		.anyMatch(mediaType -> mediaType.equals(resourceMediaType));
             if (matchingMediaType) {
                 String resourcePath = pathEntry.getKey();
                 resourceUriBuilder = UriBuilder.fromUri(baseApiUri).path(resourcePath);
