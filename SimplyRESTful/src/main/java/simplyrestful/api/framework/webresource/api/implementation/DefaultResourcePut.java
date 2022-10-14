@@ -17,6 +17,11 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultExists;
@@ -42,7 +47,13 @@ public interface DefaultResourcePut<T extends HALResource> extends DefaultExists
      */
     @Path("/{id}")
     @PUT
-    @Operation(description = "Create a resource with a specified ID or update that resource. Returns a 201 HTTP status with the UUID of the resource in the Location header, if a new one was created. Otherwise it just returns 200 OK.")
+    @Operation(description = "Modify an existing API resource.")
+    @RequestBody(description = "The modified API resource that should replace the existing one.", content = @Content(schema = @Schema(implementation = HALResource.class)))
+    @ApiResponses({
+    	@ApiResponse(responseCode = "200", description = "The API resource was successfully updated."),
+    	@ApiResponse(responseCode = "404", description = "The API resource did not exist."),
+    	@ApiResponse(responseCode = "400", description = "The API resource is incorrect. The self link in the API resource may be incorrect.")
+    })
     default Response putHALResource(
     		@Context
             ResourceInfo resourceInfo,
@@ -54,7 +65,7 @@ public interface DefaultResourcePut<T extends HALResource> extends DefaultExists
     	    UUID id,
     	    @NotNull
     	    @Valid
-    	    @Parameter(description = "The resource to be updated", required = true)
+    	    @Parameter(required = true)
             T resource) {
     	if (!this.exists(id)) {
     	    throw new NotFoundException(ERROR_RESOURCE_WITH_ID_NOT_EXISTS);

@@ -10,11 +10,14 @@ import javax.ws.rs.core.UriInfo;
 
 import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.HALServiceDocument;
 
 @Named
 @Path("")
+@Tag(name = "Service Document")
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\""+HALServiceDocument.PROFILE_STRING + "\"")
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\""+HALServiceDocument.PROFILE_STRING + "\"")
 public class WebResourceRoot{
@@ -23,9 +26,8 @@ public class WebResourceRoot{
 
 	@Produces({MediaTypeUtils.APPLICATION_HAL_JSON})
 	@GET
-	@Operation(
-		description  = "Provide a service document that describes the service and links to the OpenAPI Specification"
-	)
+	@Operation(description  = "Retrive a Service Document that describes the service and links to the OpenAPI Specification")
+	@ApiResponse(description = "A Service Document that links to the OpenAPI Specification")
 	public HALServiceDocument getServiceDocument() {
 		HALServiceDocument serviceDocument = new HALServiceDocument();
 		HALLink descriptionLink = new HALLink.Builder(uriInfo.getRequestUriBuilder().path("openapi.json").build()).build();

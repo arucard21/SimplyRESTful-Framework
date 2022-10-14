@@ -14,6 +14,11 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultCreate;
@@ -33,7 +38,12 @@ public interface DefaultCollectionPost<T extends HALResource> extends DefaultExi
      *         resource contains an self-link that refers to an existing resource.
      */
     @POST
-    @Operation(description = "Create a new resource which can already have a self-link containing a URI as identifier or one will be generated")
+    @Operation(description = "Create a new API resource which can already have a self-link containing a URI as identifier or one will be generated")
+    @RequestBody(description = "The new API resource that should be created.", content = @Content(schema = @Schema(implementation = HALResource.class)))
+    @ApiResponses({
+    		@ApiResponse(responseCode = "201", description = "The new API resource was successfully created."),
+    		@ApiResponse(responseCode = "409", description = "An API resource with the ID from the self link already exists."),
+    })
     default Response postHALResource(
     		@Context
             ResourceInfo resourceInfo,
@@ -41,7 +51,7 @@ public interface DefaultCollectionPost<T extends HALResource> extends DefaultExi
             UriInfo uriInfo,
             @NotNull
             @Valid
-            @Parameter(description = "resource", required = true)
+            @Parameter(required = true)
             T resource) {
     	UUID resourceId;
     	if(resource.getSelf() != null) {

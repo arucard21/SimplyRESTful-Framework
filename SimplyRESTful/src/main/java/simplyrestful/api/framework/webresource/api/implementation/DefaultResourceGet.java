@@ -20,6 +20,8 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.WebResourceUtils;
@@ -41,7 +43,11 @@ public interface DefaultResourceGet<T extends HALResource> extends DefaultRead<T
      */
     @Path("/{id}")
     @GET
-    @Operation(description = "Retrieve a single resource")
+    @Operation(description = "Retrieve an API resource")
+    @ApiResponses({
+    	@ApiResponse(responseCode = "200", description = "The API resource has been retrieved."),
+    	@ApiResponse(responseCode = "404", description = "The API resource did not exist.")
+    })
     default T getHALResource(
     		@Context
     		ContainerRequestContext requestContext,

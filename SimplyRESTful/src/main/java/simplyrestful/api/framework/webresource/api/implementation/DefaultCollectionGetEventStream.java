@@ -16,6 +16,7 @@ import javax.ws.rs.sse.SseEventSink;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultStream;
@@ -39,7 +40,8 @@ public interface DefaultCollectionGetEventStream<T extends HALResource> extends 
      */
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
-    @Operation(description = "Get a stream of resources")
+    @Operation(description = "Retrieve a filtered, sorted collection of resources as an event stream.")
+    @ApiResponse(description = "An event stream containing your API resources.")
     default void streamHALResources(
     		@Context
     		ContainerRequestContext requestContext,

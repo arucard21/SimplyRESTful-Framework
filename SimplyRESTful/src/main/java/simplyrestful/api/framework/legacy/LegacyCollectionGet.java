@@ -73,25 +73,25 @@ public interface LegacyCollectionGet<T extends HALResource> extends DefaultList<
      */
     @GET
     @Produces({
-	HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
-	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9",
-	HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
+    		HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
+    		HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9",
+    		HALCollectionV1.MEDIA_TYPE_HAL_JSON+";qs=0.2"
 	})
-    @Operation(description = "Get a list of resources")
-    @ApiResponse(content = {
-	    @Content(
-		    mediaType = HALCollectionV2.MEDIA_TYPE_HAL_JSON,
-		    schema = @Schema(
-			    implementation = HALCollectionV2.class)),
-	    @Content(
-		    mediaType = HALCollectionV2.MEDIA_TYPE_JSON,
-		    schema = @Schema(
-			    implementation = HALCollectionV2.class)),
-	    @Content(
-		    mediaType = HALCollectionV1.MEDIA_TYPE_HAL_JSON,
-		    schema = @Schema(
-			    implementation = HALCollectionV1.class))
-    }, description = "A collection that can contain any kind of API resource.")
+    @Operation(description = "Retrieve a filtered, sorted collection of API resources.")
+    @ApiResponse(responseCode = "200", description = "A pageable collection containing your API resources.", content = {
+    		@Content(
+    				mediaType = HALCollectionV2.MEDIA_TYPE_HAL_JSON,
+    				schema = @Schema(
+    						implementation = HALCollectionV2.class)),
+		    @Content(
+		    		mediaType = HALCollectionV2.MEDIA_TYPE_JSON,
+		    		schema = @Schema(
+		    				implementation = HALCollectionV2.class)),
+		    @Content(
+		    		mediaType = HALCollectionV1.MEDIA_TYPE_HAL_JSON,
+		    		schema = @Schema(
+		    				implementation = HALCollectionV1.class))
+    })
     default HALCollection<T> listHALResources(
     		@Context
     		ContainerRequestContext requestContext,
@@ -102,8 +102,7 @@ public interface LegacyCollectionGet<T extends HALResource> extends DefaultList<
 		    @Context
 		    HttpHeaders httpHeaders,
 		    @QueryParam(V1_QUERY_PARAM_PAGE)
-	        @DefaultValue(V1_QUERY_PARAM_PAGE_DEFAULT)
-		    @Parameter(description  = "The page to be shown", required = false)
+		    @Parameter(description  = "The page to be shown", required = false, deprecated = true)
 	        int page,
 	        @QueryParam(DefaultCollectionGet.QUERY_PARAM_PAGE_START)
 		    @DefaultValue(DefaultCollectionGet.QUERY_PARAM_PAGE_START_DEFAULT)
@@ -114,8 +113,7 @@ public interface LegacyCollectionGet<T extends HALResource> extends DefaultList<
 		    @Parameter(description = "The amount of resources shown on each page", required = false)
 		    int pageSize,
 		    @QueryParam(V1_QUERY_PARAM_COMPACT)
-	        @DefaultValue(V1_QUERY_PARAM_COMPACT_DEFAULT)
-		    @Parameter(description = "Provide minimal information for each resource", required = false)
+		    @Parameter(description = "Provide minimal information for each resource", required = false, deprecated = true)
 	        boolean compact,
 	        @QueryParam(DefaultCollectionGet.QUERY_PARAM_FIELDS)
 		    @DefaultValue(DefaultCollectionGet.QUERY_PARAM_FIELDS_DEFAULT)

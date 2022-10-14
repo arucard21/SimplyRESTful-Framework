@@ -69,8 +69,8 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 	HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
 	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9"
 	})
-    @Operation(description = "Get a list of resources")
-    @ApiResponse(content = {
+    @Operation(description = "Retrieve a filtered, sorted collection of API resources.")
+    @ApiResponse(responseCode = "200", description = "A pageable collection containing your API resources.", content = {
 	    @Content(
 		    mediaType = HALCollectionV2.MEDIA_TYPE_HAL_JSON,
 		    schema = @Schema(
