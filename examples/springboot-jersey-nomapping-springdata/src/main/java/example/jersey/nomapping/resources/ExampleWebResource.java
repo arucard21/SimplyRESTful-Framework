@@ -28,12 +28,16 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -49,6 +53,7 @@ import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.legacy.LegacyCollectionGet;
 import simplyrestful.api.framework.queryparams.SortOrder;
+import simplyrestful.api.framework.resources.HALCollection;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionPost;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceDelete;
@@ -209,5 +214,30 @@ public class ExampleWebResource implements LegacyCollectionGet<ExampleResource>,
 			persistedResource.setUUID(id);
 		}
 		return persistedResource;
+	}
+
+	@Override
+	public HALCollection<ExampleResource> listHALResources(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, int page, int pageStart, int pageSize, boolean compact, List<String> fields, String query, List<String> sort) {
+		return LegacyCollectionGet.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact, fields, query, sort);
+	}
+
+	@Override
+	public ExampleResource getHALResource(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, @NotNull UUID id, List<String> fields) {
+		return DefaultResourceGet.super.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
+	}
+
+	@Override
+	public Response postHALResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
+		return DefaultCollectionPost.super.postHALResource(resourceInfo, uriInfo, resource);
+	}
+
+	@Override
+	public Response putHALResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
+		return DefaultResourcePut.super.putHALResource(resourceInfo, uriInfo, id, resource);
+	}
+
+	@Override
+	public Response deleteHALResource(@NotNull UUID id) {
+		return DefaultResourceDelete.super.deleteHALResource(id);
 	}
 }
