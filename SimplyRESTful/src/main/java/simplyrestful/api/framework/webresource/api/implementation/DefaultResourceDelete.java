@@ -12,8 +12,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import simplyrestful.api.framework.api.crud.DefaultDelete;
 import simplyrestful.api.framework.resources.HALResource;
 
@@ -27,10 +25,6 @@ public interface DefaultResourceDelete<T extends HALResource> extends DefaultDel
     @Path("/{id}")
     @DELETE
     @Operation(description = "Delete this API resource")
-    @ApiResponses({
-    	@ApiResponse(responseCode = "204", description = "The API resource was successfully deleted."),
-    	@ApiResponse(responseCode = "404", description = "The API resource did not exist.")
-    })
     default Response deleteHALResource(
     		@PathParam("id")
     	    @NotNull
