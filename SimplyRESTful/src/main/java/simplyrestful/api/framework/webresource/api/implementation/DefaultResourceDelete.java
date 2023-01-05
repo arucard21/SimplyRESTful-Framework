@@ -13,9 +13,9 @@ import javax.ws.rs.core.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import simplyrestful.api.framework.api.crud.DefaultDelete;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultResourceDelete<T extends HALResource> extends DefaultDelete<T> {
+public interface DefaultResourceDelete<T extends APIResource> extends DefaultDelete<T> {
 	/**
      * Delete a resource.
      *

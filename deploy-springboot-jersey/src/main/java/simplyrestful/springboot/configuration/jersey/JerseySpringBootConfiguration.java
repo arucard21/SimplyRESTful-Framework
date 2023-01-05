@@ -14,7 +14,6 @@ import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.filters.AcceptHeaderModifier;
 import simplyrestful.api.framework.filters.UriCustomizer;
-import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 @Configuration
@@ -22,7 +21,6 @@ public class JerseySpringBootConfiguration implements ResourceConfigCustomizer {
     @Override
     public void customize(ResourceConfig config) {
         config.register(WebResourceRoot.class);
-        config.register(JacksonHALJsonProvider.class);
         config.register(JacksonJsonProvider.class);
         config.register(UriCustomizer.class);
         config.register(AcceptHeaderModifier.class);

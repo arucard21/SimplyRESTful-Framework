@@ -45,13 +45,13 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import example.datastore.DataStore;
 import example.datastore.StoredEmbeddedObject;
 import example.datastore.StoredObject;
-import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
+import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Named
@@ -59,177 +59,176 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })
 @Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
 @Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
-public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
-    public static final ThreadLocal<SearchContext> REQUEST_SEARCHCONTEXT = new ThreadLocal<>();
-    /**
-     * Contains the mapping between the API's HAL resources, identified by the
-     * resource's URI, and the data store's resources, identified by a UUID. In an
-     * actual implementation, this mapping should probably be persistently stored,
-     * not kept in-memory.
-     */
-    private Map<String, UUID> resourceMapping;
-    private DataStore dataStore;
-    @Context
-    private ResourceInfo resourceInfo;
-    @Context
-    private UriInfo uriInfo;
+public class ExampleWebResource
+		implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
+	public static final ThreadLocal<SearchContext> REQUEST_SEARCHCONTEXT = new ThreadLocal<>();
+	/**
+	 * Contains the mapping between the API's HAL resources, identified by the
+	 * resource's URI, and the data store's resources, identified by a UUID. In an
+	 * actual implementation, this mapping should probably be persistently stored,
+	 * not kept in-memory.
+	 */
+	private Map<URI, UUID> resourceMapping;
+	private DataStore dataStore;
+	@Context
+	private ResourceInfo resourceInfo;
+	@Context
+	private UriInfo uriInfo;
 
-    @Inject
-    public ExampleWebResource(DataStore dataStore) {
-	this.dataStore = dataStore;
-	resourceMapping = new HashMap<>();
-	for (StoredObject entity : dataStore.getData()) {
-	    UUID entityID = entity.getId();
-	    URI relativeResourceURI = UriBuilder.fromResource(ExampleWebResource.class).path(entityID.toString())
-		    .build();
-	    resourceMapping.put(relativeResourceURI.getPath(), entityID);
+	@Inject
+	public ExampleWebResource(DataStore dataStore) {
+		this.dataStore = dataStore;
+		resourceMapping = new HashMap<>();
+		for (StoredObject entity : dataStore.getData()) {
+			UUID entityID = entity.getId();
+			URI relativeResourceURI = UriBuilder.fromResource(ExampleWebResource.class).path(entityID.toString())
+					.build();
+			resourceMapping.put(relativeResourceURI, entityID);
+		}
 	}
-    }
 
-    @Override
-    public ExampleResource create(ExampleResource resource, UUID resourceUUID) {
-	HALLink selfLink = resource.getSelf();
-	if (selfLink == null) {
-	    throw new BadRequestException("The resource does not contain a self-link");
+	@Override
+	public ExampleResource create(ExampleResource resource, UUID resourceUUID) {
+		Link selfLink = resource.getSelf();
+		if (selfLink == null) {
+			throw new BadRequestException("The resource does not contain a self-link");
+		}
+		URI resourceURI = selfLink.getHref();
+		if (resourceURI == null || resourceURI.toString().isEmpty()) {
+			throw new BadRequestException("The resource contains an empty self-link");
+		}
+		if (resourceMapping.get(resourceURI) == null) {
+			// add this resource to the resource mapping
+			resourceMapping.put(resourceURI, UUID.randomUUID());
+		}
+		StoredObject previousData = dataStore.getObject(resourceMapping.get(resourceURI));
+		if (previousData == null) {
+			throw new IllegalStateException("The to-be-updated resource does not exist yet.");
+		}
+		dataStore.getData().remove(dataStore.getObject(resourceMapping.get(resourceURI)));
+		dataStore.getData().add(convertToEntity(resource));
+		return convertToResource(previousData);
 	}
-	String resourceURI = selfLink.getHref();
-	if (resourceURI == null || resourceURI.isEmpty()) {
-	    throw new BadRequestException("The resource contains an empty self-link");
-	}
-	if (resourceMapping.get(resourceURI) == null) {
-	    // add this resource to the resource mapping
-	    resourceMapping.put(resourceURI, UUID.randomUUID());
-	}
-	StoredObject previousData = dataStore.getObject(resourceMapping.get(resourceURI));
-	if (previousData == null) {
-	    throw new IllegalStateException("The to-be-updated resource does not exist yet.");
-	}
-	dataStore.getData().remove(dataStore.getObject(resourceMapping.get(resourceURI)));
-	dataStore.getData().add(convertToEntity(resource));
-	return convertToResource(previousData);
-    }
 
-    @Override
-    public ExampleResource read(UUID resourceUUID) {
-	StoredObject resourceFromDataStore = dataStore.getObject(resourceUUID);
-	return resourceFromDataStore == null ? null : convertToResource(resourceFromDataStore);
-    }
-
-    @Override
-    public ExampleResource update(ExampleResource resource, UUID resourceUUID) {
-	HALLink selfLink = resource.getSelf();
-	if (selfLink == null) {
-	    throw new BadRequestException("The resource does not contain a self-link");
+	@Override
+	public ExampleResource read(UUID resourceUUID) {
+		StoredObject resourceFromDataStore = dataStore.getObject(resourceUUID);
+		return resourceFromDataStore == null ? null : convertToResource(resourceFromDataStore);
 	}
-	String resourceURI = selfLink.getHref();
-	if (resourceURI == null || resourceURI.isEmpty()) {
-	    throw new BadRequestException("The resource contains an empty self-link");
-	}
-	if (resourceMapping.get(resourceURI) == null) {
-	    // add this resource to the resource mapping
-	    resourceMapping.put(resourceURI, UUID.randomUUID());
-	}
-	StoredObject previousData = dataStore.getObject(resourceMapping.get(resourceURI));
-	if (previousData == null) {
-	    throw new IllegalStateException("The to-be-updated resource does not exist yet.");
-	}
-	dataStore.getData().remove(dataStore.getObject(resourceMapping.get(resourceURI)));
-	dataStore.getData().add(convertToEntity(resource));
-	return convertToResource(previousData);
-    }
 
-    @Override
-    public ExampleResource delete(UUID resourceUUID) {
-	StoredObject previousData = dataStore.getObject(resourceUUID);
-	dataStore.getData().remove(previousData);
-	return previousData == null ? null : convertToResource(previousData);
-    }
-
-    @Override
-    public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query,
-	    List<SortOrder> sort) {
-	if (!sort.isEmpty()) {
-	    throw new ServerErrorException("This API does not yet support sorting", 501);
+	@Override
+	public ExampleResource update(ExampleResource resource, UUID resourceUUID) {
+		Link selfLink = resource.getSelf();
+		if (selfLink == null) {
+			throw new BadRequestException("The resource does not contain a self-link");
+		}
+		URI resourceURI = selfLink.getHref();
+		if (resourceURI == null || resourceURI.toString().isEmpty()) {
+			throw new BadRequestException("The resource contains an empty self-link");
+		}
+		if (resourceMapping.get(resourceURI) == null) {
+			// add this resource to the resource mapping
+			resourceMapping.put(resourceURI, UUID.randomUUID());
+		}
+		StoredObject previousData = dataStore.getObject(resourceMapping.get(resourceURI));
+		if (previousData == null) {
+			throw new IllegalStateException("The to-be-updated resource does not exist yet.");
+		}
+		dataStore.getData().remove(dataStore.getObject(resourceMapping.get(resourceURI)));
+		dataStore.getData().add(convertToEntity(resource));
+		return convertToResource(previousData);
 	}
-	List<StoredObject> data = dataStore.getData();
-	int dataSize = data.size();
-	if (pageStart > dataSize) {
-	    return Collections.emptyList();
+
+	@Override
+	public ExampleResource delete(UUID resourceUUID) {
+		StoredObject previousData = dataStore.getObject(resourceUUID);
+		dataStore.getData().remove(previousData);
+		return previousData == null ? null : convertToResource(previousData);
 	}
-	int endElement = pageStart + pageSize;
-	if (endElement > dataSize) {
-	    endElement = dataSize;
+
+	@Override
+	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query,
+			List<SortOrder> sort) {
+		if (!sort.isEmpty()) {
+			throw new ServerErrorException("This API does not yet support sorting", 501);
+		}
+		List<StoredObject> data = dataStore.getData();
+		int dataSize = data.size();
+		if (pageStart > dataSize) {
+			return Collections.emptyList();
+		}
+		int endElement = pageStart + pageSize;
+		if (endElement > dataSize) {
+			endElement = dataSize;
+		}
+		List<ExampleResource> resources = data.subList(pageStart, endElement).stream()
+				.map((entity) -> convertToResource(entity)).collect(Collectors.toList());
+		SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
+		if (searchContext == null) {
+			return resources;
+		}
+		SearchCondition<ExampleResource> searchCondition = searchContext.getCondition(ExampleResource.class);
+		if (searchCondition == null) {
+			return resources;
+		}
+		return searchCondition.findAll(resources);
 	}
-	List<ExampleResource> resources = data.subList(pageStart, endElement).stream()
-		.map((entity) -> convertToResource(entity)).collect(Collectors.toList());
-	SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
-	if (searchContext == null) {
-	    return resources;
+
+	@Override
+	public int count(String query) {
+		SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
+		if (searchContext == null) {
+			return dataStore.getData().size();
+		}
+		SearchCondition<ExampleResource> searchCondition = searchContext.getCondition(ExampleResource.class);
+		if (searchCondition == null) {
+			return dataStore.getData().size();
+		}
+		return searchCondition
+				.findAll(dataStore.getData().stream().map(this::convertToResource).collect(Collectors.toList())).size();
 	}
-	SearchCondition<ExampleResource> searchCondition = searchContext.getCondition(ExampleResource.class);
-	if (searchCondition == null) {
-	    return resources;
+
+	@Override
+	public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
+		return dataStore.getData().stream().map(this::convertToResource);
 	}
-	return searchCondition.findAll(resources);
-    }
 
-    @Override
-    public int count(String query) {
-	SearchContext searchContext = REQUEST_SEARCHCONTEXT.get();
-	if (searchContext == null) {
-	    return dataStore.getData().size();
+	@Override
+	public boolean exists(UUID resourceUUID) {
+		return this.read(resourceUUID) != null;
 	}
-	SearchCondition<ExampleResource> searchCondition = searchContext.getCondition(ExampleResource.class);
-	if (searchCondition == null) {
-	    return dataStore.getData().size();
+
+	private StoredObject convertToEntity(ExampleResource exampleResource) {
+		StoredObject dataResource = new StoredObject();
+		dataResource.setDescription(exampleResource.getDescription());
+		dataResource.setId(resourceMapping.get(exampleResource.getSelf().getHref()));
+		dataResource.setEmbedded(convertEmbeddedToEntity(exampleResource.getEmbeddedResource()));
+		return dataResource;
 	}
-	return searchCondition
-		.findAll(dataStore.getData().stream().map(this::convertToResource).collect(Collectors.toList())).size();
-    }
 
-    @Override
-    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
-	return dataStore.getData().stream().map(this::convertToResource);
-    }
+	private StoredEmbeddedObject convertEmbeddedToEntity(ExampleEmbeddedResource embedded) {
+		StoredEmbeddedObject embObj = new StoredEmbeddedObject();
+		embObj.setName(embedded.getName());
+		return embObj;
+	}
 
-    @Override
-    public boolean exists(UUID resourceUUID) {
-	return this.read(resourceUUID) != null;
-    }
+	private ExampleResource convertToResource(StoredObject storedResource) {
+		ExampleResource exampleResource = new ExampleResource();
+		exampleResource.setDescription(storedResource.getDescription());
+		// create resource URI with new UUID and add it to the mapping
+		exampleResource.setSelf(new Link(
+				WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, storedResource.getId()),
+				MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+		exampleResource.setEmbeddedResource(convertEmbeddedToResource(storedResource.getEmbedded()));
+		resourceMapping.put(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo), storedResource.getId());
+		return exampleResource;
+	}
 
-    private StoredObject convertToEntity(ExampleResource exampleResource) {
-	StoredObject dataResource = new StoredObject();
-	dataResource.setDescription(exampleResource.getDescription());
-	dataResource.setId(resourceMapping.get(exampleResource.getSelf().getHref()));
-	dataResource.setEmbedded(convertEmbeddedToEntity(exampleResource.getEmbeddedResource()));
-	return dataResource;
-    }
-
-    private StoredEmbeddedObject convertEmbeddedToEntity(ExampleEmbeddedResource embedded) {
-	StoredEmbeddedObject embObj = new StoredEmbeddedObject();
-	embObj.setName(embedded.getName());
-	return embObj;
-    }
-
-    private ExampleResource convertToResource(StoredObject storedResource) {
-	ExampleResource exampleResource = new ExampleResource();
-	exampleResource.setDescription(storedResource.getDescription());
-	// create resource URI with new UUID and add it to the mapping
-	exampleResource.setSelf(createSelfLinkWithUUID(storedResource.getId(), exampleResource.getProfile()));
-	exampleResource.setEmbeddedResource(convertEmbeddedToResource(storedResource.getEmbedded()));
-	resourceMapping.put(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo).getPath(), storedResource.getId());
-	return exampleResource;
-    }
-
-    private ExampleEmbeddedResource convertEmbeddedToResource(StoredEmbeddedObject embedded) {
-	ExampleEmbeddedResource embRes = new ExampleEmbeddedResource();
-	embRes.setName(embedded.getName());
-	resourceMapping.put(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo).getPath(), embedded.getId());
-	return embRes;
-    }
-
-    private HALLink createSelfLinkWithUUID(UUID id, URI resourceProfile) {
-	return new HALLink.Builder(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, id)).type(MediaTypeUtils.APPLICATION_HAL_JSON)
-		.profile(resourceProfile).build();
-    }
+	private ExampleEmbeddedResource convertEmbeddedToResource(StoredEmbeddedObject embedded) {
+		ExampleEmbeddedResource embRes = new ExampleEmbeddedResource();
+		embRes.setName(embedded.getName());
+		resourceMapping.put(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo),
+				embedded.getId());
+		return embRes;
+	}
 }

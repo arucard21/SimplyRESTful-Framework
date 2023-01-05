@@ -15,18 +15,15 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.QueryParamUtils;
-import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultRead;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultResourceGet<T extends HALResource> extends DefaultRead<T> {
+public interface DefaultResourceGet<T extends APIResource> extends DefaultRead<T> {
 	public static final String QUERY_PARAM_FIELDS_DEFAULT = "all";
 
 	/**
@@ -60,21 +57,6 @@ public interface DefaultResourceGet<T extends HALResource> extends DefaultRead<T
 	        @Parameter(description = "The fields that should be retrieved", required = false)
 	        List<String> fields) {
     	QueryParamUtils.configureFieldsDefault(requestContext, fields);
-    	T resource = Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
-        MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
-        if (MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.isCompatible(selected)) {
-            resource.setSelf(
-                    WebResourceUtils.createLink(
-                            WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, id),
-                            MediaTypeUtils.APPLICATION_HAL_JSON,
-                            resource.getProfile()));
-        } else {
-            resource.setSelf(
-                    WebResourceUtils.createLink(
-                            WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, id),
-                            resource.getCustomJsonMediaType().toString(),
-                            null));
-        }
-        return resource;
+    	return Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
     }
 }

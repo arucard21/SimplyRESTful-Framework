@@ -79,8 +79,8 @@ public class SimplyRESTfulClientApiTest {
         Assertions.assertEquals(resource.getComplexAttribute().getName(), createdResource.getComplexAttribute().getName());
         Assertions.assertNotNull(createdResource.getSelf());
         Assertions.assertNotNull(createdResource.getSelf().getHref());
-        Assertions.assertFalse(createdResource.getSelf().getHref().isBlank());
-        Assertions.assertEquals(createdResourceLocation, URI.create(createdResource.getSelf().getHref()));
+        Assertions.assertFalse(createdResource.getSelf().getHref().toString().isBlank());
+        Assertions.assertEquals(createdResourceLocation, createdResource.getSelf().getHref());
         Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(createdResourceLocation));
         Assertions.assertFalse(simplyRESTfulClient.exists(createdResourceLocation));
     }
@@ -89,7 +89,7 @@ public class SimplyRESTfulClientApiTest {
     public void read_shouldReturnTheResource() {
         List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(DefaultCollectionGet.QUERY_PARAM_FIELDS_ALL), "", Collections.emptyList());
         ExampleResource resourceFromList = listOfResources.get(0);
-        ExampleResource resourceFromOwnWebResource = simplyRESTfulClient.read(URI.create(resourceFromList.getSelf().getHref()));
+        ExampleResource resourceFromOwnWebResource = simplyRESTfulClient.read(resourceFromList.getSelf().getHref());
         Assertions.assertEquals(resourceFromList.getSelf(), resourceFromOwnWebResource.getSelf());
         Assertions.assertEquals(resourceFromList.getDescription(), resourceFromOwnWebResource.getDescription());
         Assertions.assertEquals(resourceFromList.getComplexAttribute().getName(), resourceFromOwnWebResource.getComplexAttribute().getName());
@@ -98,7 +98,7 @@ public class SimplyRESTfulClientApiTest {
     @Test
     public void exists_shouldReturnWhetherTheResourceExists() {
         List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, Collections.emptyList(), "", Collections.emptyList());
-        Assertions.assertTrue(simplyRESTfulClient.exists(URI.create(listOfResources.get(0).getSelf().getHref())));
+        Assertions.assertTrue(simplyRESTfulClient.exists(listOfResources.get(0).getSelf().getHref()));
         Assertions.assertFalse(simplyRESTfulClient.exists(simplyRESTfulClient.createResourceUriFromUuid(UUID.randomUUID())));
     }
 

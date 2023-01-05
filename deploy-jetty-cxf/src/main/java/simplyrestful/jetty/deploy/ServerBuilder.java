@@ -47,8 +47,7 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.filters.AcceptHeaderModifier;
 import simplyrestful.api.framework.filters.UriCustomizer;
-import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 
@@ -64,7 +63,7 @@ import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 public class ServerBuilder {
 	private static final Logger LOGGER = LoggerFactory.getLogger("simplyrestful.jetty.deploy.ServerBuilder");
 	private String address = "http://localhost:9000";
-	private List<Class<? extends DefaultWebResource<? extends HALResource>>> webResources = new ArrayList<>();
+	private List<Class<? extends DefaultWebResource<? extends APIResource>>> webResources = new ArrayList<>();
 	private List<Object> providers = new ArrayList<>();
 
 	/**
@@ -85,7 +84,7 @@ public class ServerBuilder {
 	 * @param webResource is the SimplyRESTful JAX-RS web resource to add to the server
 	 * @return the builder object
 	 */
-	public <T extends HALResource> ServerBuilder withWebResource(
+	public <T extends APIResource> ServerBuilder withWebResource(
 			Class<? extends DefaultWebResource<T>> webResource) {
 		webResources.add(webResource);
 		return this;
@@ -121,7 +120,7 @@ public class ServerBuilder {
         // Configure resources
         List<Class<?>> resourceClasses = new ArrayList<>();
         resourceClasses.add(WebResourceRoot.class);
-        for (Class<? extends DefaultWebResource<? extends HALResource>> webResource: webResources){
+        for (Class<? extends DefaultWebResource<? extends APIResource>> webResource: webResources){
 			resourceClasses.add(webResource);
         }
         sf.setResourceClasses(resourceClasses);
@@ -144,7 +143,6 @@ public class ServerBuilder {
         providers.addAll(Arrays.asList(
         		ValidationExceptionMapper.class,
         		MultipartProvider.class,
-        		JacksonHALJsonProvider.class,
         		JacksonJsonProvider.class,
         		UriCustomizer.class,
         		AcceptHeaderModifier.class,

@@ -12,5 +12,5 @@ repositories {
 dependencies {
 	api project(':SimplyRESTful-resources')
 	api group: "jakarta.persistence", name: "jakarta.persistence-api", version: jakartaPersistenceVersion
-	
+	api group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
 }

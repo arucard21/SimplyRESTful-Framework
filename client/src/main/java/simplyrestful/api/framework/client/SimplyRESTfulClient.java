@@ -1,9 +1,9 @@
 package simplyrestful.api.framework.client;
 
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -31,22 +31,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.parser.OpenAPIV3Parser;
-import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.HALCollectionV2;
-import simplyrestful.api.framework.resources.HALResource;
-import simplyrestful.api.framework.resources.HALServiceDocument;
+import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.APIServiceDocument;
+import simplyrestful.api.framework.resources.Link;
 
-public class SimplyRESTfulClient<T extends HALResource> {
+public class SimplyRESTfulClient<T extends APIResource> {
 	public static final String ERROR_DISCOVER_RESOURCE_URI_REQUIRED = "This method can only be used after the resource URI has been discovered. This is done at every API request but you can trigger it manually by calling discoverResourceUri() directly";
 	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
-	public static final String MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON = "application/hal+json; profile=\""+ HALServiceDocument.PROFILE_STRING + "\"";
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
 	public static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
 	public static final String HAL_ITEM_KEY = "item";
@@ -61,7 +59,6 @@ public class SimplyRESTfulClient<T extends HALResource> {
 	public static final String QUERY_PARAM_SORT = "sort";
     private final Class<T> resourceClass;
     private final URI baseApiUri;
-    private final String resourceProfile;
     private final MediaType resourceMediaType;
     private final Client client;
     private UriBuilder resourceUriBuilder;
@@ -70,27 +67,19 @@ public class SimplyRESTfulClient<T extends HALResource> {
     SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
         this.baseApiUri = baseApiUri;
         this.client = client;
-        client.register(JacksonHALJsonProvider.class);
         client.register(JacksonJsonProvider.class);
         client.register(ObjectMapperProvider.class);
         this.resourceClass = resourceClass;
-        this.resourceProfile = discoverResourceProfile();
         this.resourceMediaType = detectResourceMediaType();
     }
 
-    private String discoverResourceProfile() {
-        try {
-            return resourceClass.getDeclaredConstructor().newInstance().getProfile().toString();
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalArgumentException(
-                    "Resource class could not be instantiated so the profile and media type could not be detected", e);
-        }
-    }
-
     private MediaType detectResourceMediaType() {
-        HashMap<String, String> parameters = new HashMap<>();
-        parameters.put(HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE, resourceProfile);
-        return new MediaType(MEDIA_TYPE_HAL_JSON_TYPE, MEDIA_TYPE_HAL_JSON_SUBTYPE, parameters);
+    	try {
+			return resourceClass.getDeclaredConstructor().newInstance().customJsonMediaType();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+			return null;
+		}
     }
 
     /**
@@ -119,9 +108,9 @@ public class SimplyRESTfulClient<T extends HALResource> {
         }
         Builder request = client.target(baseApiUri).request();
         configureHttpHeaders(request, headers);
-        request.accept(MEDIA_TYPE_SERVICE_DOCUMENT_HAL_JSON);
-        HALServiceDocument serviceDocument = request.get(HALServiceDocument.class);
-        URI openApiDocumentUri = URI.create(serviceDocument.getDescribedBy().getHref());
+        request.accept(APIServiceDocument.MEDIA_TYPE_JSON);
+        APIServiceDocument serviceDocument = request.get(APIServiceDocument.class);
+        URI openApiDocumentUri = serviceDocument.getDescribedBy().getHref();
         OpenAPI openApiSpecification = new OpenAPIV3Parser().read(openApiDocumentUri.toString());
         for (Entry<String, PathItem> pathEntry : openApiSpecification.getPaths().entrySet()) {
             Operation getHttpMethod = pathEntry.getValue().getGet();
@@ -142,8 +131,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
         }
         if (Objects.isNull(resourceUriBuilder)) {
             throw new IllegalArgumentException(
-                    String.format("The API at %s does not provide resources formatted as HAL+JSON with profile %s",
-                            baseApiUri.toString(), resourceProfile));
+                    String.format("The API at %s does not provide resources of type %s", baseApiUri.toString(), resourceMediaType.toString()));
         }
     }
 
@@ -268,7 +256,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *         resource identifiers or embedded resources.
      */
     @SuppressWarnings("unchecked")
-    private HALCollectionV2<T> retrievePagedCollection(
+    private APICollectionV2<T> retrievePagedCollection(
             int pageStart,
             int pageSize,
             List<String> fields,
@@ -294,11 +282,11 @@ public class SimplyRESTfulClient<T extends HALResource> {
         }
         configureAdditionalQueryParameters(target, additionalQueryParameters);
         Builder request = target.request();
-        request.accept(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
+        request.accept(APICollectionV2.MEDIA_TYPE_JSON);
         configureHttpHeaders(request, additionalHeaders);
         String nonDeserialized = request.get(String.class);
-        HALCollectionV2<T> collection;
-        collection = (HALCollectionV2<T>) deserializeJsonWithGenerics(nonDeserialized, new TypeReference<HALCollectionV2<BasicHALResource>>() {});
+        APICollectionV2<T> collection;
+        collection = (APICollectionV2<T>) deserializeJsonWithGenerics(nonDeserialized, new TypeReference<APICollectionV2<BasicHALResource>>() {});
         JsonObject embedded = Json.createReader(new StringReader(nonDeserialized)).readObject()
                 .getJsonObject(HAL_EMBEDDED_KEY);
         if (Objects.nonNull(embedded)) {
@@ -347,11 +335,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
     }
 
     private ObjectMapper getHALMapper() {
-        ObjectMapper mapper = new ObjectMapperProvider().getContext(ObjectMapper.class);
-        if (!mapper.getRegisteredModuleIds().contains(JacksonHALJsonProvider.JACKSON_HAL_MODULE.getTypeId())) {
-            mapper.registerModule(JacksonHALJsonProvider.JACKSON_HAL_MODULE);
-        }
-        return mapper;
+        return new ObjectMapperProvider().getContext(ObjectMapper.class);
     }
 
     /**
@@ -360,7 +344,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @param resourceLink is the URI identifier of the resource.
      * @return the API resource at the given URI.
      */
-    public T read(HALLink resourceLink) {
+    public T read(Link resourceLink) {
         return read(resourceLink, null, null);
     }
 
@@ -370,8 +354,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @param resourceLink is the URI identifier of the resource.
      * @return the API resource at the given URI.
      */
-    public T read(HALLink resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
-        return read(URI.create(resourceLink.getHref()), headers, queryParameters);
+    public T read(Link resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
+        return read(resourceLink.getHref(), headers, queryParameters);
     }
 
     /**
@@ -461,7 +445,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      */
     public void update(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
-        URI resourceInstanceURI = URI.create(resource.getSelf().getHref());
+        URI resourceInstanceURI = resource.getSelf().getHref();
         if (!exists(resourceInstanceURI, headers, queryParameters)) {
             throw new IllegalArgumentException(ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST);
         }
@@ -480,7 +464,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *
      * @param resourceLink is the id of the resource
      */
-    public void delete(HALLink resourceLink) {
+    public void delete(Link resourceLink) {
         delete(resourceLink, null, null);
     }
 
@@ -489,8 +473,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
      *
      * @param resourceLink is the id of the resource
      */
-    public void delete(HALLink resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
-        delete(URI.create(resourceLink.getHref()), headers, queryParameters);
+    public void delete(Link resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
+        delete(resourceLink.getHref(), headers, queryParameters);
     }
 
 
@@ -539,8 +523,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @return a WebTarget (from a JAX-RS client) configured with the URI for the
      *         provided action.
      */
-    public WebTarget hypermediaControl(HALLink action) {
-        return client.target(URI.create(action.getHref()));
+    public WebTarget hypermediaControl(Link action) {
+        return client.target(action.getHref());
     }
 
     /**
@@ -551,7 +535,7 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @throws WebApplicationException if the client cannot confirm that the resource either
      * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(HALLink resourceLink) {
+    public boolean exists(Link resourceLink) {
         return exists(resourceLink, null, null);
     }
 
@@ -563,8 +547,8 @@ public class SimplyRESTfulClient<T extends HALResource> {
      * @throws WebApplicationException if the client cannot confirm that the resource either
      * exists or does not exist. Is likely caused by an error returned by the server.
      */
-    public boolean exists(HALLink resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
-        return exists(URI.create(resourceLink.getHref()), headers, queryParameters);
+    public boolean exists(Link resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
+        return exists(resourceLink.getHref(), headers, queryParameters);
     }
 
     /**

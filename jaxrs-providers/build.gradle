@@ -11,7 +11,6 @@ repositories {
 
 dependencies {
     api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
-    api group: "io.openapitools.jackson.dataformat", name: "jackson-dataformat-hal", version: jacksonDataformatHalVersion
     api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
     api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
 }

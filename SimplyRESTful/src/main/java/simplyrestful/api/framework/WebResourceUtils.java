@@ -6,8 +6,6 @@ import java.util.UUID;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.UriInfo;
 
-import io.openapitools.jackson.dataformat.hal.HALLink;
-
 public interface WebResourceUtils {
     /**
      * Get the absolute URI for a different web resource with the given ID.
@@ -51,26 +49,6 @@ public interface WebResourceUtils {
      */
     public static URI getAbsoluteWebResourceURI(ResourceInfo resourceInfo, UriInfo uriInfo) {
         return getAbsoluteWebResourceURI(resourceInfo, uriInfo, null);
-    }
-
-    /**
-     * Create a {@link HALLink} that refers to the provided resource URI with the
-     * given profile.
-     *
-     * Note that the media type is always set to HAL+JSON.
-     *
-     * @param resourceURI     is the URI of the resource to which this
-     *                        {@link HALLink} refers
-     * @param resourceProfile is the URI of the profile describing the resource to
-     *                        which this {@link HALLink} refers
-     * @return a {@link HALLink} that refers to the provided URI with the given
-     *         profile
-     */
-    public static HALLink createLink(URI resourceURI, String mediaType, URI resourceProfile) {
-        return new HALLink.Builder(resourceURI)
-        	.type(mediaType)
-        	.profile(resourceProfile)
-        	.build();
     }
 
     public static UUID parseUuidFromResourceUri(ResourceInfo resourceInfo, UriInfo uriInfo, URI resourceUri) {

@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.HALServiceDocument;
+import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 
@@ -65,11 +65,11 @@ public class WebResourceRootIntegrationTest extends JerseyTest {
 
     @Test
     public void webResource_shouldReturnServiceDocumentContainingLinkToOpenAPISpecification_whenGETReceivedOnRootURI() {
-	HALServiceDocument serviceDocument = target()
+	APIServiceDocument serviceDocument = target()
 		.request()
-		.get(HALServiceDocument.class);
+		.get(APIServiceDocument.class);
 	URI expected = UriBuilder.fromUri(getBaseUri()).path("openapi.json").build();
-	URI actual = URI.create(serviceDocument.getDescribedBy().getHref());
+	URI actual = serviceDocument.getDescribedBy().getHref();
 	Assertions.assertEquals(expected, actual);
     }
 }

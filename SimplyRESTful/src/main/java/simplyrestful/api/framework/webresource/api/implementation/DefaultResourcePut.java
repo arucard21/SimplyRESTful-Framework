@@ -1,6 +1,5 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
-import java.net.URI;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -21,9 +20,10 @@ import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultExists;
 import simplyrestful.api.framework.api.crud.DefaultUpdate;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.Link;
 
-public interface DefaultResourcePut<T extends HALResource> extends DefaultExists, DefaultUpdate<T> {
+public interface DefaultResourcePut<T extends APIResource> extends DefaultExists, DefaultUpdate<T> {
     public static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
     public static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
     public static final String ERROR_RESOURCE_WITH_ID_NOT_EXISTS = "A resource with the provided ID does not exist. Try to create the resource with a POST request to the collection URI.";
@@ -60,14 +60,12 @@ public interface DefaultResourcePut<T extends HALResource> extends DefaultExists
     	    throw new NotFoundException(ERROR_RESOURCE_WITH_ID_NOT_EXISTS);
     	}
     	if(resource.getSelf() == null) {
-    	    resource.setSelf(
-    	            WebResourceUtils.createLink(
+    	    resource.setSelf(new Link(
     	                    WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, id),
-    	                    MediaTypeUtils.APPLICATION_HAL_JSON,
-    	                    resource.getProfile()));
+    	                    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
     	}
     	else {
-    	    UUID resourceIdFromSelf = WebResourceUtils.parseUuidFromResourceUri(resourceInfo, uriInfo, URI.create(resource.getSelf().getHref()));
+    	    UUID resourceIdFromSelf = WebResourceUtils.parseUuidFromResourceUri(resourceInfo, uriInfo, resource.getSelf().getHref());
     	    if (resourceIdFromSelf == null) {
                     throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
                 }

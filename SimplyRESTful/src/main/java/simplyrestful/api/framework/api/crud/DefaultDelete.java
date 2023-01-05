@@ -2,9 +2,9 @@ package simplyrestful.api.framework.api.crud;
 
 import java.util.UUID;
 
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultDelete<T extends HALResource> {
+public interface DefaultDelete<T extends APIResource> {
     /**
      * Remove a resource from the data store.
      *

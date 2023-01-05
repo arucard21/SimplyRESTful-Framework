@@ -2,9 +2,9 @@ package simplyrestful.api.framework.api.crud;
 
 import java.util.UUID;
 
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultUpdate<T extends HALResource> {
+public interface DefaultUpdate<T extends APIResource> {
     /**
      * Update the existing resource in the data store where it is stored.
      *

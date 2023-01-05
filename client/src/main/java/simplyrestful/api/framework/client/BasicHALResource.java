@@ -1,19 +1,12 @@
 package simplyrestful.api.framework.client;
 
-import java.net.URI;
-
 import javax.ws.rs.core.MediaType;
 
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public class BasicHALResource extends HALResource {
+public class BasicHALResource extends APIResource {
 	@Override
-	public URI getProfile() {
-	    return null;
-	}
-
-	@Override
-	public MediaType getCustomJsonMediaType() {
+	public MediaType customJsonMediaType() {
 	    return null;
 	}
 }

@@ -18,14 +18,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultCount;
 import simplyrestful.api.framework.api.crud.DefaultList;
 import simplyrestful.api.framework.hal.HALCollectionV2Builder;
-import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.resources.HALCollectionV2;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.resources.APIResource;
 
 /**
  * Provide a default implementation for the collection resource.
@@ -33,7 +32,7 @@ import simplyrestful.api.framework.resources.HALResource;
  * If no preference is given for the type of collection resource, this will return the most recent version of the
  * collection resource in plain JSON format, using a custom JSON media type.
  */
-public interface DefaultCollectionGet<T extends HALResource> extends DefaultList<T>, DefaultCount {
+public interface DefaultCollectionGet<T extends APIResource> extends DefaultList<T>, DefaultCount {
 	public static final String QUERY_PARAM_PAGE_START = "pageStart";
     public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
     public static final String QUERY_PARAM_FIELDS = "fields";
@@ -65,22 +64,15 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
      * @return the paginated collection of resources.
      */
     @GET
-    @Produces({
-	HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
-	HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9"
-	})
+    @Produces(APICollectionV2.MEDIA_TYPE_JSON)
     @Operation(description = "Retrieve a filtered, sorted collection of API resources.")
     @ApiResponse(responseCode = "200", description = "A pageable collection containing your API resources.", content = {
-	    @Content(
-		    mediaType = HALCollectionV2.MEDIA_TYPE_HAL_JSON,
+	     @Content(
+		    mediaType = APICollectionV2.MEDIA_TYPE_JSON,
 		    schema = @Schema(
-			    implementation = HALCollectionV2.class)),
-	    @Content(
-		    mediaType = HALCollectionV2.MEDIA_TYPE_JSON,
-		    schema = @Schema(
-			    implementation = HALCollectionV2.class))
+			    implementation = APICollectionV2.class))
     })
-    default HALCollection<T> listHALResources(
+    default APICollection<T> listHALResources(
     		@Context
     		ContainerRequestContext requestContext,
     		@Context
@@ -109,21 +101,17 @@ public interface DefaultCollectionGet<T extends HALResource> extends DefaultList
 		    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 		    List<String> sort) {
-    	MediaType selected = MediaTypeUtils.selectMediaType(resourceInfo, httpHeaders);
-    	MediaType itemType = MediaType.valueOf(selected.getParameters().getOrDefault(HALCollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE, MediaType.WILDCARD));
-    	MediaTypeUtils.validateItemTypeCompatibility(selected, itemType);
-    	QueryParamUtils.configureFieldsDefault(requestContext, MediaTypeUtils.isHALJSON(selected) ? fields : QueryParamUtils.stripHALStructure(fields));
-		return HALCollectionV2Builder.from(
-			this.list(
-				pageStart,
-				pageSize,
-				QueryParamUtils.stripHALStructure(fields),
-				QueryParamUtils.stripHALStructure(query),
-				QueryParamUtils.parseSort(sort)),
-			uriInfo.getRequestUri())
-			.withNavigation(pageStart, pageSize)
-			.collectionSize(this.count(QueryParamUtils.stripHALStructure(query)))
-			.build(selected);
+    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
+    	MediaType collectionType = MediaType.valueOf(APICollectionV2.MEDIA_TYPE_JSON);
+		List<T> resources = this.list(pageStart, pageSize, fields, query, QueryParamUtils.parseSort(sort));
+		if(!resources.isEmpty()) {
+			MediaType resourceMediaType = resources.get(0).customJsonMediaType();
+			collectionType.getParameters().putIfAbsent(APICollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE, resourceMediaType.toString());
+		}
+		return HALCollectionV2Builder.from(resources, uriInfo.getRequestUri())
+				.withNavigation(pageStart, pageSize)
+				.collectionSize(this.count(query))
+				.build(collectionType);
 	    }
 
 

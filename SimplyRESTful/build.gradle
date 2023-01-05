@@ -37,7 +37,6 @@ dependencies {
     testImplementation group: "nl.jqno.equalsverifier", name: "equalsverifier", version: equalsVerifierVersion
     testImplementation group: "org.glassfish.jersey.media", name: "jersey-media-sse", version: jerseyVersion
     
-    integrationTestImplementation project(":SimplyRESTful").sourceSets.test.output
     integrationTestImplementation group: "org.glassfish.jersey.test-framework", name: "jersey-test-framework-core", version: jerseyVersion
     integrationTestImplementation group: "org.glassfish.jersey.test-framework.providers", name: "jersey-test-framework-provider-jetty", version: jerseyVersion
     integrationTestImplementation group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion

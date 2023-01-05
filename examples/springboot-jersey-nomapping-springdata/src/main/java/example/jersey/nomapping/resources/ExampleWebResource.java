@@ -18,7 +18,6 @@
  */
 package example.jersey.nomapping.resources;
 
-import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -47,31 +46,21 @@ import org.springframework.data.domain.Sort.Order;
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
-import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
-import simplyrestful.api.framework.legacy.LegacyCollectionGet;
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.HALCollection;
+import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
-import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionPost;
-import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceDelete;
-import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceGet;
-import simplyrestful.api.framework.webresource.api.implementation.DefaultResourcePut;
 
 @Named
 @Path("/resources")
 @Tag(name = "Example Resources")
-@Produces({
-		MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"; qs=0.5",
-		ExampleResource.EXAMPLE_MEDIA_TYPE_JSON + "; qs=0.8" })
-@Consumes({ MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"",
-		ExampleResource.EXAMPLE_MEDIA_TYPE_JSON })
-//public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
-public class ExampleWebResource implements LegacyCollectionGet<ExampleResource>, DefaultCollectionPost<ExampleResource>,
-		DefaultResourceGet<ExampleResource>, DefaultResourcePut<ExampleResource>,
-		DefaultResourceDelete<ExampleResource> {
+@Produces(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
+@Consumes(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
+public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
 	public static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
 	public static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
@@ -202,42 +191,41 @@ public class ExampleWebResource implements LegacyCollectionGet<ExampleResource>,
 			throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
 		}
 		if (persistedResource.getSelf() == null) {
-			persistedResource.setSelf(new HALLink.Builder(
-					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo))
-							.path(persistedResource.getUUID().toString()).build())
-									.type(MediaTypeUtils.APPLICATION_HAL_JSON).profile(persistedResource.getProfile())
-									.build());
+			persistedResource.setSelf(new Link(
+					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)).path(persistedResource.getUUID().toString()).build(),
+					MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
 		}
 		if (persistedResource.getUUID() == null) {
 			UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)
-					.relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
+					.relativize(persistedResource.getSelf().getHref())
+					.getPath());
 			persistedResource.setUUID(id);
 		}
 		return persistedResource;
 	}
 
 	@Override
-	public HALCollection<ExampleResource> listHALResources(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, int page, int pageStart, int pageSize, boolean compact, List<String> fields, String query, List<String> sort) {
-		return LegacyCollectionGet.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, page, pageStart, pageSize, compact, fields, query, sort);
+	public APICollection<ExampleResource> listHALResources(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
+		return DefaultWebResource.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, pageStart, pageSize, fields, query, sort);
 	}
 
 	@Override
 	public ExampleResource getHALResource(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, @NotNull UUID id, List<String> fields) {
-		return DefaultResourceGet.super.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
+		return DefaultWebResource.super.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
 	}
 
 	@Override
 	public Response postHALResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
-		return DefaultCollectionPost.super.postHALResource(resourceInfo, uriInfo, resource);
+		return DefaultWebResource.super.postHALResource(resourceInfo, uriInfo, resource);
 	}
 
 	@Override
 	public Response putHALResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
-		return DefaultResourcePut.super.putHALResource(resourceInfo, uriInfo, id, resource);
+		return DefaultWebResource.super.putHALResource(resourceInfo, uriInfo, id, resource);
 	}
 
 	@Override
 	public Response deleteHALResource(@NotNull UUID id) {
-		return DefaultResourceDelete.super.deleteHALResource(id);
+		return DefaultWebResource.super.deleteHALResource(id);
 	}
 }

@@ -1,6 +1,5 @@
 package example.resources.jpa;
 
-import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -15,10 +14,10 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
 @Entity
-public class ExampleResource extends HALResource {
+public class ExampleResource extends APIResource {
     public static final String EXAMPLE_MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
     public static final String EXAMPLE_PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1";
     @JsonIgnore
@@ -66,12 +65,7 @@ public class ExampleResource extends HALResource {
     }
 
     @Override
-    public URI getProfile() {
-        return URI.create(EXAMPLE_PROFILE_STRING);
-    }
-
-    @Override
-    public MediaType getCustomJsonMediaType() {
+    public MediaType customJsonMediaType() {
         return MediaType.valueOf(EXAMPLE_MEDIA_TYPE_JSON);
     }
 

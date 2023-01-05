@@ -8,6 +8,8 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.glassfish.jersey.client.ClientConfig;
@@ -18,15 +20,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import simplyrestful.api.framework.filters.UriCustomizer;
-import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter;
 
@@ -49,34 +51,33 @@ public class OpenApiIntegrationTest extends JerseyTest {
     protected Application configure() {
         ResourceConfig config = new ResourceConfig(
                 WebResourceRoot.class,
+                JacksonJsonProvider.class,
+                UriCustomizer.class,
                 OpenApiResource.class,
                 AcceptHeaderOpenApiResource.class,
-                ObjectMapperProvider.class,
-                JacksonHALJsonProvider.class,
-                JacksonJsonProvider.class,
-                UriCustomizer.class);
+                ObjectMapperProvider.class);
+
         return config;
     }
 
     @Override
     protected void configureClient(ClientConfig config) {
         config.register(ObjectMapperProvider.class);
-        config.register(JacksonHALJsonProvider.class);
         config.register(JacksonJsonProvider.class);
     }
 
     @Test
-    public void openApi_shouldContainASchemaForTheHALResourceParent() {
-        Assertions.assertTrue(retrieveOpenAPI().getComponents().getSchemas().containsKey(HALResource.class.getSimpleName()));
+    public void openApi_shouldContainASchemaForTheHALResourceParent() throws JsonMappingException, JsonProcessingException {
+        Assertions.assertTrue(retrieveOpenAPI().getComponents().getSchemas().containsKey(APIResource.class.getSimpleName()));
     }
 
     @Test
-    public void openApi_shouldNotContainASchemaForTheHALCollectionParent() {
-        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(HALCollection.class.getSimpleName()));
+    public void openApi_shouldNotContainASchemaForTheHALCollectionParent() throws JsonMappingException, JsonProcessingException {
+        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()));
     }
 
     @Test
-    public void openApi_shouldNotContainMediaTypesWithQsParameterName() {
+    public void openApi_shouldNotContainMediaTypesWithQsParameterName() throws JsonMappingException, JsonProcessingException {
         List<String> allMediaTypeParameterNames = retrieveOpenAPI()
                 .getPaths().values().stream()
                 .flatMap(pathItem -> pathItem.readOperations().stream())
@@ -90,11 +91,13 @@ public class OpenApiIntegrationTest extends JerseyTest {
         Assertions.assertFalse(allMediaTypeParameterNames.contains(SimplyRESTfulOpenApiFilter.MEDIA_TYPE_PARAMETER_NAME_QS));
     }
 
-    private OpenAPI retrieveOpenAPI() {
+    private OpenAPI retrieveOpenAPI() throws JsonMappingException, JsonProcessingException {
         Response response = target().path(OPENAPI_PATH_JSON).request().get();
         Assertions.assertEquals(200, response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
-        OpenAPI openApi = response.readEntity(OpenAPI.class);
+        String openApiString = response.readEntity(String.class);
+        // OpenAPI 3.x requires a custom-configured ObjectMapper (provided by Swagger) to deserialize correctly to the OpenAPI class
+        OpenAPI openApi = Json.mapper().readValue(openApiString, OpenAPI.class);
         return openApi;
     }
 }

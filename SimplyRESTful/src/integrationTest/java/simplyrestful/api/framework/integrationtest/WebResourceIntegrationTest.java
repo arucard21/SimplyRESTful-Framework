@@ -26,10 +26,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.filters.UriCustomizer;
-import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.HALCollectionV2;
-import simplyrestful.api.framework.resources.HALServiceDocument;
+import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
@@ -38,9 +37,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     public static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
     public static final String WEB_RESOURCE_PATH = "testresources";
 	public static final String MEDIA_TYPE_LEGACY_COLLECTION_V1 = "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1\"";
-    public static final MediaType MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE = MediaType.valueOf(MEDIA_TYPE_LEGACY_COLLECTION_V1);
-    public static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_HAL_JSON);
-    public static final MediaType MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE = MediaType.valueOf(HALCollectionV2.MEDIA_TYPE_JSON);
+    public static final MediaType MEDIA_TYPE_COLLECTION_V2_JSON_TYPE = MediaType.valueOf(APICollectionV2.MEDIA_TYPE_JSON);
     private TestResource testInstance;
     private TestResource testInstanceWithRandomId;
 
@@ -75,7 +72,6 @@ public class WebResourceIntegrationTest extends JerseyTest {
         	TestWebResource.class,
         	WebResourceRoot.class,
         	ObjectMapperProvider.class,
-        	JacksonHALJsonProvider.class,
         	JacksonJsonProvider.class,
         	UriCustomizer.class);
         return config;
@@ -84,7 +80,6 @@ public class WebResourceIntegrationTest extends JerseyTest {
     @Override
     protected void configureClient(ClientConfig config) {
         config.register(ObjectMapperProvider.class);
-        config.register(JacksonHALJsonProvider.class);
         config.register(JacksonJsonProvider.class);
     }
 
@@ -95,25 +90,11 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.request()
     		.get();
     	Assertions.assertEquals(200, response.getStatus());
-    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
+    	Assertions.assertEquals(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE, response.getMediaType());
 
-    	HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
+    	APICollectionV2<TestResource> collection = response.readEntity(new GenericType<APICollectionV2<TestResource>>() {});
     	Assertions.assertEquals(2, collection.getTotal());
     	Assertions.assertTrue(collection.getItem().contains(testInstance));
-    }
-
-    @Test
-    public void webResource_shouldReturnHALV2Collection_whenHALV2IsRequested() {
-        Response response = target()
-        	.path(WEB_RESOURCE_PATH)
-        	.request()
-        	.accept(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE)
-        	.get();
-        Assertions.assertEquals(200, response.getStatus());
-        Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE, response.getMediaType());
-        HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
-        Assertions.assertEquals(2, collection.getTotal());
-        Assertions.assertTrue(collection.getItem().contains(testInstance));
     }
 
     @Test
@@ -121,23 +102,9 @@ public class WebResourceIntegrationTest extends JerseyTest {
         Response response = target()
         	.path(WEB_RESOURCE_PATH)
         	.request()
-        	.accept(MEDIA_TYPE_HALCOLLECTION_V1_HAL_JSON_TYPE)
+        	.accept(MEDIA_TYPE_LEGACY_COLLECTION_V1)
         	.get();
         Assertions.assertEquals(406, response.getStatus());
-    }
-
-    @Test
-    public void webResource_shouldContainLinkAndEmbeddedFieldsInHALJsonV2Collection_whenGETToPathAndAcceptIsHALJson() {
-    	Response response = target()
-    		.path(WEB_RESOURCE_PATH)
-    		.request()
-    		.accept(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE)
-    		.get();
-    	Assertions.assertEquals(200, response.getStatus());
-    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE, response.getMediaType());
-    	String halJsonRepresentation = response.readEntity(String.class);
-    	Assertions.assertTrue(halJsonRepresentation.contains("_links"));
-    	Assertions.assertTrue(halJsonRepresentation.contains("_embedded"));
     }
 
     @Test
@@ -145,12 +112,12 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
-    		.accept(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE)
+    		.accept(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE)
     		.get();
     	Assertions.assertEquals(200, response.getStatus());
-    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
+    	Assertions.assertEquals(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE, response.getMediaType());
 
-    	HALCollectionV2<TestResource> collection = response.readEntity(new GenericType<HALCollectionV2<TestResource>>() {});
+    	APICollectionV2<TestResource> collection = response.readEntity(new GenericType<APICollectionV2<TestResource>>() {});
     	Assertions.assertEquals(2, collection.getTotal());
     	Assertions.assertTrue(collection.getItem().contains(testInstance));
     }
@@ -160,9 +127,9 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
-    		.accept(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE).get();
+    		.accept(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE).get();
     	Assertions.assertEquals(200, response.getStatus());
-    	Assertions.assertEquals(MEDIA_TYPE_HALCOLLECTION_V2_JSON_TYPE, response.getMediaType());
+    	Assertions.assertEquals(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE, response.getMediaType());
 
     	String jsonRepresentation = response.readEntity(String.class);
     	Assertions.assertFalse(jsonRepresentation.contains("_links"));
@@ -175,7 +142,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
         try (SseEventSource eventSource = SseEventSource.target(target().path(WEB_RESOURCE_PATH)).build()) {
             eventSource.register(
                     event -> {
-                        receivedSelfLinks.add(event.readData(TestResource.class).getSelf().getHref());
+                        receivedSelfLinks.add(event.readData(TestResource.class).getSelf().getHref().toString());
                         },
                     error -> {
                         Assertions.fail("An error occurred while receiving events.");
@@ -275,13 +242,13 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	URI customUri = UriBuilder.fromUri("https://simplyrestful-testhost.org/services/")
     		.path(WEB_RESOURCE_PATH)
     		.build();
-    	HALCollectionV2<TestResource> collection = target()
+    	APICollectionV2<TestResource> collection = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
-    		.accept(MEDIA_TYPE_HALCOLLECTION_V2_HAL_JSON_TYPE)
+    		.accept(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE)
     		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
-    		.get(new GenericType<HALCollectionV2<TestResource>>() {});
-    	Assertions.assertEquals(customUri, URI.create(collection.getSelf().getHref()));
+    		.get(new GenericType<APICollectionV2<TestResource>>() {});
+    	Assertions.assertEquals(customUri, collection.getSelf().getHref());
     	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }
 
@@ -289,11 +256,11 @@ public class WebResourceIntegrationTest extends JerseyTest {
     public void webResource_shouldUseCustomUriInTheServiceDocument_whenUriCustomizerPropertyAndHeaderAreProvided() {
     	System.setProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME, HTTP_HEADER_NAME_CUSTOM_URI);
     	URI customUri = UriBuilder.fromUri("https://simplyrestful-testhost.org/services/").build();
-    	HALServiceDocument serviceDocument = target()
+    	APIServiceDocument serviceDocument = target()
     		.request()
     		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
-    		.get(HALServiceDocument.class);
-    	Assertions.assertEquals(customUri, URI.create(serviceDocument.getSelf().getHref()));
+    		.get(APIServiceDocument.class);
+    	Assertions.assertEquals(customUri, serviceDocument.getSelf().getHref());
     	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }
 }

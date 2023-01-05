@@ -40,45 +40,6 @@ public class QueryParamUtils {
 	}
 
     /**
-     * Strips the HAL structure from the provided field names.
-     * <p>
-     * This will remove "_links." and "_embedded." from the provided fields
-     * names. This ensures that these fields don't contain this HAL-specific
-     * structure in their nesting format so their hierarchy should match that
-     * of the POJOs.
-     * </p>
-     * @param fields is a list of field names from which the HAL structure
-     * should be removed.
-     * @return the list of field names with their HAL structure removed.
-     */
-    public static List<String> stripHALStructure(List<String> fields) {
-    	return flattenQueryParameters(fields).stream()
-    		.map(QueryParamUtils::stripHALStructure)
-    		.map(String::trim)
-    		.filter(trimmed -> !trimmed.isBlank())
-    		.collect(Collectors.toList());
-    }
-
-    /**
-     * Strips the HAL structure from the provided String value.
-     * <p>
-     * This will remove "_links." and "_embedded." from the provided String value
-     * This ensures that any fields in the String don't contain this HAL-specific
-     * structure in their nesting format so their hierarchy should match that of
-     * the POJOs.
-     * </p>
-     * @param value is the String containing field names with HAL-specific hierarchy.
-     * @return the provided String without any HAL-specific hierarchy.
-     */
-    public static String stripHALStructure(String value) {
-        String stripped = value.replaceAll(HAL_LINKS_OBJECT_NAME+".", "").replaceAll(HAL_EMBEDDED_OBJECT_NAME+".", "");
-        if(HAL_LINKS_OBJECT_NAME.equals(stripped) || HAL_EMBEDDED_OBJECT_NAME.equals(stripped)) {
-            return "";
-        }
-        return stripped;
-    }
-
-    /**
      * Parse sort values as field name and sort order and remove the HAL structure.
      * <p>
      * This will parse the sort fields and sort order correctly, mapping them to a
@@ -94,7 +55,7 @@ public class QueryParamUtils {
      * field that should be sorted.
      */
     public static List<SortOrder> parseSort(List<String> sortValues) {
-    	return stripHALStructure(sortValues).stream()
+    	return sortValues.stream()
     		.filter(sortValue -> !sortValue.isBlank())
     		.map(String::trim)
     		.map(SortOrder::from)

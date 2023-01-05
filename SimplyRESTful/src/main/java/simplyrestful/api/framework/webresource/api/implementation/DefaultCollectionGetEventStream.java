@@ -1,6 +1,5 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -17,12 +16,11 @@ import javax.ws.rs.sse.SseEventSink;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultStream;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultCollectionGetEventStream<T extends HALResource> extends DefaultStream<T> {
+public interface DefaultCollectionGetEventStream<T extends APIResource> extends DefaultStream<T> {
 	/**
      * Retrieve the collection of resources as a stream of events (as server-sent events).
      * <p>
@@ -64,18 +62,13 @@ public interface DefaultCollectionGetEventStream<T extends HALResource> extends 
         try (SseEventSink sink = eventSink) {
         	QueryParamUtils.configureFieldsDefault(requestContext, fields);
             try (Stream<T> stream = stream(
-        	    QueryParamUtils.stripHALStructure(fields),
-                    QueryParamUtils.stripHALStructure(query),
+            		fields,
+                    query,
                     QueryParamUtils.parseSort(sort))) {
                 stream.forEach(resourceItem -> {
                     sink.send(sse.newEventBuilder()
                             .data(resourceItem)
-                            .mediaType(new MediaType(
-                                    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.getType(),
-                                    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE.getSubtype(),
-                                    Collections.singletonMap(
-                                            MediaTypeUtils.APPLICATION_HAL_JSON_PARAMETER_PROFILE,
-                                            resourceItem.getProfile().toString())))
+                            .mediaType(resourceItem.customJsonMediaType())
                             .build());
                 });
             }

@@ -18,7 +18,6 @@
  */
 package example.microprofile.quarkus.microprofile.quarkus.resources;
 
-import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -56,7 +55,6 @@ import javax.ws.rs.sse.SseEventSink;
 
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
-import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.panache.common.Sort.Direction;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -65,8 +63,9 @@ import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.resources.HALCollectionV2;
+import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceGet;
@@ -229,15 +228,14 @@ public class ExampleWebResource
             throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
         }
         if (persistedResource.getSelf() == null) {
-            persistedResource.setSelf(new HALLink.Builder(
-                    UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo))
-                            .path(persistedResource.getUUID().toString()).build())
-                                    .type(MediaTypeUtils.APPLICATION_HAL_JSON).profile(persistedResource.getProfile())
-                                    .build());
+            persistedResource.setSelf(new Link(
+            		UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)).path(persistedResource.getUUID().toString()).build(),
+            		MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
         }
         if (persistedResource.getUUID() == null) {
             UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)
-                    .relativize(URI.create(persistedResource.getSelf().getHref())).getPath());
+                    .relativize(persistedResource.getSelf().getHref())
+                    .getPath());
             persistedResource.setUUID(id);
         }
         return persistedResource;
@@ -251,11 +249,8 @@ public class ExampleWebResource
 
     @Override
     @GET
-    @Produces({
-    HALCollectionV2.MEDIA_TYPE_HAL_JSON+";qs=0.7",
-    HALCollectionV2.MEDIA_TYPE_JSON+";qs=0.9"
-    })
-    public HALCollection<ExampleResource> listHALResources(
+    @Produces(APICollectionV2.MEDIA_TYPE_JSON)
+    public APICollection<ExampleResource> listHALResources(
     		@Context
     		ContainerRequestContext requestContext,
 	        @Context

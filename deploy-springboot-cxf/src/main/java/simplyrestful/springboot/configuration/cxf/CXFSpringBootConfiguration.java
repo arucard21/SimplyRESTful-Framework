@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
-
 @Configuration
 @ComponentScan(basePackages = { "simplyrestful" })
 public class CXFSpringBootConfiguration { /* Ensure that the simplyrestful package is scanned */
@@ -19,12 +17,6 @@ public class CXFSpringBootConfiguration { /* Ensure that the simplyrestful packa
     @ConditionalOnMissingBean
     public JacksonJsonProvider jacksonJsonProvider() {
         return new JacksonJsonProvider();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public JacksonHALJsonProvider jacksonHALJsonProvider() {
-        return new JacksonHALJsonProvider();
     }
 
     @Bean

@@ -2,9 +2,9 @@ package simplyrestful.api.framework.api.crud;
 
 import java.util.UUID;
 
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultRead<T extends HALResource> {
+public interface DefaultRead<T extends APIResource> {
     /**
      * Retrieve the resource from the data store where it is stored.
      *

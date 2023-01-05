@@ -3,9 +3,9 @@ package simplyrestful.api.framework.api.crud;
 import java.util.List;
 
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultList<T extends HALResource> {
+public interface DefaultList<T extends APIResource> {
     /**
      * Retrieve the paged collection of resources that have been requested.
      *

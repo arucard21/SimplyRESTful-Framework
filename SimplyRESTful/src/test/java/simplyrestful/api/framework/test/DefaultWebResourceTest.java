@@ -26,8 +26,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import simplyrestful.api.framework.MediaTypeUtils;
-import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultResourceGet;
@@ -60,24 +58,6 @@ public class DefaultWebResourceTest {
     private HttpHeaders httpHeaders;
     @InjectMocks
     public TestWebResource testEndpoint;
-
-    @Test
-    public void endpoint_shouldCreateLinkWithCorrectMediaType() {
-        Assertions.assertEquals(MediaTypeUtils.APPLICATION_HAL_JSON, WebResourceUtils.createLink(TEST_REQUEST_URI,
-                MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getType());
-    }
-
-    @Test
-    public void endpoint_shouldCreateLinkWithCorrectProfile() {
-        Assertions.assertEquals(TestResource.TEST_RESOURCE_PROFILE_URI, WebResourceUtils.createLink(TEST_REQUEST_URI,
-                MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getProfile());
-    }
-
-    @Test
-    public void endpoint_shouldCreateLinkWithCorrectRequestURI() {
-        Assertions.assertEquals(TEST_REQUEST_URI, URI.create(WebResourceUtils.createLink(TEST_REQUEST_URI,
-                MediaTypeUtils.APPLICATION_HAL_JSON, TestResource.TEST_RESOURCE_PROFILE_URI).getHref()));
-    }
 
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {

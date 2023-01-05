@@ -6,10 +6,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.client.Client;
 
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
 @Named
-public class SimplyRESTfulClientFactory<T extends HALResource> {
+public class SimplyRESTfulClientFactory<T extends APIResource> {
 	private final Client client;
 
 	@Inject

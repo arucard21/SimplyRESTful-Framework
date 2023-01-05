@@ -15,8 +15,8 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import simplyrestful.api.framework.resources.HALCollection;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.APIResource;
 
 public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 	public static final String MEDIA_TYPE_PARAMETER_NAME_QS = "qs";
@@ -56,13 +56,13 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 	}
 
 	/**
-	 * Remove the schema that's detected for the {@link HALCollection} parent class.
+	 * Remove the schema that's detected for the {@link APICollection} parent class.
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
 			Map<String, List<String>> headers) {
-		String halCollectionSchemaName = HALCollection.class.getSimpleName() + HALResource.class.getSimpleName();
+		String halCollectionSchemaName = APICollection.class.getSimpleName() + APIResource.class.getSimpleName();
 		String schemaName = schema.getName();
 		if (schemaName.equals(halCollectionSchemaName)) {
 			return Optional.empty();

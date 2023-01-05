@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
 
-public interface DefaultStream<T extends HALResource> {
+public interface DefaultStream<T extends APIResource> {
     /**
      * Retrieve the stream of resources that have been requested.
      *

@@ -10,8 +10,7 @@ repositories {
 }
 
 dependencies {
-    api group: "io.openapitools.jackson.dataformat", name: "jackson-dataformat-hal", version: jacksonDataformatHalVersion
-    api group: "io.openapitools.hal", name: "swagger-hal", version: swaggerHalVersion
+	api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
 
     testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
     testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion

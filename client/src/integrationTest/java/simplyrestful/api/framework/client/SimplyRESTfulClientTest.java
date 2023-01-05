@@ -19,14 +19,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import io.openapitools.jackson.dataformat.hal.HALLink;
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.client.test.implementation.TestResource;
 import simplyrestful.api.framework.client.test.implementation.TestWebResource;
 import simplyrestful.api.framework.filters.UriCustomizer;
-import simplyrestful.api.framework.providers.JacksonHALJsonProvider;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
+import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,7 +65,6 @@ public class SimplyRESTfulClientTest extends JerseyTest {
                 WebResourceRoot.class,
                 ObjectMapperProvider.class,
                 JacksonJsonProvider.class,
-                JacksonHALJsonProvider.class,
                 UriCustomizer.class,
                 OpenApiResource.class,
                 AcceptHeaderOpenApiResource.class);
@@ -162,14 +160,14 @@ public class SimplyRESTfulClientTest extends JerseyTest {
     @Test
     public void update_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentHostname() {
         TestResource invalidResource = new TestResource();
-        invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_HOST).build());
+        invalidResource.setSelf(new Link(INVALID_RESOURCE_URI_DIFFERENT_HOST, null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
     }
 
     @Test
     public void update_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentPath() {
         TestResource invalidResource = new TestResource();
-        invalidResource.setSelf(new HALLink.Builder(INVALID_RESOURCE_URI_DIFFERENT_PATH).build());
+        invalidResource.setSelf(new Link(INVALID_RESOURCE_URI_DIFFERENT_PATH, null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
     }
 

@@ -1,6 +1,5 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
-import java.net.URI;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -18,9 +17,10 @@ import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultCreate;
 import simplyrestful.api.framework.api.crud.DefaultExists;
-import simplyrestful.api.framework.resources.HALResource;
+import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.Link;
 
-public interface DefaultCollectionPost<T extends HALResource> extends DefaultExists, DefaultCreate<T> {
+public interface DefaultCollectionPost<T extends APIResource> extends DefaultExists, DefaultCreate<T> {
     public static final String ERROR_RESOURCE_WITH_ID_EXISTS = "A resource with the same ID already exists. Try to update the resource with a PUT request to the URI for that resource.";
 
     /**
@@ -45,22 +45,16 @@ public interface DefaultCollectionPost<T extends HALResource> extends DefaultExi
             T resource) {
     	UUID resourceId;
     	if(resource.getSelf() != null) {
-    	    resourceId = WebResourceUtils.parseUuidFromResourceUri(resourceInfo, uriInfo, URI.create(resource.getSelf().getHref()));
+    	    resourceId = WebResourceUtils.parseUuidFromResourceUri(resourceInfo, uriInfo, resource.getSelf().getHref());
     	    if (this.exists(resourceId)) {
-    		throw new ClientErrorException(
-    			ERROR_RESOURCE_WITH_ID_EXISTS,
-    			Response.Status.CONFLICT);
+    	    	throw new ClientErrorException(ERROR_RESOURCE_WITH_ID_EXISTS, Response.Status.CONFLICT);
     	    }
     	}
     	else {
     	    resourceId = UUID.randomUUID();
-    	    resource.setSelf(
-    	            WebResourceUtils.createLink(
-    	                    WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, resourceId),
-    	                    MediaTypeUtils.APPLICATION_HAL_JSON,
-    	                    resource.getProfile()));
+    	    resource.setSelf(new Link(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, resourceId), MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
     	}
     	T updatedResource = this.create(resource, resourceId);
-    	return Response.created(URI.create(updatedResource.getSelf().getHref())).build();
+    	return Response.created(updatedResource.getSelf().getHref()).build();
     }
 }
