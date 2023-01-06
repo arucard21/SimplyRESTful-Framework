@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     api project(":SimplyRESTful")
+    api project(":jaxrs-providers")
     api project(':fields-filter-json-servlet')
     api group: "org.apache.cxf", name: "cxf-spring-boot-starter-jaxrs", version: cxfVersion
     api group: "org.apache.cxf", name: "cxf-rt-rs-service-description-openapi-v3", version: cxfVersion

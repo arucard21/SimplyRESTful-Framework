@@ -47,6 +47,7 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.filters.AcceptHeaderModifier;
 import simplyrestful.api.framework.filters.UriCustomizer;
+import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
@@ -144,6 +145,7 @@ public class ServerBuilder {
         		ValidationExceptionMapper.class,
         		MultipartProvider.class,
         		JacksonJsonProvider.class,
+        		ObjectMapperProvider.class,
         		UriCustomizer.class,
         		AcceptHeaderModifier.class,
         		OpenApiResource.class,

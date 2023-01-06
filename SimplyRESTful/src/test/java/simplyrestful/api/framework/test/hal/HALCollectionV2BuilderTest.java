@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import simplyrestful.api.framework.hal.APICollectionV2Builder;
+import simplyrestful.api.framework.collection.APICollectionV2Builder;
 import simplyrestful.api.framework.resources.APICollectionV2;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;

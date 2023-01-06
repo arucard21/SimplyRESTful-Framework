@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultCount;
 import simplyrestful.api.framework.api.crud.DefaultList;
-import simplyrestful.api.framework.hal.APICollectionV2Builder;
+import simplyrestful.api.framework.collection.APICollectionV2Builder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APICollectionV2;
 import simplyrestful.api.framework.resources.APIResource;
