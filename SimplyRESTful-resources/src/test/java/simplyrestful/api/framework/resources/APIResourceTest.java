@@ -34,22 +34,22 @@ public class APIResourceTest{
 	}
 
 	@Test
-	public void halResource_shouldHaveSameHashcode_whenObjectsAreEqual() throws Exception {
+	public void apiResource_shouldHaveSameHashcode_whenObjectsAreEqual() throws Exception {
 		Assertions.assertEquals(testResource.hashCode(), testResourceSame.hashCode());
 	}
 
 	@Test
-	public void halResource_shouldBeEqual_whenContainingSameValues() throws Exception {
+	public void apiResource_shouldBeEqual_whenContainingSameValues() throws Exception {
 		Assertions.assertEquals(testResource, testResourceSame);
 	}
 
 	@Test
-	public void halResource_shouldBeEqual_whenSameInstance() throws Exception {
+	public void apiResource_shouldBeEqual_whenSameInstance() throws Exception {
 		Assertions.assertEquals(testResource, testResource);
 	}
 
 	@Test
-	public void halResource_shouldNotBeEqual_whenContainingDifferentValues() throws Exception {
+	public void apiResource_shouldNotBeEqual_whenContainingDifferentValues() throws Exception {
 		Assertions.assertNotEquals(testResource, testResourceDifferent);
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Objects;
 import javax.ws.rs.core.MediaType;
 
 public class APICollectionV2<T extends APIResource> extends APICollection<T> {
-    public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-halcollection-v2+json";
+    public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-collection-v2+json";
     public static final String MEDIA_TYPE_PARAMETER_ITEM_TYPE = "item-type";
 
     private int total;

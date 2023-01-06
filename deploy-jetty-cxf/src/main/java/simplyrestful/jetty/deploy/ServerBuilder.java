@@ -81,12 +81,11 @@ public class ServerBuilder {
 	/**
 	 * Add a SimplyRESTful JAX-RS web resource to the server
 	 *
-	 * @param <T> is the HAL-based resource to which the Web Resource provides acces.
-	 * @param webResource is the SimplyRESTful JAX-RS web resource to add to the server
+	 * @param <T> is the API resource to which the Web Resource provides access.
+	 * @param webResource is the SimplyRESTful JAX-RS web resource to add to the server.
 	 * @return the builder object
 	 */
-	public <T extends APIResource> ServerBuilder withWebResource(
-			Class<? extends DefaultWebResource<T>> webResource) {
+	public <T extends APIResource> ServerBuilder withWebResource(Class<? extends DefaultWebResource<T>> webResource) {
 		webResources.add(webResource);
 		return this;
 	}

@@ -36,7 +36,6 @@ import example.jetty.resources.dao.ExampleEntityDAO;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.Link;
@@ -44,8 +43,8 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
 
 @Path("/resources")
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })
-@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
-@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
+@Produces(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
+@Consumes(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
 public class ExampleWebResource
 		implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
 	private ExampleEntityDAO dao;
@@ -124,7 +123,7 @@ public class ExampleWebResource
 			persistedResource.setSelf(new Link(
 					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo))
 							.path(persistedResource.getUUID().toString()).build(),
-					MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+					persistedResource.customJsonMediaType()));
 		}
 		if (persistedResource.getUUID() == null) {
 			UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)

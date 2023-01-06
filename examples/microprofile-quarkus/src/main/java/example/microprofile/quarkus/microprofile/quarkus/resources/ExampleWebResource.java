@@ -60,7 +60,6 @@ import io.quarkus.panache.common.Sort.Direction;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
@@ -73,11 +72,8 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultResourc
 @RequestScoped
 @Path("/resources")
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })
-@Produces({
-        MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"; qs=0.5",
-        ExampleResource.EXAMPLE_MEDIA_TYPE_JSON + "; qs=0.8" })
-@Consumes({ MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + ExampleResource.EXAMPLE_PROFILE_STRING + "\"",
-        ExampleResource.EXAMPLE_MEDIA_TYPE_JSON })
+@Produces(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
+@Consumes(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
 public class ExampleWebResource
         implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
@@ -230,7 +226,7 @@ public class ExampleWebResource
         if (persistedResource.getSelf() == null) {
             persistedResource.setSelf(new Link(
             		UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)).path(persistedResource.getUUID().toString()).build(),
-            		MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+            		persistedResource.customJsonMediaType()));
         }
         if (persistedResource.getUUID() == null) {
             UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)
@@ -250,7 +246,7 @@ public class ExampleWebResource
     @Override
     @GET
     @Produces(APICollectionV2.MEDIA_TYPE_JSON)
-    public APICollection<ExampleResource> listHALResources(
+    public APICollection<ExampleResource> listAPIResources(
     		@Context
     		ContainerRequestContext requestContext,
 	        @Context
@@ -274,13 +270,13 @@ public class ExampleWebResource
 	        @QueryParam(QUERY_PARAM_SORT)
 	        @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 	        List<String> sort) {
-        return DefaultWebResource.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, pageStart, pageSize, fields, query, sort);
+        return DefaultWebResource.super.listAPIResources(requestContext, resourceInfo, uriInfo, httpHeaders, pageStart, pageSize, fields, query, sort);
     }
 
     @Override
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
-    public void streamHALResources(
+    public void streamAPIResources(
     		@Context
     		ContainerRequestContext requestContext,
 	        @QueryParam(QUERY_PARAM_FIELDS)
@@ -296,12 +292,12 @@ public class ExampleWebResource
 	        SseEventSink eventSink,
 	        @Context
 	        Sse sse) {
-        DefaultCollectionGetEventStream.super.streamHALResources(requestContext, fields, query, sort, eventSink, sse);
+        DefaultCollectionGetEventStream.super.streamAPIResources(requestContext, fields, query, sort, eventSink, sse);
     }
 
     @Override
     @POST
-    public Response postHALResource(
+    public Response postAPIResource(
             @Context
             ResourceInfo resourceInfo,
             @Context
@@ -309,13 +305,13 @@ public class ExampleWebResource
             @NotNull
             @Valid
             ExampleResource resource) {
-        return DefaultWebResource.super.postHALResource(resourceInfo, uriInfo, resource);
+        return DefaultWebResource.super.postAPIResource(resourceInfo, uriInfo, resource);
     }
 
     @Override
     @Path("/{id}")
     @GET
-    public ExampleResource getHALResource(
+    public ExampleResource getAPIResource(
     		@Context
     		ContainerRequestContext requestContext,
 	        @Context
@@ -330,13 +326,13 @@ public class ExampleWebResource
 	        @QueryParam(DefaultCollectionGet.QUERY_PARAM_FIELDS)
 	        @DefaultValue(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)
 	        List<String> fields) {
-        return DefaultWebResource.super.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
+        return DefaultWebResource.super.getAPIResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
     }
 
     @Override
     @Path("/{id}")
     @PUT
-    public Response putHALResource(
+    public Response putAPIResource(
             @Context
             ResourceInfo resourceInfo,
             @Context
@@ -347,16 +343,16 @@ public class ExampleWebResource
             @NotNull
             @Valid
             ExampleResource resource) {
-        return DefaultWebResource.super.putHALResource(resourceInfo, uriInfo, id, resource);
+        return DefaultWebResource.super.putAPIResource(resourceInfo, uriInfo, id, resource);
     }
 
     @Override
     @Path("/{id}")
     @DELETE
-    public Response deleteHALResource(
+    public Response deleteAPIResource(
         @PathParam("id")
         @NotNull
         UUID id) {
-        return DefaultWebResource.super.deleteHALResource(id);
+        return DefaultWebResource.super.deleteAPIResource(id);
     }
 }

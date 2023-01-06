@@ -9,9 +9,8 @@ public interface DefaultList<T extends APIResource> {
     /**
      * Retrieve the paged collection of resources that have been requested.
      *
-     * For proper discoverability of the API, all links (href values in each HALLink
-     * object) should contain absolute URI's and a self-link must be available in
-     * each resource.
+     * For proper discoverability of the API, all links (href values in each Link object) should contain
+     * absolute URI's and a self-link must be available in each resource.
      *
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize is the requested size of each page.

@@ -48,7 +48,6 @@ import example.datastore.StoredObject;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.Link;
@@ -57,13 +56,13 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
 @Named
 @Path("/resources")
 @OpenAPIDefinition(tags = { @Tag(name = "Example Resources") })
-@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
-@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=" + ExampleResource.EXAMPLE_PROFILE_STRING)
+@Produces(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
+@Consumes(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
 public class ExampleWebResource
 		implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
 	public static final ThreadLocal<SearchContext> REQUEST_SEARCHCONTEXT = new ThreadLocal<>();
 	/**
-	 * Contains the mapping between the API's HAL resources, identified by the
+	 * Contains the mapping between the API's resources, identified by the
 	 * resource's URI, and the data store's resources, identified by a UUID. In an
 	 * actual implementation, this mapping should probably be persistently stored,
 	 * not kept in-memory.
@@ -218,7 +217,7 @@ public class ExampleWebResource
 		// create resource URI with new UUID and add it to the mapping
 		exampleResource.setSelf(new Link(
 				WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, storedResource.getId()),
-				MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+				exampleResource.customJsonMediaType()));
 		exampleResource.setEmbeddedResource(convertEmbeddedToResource(storedResource.getEmbedded()));
 		resourceMapping.put(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo), storedResource.getId());
 		return exampleResource;

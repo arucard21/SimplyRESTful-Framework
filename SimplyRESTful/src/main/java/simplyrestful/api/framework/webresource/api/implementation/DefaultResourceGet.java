@@ -39,7 +39,7 @@ public interface DefaultResourceGet<T extends APIResource> extends DefaultRead<T
     @Path("/{id}")
     @GET
     @Operation(description = "Retrieve an API resource")
-    default T getHALResource(
+    default T getAPIResource(
     		@Context
     		ContainerRequestContext requestContext,
     		@Context

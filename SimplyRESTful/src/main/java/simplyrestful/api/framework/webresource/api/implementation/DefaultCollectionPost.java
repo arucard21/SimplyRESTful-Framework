@@ -13,7 +13,6 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultCreate;
 import simplyrestful.api.framework.api.crud.DefaultExists;
@@ -34,7 +33,7 @@ public interface DefaultCollectionPost<T extends APIResource> extends DefaultExi
      */
     @POST
     @Operation(description = "Create a new API resource which can already have a self-link containing a URI as identifier or one will be generated")
-    default Response postHALResource(
+    default Response postAPIResource(
     		@Context
             ResourceInfo resourceInfo,
             @Context
@@ -52,7 +51,9 @@ public interface DefaultCollectionPost<T extends APIResource> extends DefaultExi
     	}
     	else {
     	    resourceId = UUID.randomUUID();
-    	    resource.setSelf(new Link(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, resourceId), MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+    	    resource.setSelf(new Link(
+    	    		WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, resourceId),
+    	    		resource.customJsonMediaType()));
     	}
     	T updatedResource = this.create(resource, resourceId);
     	return Response.created(updatedResource.getSelf().getHref()).build();

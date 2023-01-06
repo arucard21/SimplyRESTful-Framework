@@ -19,10 +19,10 @@ public class APICollectionV2Builder<T extends APIResource> {
     private Integer pageStart;
     private Integer pageSize;
     /**
-     * Create a builder for the HALCollectionV2 object.
+     * Create a builder for the APICollectionV2 object.
      *
      * @param <T> is the type of resource that this collection will contain.
-     * @param resources is the list of resources for the page of the collection that the HALCollectionV2 object should contain.
+     * @param resources is the list of resources for the page of the collection that the APICollectionV2 object should contain.
      * @param requestURI is the request URI used to request this collection from the API.
      * @return the builder object.
      */
@@ -79,20 +79,20 @@ public class APICollectionV2Builder<T extends APIResource> {
     }
 
     private void includeNavigation(APICollectionV2<T> collection) {
-		collection.setFirst(createHALLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE));
+		collection.setFirst(createLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE));
 		if (this.pageStart > 0) {
 		    int startofPrevPage = this.pageStart - this.pageSize;
 		    if (startofPrevPage >= 0) {
-			collection.setPrev(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage));
+			collection.setPrev(createLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage));
 		    }
 		}
 		if (this.collectionSize != null) {
 		    int startofLastPage = calculateStartOfLastPage();
-		    collection.setLast(createHALLinkFromURIWithModifiedPageOffset(requestURI, startofLastPage));
+		    collection.setLast(createLinkFromURIWithModifiedPageOffset(requestURI, startofLastPage));
 		    if (this.pageStart < startofLastPage) {
 			int startOfNextPage = this.pageStart + this.pageSize;
 			if (startOfNextPage <= startofLastPage) {
-			    collection.setNext(createHALLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage));
+			    collection.setNext(createLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage));
 			}
 		    }
 		}
@@ -110,7 +110,7 @@ public class APICollectionV2Builder<T extends APIResource> {
 		return numberOfPages * this.pageSize;
     }
 
-    protected Link createHALLinkFromURIWithModifiedPageOffset(URI requestURI, int pageStart) {
+    protected Link createLinkFromURIWithModifiedPageOffset(URI requestURI, int pageStart) {
 		URI modifiedUri = UriBuilder.fromUri(requestURI)
 			.replaceQueryParam(DefaultCollectionGet.QUERY_PARAM_PAGE_START, pageStart)
 			.build();

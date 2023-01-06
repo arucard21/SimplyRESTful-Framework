@@ -74,7 +74,7 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		    schema = @Schema(
 			    implementation = APICollectionV2.class))
     })
-    default APICollection<T> listHALResources(
+    default APICollection<T> listAPIResources(
     		@Context
     		ContainerRequestContext requestContext,
     		@Context

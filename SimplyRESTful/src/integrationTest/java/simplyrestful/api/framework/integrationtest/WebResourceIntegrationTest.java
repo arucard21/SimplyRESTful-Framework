@@ -36,7 +36,6 @@ import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 public class WebResourceIntegrationTest extends JerseyTest {
     public static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
     public static final String WEB_RESOURCE_PATH = "testresources";
-	public static final String MEDIA_TYPE_LEGACY_COLLECTION_V1 = "application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1\"";
     public static final MediaType MEDIA_TYPE_COLLECTION_V2_JSON_TYPE = MediaType.valueOf(APICollectionV2.MEDIA_TYPE_JSON);
     private TestResource testInstance;
     private TestResource testInstanceWithRandomId;
@@ -102,13 +101,23 @@ public class WebResourceIntegrationTest extends JerseyTest {
         Response response = target()
         	.path(WEB_RESOURCE_PATH)
         	.request()
-        	.accept(MEDIA_TYPE_LEGACY_COLLECTION_V1)
+        	.accept("application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v1\"")
         	.get();
         Assertions.assertEquals(406, response.getStatus());
     }
 
     @Test
-    public void webResource_shouldReturnAllResourcesEmbeddedInHALJsonV2Collection_whenGETToPathAndAcceptIsCustomJson() {
+    public void webResource_shouldReturn406NotAcceptable_whenHALV2IsRequested() {
+        Response response = target()
+        	.path(WEB_RESOURCE_PATH)
+        	.request()
+        	.accept("application/hal+json;profile=\"https://arucard21.github.io/SimplyRESTful-Framework/HALCollection/v2\"")
+        	.get();
+        Assertions.assertEquals(406, response.getStatus());
+    }
+
+    @Test
+    public void webResource_shouldReturnAllResourcesEmbeddedInCollection_whenGETToPathAndAcceptIsCustomJson() {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
@@ -123,7 +132,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void webResource_shouldNotContainLinkAndEmbeddedFieldsInHALJsonV2Collection_whenGETToPathAndAcceptIsCustomJson() {
+    public void webResource_shouldNotContainLinkAndEmbeddedFieldsInCollection_whenGETToPathAndAcceptIsCustomJson() {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
@@ -173,7 +182,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
-    		.post(Entity.entity(expectedResource, TestResource.MEDIA_TYPE_HAL_JSON));
+    		.post(Entity.entity(expectedResource, TestResource.MEDIA_TYPE_JSON));
     	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     	Assertions.assertTrue(response.getLocation().toString().startsWith(getBaseUri().toString()));
     }
@@ -183,7 +192,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
-    		.post(Entity.entity(testInstance, TestResource.MEDIA_TYPE_HAL_JSON));
+    		.post(Entity.entity(testInstance, TestResource.MEDIA_TYPE_JSON));
     	Assertions.assertEquals(Status.CONFLICT.getStatusCode(), response.getStatus());
     }
 
@@ -193,7 +202,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.path(WEB_RESOURCE_PATH)
     		.path(TestResource.TEST_RESOURCE_ID.toString())
     		.request()
-    		.put(Entity.entity(testInstance, TestResource.MEDIA_TYPE_HAL_JSON));
+    		.put(Entity.entity(testInstance, TestResource.MEDIA_TYPE_JSON));
     	Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
@@ -203,7 +212,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.path(WEB_RESOURCE_PATH)
     		.path(UUID.randomUUID().toString())
     		.request()
-    		.put(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_HAL_JSON));
+    		.put(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_JSON));
     	Assertions.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
@@ -230,7 +239,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.path(WEB_RESOURCE_PATH)
     		.request()
     		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
-    		.post(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_HAL_JSON));
+    		.post(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_JSON));
     	Assertions.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     	Assertions.assertTrue(response.getLocation().toString().startsWith(customUri.toString()));
     	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);

@@ -36,6 +36,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -48,7 +49,6 @@ import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
@@ -193,7 +193,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 		if (persistedResource.getSelf() == null) {
 			persistedResource.setSelf(new Link(
 					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)).path(persistedResource.getUUID().toString()).build(),
-					MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+					MediaType.valueOf(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)));
 		}
 		if (persistedResource.getUUID() == null) {
 			UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)
@@ -205,27 +205,27 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 	}
 
 	@Override
-	public APICollection<ExampleResource> listHALResources(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
-		return DefaultWebResource.super.listHALResources(requestContext, resourceInfo, uriInfo, httpHeaders, pageStart, pageSize, fields, query, sort);
+	public APICollection<ExampleResource> listAPIResources(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
+		return DefaultWebResource.super.listAPIResources(requestContext, resourceInfo, uriInfo, httpHeaders, pageStart, pageSize, fields, query, sort);
 	}
 
 	@Override
-	public ExampleResource getHALResource(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, @NotNull UUID id, List<String> fields) {
-		return DefaultWebResource.super.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
+	public ExampleResource getAPIResource(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, @NotNull UUID id, List<String> fields) {
+		return DefaultWebResource.super.getAPIResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
 	}
 
 	@Override
-	public Response postHALResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.postHALResource(resourceInfo, uriInfo, resource);
+	public Response postAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.postAPIResource(resourceInfo, uriInfo, resource);
 	}
 
 	@Override
-	public Response putHALResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.putHALResource(resourceInfo, uriInfo, id, resource);
+	public Response putAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.putAPIResource(resourceInfo, uriInfo, id, resource);
 	}
 
 	@Override
-	public Response deleteHALResource(@NotNull UUID id) {
-		return DefaultWebResource.super.deleteHALResource(id);
+	public Response deleteAPIResource(@NotNull UUID id) {
+		return DefaultWebResource.super.deleteAPIResource(id);
 	}
 }

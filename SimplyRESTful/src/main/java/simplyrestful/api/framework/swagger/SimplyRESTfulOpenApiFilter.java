@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javax.ws.rs.core.MediaType;
 
 import io.swagger.v3.core.filter.AbstractSpecFilter;
@@ -15,6 +13,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
 
@@ -47,7 +46,7 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 			}
 			Content modifiedContent = new Content();
 			for(Entry<String, io.swagger.v3.oas.models.media.MediaType> mediaTypeEntry: content.entrySet()) {
-				String modifiedMediaType = withoutQsParameter(mediaTypeEntry.getKey());
+				String modifiedMediaType = MediaTypeUtils.withoutQualityParameters(MediaType.valueOf(mediaTypeEntry.getKey())).toString();
 				modifiedContent.addMediaType(modifiedMediaType, mediaTypeEntry.getValue());
 			}
 			response.setContent(modifiedContent);
@@ -62,19 +61,11 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 	@Override
 	public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
 			Map<String, List<String>> headers) {
-		String halCollectionSchemaName = APICollection.class.getSimpleName() + APIResource.class.getSimpleName();
+		String apiCollectionSchemaName = APICollection.class.getSimpleName() + APIResource.class.getSimpleName();
 		String schemaName = schema.getName();
-		if (schemaName.equals(halCollectionSchemaName)) {
+		if (schemaName.equals(apiCollectionSchemaName)) {
 			return Optional.empty();
 		}
 		return super.filterSchema(schema, params, cookies, headers);
-	}
-
-	private String withoutQsParameter(String mediaTypeString) {
-		MediaType mediaType = MediaType.valueOf(mediaTypeString);
-		Map<String, String> parameters = mediaType.getParameters().entrySet().stream()
-				.filter(entry -> !entry.getKey().equalsIgnoreCase(MEDIA_TYPE_PARAMETER_NAME_QS))
-				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-		return new MediaType(mediaType.getType(), mediaType.getSubtype(), parameters).toString();
 	}
 }

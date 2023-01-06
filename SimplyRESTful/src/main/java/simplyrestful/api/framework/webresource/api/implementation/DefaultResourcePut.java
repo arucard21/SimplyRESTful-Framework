@@ -16,7 +16,6 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultExists;
 import simplyrestful.api.framework.api.crud.DefaultUpdate;
@@ -43,7 +42,7 @@ public interface DefaultResourcePut<T extends APIResource> extends DefaultExists
     @Path("/{id}")
     @PUT
     @Operation(description = "Modify an existing API resource.")
-    default Response putHALResource(
+    default Response putAPIResource(
     		@Context
             ResourceInfo resourceInfo,
             @Context
@@ -62,7 +61,7 @@ public interface DefaultResourcePut<T extends APIResource> extends DefaultExists
     	if(resource.getSelf() == null) {
     	    resource.setSelf(new Link(
     	                    WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, id),
-    	                    MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+    	                    resource.customJsonMediaType()));
     	}
     	else {
     	    UUID resourceIdFromSelf = WebResourceUtils.parseUuidFromResourceUri(resourceInfo, uriInfo, resource.getSelf().getHref());

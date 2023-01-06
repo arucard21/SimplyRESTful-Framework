@@ -10,8 +10,6 @@ import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
 public class QueryParamUtils {
-	public static final String HAL_EMBEDDED_OBJECT_NAME = "_embedded";
-	public static final String HAL_LINKS_OBJECT_NAME = "_links";
 	public static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
 	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
 
@@ -40,12 +38,11 @@ public class QueryParamUtils {
 	}
 
     /**
-     * Parse sort values as field name and sort order and remove the HAL structure.
+     * Parse sort values as field name and sort order.
      * <p>
      * This will parse the sort fields and sort order correctly, mapping them to a
-     * String and Boolean value respectively. The HAL-structure will also be removed
-     * from the sort fields so they match the hierarchy of the POJOs. If no sort order
-     * is provided, the default sort order, asc, is used.
+     * String and Boolean value respectively. If no sort order is provided, the default
+     * sort order, asc, is used.
      *
      * The Boolean value in the map uses true for ascending and false for descending order.
      *

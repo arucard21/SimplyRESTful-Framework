@@ -10,7 +10,6 @@ import javax.ws.rs.core.UriInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.resources.Link;
 
@@ -29,7 +28,7 @@ public class WebResourceRoot{
 		APIServiceDocument serviceDocument = new APIServiceDocument();
 		Link descriptionLink = new Link(uriInfo.getRequestUriBuilder().path("openapi.json").build(), null);
 		serviceDocument.setDescribedBy(descriptionLink);
-		Link selfLink = new Link(uriInfo.getRequestUriBuilder().build(), MediaTypeUtils.APPLICATION_HAL_JSON_TYPE);
+		Link selfLink = new Link(uriInfo.getRequestUriBuilder().build(), serviceDocument.customJsonMediaType());
 		serviceDocument.setSelf(selfLink);
 		return serviceDocument;
 	}

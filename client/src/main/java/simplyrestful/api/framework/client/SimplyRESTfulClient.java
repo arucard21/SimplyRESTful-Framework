@@ -91,9 +91,9 @@ public class SimplyRESTfulClient<T extends APIResource> {
      * that request will be used here, to discover the resource URI.
      *
      * This discovery is done by accessing the OpenAPI Specification document which
-     * is linked in the HAL Service Document located at the root of the API
+     * is linked in the API Service Document located at the root of the API
      * (baseApiUri). Here, we find the GET path for the media type matching that of
-     * the HAL resource T, which is the resource URI.
+     * the API resource T, which is the resource URI.
      *
      * The limitation is that the GET operation on the resource must be available in
      * order for that resource's URI to be discoverable.
@@ -331,7 +331,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     /**
-     * Retrieve a single API resource referenced with a HALLink.
+     * Retrieve a single API resource referenced with a Link.
      *
      * @param resourceLink is the URI identifier of the resource.
      * @return the API resource at the given URI.
@@ -341,7 +341,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     /**
-     * Retrieve a single API resource referenced with a HALLink.
+     * Retrieve a single API resource referenced with a Link.
      *
      * @param resourceLink is the URI identifier of the resource.
      * @return the API resource at the given URI.
@@ -410,8 +410,8 @@ public class SimplyRESTfulClient<T extends APIResource> {
         configureAdditionalQueryParameters(target, queryParameters);
         Builder request = target.request();
         configureHttpHeaders(request, headers);
-        Entity<T> halJsonEntity = Entity.entity(resource, resourceMediaType);
-        try (Response response = request.post(halJsonEntity)) {
+        Entity<T> jsonEntity = Entity.entity(resource, resourceMediaType);
+        try (Response response = request.post(jsonEntity)) {
             if (!Objects.equals(201, response.getStatus())) {
                 throw new WebApplicationException(response);
             }
@@ -452,7 +452,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     /**
-     * Remove an API resource referenced with a HALLink.
+     * Remove an API resource referenced with a Link.
      *
      * @param resourceLink is the id of the resource
      */
@@ -461,7 +461,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     /**
-     * Remove an API resource referenced with a HALLink.
+     * Remove an API resource referenced with a Link.
      *
      * @param resourceLink is the id of the resource
      */
@@ -520,7 +520,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     /**
-     * Check whether a resource with the given URI, referenced with a HALLink, exists on the server.
+     * Check whether a resource with the given URI, referenced with a Link, exists on the server.
      *
      * @param resourceLink is the URI of the resource that should be checked.
      * @return true iff the resource exists on the server, false if it does not exist.
@@ -532,7 +532,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     /**
-     * Check whether a resource with the given URI, referenced with a HALLink, exists on the server.
+     * Check whether a resource with the given URI, referenced with a Link, exists on the server.
      *
      * @param resourceLink is the URI of the resource that should be checked.
      * @return true iff the resource exists on the server, false if it does not exist.

@@ -11,13 +11,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import simplyrestful.api.framework.DefaultWebResource;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path("testresources")
-@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
-@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.PROFILE_STRING+ "\"")
+@Produces(TestResource.MEDIA_TYPE_JSON)
+@Consumes(TestResource.MEDIA_TYPE_JSON)
 public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource>{
 	public static final List<TestResource> TEST_RESOURCES = new ArrayList<>();
 

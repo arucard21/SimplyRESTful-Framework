@@ -18,9 +18,6 @@ public abstract class APIResource {
 	/**
 	 * Provide the custom JSON media type representing this resource.
 	 *
-	 * This custom JSON media type is an alternative representation, alongside the
-	 * HAL+JSON representation.
-	 *
 	 * @return the custom JSON media type for this resource.
 	 */
 	public abstract MediaType customJsonMediaType();

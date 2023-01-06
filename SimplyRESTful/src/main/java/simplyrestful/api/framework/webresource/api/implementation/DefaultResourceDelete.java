@@ -25,7 +25,7 @@ public interface DefaultResourceDelete<T extends APIResource> extends DefaultDel
     @Path("/{id}")
     @DELETE
     @Operation(description = "Delete this API resource")
-    default Response deleteHALResource(
+    default Response deleteAPIResource(
     		@PathParam("id")
     	    @NotNull
     	    @Parameter(description = "The UUID part of the identifier for the resource", required = true)

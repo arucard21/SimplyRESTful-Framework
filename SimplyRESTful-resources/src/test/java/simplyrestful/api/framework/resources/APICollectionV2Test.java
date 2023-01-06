@@ -67,27 +67,27 @@ public class APICollectionV2Test {
 	}
 
 	@Test
-	public void halCollection_shouldHaveSameHashcode_whenObjectsAreEqual() throws Exception {
+	public void apiCollection_shouldHaveSameHashcode_whenObjectsAreEqual() throws Exception {
 		Assertions.assertEquals(testCollection.hashCode(), testCollectionSame.hashCode());
 	}
 
 	@Test
-	public void halCollection_shouldBeEqual_whenContainingSameValues() throws Exception {
+	public void apiCollection_shouldBeEqual_whenContainingSameValues() throws Exception {
 		Assertions.assertEquals(testCollection, testCollectionSame);
 	}
 
 	@Test
-	public void halCollection_shouldBeEqual_whenSameInstance() throws Exception {
+	public void apiCollection_shouldBeEqual_whenSameInstance() throws Exception {
 		Assertions.assertEquals(testCollection, testCollection);
 	}
 
 	@Test
-	public void halCollection_shouldNotBeEqual_whenContainingDifferentValues() throws Exception {
+	public void apiCollection_shouldNotBeEqual_whenContainingDifferentValues() throws Exception {
 		Assertions.assertNotEquals(testCollection, testCollectionDifferent);
 	}
 
 	@Test
-	public void halCollection_shouldNotBeEqual_whenOnlySelfLinkDiffers() throws Exception {
+	public void apiCollection_shouldNotBeEqual_whenOnlySelfLinkDiffers() throws Exception {
 		APICollectionV2<TestResource> onlySelfLink1 = new APICollectionV2<>();
 		onlySelfLink1.setSelf(new Link(TEST_COLLECTION_HREF_1, null));
 

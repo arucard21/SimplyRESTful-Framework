@@ -10,7 +10,7 @@ public interface DefaultStream<T extends APIResource> {
     /**
      * Retrieve the stream of resources that have been requested.
      *
-     * For proper discoverability of the API, all links (href values in each HALLink
+     * For proper discoverability of the API, all links (href values in each Link
      * object) should contain absolute URI's and a self-link must be available in
      * each resource.
      *

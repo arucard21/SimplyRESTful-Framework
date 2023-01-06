@@ -64,7 +64,7 @@ public class DefaultWebResourceTest {
     	Mockito.when(requestContext.getUriInfo()).thenReturn(uriInfo);
     	Mockito.when(uriInfo.getQueryParameters()).thenReturn(new MultivaluedHashMap<>());
         Assertions.assertThrows(NotFoundException.class,
-                () -> testEndpoint.getHALResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
+                () -> testEndpoint.getAPIResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
     }
 
     @Test
@@ -72,25 +72,25 @@ public class DefaultWebResourceTest {
         Mockito.doReturn(TestWebResource.class).when(resourceInfo).getResourceClass();
         Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
         Assertions.assertThrows(ClientErrorException.class,
-                () -> testEndpoint.postHALResource(resourceInfo, uriInfo, TestResource.testInstance(TEST_BASE_URI)));
+                () -> testEndpoint.postAPIResource(resourceInfo, uriInfo, TestResource.testInstance(TEST_BASE_URI)));
     }
 
     @Test
     public void endpoint_shouldThrowBadRequestWhenIDDoesNotMatchResource_withPUTonResource() {
         Mockito.doReturn(TestWebResource.class).when(resourceInfo).getResourceClass();
         Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
-        Assertions.assertThrows(BadRequestException.class, () -> testEndpoint.putHALResource(resourceInfo, uriInfo,
+        Assertions.assertThrows(BadRequestException.class, () -> testEndpoint.putAPIResource(resourceInfo, uriInfo,
                 TestResource.TEST_RESOURCE_ID, TestResource.custom(TEST_BASE_URI, UUID.randomUUID())));
     }
 
     @Test
     public void endpoint_shouldRemoveResource_withDELETEonResource() {
-        Response deleteResponse = testEndpoint.deleteHALResource(TestResource.TEST_RESOURCE_ID);
+        Response deleteResponse = testEndpoint.deleteAPIResource(TestResource.TEST_RESOURCE_ID);
         Assertions.assertEquals(Status.NO_CONTENT.getStatusCode(), deleteResponse.getStatus());
     }
 
     @Test
     public void endpoint_shouldThrowNotFoundWhenResourceNonexisting_withDELETEonResource() {
-        Assertions.assertThrows(NotFoundException.class, () -> testEndpoint.deleteHALResource(UUID.randomUUID()));
+        Assertions.assertThrows(NotFoundException.class, () -> testEndpoint.deleteAPIResource(UUID.randomUUID()));
     }
 }

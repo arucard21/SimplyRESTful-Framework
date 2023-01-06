@@ -4,5 +4,5 @@
 
 Contains some useful JAX-RS Providers that can be used both server-side and client-side. 
 It currently only contains:
-* HALMapperProvider: Provides a HALMapper (configured for use with SimplyRESTful) as ObjectMapper to JacksonJsonProvider when a HAL+JSON media type is used.
-* ObjectMapperProvider: Provides an ObjectMapper (configured for use with SimplyRESTful) for use by JacksonJsonProvider when any other media type is used.
+* `ObjectMapperProvider`: Provides an `ObjectMapper` configured for use with SimplyRESTful. It would automatically be used by `JacksonJsonProvider`, if both are registered with JAX-RS.
+* `MediaTypeModule`: a Jackson module to serialize and deserialize a `javax.ws.rs.core.MediaType` object to and from a simple String representation. This can be registered automatically when using `findModules()` on the ObjectMapper (which is already done in `ObjectMapperProvider`).

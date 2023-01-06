@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.test.hal;
+package simplyrestful.api.framework.test.collection;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import simplyrestful.api.framework.resources.APICollectionV2;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
 
-public class HALCollectionV2BuilderTest {
+public class APICollectionV2BuilderTest {
     protected static final int TEST_RESOURCES_SIZE = 1000;
     protected static final URI requestURI = URI.create("local://resources/testresources/");
     protected List<TestResource> testResourcesList;

@@ -40,7 +40,7 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
     @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
     @Operation(description = "Retrieve a filtered, sorted collection of resources as an event stream.")
     @ApiResponse(description = "An event stream containing your API resources.")
-    default void streamHALResources(
+    default void streamAPIResources(
     		@Context
     		ContainerRequestContext requestContext,
     		@QueryParam(DefaultCollectionGet.QUERY_PARAM_FIELDS)

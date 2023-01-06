@@ -6,9 +6,6 @@ A framework for creating a RESTful API.
 
 This framework provides a default implementation of a JAX-RS Web Resource (sometimes called an endpoint) that maps the more complicated [HTTP](https://tools.ietf.org/html/rfc7231)-compliant access to simpler [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) functions. This has the benefit of providing standards-compliant as well as consistent behavior for your API without needing to understand the complexity of standards like HTTP. As API developer you only have to implement CRUD functions which are much simpler and more concretely defined. This level of consistency in the API also allows for additional convenience and features to be implemented generically, with little to no effort required from the API developer to enable it.
 * The implementation is based on [JAX-RS](https://jakarta.ee/specifications/restful-ws/) and can be used with any JAX-RS framework.
-* It allows resources to be represented as either plain [JSON](https://tools.ietf.org/html/rfc8259), with a custom media type, or as [HAL+JSON](https://tools.ietf.org/html/draft-kelly-json-hal-08). The latter of which is specifically created for use in REST APIs and provides a standardized structure for your attributes, links, embedded resources and hypermedia controls (sometimes called actions).
-  * It only requires a single Java class for the resource and will use [Content Negotiation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation) to automatically serialize to either plain JSON or HAL+JSON using Jackson.
-  * If both representations are equally preferred, the API will default to plain JSON, as it the more familiar media type. However, the use of HAL+JSON is recommended as it is more suitable for REST APIs.
 * The HTTP methods are mapped to simple CRUD functions (Create, Read, Update, Delete and List by default). The exact details of how each of these methods should behave is provided in the accompanying javadoc.
 
 ## Usage
@@ -17,20 +14,12 @@ This framework provides a default implementation of a JAX-RS Web Resource (somet
 * Add a dependency on [`SimplyRESTful`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/SimplyRESTful/) to your project
 
 ### Implement your API resource
-For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object) that extends [HALResource](/SimplyRESTful-resources/src/main/java/simplyrestful/api/framework/resources/HALResource.java), providing it with a profile URI.
-* *It's strongly recommended to provide full documentation for your API resource at the location indicated by the profile URI*
-* It is recommended to use a profile name that includes a version number.
+For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object) that extends [APIResource](/SimplyRESTful-resources/src/main/java/simplyrestful/api/framework/resources/APIResource.java) and provide it with a custom JSON media type.
 
 ```Java
-public class MyResource extends HALResource {  
-  public static final String PROFILE = "https://api.example.com/resources/my-resource/v1";
+public class MyResource extends APIResource {  
   public static final String MEDIA_TYPE_JSON = "application/x.myresource-v1+json";
 
-  @Override
-  public URI getProfile() {
-    return URI.create(PROFILE);
-  }
-  
   @Override
   public MediaType getCustomJsonMediaType(){
   	return MediaType.valueOf(MEDIA_TYPE_JSON);
@@ -79,11 +68,6 @@ In your JAX-RS framework, register:
 ```Java
 // Example for Jersey (in ResourceConfig)
 register(JacksonJsonProvider.class);
-```
-* the `JacksonHalJsonProvider` class (to correctly serialize and deserialize our HAL+JSON documents).
-```Java
-// Example for Jersey (in ResourceConfig)
-register(JacksonHalJsonProvider.class);
 ```
 * the Swagger classes (to generate the OpenAPI Specification document).
 ```Java
