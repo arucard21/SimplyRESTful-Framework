@@ -75,12 +75,12 @@ public class SimplyRESTfulClientTest extends JerseyTest {
 
     @Test
     public void client_shouldDiscoverTheResourceURI_whenItIsCreated() {
-        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.listResources(-1, -1, "", "", ""));
+        Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.listResources());
     }
 
     @Test
     public void listResources_shouldReturnTestResources() {
-        List<TestResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, "", "", "");
+        List<TestResource> listOfResources = simplyRESTfulClient.listResources();
         Assertions.assertNotNull(listOfResources);
         Assertions.assertEquals(2, listOfResources.size());
         Assertions.assertTrue(listOfResources.contains(TestResource.testInstance()));

@@ -7,13 +7,11 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
 
 public class TestResource extends APIResource {
-	public static final String TEST_RESOURCE_PROFILE = "http://localhost/profiles/testresource/v1";
-	public static final URI TEST_RESOURCE_PROFILE_URI = UriBuilder.fromUri(TEST_RESOURCE_PROFILE).build();
+	public static final String MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
 	public static final UUID TEST_RESOURCE_ID = UUID.randomUUID();
 	public static final String ADDITIONAL_FIELD_TEST_VALUE = "additional-field-value";
 
@@ -25,7 +23,7 @@ public class TestResource extends APIResource {
 
 	private TestResource(URI resourceUri, String additionalField) {
 		this.additionalField = additionalField;
-		this.setSelf(new Link(resourceUri, MediaTypeUtils.APPLICATION_HAL_JSON_TYPE));
+		this.setSelf(new Link(resourceUri, customJsonMediaType()));
 	}
 
 	public TestResource() {
@@ -45,7 +43,7 @@ public class TestResource extends APIResource {
 
 	@Override
 	public MediaType customJsonMediaType() {
-		return new MediaType("application", "x.testresource-v1+json");
+		return MediaType.valueOf(MEDIA_TYPE_JSON);
 	}
 
 	public String getAdditionalField() {

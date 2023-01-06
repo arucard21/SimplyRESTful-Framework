@@ -40,6 +40,7 @@ dependencies {
 	integrationTestImplementation group: "jakarta.xml.bind", name: "jakarta.xml.bind-api", version: jakartaXmlBindVersion
 	integrationTestImplementation group: "org.glassfish", name: "jakarta.json", version: jakartaJsonVersion
 	integrationTestImplementation group: "io.swagger.core.v3", name: "swagger-jaxrs2", version: swaggerVersion
+	integrationTestImplementation group: "ch.qos.logback", name: "logback-classic", version: logbackClassicVersion
 	
 	e2eTestImplementation project(":examples:examples-resources-jpa")
 }

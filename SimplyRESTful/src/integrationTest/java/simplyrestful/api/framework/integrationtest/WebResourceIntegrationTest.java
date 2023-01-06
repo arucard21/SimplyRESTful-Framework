@@ -26,12 +26,12 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.filters.UriCustomizer;
+import simplyrestful.api.framework.integrationTest.implementation.TestResource;
+import simplyrestful.api.framework.integrationTest.implementation.TestWebResource;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.APICollectionV2;
 import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
-import simplyrestful.api.framework.test.implementation.TestResource;
-import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 public class WebResourceIntegrationTest extends JerseyTest {
     public static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";

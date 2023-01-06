@@ -15,14 +15,13 @@ import javax.ws.rs.Produces;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
 @OpenAPIDefinition(tags = { @Tag(name = "Test Resources") })
-@Produces(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.TEST_RESOURCE_PROFILE + "\"")
-@Consumes(MediaTypeUtils.APPLICATION_HAL_JSON + "; profile=\"" + TestResource.TEST_RESOURCE_PROFILE + "\"")
+@Produces(TestResource.MEDIA_TYPE_JSON)
+@Consumes(TestResource.MEDIA_TYPE_JSON)
 public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource> {
     public static final String WEBRESOURCE_PATH = "testresources";
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();

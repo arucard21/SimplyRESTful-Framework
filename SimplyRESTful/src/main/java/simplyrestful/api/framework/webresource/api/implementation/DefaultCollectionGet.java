@@ -1,6 +1,8 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -21,7 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultCount;
 import simplyrestful.api.framework.api.crud.DefaultList;
-import simplyrestful.api.framework.hal.HALCollectionV2Builder;
+import simplyrestful.api.framework.hal.APICollectionV2Builder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APICollectionV2;
 import simplyrestful.api.framework.resources.APIResource;
@@ -41,7 +43,7 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 
     public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
     public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
-    public static final String QUERY_PARAM_FIELDS_DEFAULT = "_links.self,_links.first,_links.last,_links.prev,_links.next,total,_embedded.item._links.self";
+    public static final String QUERY_PARAM_FIELDS_DEFAULT = "self,first,last,prev,next,total,item.self";
     public static final String QUERY_PARAM_FIELDS_ALL= "all";
     public static final String QUERY_PARAM_QUERY_DEFAULT = "";
     public static final String QUERY_PARAM_SORT_DEFAULT = "";
@@ -106,9 +108,16 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		List<T> resources = this.list(pageStart, pageSize, fields, query, QueryParamUtils.parseSort(sort));
 		if(!resources.isEmpty()) {
 			MediaType resourceMediaType = resources.get(0).customJsonMediaType();
-			collectionType.getParameters().putIfAbsent(APICollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE, resourceMediaType.toString());
+			if(!collectionType.getParameters().containsKey(APICollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE)) {
+				Map<String, String> mediaTypeParameters = new HashMap<>(collectionType.getParameters());
+				mediaTypeParameters.put(APICollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE, resourceMediaType.toString());
+				collectionType = new MediaType(
+						collectionType.getType(),
+						collectionType.getSubtype(),
+						mediaTypeParameters);
+			}
 		}
-		return HALCollectionV2Builder.from(resources, uriInfo.getRequestUri())
+		return APICollectionV2Builder.from(resources, uriInfo.getRequestUri())
 				.withNavigation(pageStart, pageSize)
 				.collectionSize(this.count(query))
 				.build(collectionType);

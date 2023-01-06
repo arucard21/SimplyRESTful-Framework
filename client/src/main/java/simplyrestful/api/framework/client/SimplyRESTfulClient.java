@@ -7,12 +7,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -27,7 +31,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -47,11 +50,8 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
 	public static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
-	public static final String HAL_ITEM_KEY = "item";
-	public static final String HAL_EMBEDDED_KEY = "_embedded";
-	public static final String HAL_MEDIA_TYPE_ATTRIBUTE_PROFILE = "profile";
-	public static final String MEDIA_TYPE_HAL_JSON_TYPE = "application";
-	public static final String MEDIA_TYPE_HAL_JSON_SUBTYPE = "hal+json";
+	public static final String COLLECTION_ITEM_KEY = "item";
+	public static final String COLLECTION_TOTAL_KEY = "total";
 	public static final String QUERY_PARAM_PAGE_START = "pageStart";
 	public static final String QUERY_PARAM_PAGESIZE = "pageSize";
 	public static final String QUERY_PARAM_FIELDS = "fields";
@@ -231,19 +231,18 @@ public class SimplyRESTfulClient<T extends APIResource> {
             MultivaluedMap<String, String> additionalHeaders,
             MultivaluedMap<String, String> additionalQueryParameters) {
         discoverResourceUri(additionalHeaders);
-        return retrievePagedCollection(
+        return retrieveResourcesFromCollection(
         		pageStart,
         		pageSize,
         		fields == null ? Collections.emptyList() : fields,
         		query == null ? "" : query,
         		sort == null ? Collections.emptyList() : sort,
         		additionalHeaders,
-        		additionalQueryParameters)
-        		.getItem();
+        		additionalQueryParameters);
     }
 
     /**
-     * Retrieve HAL Collection resource containing a page of API resources.
+     * Retrieve the resources from a Collection resource containing a page of API resources.
      *
      * @param pageStart is the offset at which the requested page starts.
      * @param pageSize is the size of a single page in this paginated collection of resources
@@ -255,8 +254,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
      * @return the entire collection resource that was retrieved, containing either
      *         resource identifiers or embedded resources.
      */
-    @SuppressWarnings("unchecked")
-    private APICollectionV2<T> retrievePagedCollection(
+    private List<T> retrieveResourcesFromCollection(
             int pageStart,
             int pageSize,
             List<String> fields,
@@ -285,17 +283,19 @@ public class SimplyRESTfulClient<T extends APIResource> {
         request.accept(APICollectionV2.MEDIA_TYPE_JSON);
         configureHttpHeaders(request, additionalHeaders);
         String nonDeserialized = request.get(String.class);
-        APICollectionV2<T> collection;
-        collection = (APICollectionV2<T>) deserializeJsonWithGenerics(nonDeserialized, new TypeReference<APICollectionV2<BasicHALResource>>() {});
-        JsonObject embedded = Json.createReader(new StringReader(nonDeserialized)).readObject()
-                .getJsonObject(HAL_EMBEDDED_KEY);
-        if (Objects.nonNull(embedded)) {
-            collection.setItem(embedded.getJsonArray(HAL_ITEM_KEY).stream().filter(Objects::nonNull)
-                    .map(jsonValue -> deserializeJson(jsonValue.toString(), resourceClass)).filter(Objects::nonNull)
-                    .collect(Collectors.toList()));
-        }
-        this.totalAmountOfLastRetrievedCollection = collection.getTotal();
-        return collection;
+        JsonObject collectionJsonObject = Json.createReader(new StringReader(nonDeserialized)).readObject();
+		List<T> resources = Optional.ofNullable(collectionJsonObject.getJsonArray(COLLECTION_ITEM_KEY))
+				.map(JsonArray::stream)
+				.orElse(Stream.of())
+                .filter(Objects::nonNull)
+                .map(JsonValue::toString)
+                .map(resourceJson -> this.deserializeJson(resourceJson, resourceClass))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        this.totalAmountOfLastRetrievedCollection = Optional.ofNullable(collectionJsonObject.getJsonNumber(COLLECTION_TOTAL_KEY))
+        		.map(JsonNumber::intValue)
+        		.orElse(-1);
+        return resources;
     }
 
     public int getTotalAmountOfLastRetrievedCollection() {
@@ -320,21 +320,13 @@ public class SimplyRESTfulClient<T extends APIResource> {
 
     private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {
         try {
-            return getHALMapper().readValue(jsonString, deserializationClass);
+            return getConfiguredObjectMapper().readValue(jsonString, deserializationClass);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private <S> S deserializeJsonWithGenerics(String jsonString, TypeReference<S> typeRef) {
-        try {
-            return getHALMapper().readValue(jsonString, typeRef);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private ObjectMapper getHALMapper() {
+    private ObjectMapper getConfiguredObjectMapper() {
         return new ObjectMapperProvider().getContext(ObjectMapper.class);
     }
 

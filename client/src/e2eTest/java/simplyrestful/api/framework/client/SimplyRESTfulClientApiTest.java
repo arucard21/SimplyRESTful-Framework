@@ -97,7 +97,7 @@ public class SimplyRESTfulClientApiTest {
 
     @Test
     public void exists_shouldReturnWhetherTheResourceExists() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(-1, -1, Collections.emptyList(), "", Collections.emptyList());
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources();
         Assertions.assertTrue(simplyRESTfulClient.exists(listOfResources.get(0).getSelf().getHref()));
         Assertions.assertFalse(simplyRESTfulClient.exists(simplyRESTfulClient.createResourceUriFromUuid(UUID.randomUUID())));
     }

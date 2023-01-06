@@ -11,7 +11,7 @@ import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
-public class HALCollectionV2Builder<T extends APIResource> {
+public class APICollectionV2Builder<T extends APIResource> {
 	public static final int START_OF_FIRST_PAGE = 0;
     private final List<T> resources;
     private final URI requestURI;
@@ -26,11 +26,11 @@ public class HALCollectionV2Builder<T extends APIResource> {
      * @param requestURI is the request URI used to request this collection from the API.
      * @return the builder object.
      */
-	public static <T extends APIResource> HALCollectionV2Builder<T> from(List<T> resources, URI requestURI) {
-		return new HALCollectionV2Builder<T>(resources, requestURI);
+	public static <T extends APIResource> APICollectionV2Builder<T> from(List<T> resources, URI requestURI) {
+		return new APICollectionV2Builder<T>(resources, requestURI);
 	}
 
-	private HALCollectionV2Builder(List<T> resources, URI requestURI) {
+	private APICollectionV2Builder(List<T> resources, URI requestURI) {
 		this.resources = resources;
 		this.requestURI = requestURI;
 	}
@@ -44,7 +44,7 @@ public class HALCollectionV2Builder<T extends APIResource> {
      * @param pageSize is the maximum size of each page.
      * @return this builder object.
      */
-	public HALCollectionV2Builder<T> withNavigation(int pageStart, int pageSize) {
+	public APICollectionV2Builder<T> withNavigation(int pageStart, int pageSize) {
 		this.pageStart = pageStart;
 		this.pageSize = pageSize;
 		return this;
@@ -59,7 +59,7 @@ public class HALCollectionV2Builder<T extends APIResource> {
      * @param collectionSize is the size of the entire collection
      * @return this build object.
      */
-	public HALCollectionV2Builder<T> collectionSize(int collectionSize) {
+	public APICollectionV2Builder<T> collectionSize(int collectionSize) {
 		this.collectionSize = collectionSize;
 		return this;
 	}

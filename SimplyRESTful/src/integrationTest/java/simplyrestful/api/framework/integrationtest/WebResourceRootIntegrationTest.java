@@ -18,10 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import simplyrestful.api.framework.integrationTest.implementation.TestWebResource;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
-import simplyrestful.api.framework.test.implementation.TestWebResource;
 
 @ExtendWith(MockitoExtension.class)
 public class WebResourceRootIntegrationTest extends JerseyTest {
