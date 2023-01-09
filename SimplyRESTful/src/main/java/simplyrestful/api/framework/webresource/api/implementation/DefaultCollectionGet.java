@@ -23,9 +23,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultCount;
 import simplyrestful.api.framework.api.crud.DefaultList;
-import simplyrestful.api.framework.collection.APICollectionV2Builder;
+import simplyrestful.api.framework.collection.APICollectionBuilder;
 import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APICollectionV2;
 import simplyrestful.api.framework.resources.APIResource;
 
 /**
@@ -66,13 +65,13 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
      * @return the paginated collection of resources.
      */
     @GET
-    @Produces(APICollectionV2.MEDIA_TYPE_JSON)
+    @Produces(APICollection.MEDIA_TYPE_JSON)
     @Operation(description = "Retrieve a filtered, sorted collection of API resources.")
     @ApiResponse(responseCode = "200", description = "A pageable collection containing your API resources.", content = {
 	     @Content(
-		    mediaType = APICollectionV2.MEDIA_TYPE_JSON,
+		    mediaType = APICollection.MEDIA_TYPE_JSON,
 		    schema = @Schema(
-			    implementation = APICollectionV2.class))
+			    implementation = APICollection.class))
     })
     default APICollection<T> listAPIResources(
     		@Context
@@ -104,20 +103,20 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 		    List<String> sort) {
     	QueryParamUtils.configureFieldsDefault(requestContext, fields);
-    	MediaType collectionType = MediaType.valueOf(APICollectionV2.MEDIA_TYPE_JSON);
+    	MediaType collectionType = MediaType.valueOf(APICollection.MEDIA_TYPE_JSON);
 		List<T> resources = this.list(pageStart, pageSize, fields, query, QueryParamUtils.parseSort(sort));
 		if(!resources.isEmpty()) {
 			MediaType resourceMediaType = resources.get(0).customJsonMediaType();
-			if(!collectionType.getParameters().containsKey(APICollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE)) {
+			if(!collectionType.getParameters().containsKey(APICollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE)) {
 				Map<String, String> mediaTypeParameters = new HashMap<>(collectionType.getParameters());
-				mediaTypeParameters.put(APICollectionV2.MEDIA_TYPE_PARAMETER_ITEM_TYPE, resourceMediaType.toString());
+				mediaTypeParameters.put(APICollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE, resourceMediaType.toString());
 				collectionType = new MediaType(
 						collectionType.getType(),
 						collectionType.getSubtype(),
 						mediaTypeParameters);
 			}
 		}
-		return APICollectionV2Builder.from(resources, uriInfo.getRequestUri())
+		return APICollectionBuilder.from(resources, uriInfo.getRequestUri())
 				.withNavigation(pageStart, pageSize)
 				.collectionSize(this.count(query))
 				.build(collectionType);

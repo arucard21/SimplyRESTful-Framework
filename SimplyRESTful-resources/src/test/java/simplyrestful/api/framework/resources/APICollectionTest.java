@@ -14,16 +14,16 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import simplyrestful.api.framework.resources.test.TestResource;
 
-public class APICollectionV2Test {
+public class APICollectionTest {
 	public static final String TEST_COLLECTION_HREF_1 = "local://docs/resources/testcollection1/";
 	public static final String TEST_COLLECTION_HREF_2 = "local://docs/resources/testcollection2/";
 	public static final String TEST_COLLECTION_PAGE_BASE1 = "local://docs/resources/testcollection1/?page=";
 	public static final String TEST_COLLECTION_PAGE_BASE2 = "local://docs/resources/testcollection2/?page=";
 	public static final URI requestURI = URI.create("local://resources/testresources/");
 
-	private APICollectionV2<TestResource> testCollection;
-	private APICollectionV2<TestResource> testCollectionSame;
-	private APICollectionV2<TestResource> testCollectionDifferent;
+	private APICollection<TestResource> testCollection;
+	private APICollection<TestResource> testCollectionSame;
+	private APICollection<TestResource> testCollectionDifferent;
 	private List<TestResource> testResourcesList;
 
 	@BeforeEach
@@ -36,7 +36,7 @@ public class APICollectionV2Test {
 			testResourcesList.add(testResource);
 		}
 
-		testCollection = new APICollectionV2<>();
+		testCollection = new APICollection<>();
 		testCollection.setSelf(new Link(TEST_COLLECTION_HREF_1, null));
 		testCollection.setTotal(100);
 		testCollection.setFirst(new Link(TEST_COLLECTION_PAGE_BASE1+"1", null));
@@ -44,7 +44,7 @@ public class APICollectionV2Test {
 		testCollection.setPrev(new Link(TEST_COLLECTION_PAGE_BASE1+"1", null));
 		testCollection.setNext(new Link(TEST_COLLECTION_PAGE_BASE1+"10", null));
 
-		testCollectionSame = new APICollectionV2<>();
+		testCollectionSame = new APICollection<>();
 		testCollectionSame.setSelf(new Link(TEST_COLLECTION_HREF_1, null));
 		testCollectionSame.setTotal(100);
 		testCollectionSame.setFirst(new Link(TEST_COLLECTION_PAGE_BASE1+"1", null));
@@ -52,7 +52,7 @@ public class APICollectionV2Test {
 		testCollectionSame.setPrev(new Link(TEST_COLLECTION_PAGE_BASE1+"1", null));
 		testCollectionSame.setNext(new Link(TEST_COLLECTION_PAGE_BASE1+"10", null));
 
-		testCollectionDifferent = new APICollectionV2<>();
+		testCollectionDifferent = new APICollection<>();
 		testCollectionDifferent.setSelf(new Link(TEST_COLLECTION_HREF_2, null));
 		testCollectionDifferent.setTotal(50);
 		testCollectionDifferent.setFirst(new Link(TEST_COLLECTION_PAGE_BASE2+"1", null));
@@ -63,7 +63,7 @@ public class APICollectionV2Test {
 
 	@Test
 	public void equalsContract() {
-	    EqualsVerifier.forClass(APICollectionV2.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS).verify();
+	    EqualsVerifier.forClass(APICollection.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 
 	@Test
@@ -88,10 +88,10 @@ public class APICollectionV2Test {
 
 	@Test
 	public void apiCollection_shouldNotBeEqual_whenOnlySelfLinkDiffers() throws Exception {
-		APICollectionV2<TestResource> onlySelfLink1 = new APICollectionV2<>();
+		APICollection<TestResource> onlySelfLink1 = new APICollection<>();
 		onlySelfLink1.setSelf(new Link(TEST_COLLECTION_HREF_1, null));
 
-		APICollectionV2<TestResource> onlySelfLink2 = new APICollectionV2<>();
+		APICollection<TestResource> onlySelfLink2 = new APICollection<>();
 		onlySelfLink2.setSelf(new Link(TEST_COLLECTION_HREF_2, null));
 
 		Assertions.assertNotEquals(onlySelfLink1, onlySelfLink2);

@@ -63,7 +63,6 @@ import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APICollectionV2;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
@@ -245,7 +244,7 @@ public class ExampleWebResource
 
     @Override
     @GET
-    @Produces(APICollectionV2.MEDIA_TYPE_JSON)
+    @Produces(APICollection.MEDIA_TYPE_JSON)
     public APICollection<ExampleResource> listAPIResources(
     		@Context
     		ContainerRequestContext requestContext,

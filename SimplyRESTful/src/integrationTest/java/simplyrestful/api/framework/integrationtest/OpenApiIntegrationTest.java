@@ -72,8 +72,13 @@ public class OpenApiIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void openApi_shouldNotContainASchemaForTheAPICollectionParent() throws JsonMappingException, JsonProcessingException {
-        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()));
+    public void openApi_shouldContainASchemaForTheAPICollectionParent() throws JsonMappingException, JsonProcessingException {
+        Assertions.assertTrue(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()));
+    }
+
+    @Test
+    public void openApi_shouldNotContainASchemaForTheAPIResourceTypedAPICollection() throws JsonMappingException, JsonProcessingException {
+    	Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()+APIResource.class.getSimpleName()));
     }
 
     @Test

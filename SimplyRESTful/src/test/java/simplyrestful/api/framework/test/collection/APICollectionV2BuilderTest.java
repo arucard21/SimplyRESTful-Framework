@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import simplyrestful.api.framework.collection.APICollectionV2Builder;
-import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.collection.APICollectionBuilder;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
 
@@ -21,7 +21,7 @@ public class APICollectionV2BuilderTest {
     protected static final int TEST_RESOURCES_SIZE = 1000;
     protected static final URI requestURI = URI.create("local://resources/testresources/");
     protected List<TestResource> testResourcesList;
-    private final MediaType customJson = MediaType.valueOf(APICollectionV2.MEDIA_TYPE_JSON);
+    private final MediaType customJson = MediaType.valueOf(APICollection.MEDIA_TYPE_JSON);
 
     @BeforeEach
     public void createSourceData() {
@@ -35,9 +35,9 @@ public class APICollectionV2BuilderTest {
         }
     }
 
-    protected APICollectionV2<TestResource> createExpectedCollection(int startOfFirst, int startOfLast, int startOfPrev,
+    protected APICollection<TestResource> createExpectedCollection(int startOfFirst, int startOfLast, int startOfPrev,
             int startOfNext, int sublistBegin, int sublistEnd) {
-        APICollectionV2<TestResource> expected = new APICollectionV2<TestResource>();
+        APICollection<TestResource> expected = new APICollection<TestResource>();
         expected.setSelf(new Link(requestURI, customJson));
         expected.setTotal(TEST_RESOURCES_SIZE);
         Link firstPage = startOfFirst == -1 ? null
@@ -82,9 +82,9 @@ public class APICollectionV2BuilderTest {
         int pageStart = 0;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(0, 100);
-        APICollectionV2<TestResource> actual = APICollectionV2Builder.from(resources, requestURI)
+        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
-        APICollectionV2<TestResource> expected = createExpectedCollection(0, 900, -1, 100, 0, 100);
+        APICollection<TestResource> expected = createExpectedCollection(0, 900, -1, 100, 0, 100);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -93,9 +93,9 @@ public class APICollectionV2BuilderTest {
         int pageStart = 300;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(200, 300);
-        APICollectionV2<TestResource> actual = APICollectionV2Builder.from(resources, requestURI)
+        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
-        APICollectionV2<TestResource> expected = createExpectedCollection(0, 900, 200, 400, 200, 300);
+        APICollection<TestResource> expected = createExpectedCollection(0, 900, 200, 400, 200, 300);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -104,9 +104,9 @@ public class APICollectionV2BuilderTest {
         int pageStart = 900;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(900, 1000);
-        APICollectionV2<TestResource> actual = APICollectionV2Builder.from(resources, requestURI)
+        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
-        APICollectionV2<TestResource> expected = createExpectedCollection(0, 900, 800, -1, 900, 1000);
+        APICollection<TestResource> expected = createExpectedCollection(0, 900, 800, -1, 900, 1000);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -115,7 +115,7 @@ public class APICollectionV2BuilderTest {
         int pageStart = 4;
         int maxPageSize = 300;
         List<TestResource> resources = testResourcesList.subList(900, 1000);
-        APICollectionV2<TestResource> actual = APICollectionV2Builder.from(resources, requestURI)
+        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
         Assertions.assertEquals(100, actual.getItem().size());
     }
@@ -125,7 +125,7 @@ public class APICollectionV2BuilderTest {
         int pageStart = 1;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(200, 300);
-        APICollectionV2<TestResource> actual = APICollectionV2Builder.from(resources, requestURI)
+        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
         Assertions.assertEquals(customJson, actual.getSelf().getType());
     }
@@ -135,7 +135,7 @@ public class APICollectionV2BuilderTest {
         int pageStart = 0;
         int maxPageSize = 100;
         List<TestResource> resources = Collections.emptyList();
-        APICollectionV2<TestResource> actual = APICollectionV2Builder.from(resources, requestURI)
+        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
                 .collectionSize(0).withNavigation(pageStart, maxPageSize).build(customJson);
         Assertions.assertEquals(0, actual.getItem().size());
     }

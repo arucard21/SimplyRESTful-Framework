@@ -40,7 +40,7 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.parser.OpenAPIV3Parser;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.resources.Link;
@@ -280,7 +280,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
         }
         configureAdditionalQueryParameters(target, additionalQueryParameters);
         Builder request = target.request();
-        request.accept(APICollectionV2.MEDIA_TYPE_JSON);
+        request.accept(APICollection.MEDIA_TYPE_JSON);
         configureHttpHeaders(request, additionalHeaders);
         String nonDeserialized = request.get(String.class);
         JsonObject collectionJsonObject = Json.createReader(new StringReader(nonDeserialized)).readObject();

@@ -29,14 +29,14 @@ import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.integrationTest.implementation.TestResource;
 import simplyrestful.api.framework.integrationTest.implementation.TestWebResource;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 public class WebResourceIntegrationTest extends JerseyTest {
     public static final String HTTP_HEADER_NAME_CUSTOM_URI = "X-Original-URL";
     public static final String WEB_RESOURCE_PATH = "testresources";
-    public static final MediaType MEDIA_TYPE_COLLECTION_V2_JSON_TYPE = MediaType.valueOf(APICollectionV2.MEDIA_TYPE_JSON);
+    public static final MediaType MEDIA_TYPE_COLLECTION_V2_JSON_TYPE = MediaType.valueOf(APICollection.MEDIA_TYPE_JSON);
     private TestResource testInstance;
     private TestResource testInstanceWithRandomId;
 
@@ -91,7 +91,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	Assertions.assertEquals(200, response.getStatus());
     	Assertions.assertEquals(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE, response.getMediaType());
 
-    	APICollectionV2<TestResource> collection = response.readEntity(new GenericType<APICollectionV2<TestResource>>() {});
+    	APICollection<TestResource> collection = response.readEntity(new GenericType<APICollection<TestResource>>() {});
     	Assertions.assertEquals(2, collection.getTotal());
     	Assertions.assertTrue(collection.getItem().contains(testInstance));
     }
@@ -126,7 +126,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	Assertions.assertEquals(200, response.getStatus());
     	Assertions.assertEquals(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE, response.getMediaType());
 
-    	APICollectionV2<TestResource> collection = response.readEntity(new GenericType<APICollectionV2<TestResource>>() {});
+    	APICollection<TestResource> collection = response.readEntity(new GenericType<APICollection<TestResource>>() {});
     	Assertions.assertEquals(2, collection.getTotal());
     	Assertions.assertTrue(collection.getItem().contains(testInstance));
     }
@@ -251,12 +251,12 @@ public class WebResourceIntegrationTest extends JerseyTest {
     	URI customUri = UriBuilder.fromUri("https://simplyrestful-testhost.org/services/")
     		.path(WEB_RESOURCE_PATH)
     		.build();
-    	APICollectionV2<TestResource> collection = target()
+    	APICollection<TestResource> collection = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
     		.accept(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE)
     		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
-    		.get(new GenericType<APICollectionV2<TestResource>>() {});
+    		.get(new GenericType<APICollection<TestResource>>() {});
     	Assertions.assertEquals(customUri, collection.getSelf().getHref());
     	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }

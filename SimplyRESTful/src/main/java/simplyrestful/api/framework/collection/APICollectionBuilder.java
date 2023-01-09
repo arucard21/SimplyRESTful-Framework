@@ -6,12 +6,12 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import simplyrestful.api.framework.resources.APICollectionV2;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
-public class APICollectionV2Builder<T extends APIResource> {
+public class APICollectionBuilder<T extends APIResource> {
 	public static final int START_OF_FIRST_PAGE = 0;
     private final List<T> resources;
     private final URI requestURI;
@@ -26,11 +26,11 @@ public class APICollectionV2Builder<T extends APIResource> {
      * @param requestURI is the request URI used to request this collection from the API.
      * @return the builder object.
      */
-	public static <T extends APIResource> APICollectionV2Builder<T> from(List<T> resources, URI requestURI) {
-		return new APICollectionV2Builder<T>(resources, requestURI);
+	public static <T extends APIResource> APICollectionBuilder<T> from(List<T> resources, URI requestURI) {
+		return new APICollectionBuilder<T>(resources, requestURI);
 	}
 
-	private APICollectionV2Builder(List<T> resources, URI requestURI) {
+	private APICollectionBuilder(List<T> resources, URI requestURI) {
 		this.resources = resources;
 		this.requestURI = requestURI;
 	}
@@ -44,7 +44,7 @@ public class APICollectionV2Builder<T extends APIResource> {
      * @param pageSize is the maximum size of each page.
      * @return this builder object.
      */
-	public APICollectionV2Builder<T> withNavigation(int pageStart, int pageSize) {
+	public APICollectionBuilder<T> withNavigation(int pageStart, int pageSize) {
 		this.pageStart = pageStart;
 		this.pageSize = pageSize;
 		return this;
@@ -59,13 +59,13 @@ public class APICollectionV2Builder<T extends APIResource> {
      * @param collectionSize is the size of the entire collection
      * @return this build object.
      */
-	public APICollectionV2Builder<T> collectionSize(int collectionSize) {
+	public APICollectionBuilder<T> collectionSize(int collectionSize) {
 		this.collectionSize = collectionSize;
 		return this;
 	}
 
-    public APICollectionV2<T> build(MediaType type) {
-    	APICollectionV2<T> collection = new APICollectionV2<T>();
+    public APICollection<T> build(MediaType type) {
+    	APICollection<T> collection = new APICollection<T>();
     	collection.setSelf(new Link(requestURI, type));
     	collection.setItem(this.resources);
 
@@ -78,7 +78,7 @@ public class APICollectionV2Builder<T extends APIResource> {
     	return collection;
     }
 
-    private void includeNavigation(APICollectionV2<T> collection) {
+    private void includeNavigation(APICollection<T> collection) {
 		collection.setFirst(createLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE));
 		if (this.pageStart > 0) {
 		    int startofPrevPage = this.pageStart - this.pageSize;
