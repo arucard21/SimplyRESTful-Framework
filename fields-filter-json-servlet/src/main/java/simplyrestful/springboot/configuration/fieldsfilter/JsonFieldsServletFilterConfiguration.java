@@ -1,14 +1,13 @@
 package simplyrestful.springboot.configuration.fieldsfilter;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.ConditionalOnMissingFilterBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import simplyrestful.api.framework.servlet.filters.JsonFieldsServletFilter;
 
-@Configuration
+@AutoConfiguration
 public class JsonFieldsServletFilterConfiguration {
     @Bean
     @ConditionalOnMissingFilterBean
