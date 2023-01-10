@@ -2,7 +2,7 @@ package simplyrestful.api.framework.resources;
 
 import java.util.Objects;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public class APIServiceDocument extends APIResource {
 	public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-servicedocument-v1+json";

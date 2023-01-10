@@ -3,7 +3,7 @@ package example.microprofile.quarkus.microprofile.quarkus.resources;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import example.resources.jpa.ExampleResource;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;

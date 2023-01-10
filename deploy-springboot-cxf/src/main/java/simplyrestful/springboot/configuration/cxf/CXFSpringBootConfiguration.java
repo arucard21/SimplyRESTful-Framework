@@ -2,17 +2,16 @@ package simplyrestful.springboot.configuration.cxf;
 
 import org.apache.coyote.http2.Http2Protocol;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 
-@Configuration
+@AutoConfiguration
 @ComponentScan(basePackages = { "simplyrestful" })
 public class CXFSpringBootConfiguration { /* Ensure that the simplyrestful package is scanned */
     @Bean
@@ -34,6 +33,7 @@ public class CXFSpringBootConfiguration { /* Ensure that the simplyrestful packa
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public TomcatConnectorCustomizer http2UpgradeProtocol() {
         return (connector -> connector.addUpgradeProtocol(new Http2Protocol()));
     }

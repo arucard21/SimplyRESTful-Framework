@@ -3,8 +3,8 @@ apply plugin: 'org.unbroken-dome.test-sets'
 
 project.description = "A framework for creating a RESTful API"
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 testSets {
     integrationTest
@@ -24,15 +24,14 @@ dependencies {
     api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
     api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
     api group: "jakarta.validation", name: "jakarta.validation-api", version: jakartaValidationVersion
-    api group: "io.swagger.core.v3", name: "swagger-jaxrs2", version: swaggerVersion
+    api group: "io.swagger.core.v3", name: "swagger-jaxrs2-jakarta", version: swaggerVersion
     api group: "jakarta.servlet", name: "jakarta.servlet-api", version: jakartaServletVersion
     api group: "jakarta.json", name: "jakarta.json-api", version: jakartaJsonVersion
 
     testImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
     testImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
-    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
-    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
-    testImplementation group: "org.junit.platform", name: "junit-platform-launcher", version: junitPlatformVersion
+    testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
+	testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation group: "org.glassfish.jersey.containers", name: "jersey-container-servlet", version: jerseyVersion
     testImplementation group: "nl.jqno.equalsverifier", name: "equalsverifier", version: equalsVerifierVersion
     testImplementation group: "org.glassfish.jersey.media", name: "jersey-media-sse", version: jerseyVersion

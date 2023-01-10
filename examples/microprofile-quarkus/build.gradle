@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation enforcedPlatform(group: "io.quarkus", name: "quarkus-bom", version: "2.7.2.Final")
+    implementation enforcedPlatform(group: "io.quarkus", name: "quarkus-bom", version: "3.0.0.Alpha2")
     implementation project(':SimplyRESTful')
     implementation project(':fields-filter-json-servlet')
     implementation project(':examples:examples-resources-jpa')
@@ -20,15 +20,15 @@ dependencies {
     implementation group: "io.quarkus", name:"quarkus-jdbc-h2"
     implementation group: "com.h2database", name: "h2", version: h2Version
     implementation group: "io.github.perplexhub", name: "rsql-jpa", version: rsqlJpaVersion
-    implementation group: "org.glassfish", name: "jakarta.json", version: jakartaJsonVersion
+    implementation group: "org.eclipse.parsson", name: "parsson", version: parssonVersion
     implementation group: "org.threeten", name: "threetenbp", version: threetenVersion
 }
 
 description = "Example project for a SimplyRESTful API using MicroProfile-compliant Quarkus libraries"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 compileJava {

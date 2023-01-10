@@ -3,7 +3,7 @@ package simplyrestful.api.framework.resources;
 import java.net.URI;
 import java.util.Objects;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public class Link{
 	private URI href;

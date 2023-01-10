@@ -2,9 +2,9 @@ package simplyrestful.api.framework.client;
 
 import java.net.URI;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.client.Client;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.ws.rs.client.Client;
 
 import simplyrestful.api.framework.resources.APIResource;
 

@@ -6,8 +6,8 @@ repositories {
 
 project.description = "A Servlet Filter that can filter a JSON response based on fields provided in a query parameter."
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 tasks.withType(Test){
 	useJUnitPlatform()

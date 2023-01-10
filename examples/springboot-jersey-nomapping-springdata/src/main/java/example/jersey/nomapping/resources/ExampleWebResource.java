@@ -25,25 +25,27 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
+import cz.jirutka.rsql.parser.RSQLParserException;
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
@@ -145,10 +147,15 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 	@Override
 	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query,
 			List<SortOrder> sort) {
-		List<ExampleResource> retrievedPage = repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query),
-				new OffsetBasedPageRequest(pageStart, pageSize, map(sort))).getContent();
-		return retrievedPage.stream().map(resource -> ensureSelfLinkAndUUIDPresent(resource))
-				.collect(Collectors.toList());
+		try {
+			List<ExampleResource> retrievedPage = repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query),
+					new OffsetBasedPageRequest(pageStart, pageSize, map(sort))).getContent();
+			return retrievedPage.stream().map(resource -> ensureSelfLinkAndUUIDPresent(resource))
+					.collect(Collectors.toList());
+		}
+		catch(RSQLParserException e) {
+			throw new BadRequestException("The FIQL query could not be parsed");
+		}
 	}
 //    @Override
 //    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {

@@ -12,11 +12,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.MediaType;
 
 public class MediaTypeUtils {
 	public static final String ERROR_PREMATCHING_NOT_SUPPORTED = "This method must be called after JAX-RS matching is done. It cannot be called from a @PreMatching JAX-RS filter, use getAllProducibleMediaTypes() instead";

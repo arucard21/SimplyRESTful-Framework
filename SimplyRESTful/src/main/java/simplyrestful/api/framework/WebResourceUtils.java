@@ -3,8 +3,8 @@ package simplyrestful.api.framework;
 import java.net.URI;
 import java.util.UUID;
 
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.UriInfo;
 
 public interface WebResourceUtils {
     /**

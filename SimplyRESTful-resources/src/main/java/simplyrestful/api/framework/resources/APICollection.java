@@ -3,7 +3,7 @@ package simplyrestful.api.framework.resources;
 import java.util.List;
 import java.util.Objects;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public class APICollection<T extends APIResource> extends APIResource {
     public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-collection-v1+json";

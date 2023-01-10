@@ -2,7 +2,7 @@ package simplyrestful.api.framework.resources;
 
 import java.util.Objects;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public abstract class APIResource {
 	private Link self;

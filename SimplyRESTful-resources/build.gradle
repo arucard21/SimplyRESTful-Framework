@@ -2,8 +2,8 @@ apply plugin: "java-library"
 
 project.description = "The core API resources used in SimplyRESTful APIs"
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -12,9 +12,8 @@ repositories {
 dependencies {
 	api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
 
-    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
-    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
-    testImplementation group: "org.junit.platform", name: "junit-platform-launcher", version: junitPlatformVersion
+    testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
+	testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation group: "org.glassfish.jersey.containers", name: "jersey-container-servlet", version: jerseyVersion
     testImplementation group: "nl.jqno.equalsverifier", name: "equalsverifier", version: equalsVerifierVersion
 }

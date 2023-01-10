@@ -5,8 +5,8 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javax.json.Json;
-import javax.json.JsonStructure;
+import jakarta.json.Json;
+import jakarta.json.JsonStructure;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;

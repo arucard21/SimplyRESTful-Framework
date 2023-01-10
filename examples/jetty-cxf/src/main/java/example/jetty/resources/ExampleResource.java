@@ -2,8 +2,8 @@ package example.jetty.resources;
 
 import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.MediaType;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

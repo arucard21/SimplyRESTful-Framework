@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;

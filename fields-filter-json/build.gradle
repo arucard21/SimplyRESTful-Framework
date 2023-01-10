@@ -6,8 +6,8 @@ repositories {
 
 project.description = "A utility to filter a JSON object so it contains only a specified set of fields."
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 tasks.withType(Test){
 	useJUnitPlatform()
@@ -16,11 +16,9 @@ tasks.withType(Test){
 dependencies {
 	api group: "jakarta.json", name: "jakarta.json-api", version: jakartaJsonVersion
 	
-	testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
-	testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
-	testImplementation group: "org.junit.jupiter", name: "junit-jupiter-params", version: junitVersion
-	testImplementation group: "org.junit.platform", name:"junit-platform-launcher", version: junitPlatformVersion
-	testImplementation group: "org.glassfish", name: "jakarta.json", version: jakartaJsonVersion
+	testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
+	testImplementation('org.junit.jupiter:junit-jupiter')
+	testImplementation group: "org.eclipse.parsson", name: "parsson", version: parssonVersion
 }
 
 publishing{

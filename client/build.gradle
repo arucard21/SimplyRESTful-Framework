@@ -3,12 +3,12 @@ apply plugin: 'org.unbroken-dome.test-sets'
 
 project.description = "A generic client that can be used with any SimplyRESTful API"
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 testSets {
     integrationTest
-    e2eTest { extendsFrom integrationTest }
+    e2eTest
 }
 
 tasks.withType(Test){
@@ -23,23 +23,24 @@ dependencies {
 	api project(":SimplyRESTful-resources")
 	api project(":jaxrs-providers")
 	api group: "jakarta.json", name: "jakarta.json-api", version: jakartaJsonVersion
-	api group: "io.swagger.core.v3", name: "swagger-models", version: swaggerVersion
+	api group: "io.swagger.core.v3", name: "swagger-models-jakarta", version: swaggerVersion
 	api group: "io.swagger.parser.v3", name: "swagger-parser", version: swaggerParserVersion
-	api group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: jacksonVersion
+	api group: 'com.fasterxml.jackson.jakarta.rs', name: 'jackson-jakarta-rs-json-provider', version: jacksonVersion
 
-	integrationTestImplementation project(":SimplyRESTful")
-	integrationTestImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
-	integrationTestImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
-	integrationTestImplementation group: "org.junit.platform", name: "junit-platform-launcher", version: junitPlatformVersion
+	// dependencies shared by integrationTest and e2eTest
+	testImplementation project(":SimplyRESTful")
+	testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
+	testImplementation('org.junit.jupiter:junit-jupiter')
+	testImplementation group: "org.glassfish.jersey.core", name: "jersey-client", version: jerseyVersion
+	testImplementation group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion
+	testImplementation group: "org.eclipse.parsson", name: "parsson", version: parssonVersion
+	
 	integrationTestImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
 	integrationTestImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
-	integrationTestImplementation group: "org.glassfish.jersey.core", name: "jersey-client", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework", name: "jersey-test-framework-core", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework.providers", name: "jersey-test-framework-provider-jetty", version: jerseyVersion
-	integrationTestImplementation group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion
 	integrationTestImplementation group: "jakarta.xml.bind", name: "jakarta.xml.bind-api", version: jakartaXmlBindVersion
-	integrationTestImplementation group: "org.glassfish", name: "jakarta.json", version: jakartaJsonVersion
-	integrationTestImplementation group: "io.swagger.core.v3", name: "swagger-jaxrs2", version: swaggerVersion
+	integrationTestImplementation group: "io.swagger.core.v3", name: "swagger-jaxrs2-jakarta", version: swaggerVersion
 	integrationTestImplementation group: "ch.qos.logback", name: "logback-classic", version: logbackClassicVersion
 	
 	e2eTestImplementation project(":examples:examples-resources-jpa")

@@ -1,6 +1,6 @@
 package simplyrestful.api.framework.serialization;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 

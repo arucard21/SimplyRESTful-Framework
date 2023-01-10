@@ -3,7 +3,7 @@ package simplyrestful.api.framework.test.implementation;
 import java.net.URI;
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;

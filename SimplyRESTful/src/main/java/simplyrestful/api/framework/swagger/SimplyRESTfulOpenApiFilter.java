@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import io.swagger.v3.core.filter.AbstractSpecFilter;
 import io.swagger.v3.core.model.ApiDescription;

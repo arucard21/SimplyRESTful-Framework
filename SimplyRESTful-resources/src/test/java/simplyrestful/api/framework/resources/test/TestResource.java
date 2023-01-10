@@ -1,6 +1,6 @@
 package simplyrestful.api.framework.resources.test;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import simplyrestful.api.framework.resources.APIResource;
 

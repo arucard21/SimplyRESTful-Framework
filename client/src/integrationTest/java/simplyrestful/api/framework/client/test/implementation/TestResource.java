@@ -4,8 +4,8 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriBuilder;
 
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;

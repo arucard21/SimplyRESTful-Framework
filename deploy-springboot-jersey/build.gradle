@@ -2,8 +2,8 @@ apply plugin: "java-library"
 
 project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -18,7 +18,7 @@ dependencies {
         exclude group: "org.glassfish.jersey.media", module: "jersey-media-json-jackson"
     }
     api group: "org.glassfish.jersey.media", name: "jersey-media-sse", version: jerseyVersion
-    api group: "io.swagger.core.v3", name: "swagger-jaxrs2", version: swaggerVersion
+    api group: "io.swagger.core.v3", name: "swagger-jaxrs2-jakarta", version: swaggerVersion
 }
 
 publishing{
