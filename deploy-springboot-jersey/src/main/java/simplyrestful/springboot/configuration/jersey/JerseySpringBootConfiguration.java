@@ -13,6 +13,7 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.filters.AcceptHeaderModifier;
+import simplyrestful.api.framework.filters.FieldsDefaultValueFilter;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
@@ -26,6 +27,7 @@ public class JerseySpringBootConfiguration implements ResourceConfigCustomizer {
         config.register(ObjectMapperProvider.class);
         config.register(UriCustomizer.class);
         config.register(AcceptHeaderModifier.class);
+        config.register(FieldsDefaultValueFilter.class);
         config.register(OpenApiResource.class);
         config.register(AcceptHeaderOpenApiResource.class);
         config.property(ServerProperties.WADL_FEATURE_DISABLE, true);
