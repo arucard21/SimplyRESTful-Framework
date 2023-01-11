@@ -16,6 +16,7 @@ dependencies {
     api group: "org.apache.cxf", name: "cxf-spring-boot-starter-jaxrs", version: cxfVersion
     api group: "org.apache.cxf", name: "cxf-rt-rs-service-description-openapi-v3", version: cxfVersion
     api group: "org.apache.cxf", name: "cxf-rt-rs-extension-search", version: cxfVersion
+    api group: "org.eclipse.parsson", name: "parsson", version: parssonVersion    
 }
 
 publishing{

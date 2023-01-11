@@ -7,7 +7,7 @@ Convenience library for starting the SimplyRESTful API on a Tomcat server with A
 What this library does:
 * Registers the JAX-RS providers required by SimplyRESTful.
 * Makes the registered JAX-RS Web Resources available directly under the path `/services`.
-* Generates an OpenAPI Specification document at `/services/swagger.json`
+* Generates an OpenAPI Specification document at `/services/openapi.json`
 * Provides a Swagger UI at `/services/api-docs`.
     * Tip: If you access Swagger UI with `/services/api-docs?url=../swagger.json` it automatically loads the generated OpenAPI Specification file of the API.
 
