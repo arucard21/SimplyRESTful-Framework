@@ -8,9 +8,11 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.PreMatching;
 import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ext.Provider;
 
 @Named
 @PreMatching
+@Provider
 public class UriCustomizer implements ContainerRequestFilter {
     public static final String CONFIGURATION_PROPERTY_NAME = "SIMPLYRESTFUL_URI_HTTP_HEADER";
 

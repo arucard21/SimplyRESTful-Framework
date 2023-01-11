@@ -10,7 +10,6 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
@@ -61,8 +60,6 @@ public class DefaultWebResourceTest {
 
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {
-    	Mockito.when(requestContext.getUriInfo()).thenReturn(uriInfo);
-    	Mockito.when(uriInfo.getQueryParameters()).thenReturn(new MultivaluedHashMap<>());
         Assertions.assertThrows(NotFoundException.class,
                 () -> testEndpoint.getAPIResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
     }

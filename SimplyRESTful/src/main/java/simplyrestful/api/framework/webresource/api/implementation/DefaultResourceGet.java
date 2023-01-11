@@ -56,7 +56,7 @@ public interface DefaultResourceGet<T extends APIResource> extends DefaultRead<T
 	        @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)
 	        @Parameter(description = "The fields that should be retrieved", required = false)
 	        List<String> fields) {
-    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
+    	QueryParamUtils.configureFieldsDefaultProperty(fields);
     	return Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
     }
 }

@@ -60,7 +60,7 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
 		    @Context
 		    Sse sse){
         try (SseEventSink sink = eventSink) {
-        	QueryParamUtils.configureFieldsDefault(requestContext, fields);
+        	QueryParamUtils.configureFieldsDefaultProperty(fields);
             try (Stream<T> stream = stream(
             		fields,
                     query,

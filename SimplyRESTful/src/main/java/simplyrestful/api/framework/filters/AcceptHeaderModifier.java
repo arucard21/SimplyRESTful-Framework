@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.Configuration;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.ext.Provider;
 import simplyrestful.api.framework.MediaTypeUtils;
 
 /**
@@ -25,6 +25,7 @@ import simplyrestful.api.framework.MediaTypeUtils;
  */
 @Named
 @PreMatching
+@Provider
 public class AcceptHeaderModifier implements ContainerRequestFilter {
     @Context
     private Configuration configuration;

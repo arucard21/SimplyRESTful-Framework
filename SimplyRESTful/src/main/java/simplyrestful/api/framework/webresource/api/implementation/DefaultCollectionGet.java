@@ -102,7 +102,7 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 		    List<String> sort) {
-    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
+    	QueryParamUtils.configureFieldsDefaultProperty(fields);
     	MediaType collectionType = MediaType.valueOf(APICollection.MEDIA_TYPE_JSON);
 		List<T> resources = this.list(pageStart, pageSize, fields, query, QueryParamUtils.parseSort(sort));
 		if(!resources.isEmpty()) {
