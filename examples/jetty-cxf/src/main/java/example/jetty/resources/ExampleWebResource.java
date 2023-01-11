@@ -88,12 +88,11 @@ public class ExampleWebResource
 	}
 
 	@Override
-	public List<ExampleResource> list(int pageNumber, int pageSize, List<String> fields, String query,
-			List<SortOrder> sort) {
+	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort) {
 		if (!sort.isEmpty()) {
 			throw new ServerErrorException("This API does not yet support sorting", 501);
 		}
-		return getEntityDao().findAllForPage(pageNumber, pageSize).stream().map(entity -> map(entity))
+		return getEntityDao().findAllForPage(pageStart, pageSize).stream().map(entity -> map(entity))
 				.collect(Collectors.toList());
 	}
 

@@ -39,16 +39,15 @@ public class ExampleEntityDAOImpl implements ExampleEntityDAO {
 		return unmappedDatastore.size();
 	}
 
-	public List<ExampleResource> findAllForPage(long pageNumber, long pageSize) {
-		if(pageNumber - 1 < 0) {
-			pageNumber = 0;
+	public List<ExampleResource> findAllForPage(int pageStart, int pageSize) {
+		int pageEnd = pageStart+pageSize;
+		if(pageEnd > count()) {
+			pageEnd = unmappedDatastore.size();
 		}
-		if(pageSize > count()) {
-			pageSize = unmappedDatastore.size();
+		if(pageStart > pageEnd) {
+			pageStart = pageEnd;
 		}
-		int start = Math.toIntExact((pageNumber - 1) * pageSize);
-		int end = Math.toIntExact(pageSize);
-		return unmappedDatastore.subList(start, end);
+		return unmappedDatastore.subList(pageStart, pageEnd);
 	}
 
 	public ExampleResource findByUUID(UUID entityID) {

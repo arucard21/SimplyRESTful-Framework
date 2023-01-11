@@ -9,7 +9,7 @@ import example.jetty.resources.ExampleResource;
 public interface ExampleEntityDAO {
     public long count();
     public boolean exists(UUID entityID);
-    public List<ExampleResource> findAllForPage(long pageNumber, long pageSize);
+    public List<ExampleResource> findAllForPage(int pageNumber, int pageSize);
     public Stream<ExampleResource> stream();
     public ExampleResource findByUUID(UUID entityID);
     public ExampleResource persist(ExampleResource entity);
