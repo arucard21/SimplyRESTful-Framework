@@ -45,18 +45,57 @@ import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.resources.Link;
 
+/**
+ * A client for any SimplyRESTful-based API.
+ *
+ * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
+ */
 public class SimplyRESTfulClient<T extends APIResource> {
+	/**
+	 * Error message when the discovery process was not initiated before attempting to access the API.
+	 */
 	public static final String ERROR_DISCOVER_RESOURCE_URI_REQUIRED = "This method can only be used after the resource URI has been discovered. This is done at every API request but you can trigger it manually by calling discoverResourceUri() directly";
-	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
+	/**
+	 * Error message when trying to create a resource with the update() method.
+	 */
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The resource does not exist yet. Use create() if you wish to create a new resource.";
+	/**
+	 * Error message when the self-link does not match the URI where the resource is available.
+	 */
 	public static final String ERROR_INVALID_RESOURCE_URI = "The identifier of the resource does not correspond to the API in this client";
+	/**
+	 * Delimiter used to separate multiple values in a single query parameter.
+	 */
+	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
+	/**
+	 * Field name for the list of items contained in the page of the collection.
+	 */
 	public static final String COLLECTION_ITEM_KEY = "item";
+	/**
+	 * Field name for the total amount of items contain in the collection.
+	 */
 	public static final String COLLECTION_TOTAL_KEY = "total";
+	/**
+	 * Query parameter name for the start index of the page of the collection that you are retrieving.
+	 */
 	public static final String QUERY_PARAM_PAGE_START = "pageStart";
+	/**
+	 * Query parameter name for the size of the page of the collection that you are retrieving.
+	 */
 	public static final String QUERY_PARAM_PAGESIZE = "pageSize";
+	/**
+	 * Query parameter name for indicating which fields should be included in the response.
+	 */
 	public static final String QUERY_PARAM_FIELDS = "fields";
+	/**
+	 * Query parameter name for the FIQL query to filter the list of resources contained in the collection.
+	 */
 	public static final String QUERY_PARAM_QUERY = "query";
+	/**
+	 * Query parameter name for specifying on which fields to sort the resources contained in the collection.
+	 */
 	public static final String QUERY_PARAM_SORT = "sort";
+
     private final Class<T> resourceClass;
     private final URI baseApiUri;
     private final MediaType resourceMediaType;
@@ -298,6 +337,13 @@ public class SimplyRESTfulClient<T extends APIResource> {
         return resources;
     }
 
+    /**
+     * Retrieve the total amount of resources that were contained in the (filtered) collection that was last retrieved.
+     *
+     * Note that this is the total amount in the collection, not the total amount in the page that was returned.
+     *
+     * @return the total amount of resources in the collection that was last retrieved.
+     */
     public int getTotalAmountOfLastRetrievedCollection() {
         return this.totalAmountOfLastRetrievedCollection;
     }
@@ -344,6 +390,8 @@ public class SimplyRESTfulClient<T extends APIResource> {
      * Retrieve a single API resource referenced with a Link.
      *
      * @param resourceLink is the URI identifier of the resource.
+     * @param headers contains any additional HTTP headers that should be sent.
+     * @param queryParameters contains any additional query parameters that should be sent.
      * @return the API resource at the given URI.
      */
     public T read(Link resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
@@ -365,7 +413,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
      *
      * @param resourceUri is the URI identifier of the resource.
      * @param headers is the set of additional HTTP headers that should be used in the request.
-     * @param queryParameters is the set of query parameters that should be used in the request
+     * @param queryParameters is the set of query parameters that should be used in the request.
      * @return the API resource at the given URI.
      */
     public T read(URI resourceUri, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
@@ -398,7 +446,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
      *
      * @param resource is the new resource
      * @param headers is the set of additional HTTP headers that should be used in the request.
-     * @param queryParameters is the set of query parameters that should be used in the request
+     * @param queryParameters is the set of query parameters that should be used in the request.
      * @return the URI identifier for the created resource.
      */
     public URI create(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
@@ -433,7 +481,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
      *
      * @param resource is the updated resource
      * @param headers is the set of additional HTTP headers that should be used in the request.
-     * @param queryParameters is the set of query parameters that should be used in the request
+     * @param queryParameters is the set of query parameters that should be used in the request.
      */
     public void update(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
@@ -464,6 +512,8 @@ public class SimplyRESTfulClient<T extends APIResource> {
      * Remove an API resource referenced with a Link.
      *
      * @param resourceLink is the id of the resource
+     * @param headers is the set of additional HTTP headers that should be used in the request.
+     * @param queryParameters is the set of query parameters that should be used in the request.
      */
     public void delete(Link resourceLink, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         delete(resourceLink.getHref(), headers, queryParameters);
@@ -484,7 +534,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
      *
      * @param resourceUri is the URI identifier of the resource
      * @param headers is the set of additional HTTP headers that should be used in the request.
-     * @param queryParameters is the set of query parameters that should be used in the request
+     * @param queryParameters is the set of query parameters that should be used in the request.
      */
     public void delete(URI resourceUri, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
@@ -535,6 +585,8 @@ public class SimplyRESTfulClient<T extends APIResource> {
      * Check whether a resource with the given URI, referenced with a Link, exists on the server.
      *
      * @param resourceLink is the URI of the resource that should be checked.
+     * @param headers is the set of additional HTTP headers that should be used in the request.
+     * @param queryParameters is the set of query parameters that should be used in the request.
      * @return true iff the resource exists on the server, false if it does not exist.
      * @throws WebApplicationException if the client cannot confirm that the resource either
      * exists or does not exist. Is likely caused by an error returned by the server.
