@@ -1,18 +1,43 @@
 apply plugin: 'java-library'
-apply plugin: 'org.unbroken-dome.test-sets'
 
 project.description = "A generic client that can be used with any SimplyRESTful API"
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-testSets {
-    integrationTest
-    e2eTest
-}
-
-tasks.withType(Test){
-	useJUnitPlatform()
+testing {
+	suites { 
+    	test { 
+            useJUnitJupiter()
+        }
+        integrationTest(JvmTestSuite) { 
+            dependencies {
+				implementation project()
+			}
+			configurations.integrationTestImplementation {
+				extendsFrom configurations.testImplementation
+			}
+            targets { 
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }            
+        }
+        e2eTest(JvmTestSuite) { 
+			configurations.e2eTestImplementation {
+				extendsFrom configurations.integrationTestImplementation
+			}
+            targets { 
+                all {
+                    testTask.configure {
+                        shouldRunAfter(integrationTest)
+                    }
+                }
+            }            
+        }
+    }
 }
 
 repositories {
@@ -31,12 +56,12 @@ dependencies {
 	testImplementation project(":SimplyRESTful")
 	testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
 	testImplementation('org.junit.jupiter:junit-jupiter')
+	testImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
+	testImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
 	testImplementation group: "org.glassfish.jersey.core", name: "jersey-client", version: jerseyVersion
 	testImplementation group: "org.glassfish.jersey.inject", name: "jersey-hk2", version: jerseyVersion
 	testImplementation group: "org.eclipse.parsson", name: "parsson", version: parssonVersion
 	
-	integrationTestImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
-	integrationTestImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework", name: "jersey-test-framework-core", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework.providers", name: "jersey-test-framework-provider-jetty", version: jerseyVersion
 	integrationTestImplementation group: "jakarta.xml.bind", name: "jakarta.xml.bind-api", version: jakartaXmlBindVersion

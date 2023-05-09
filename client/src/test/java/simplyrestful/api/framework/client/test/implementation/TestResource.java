@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
-
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
 

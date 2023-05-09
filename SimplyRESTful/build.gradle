@@ -1,17 +1,31 @@
 apply plugin: "java-library"
-apply plugin: 'org.unbroken-dome.test-sets'
 
 project.description = "A framework for creating a RESTful API"
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-testSets {
-    integrationTest
-}
-
-tasks.withType(Test){
-    useJUnitPlatform()
+testing {
+	suites { 
+    	test { 
+            useJUnitJupiter() 
+        }
+        integrationTest(JvmTestSuite) {
+        	dependencies {
+				implementation project()
+			}
+			configurations.integrationTestImplementation {
+				extendsFrom configurations.testImplementation
+			}
+            targets { 
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
 }
 
 repositories {

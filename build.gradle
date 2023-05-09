@@ -1,7 +1,7 @@
 plugins{
     id "org.springframework.boot" apply false
     id "com.github.ben-manes.versions"
-    id "org.unbroken-dome.test-sets" apply false
+    id 'jvm-test-suite'
 }
 
 //Shared configuration for all projects (root, library and example projects) including ones with a custom build.gradle

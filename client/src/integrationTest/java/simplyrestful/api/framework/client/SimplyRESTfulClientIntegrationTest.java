@@ -21,15 +21,15 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import simplyrestful.api.framework.client.test.implementation.TestResource;
-import simplyrestful.api.framework.client.test.implementation.TestWebResource;
+import simplyrestful.api.framework.client.integrationtest.implementation.TestResource;
+import simplyrestful.api.framework.client.integrationtest.implementation.TestWebResource;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 @ExtendWith(MockitoExtension.class)
-public class SimplyRESTfulClientTest extends JerseyTest {
+public class SimplyRESTfulClientIntegrationTest extends JerseyTest {
     public static final UUID UUID_NIL = UUID.fromString("00000000-0000-0000-0000-000000000000");
     public static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI
             .create("http://invalid-host/testresources/" + UUID_NIL.toString());
