@@ -3,10 +3,12 @@ package simplyrestful.api.framework.resources;
 import java.net.URI;
 import java.util.Objects;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.core.MediaType;
 
 public class Link{
 	private URI href;
+	@Schema(type="string", format="media-type", example=MediaType.APPLICATION_JSON)
 	private MediaType type;
 
 	public Link() {}
@@ -52,5 +54,10 @@ public class Link{
 			return false;
 		Link other = (Link) obj;
 		return Objects.equals(href, other.href) && Objects.equals(type, other.type);
+	}
+
+	@Override
+	public String toString() {
+		return "Link [href=" + href + ", type=" + type + "]";
 	}
 }

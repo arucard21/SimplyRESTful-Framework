@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
 	api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
+	api group: 'io.swagger.core.v3', name: 'swagger-annotations-jakarta', version: swaggerVersion
 
     testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
 	testImplementation('org.junit.jupiter:junit-jupiter')
