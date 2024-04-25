@@ -10,15 +10,6 @@ configure(allprojects){
 
     group = 'com.github.arucard21.simplyrestful'
     version = '1.0.1'
-
-	// Force using the fixed log4j dependency to avoid false positives (only non-vulnerable log4j-api dependency is used)
-	configurations.all {
-		resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-			if (details.requested.group == 'org.apache.logging.log4j') {
-				details.useVersion '2.16.0'
-			}
-		}
-	}
 }
 
 // Publishing configuration for all library projects (excluding root and example projects)
