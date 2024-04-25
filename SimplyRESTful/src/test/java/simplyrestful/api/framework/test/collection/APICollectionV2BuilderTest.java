@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriBuilder;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriBuilder;
 import simplyrestful.api.framework.collection.APICollectionBuilder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
@@ -21,7 +20,7 @@ public class APICollectionV2BuilderTest {
     protected static final int TEST_RESOURCES_SIZE = 1000;
     protected static final URI requestURI = URI.create("local://resources/testresources/");
     protected List<TestResource> testResourcesList;
-    private final MediaType customJson = MediaType.valueOf(APICollection.MEDIA_TYPE_JSON);
+    private final MediaType customJson = new APICollection<TestResource>().customJsonMediaType(new TestResource().customJsonMediaType());
 
     @BeforeEach
     public void createSourceData() {
@@ -41,16 +40,16 @@ public class APICollectionV2BuilderTest {
         expected.setSelf(new Link(requestURI, customJson));
         expected.setTotal(TEST_RESOURCES_SIZE);
         Link firstPage = startOfFirst == -1 ? null
-                : new Link(UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfFirst).build(), null);
+                : new Link(UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfFirst).build(), customJson);
         Link lastPage = startOfLast == -1 ? null
                 : new Link(
-                        UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfLast).build(), null);
+                        UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfLast).build(), customJson);
         Link prevPage = startOfPrev == -1 ? null
                 : new Link(
-                        UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfPrev).build(), null);
+                        UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfPrev).build(), customJson);
         Link nextPage = startOfNext == -1 ? null
                 : new Link(
-                        UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfNext).build(), null);
+                        UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfNext).build(), customJson);
         expected.setFirst(firstPage);
         expected.setLast(lastPage);
         expected.setPrev(prevPage);

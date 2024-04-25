@@ -5,7 +5,6 @@ import java.util.List;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
-
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
@@ -79,20 +78,22 @@ public class APICollectionBuilder<T extends APIResource> {
     }
 
     private void includeNavigation(APICollection<T> collection) {
-		collection.setFirst(createLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE));
+    	MediaType collectionType = collection.getSelf().getType();
+
+		collection.setFirst(createLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE, collectionType));
 		if (this.pageStart > 0) {
 		    int startofPrevPage = this.pageStart - this.pageSize;
 		    if (startofPrevPage >= 0) {
-			collection.setPrev(createLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage));
+			collection.setPrev(createLinkFromURIWithModifiedPageOffset(requestURI, startofPrevPage, collectionType));
 		    }
 		}
 		if (this.collectionSize != null) {
 		    int startofLastPage = calculateStartOfLastPage();
-		    collection.setLast(createLinkFromURIWithModifiedPageOffset(requestURI, startofLastPage));
+		    collection.setLast(createLinkFromURIWithModifiedPageOffset(requestURI, startofLastPage, collectionType));
 		    if (this.pageStart < startofLastPage) {
 			int startOfNextPage = this.pageStart + this.pageSize;
 			if (startOfNextPage <= startofLastPage) {
-			    collection.setNext(createLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage));
+			    collection.setNext(createLinkFromURIWithModifiedPageOffset(requestURI, startOfNextPage, collectionType));
 			}
 		    }
 		}
@@ -110,10 +111,10 @@ public class APICollectionBuilder<T extends APIResource> {
 		return numberOfPages * this.pageSize;
     }
 
-    protected Link createLinkFromURIWithModifiedPageOffset(URI requestURI, int pageStart) {
+    protected Link createLinkFromURIWithModifiedPageOffset(URI requestURI, int pageStart, MediaType type) {
 		URI modifiedUri = UriBuilder.fromUri(requestURI)
 			.replaceQueryParam(DefaultCollectionGet.QUERY_PARAM_PAGE_START, pageStart)
 			.build();
-		return new Link(modifiedUri, null);
+		return new Link(modifiedUri, type);
     }
 }

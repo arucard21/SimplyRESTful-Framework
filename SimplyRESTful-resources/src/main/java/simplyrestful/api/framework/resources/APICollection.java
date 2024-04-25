@@ -69,6 +69,10 @@ public class APICollection<T extends APIResource> extends APIResource {
     	return MediaType.valueOf(MEDIA_TYPE_JSON);
     }
 
+    public MediaType customJsonMediaType(MediaType itemResourceMediaType) {
+    	return MediaType.valueOf(MEDIA_TYPE_JSON + ";" + MEDIA_TYPE_PARAMETER_ITEM_TYPE +"=\""+ itemResourceMediaType.toString()+"\"");
+    }
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -90,5 +94,11 @@ public class APICollection<T extends APIResource> extends APIResource {
 		return Objects.equals(first, other.first) && Objects.equals(item, other.item)
 				&& Objects.equals(last, other.last) && Objects.equals(next, other.next)
 				&& Objects.equals(prev, other.prev) && total == other.total;
+	}
+
+	@Override
+	public String toString() {
+		return "APICollection [total=" + total + ", first=" + first + ", last=" + last + ", prev=" + prev + ", next="
+				+ next + ", item=" + item + "]";
 	}
 }
