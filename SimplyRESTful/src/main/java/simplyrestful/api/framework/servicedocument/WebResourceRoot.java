@@ -1,15 +1,15 @@
 package simplyrestful.api.framework.servicedocument;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Named;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.resources.APIServiceDocument;
 import simplyrestful.api.framework.resources.Link;
 
@@ -26,7 +26,7 @@ public class WebResourceRoot{
 	@ApiResponse(description = "A Service Document that links to the OpenAPI Specification")
 	public APIServiceDocument getServiceDocument() {
 		APIServiceDocument serviceDocument = new APIServiceDocument();
-		Link descriptionLink = new Link(uriInfo.getRequestUriBuilder().path("openapi.json").build(), null);
+		Link descriptionLink = new Link(uriInfo.getRequestUriBuilder().path("openapi.json").build(), MediaType.APPLICATION_JSON_TYPE);
 		serviceDocument.setDescribedBy(descriptionLink);
 		Link selfLink = new Link(uriInfo.getRequestUriBuilder().build(), serviceDocument.customJsonMediaType());
 		serviceDocument.setSelf(selfLink);
