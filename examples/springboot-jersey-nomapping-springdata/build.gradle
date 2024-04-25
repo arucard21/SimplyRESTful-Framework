@@ -31,6 +31,6 @@ dependencies {
 	implementation group: "com.h2database", name: "h2", version: h2Version
 	implementation group: "io.github.perplexhub", name: "rsql-jpa-spring-boot-starter", version: rsqlJpaVersion
 	implementation group: "org.eclipse.parsson", name: "parsson", version: parssonVersion
-	implementation 'org.webjars:swagger-ui:4.15.5'
-	implementation 'org.webjars:webjars-locator-core:0.52'
+	implementation group: "org.webjars", name: "swagger-ui", version: swaggerUiVersion
+	implementation group: "org.webjars", name: "webjars-locator-core", version: webjarsLocatorVersion
 }
