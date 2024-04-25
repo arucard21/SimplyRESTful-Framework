@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import jakarta.ws.rs.core.MediaType;
 
 import io.swagger.v3.core.filter.AbstractSpecFilter;
 import io.swagger.v3.core.model.ApiDescription;
@@ -13,6 +12,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import jakarta.ws.rs.core.MediaType;
 import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
@@ -55,15 +55,20 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 	}
 
 	/**
-	 * Remove the schema that's detected for the {@link APICollection} parent class.
+	 * Remove the schema that's detected for the {@link APICollection} or {@link APIResource} parent class.
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
 			Map<String, List<String>> headers) {
-		String apiCollectionSchemaName = APICollection.class.getSimpleName() + APIResource.class.getSimpleName();
+		String apiResourceSchemaName = APIResource.class.getSimpleName();
+		String apiCollectionParentSchemaName = APICollection.class.getSimpleName();
+		String apiCollectionSchemaName = apiCollectionParentSchemaName + apiResourceSchemaName;
 		String schemaName = schema.getName();
-		if (schemaName.equals(apiCollectionSchemaName)) {
+		if (
+				schemaName.equals(apiCollectionParentSchemaName) ||
+				schemaName.equals(apiCollectionSchemaName) ||
+				schemaName.equals(apiResourceSchemaName)) {
 			return Optional.empty();
 		}
 		return super.filterSchema(schema, params, cookies, headers);
