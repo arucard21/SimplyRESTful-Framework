@@ -4,14 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.core.Application;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -20,11 +12,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.APICollection;
@@ -67,13 +66,13 @@ public class OpenApiIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void openApi_shouldContainASchemaForTheAPIResourceParent() throws JsonMappingException, JsonProcessingException {
-        Assertions.assertTrue(retrieveOpenAPI().getComponents().getSchemas().containsKey(APIResource.class.getSimpleName()));
+    public void openApi_shouldNotContainASchemaForTheAPIResourceParent() throws JsonMappingException, JsonProcessingException {
+        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APIResource.class.getSimpleName()));
     }
 
     @Test
-    public void openApi_shouldContainASchemaForTheAPICollectionParent() throws JsonMappingException, JsonProcessingException {
-        Assertions.assertTrue(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()));
+    public void openApi_shouldNotContainASchemaForTheAPICollectionParent() throws JsonMappingException, JsonProcessingException {
+        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()));
     }
 
     @Test
