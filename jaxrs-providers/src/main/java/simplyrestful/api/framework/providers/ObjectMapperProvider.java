@@ -1,16 +1,15 @@
 package simplyrestful.api.framework.providers;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import jakarta.inject.Named;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.Provider;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Named
 @Provider
@@ -34,7 +33,6 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
         jsonObjectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         jsonObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
         jsonObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        jsonObjectMapper.setSerializationInclusion(Include.NON_EMPTY);
         return jsonObjectMapper;
     }
 }
