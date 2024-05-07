@@ -12,6 +12,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonNumber;
@@ -29,15 +37,6 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.parser.OpenAPIV3Parser;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
@@ -103,7 +102,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     private UriBuilder resourceUriBuilder;
     private int totalAmountOfLastRetrievedCollection;
 
-    SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
+    public SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
         this.baseApiUri = baseApiUri;
         this.client = client;
         client.register(JacksonJsonProvider.class);
@@ -145,12 +144,18 @@ public class SimplyRESTfulClient<T extends APIResource> {
         if (resourceUriBuilder != null) {
             return;
         }
-        Builder request = client.target(baseApiUri).request();
-        configureHttpHeaders(request, headers);
-        request.accept(APIServiceDocument.MEDIA_TYPE_JSON);
-        APIServiceDocument serviceDocument = request.get(APIServiceDocument.class);
+        Builder serviceDocumentRequest = client.target(baseApiUri).request();
+        configureHttpHeaders(serviceDocumentRequest, headers);
+        serviceDocumentRequest.accept(APIServiceDocument.MEDIA_TYPE_JSON);
+        APIServiceDocument serviceDocument = serviceDocumentRequest.get(APIServiceDocument.class);
         URI openApiDocumentUri = serviceDocument.getDescribedBy().getHref();
-        OpenAPI openApiSpecification = new OpenAPIV3Parser().read(openApiDocumentUri.toString());
+
+        Builder openApiDocumentRequest = client.target(openApiDocumentUri).request();
+        configureHttpHeaders(openApiDocumentRequest, headers);
+        openApiDocumentRequest.accept(MediaType.APPLICATION_JSON_TYPE);
+        String openApiDocumentContents = openApiDocumentRequest.get(String.class);
+        OpenAPI openApiSpecification = new OpenAPIV3Parser().readContents(openApiDocumentContents).getOpenAPI();
+
         for (Entry<String, PathItem> pathEntry : openApiSpecification.getPaths().entrySet()) {
             Operation getHttpMethod = pathEntry.getValue().getGet();
             if (Objects.isNull(getHttpMethod)) {
