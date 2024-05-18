@@ -1,17 +1,21 @@
 package simplyrestful.api.framework.filters;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
-
-import jakarta.json.Json;
-import jakarta.json.JsonStructure;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import jakarta.json.Json;
+import jakarta.json.JsonStructure;
+import simplyrestful.api.framework.outputstream.json.JsonFieldsFilterOutputStream;
 
 public class JsonFieldsFilterTest {
 	public static final String ARRAY_ORIGINAL_PLAIN_JSON = "/array/plain_original.json";
@@ -22,10 +26,11 @@ public class JsonFieldsFilterTest {
 	public static final String RESOURCE_ORIGINAL_PLAIN_JSON = "/resource/plain_original.json";
 	public static final String RESOURCE_ORIGINAL_HAL_JSON = "/resource/hal_original.json";
 
-    private static JsonStructure loadTestJson(String testJson) {
-        InputStream collectionStream = JsonFieldsFilterTest.class.getResourceAsStream(testJson);
-        Assertions.assertNotNull(collectionStream);
-        return Json.createReader(collectionStream).read();
+    private static JsonStructure loadTestJson(String testJson) throws IOException {
+        try(InputStream collectionStream = JsonFieldsFilterTest.class.getResourceAsStream(testJson)){
+        	Assertions.assertNotNull(collectionStream);
+        	return Json.createReader(collectionStream).read();
+        }
     }
 
     private static Stream<Arguments> getAllTestConfigurations(){
@@ -97,11 +102,27 @@ public class JsonFieldsFilterTest {
 
     @ParameterizedTest
     @MethodSource("getAllTestConfigurations")
-    public void testFieldsFilter(String originalJsonFile, String filteredJsonFile, List<String> fields) {
+    public void testFieldsFilter(String originalJsonFile, String filteredJsonFile, List<String> fields) throws IOException {
         JsonStructure original = loadTestJson(originalJsonFile);
         JsonStructure filtered = loadTestJson(filteredJsonFile);
         String actualString = new JsonFieldsFilter().filterFieldsInJson(original.toString(), fields);
         JsonStructure actualJson = Json.createReader(new StringReader(actualString)).read();
         Assertions.assertEquals(filtered, actualJson);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getAllTestConfigurations")
+    public void testFieldsFilterOutputStream(String originalJsonFile, String filteredJsonFile, List<String> fields) throws IOException {
+    	try(
+    			InputStream originalJsonInputStream = JsonFieldsFilterTest.class.getResourceAsStream(originalJsonFile);
+    			ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+    			JsonFieldsFilterOutputStream jsonFieldsFilterOutputStream = new JsonFieldsFilterOutputStream(byteOutputStream, fields);
+    	){
+    		originalJsonInputStream.transferTo(jsonFieldsFilterOutputStream);
+    		String filteredJsonString = byteOutputStream.toString(StandardCharsets.UTF_8);
+    		JsonStructure filteredJsonStructure = Json.createReader(new StringReader(filteredJsonString)).read();
+    		JsonStructure expectedFilteredJsonStructure = loadTestJson(filteredJsonFile);
+    		Assertions.assertEquals(expectedFilteredJsonStructure, filteredJsonStructure);
+    	}
     }
 }
