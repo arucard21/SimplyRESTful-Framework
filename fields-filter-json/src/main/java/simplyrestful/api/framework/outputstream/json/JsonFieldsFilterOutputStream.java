@@ -35,9 +35,16 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 
 	private final List<String> fields;
 
-	private boolean isJson = false;
-	private boolean isJsonObjectNotArray = false;
 	private long nestingLevel = 0;
+	/**
+	 * The stream contains a JSON object or array.
+	 * The stream may contain more data before and after the JSON object or
+	 * array. Any full JSON object or array in the data will be filtered.
+	 *
+	 * Only one of isJsonObject and isJsonArray can be true at any given time.
+	 */
+	private boolean isJsonObject = false;
+	private boolean isJsonArray = false;
 
 	public JsonFieldsFilterOutputStream(OutputStream out, List<String> fields) {
 		super(out, INITIAL_BUFFER_SIZE);
@@ -46,7 +53,8 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 
 	@Override
 	public synchronized void write(int b) throws IOException {
-		if(!isJson(asByteArray(b))) {
+		detectJsonInData(asByteArray(b), 1);
+		if(!isJsonObject && !isJsonArray) {
 			out.write(b);
 			return;
 		}
@@ -54,14 +62,15 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 		super.write(b);
 
 		updateNestingLevel(asByteArray(b), 1);
-		if(nestingLevel == 0) {
+		if((isJsonObject || isJsonArray) && nestingLevel == 0) {
 			filterJson();
 		}
 	}
 
 	@Override
 	public synchronized void write(byte[] b, int off, int len) throws IOException {
-		if(!isJson(b)) {
+		detectJsonInData(b, len);
+		if(!isJsonObject && !isJsonArray) {
 			out.write(b, off, len);
 			return;
 		}
@@ -69,7 +78,7 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 		super.write(b, off, len);
 
 		updateNestingLevel(b, len);
-		if(nestingLevel == 0) {
+		if((isJsonObject || isJsonArray) && nestingLevel == 0) {
 			filterJson();
 		}
 	}
@@ -84,15 +93,12 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 	 * @param b contains the data to be written.
 	 * @return true if the output stream contains a JSON document.
 	 */
-	private boolean isJson(byte[] b) {
-		if(count == 0) {
-			String written = new String(b, StandardCharsets.UTF_8);
-			boolean isJsonObject = written.startsWith(String.valueOf(JSON_START_OBJECT_TOKEN));
-			boolean isJsonArray = written.startsWith(String.valueOf(JSON_START_ARRAY_TOKEN));
-			isJson = isJsonObject || isJsonArray;
-			isJsonObjectNotArray = isJsonObject && !isJsonArray;
+	private void detectJsonInData(byte[] b, int len) {
+		if(!isJsonObject && !isJsonArray) {
+			String toBeWritten = new String(b, 0, len, StandardCharsets.UTF_8);
+			isJsonObject = toBeWritten.startsWith(String.valueOf(JSON_START_OBJECT_TOKEN));
+			isJsonArray = toBeWritten.startsWith(String.valueOf(JSON_START_ARRAY_TOKEN));
 		}
-		return isJson;
 	}
 
 	private byte[] asByteArray(int b) {
@@ -110,10 +116,10 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 	private void updateNestingLevel(byte[] b, int len) {
 		String written = new String(b, 0, len, StandardCharsets.UTF_8);
 		long amountOfNestingStarts = written.chars()
-				.filter(character -> character == (isJsonObjectNotArray ? JSON_START_OBJECT_TOKEN : JSON_START_ARRAY_TOKEN))
+				.filter(character -> character == (isJsonObject ? JSON_START_OBJECT_TOKEN : JSON_START_ARRAY_TOKEN))
 				.count();
 		long amountOfNestingEnds = written.chars()
-				.filter(character -> character == (isJsonObjectNotArray ? JSON_END_OBJECT_TOKEN : JSON_END_ARRAY_TOKEN))
+				.filter(character -> character == (isJsonObject ? JSON_END_OBJECT_TOKEN : JSON_END_ARRAY_TOKEN))
 				.count();
 		nestingLevel = nestingLevel + amountOfNestingStarts - amountOfNestingEnds;
 		if (nestingLevel < 0) {
@@ -132,8 +138,8 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 	private void reset() {
 		count = 0;
 		buf = new byte[INITIAL_BUFFER_SIZE];
-		isJson = false;
-		isJsonObjectNotArray  = false;
+		isJsonObject = false;
+		isJsonArray = false;
 		nestingLevel = 0;
 	}
 }
