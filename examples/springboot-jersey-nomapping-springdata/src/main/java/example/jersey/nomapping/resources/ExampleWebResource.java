@@ -24,7 +24,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
+
+import cz.jirutka.rsql.parser.RSQLParserException;
+import example.resources.jpa.ExampleComplexAttribute;
+import example.resources.jpa.ExampleResource;
+import io.github.perplexhub.rsql.RSQLJPASupport;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.validation.Valid;
@@ -41,28 +50,20 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
-
-import cz.jirutka.rsql.parser.RSQLParserException;
-import example.resources.jpa.ExampleComplexAttribute;
-import example.resources.jpa.ExampleResource;
-import io.github.perplexhub.rsql.RSQLJPASupport;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
+import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Named
 @Path("/resources")
 @Tag(name = "Example Resources")
 @Produces(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
 @Consumes(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
-public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
+public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
 	public static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
 	public static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
@@ -157,15 +158,15 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 			throw new BadRequestException("The FIQL query could not be parsed");
 		}
 	}
-//    @Override
-//    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
-//	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query), map(sort))
-//		.map(resource -> {
-//		    simulateSlowDataRetrieval();
-//		    return resource;
-//		})
-//		.map(this::ensureSelfLinkAndUUIDPresent);
-//    }
+    @Override
+    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
+	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query), map(sort))
+		.map(resource -> {
+		    simulateSlowDataRetrieval();
+		    return resource;
+		})
+		.map(this::ensureSelfLinkAndUUIDPresent);
+    }
 
 	@Override
 	public int count(String query) {
@@ -177,13 +178,13 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 		return repo.existsByUuid(resourceUUID);
 	}
 
-//	private void simulateSlowDataRetrieval() {
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//	}
+	private void simulateSlowDataRetrieval() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private Sort map(List<SortOrder> sort) {
 		if (sort == null || sort.isEmpty()) {

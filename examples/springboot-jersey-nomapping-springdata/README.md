@@ -13,3 +13,11 @@ These environment variables are recommended (but not required)
 server.port=8888
 SIMPLYRESTFUL_URI_HTTP_HEADER=xoriginalurl
 ```
+
+This API supports server-sent events for streaming a list of API resources, as opposed to retrieving them with pagination. You can get the stream of API resources by performing a GET request on the collection endpoint with the `Accept` header set to `text/event-stream`. Once you do, you should see the API resources coming in one at a time. To make the streaming of data more noticeable, this API adds a 1 second delay before the retrieval of every API resource from the database.
+
+You can do this with `curl` as follows:
+
+```shell
+> curl --no-buffer --http2 -H "Accept:text/event-stream" --silent http://localhost:8888/resources?fields=all
+```
