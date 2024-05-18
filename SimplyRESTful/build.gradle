@@ -35,6 +35,7 @@ repositories {
 dependencies {
 	api project(":SimplyRESTful-resources")
     api project(":jaxrs-providers")
+    api project(":fields-filter-json")
     api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
     api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
     api group: "jakarta.validation", name: "jakarta.validation-api", version: jakartaValidationVersion
