@@ -26,7 +26,8 @@ public class JsonFieldsFilterInterceptor implements WriterInterceptor {
 
 	@Override
 	public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-		if (isJson(context.getMediaType())) {
+		boolean isEventStream = context.getMediaType().isCompatible(MediaType.SERVER_SENT_EVENTS_TYPE);
+		if (isJson(context.getMediaType()) || isEventStream) {
 			String fieldsOverride = getFieldsOverride(context);
 			List<String> fieldsQueryParameters = fieldsOverride == null ? getFieldsQueryParameters() : List.of(fieldsOverride);
 			List<String> fields = fieldsQueryParameters.stream()
