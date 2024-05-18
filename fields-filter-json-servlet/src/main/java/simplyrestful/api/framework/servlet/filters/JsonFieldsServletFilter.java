@@ -15,9 +15,9 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import simplyrestful.api.framework.filters.JsonFieldsFilter;
 
+@Deprecated(forRemoval = true)
 @Named
 @WebFilter("*")
 public class JsonFieldsServletFilter extends HttpFilter {

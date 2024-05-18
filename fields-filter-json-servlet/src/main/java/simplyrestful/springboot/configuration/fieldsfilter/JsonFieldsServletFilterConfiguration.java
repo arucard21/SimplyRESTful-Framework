@@ -5,8 +5,10 @@ import org.springframework.boot.autoconfigure.web.servlet.ConditionalOnMissingFi
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.context.annotation.Bean;
+
 import simplyrestful.api.framework.servlet.filters.JsonFieldsServletFilter;
 
+@Deprecated(forRemoval = true)
 @AutoConfiguration
 public class JsonFieldsServletFilterConfiguration {
     @Bean
