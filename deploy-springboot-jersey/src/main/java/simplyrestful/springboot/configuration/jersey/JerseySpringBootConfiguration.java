@@ -8,11 +8,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.jersey.ResourceConfigCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.context.annotation.Bean;
+
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import simplyrestful.api.framework.filters.AcceptHeaderModifier;
+import simplyrestful.api.framework.filters.JsonFieldsFilterInterceptor;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
@@ -25,6 +27,7 @@ public class JerseySpringBootConfiguration implements ResourceConfigCustomizer {
         config.register(JacksonJsonProvider.class);
         config.register(ObjectMapperProvider.class);
         config.register(UriCustomizer.class);
+        config.register(JsonFieldsFilterInterceptor.class);
         config.register(AcceptHeaderModifier.class);
         config.register(OpenApiResource.class);
         config.register(AcceptHeaderOpenApiResource.class);
@@ -34,7 +37,7 @@ public class JerseySpringBootConfiguration implements ResourceConfigCustomizer {
 
     @Bean
     @ConditionalOnMissingBean
-    public TomcatConnectorCustomizer http2UpgradeProtocol() {
+    TomcatConnectorCustomizer http2UpgradeProtocol() {
         return (connector -> connector.addUpgradeProtocol(new Http2Protocol()));
     }
 }
