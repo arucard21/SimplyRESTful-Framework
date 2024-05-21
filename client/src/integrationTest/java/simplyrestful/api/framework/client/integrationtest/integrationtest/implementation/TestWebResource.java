@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.client.integrationtest.implementation;
+package simplyrestful.api.framework.client.integrationtest.integrationtest.implementation;
 
 import java.net.URI;
 import java.util.Arrays;

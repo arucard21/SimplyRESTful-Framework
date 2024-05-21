@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.client;
+package simplyrestful.api.framework.client.integrationtest;
 
 import java.net.URI;
 import java.util.List;
@@ -21,8 +21,10 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import simplyrestful.api.framework.client.integrationtest.implementation.TestResource;
-import simplyrestful.api.framework.client.integrationtest.implementation.TestWebResource;
+import simplyrestful.api.framework.client.SimplyRESTfulClient;
+import simplyrestful.api.framework.client.SimplyRESTfulClientFactory;
+import simplyrestful.api.framework.client.integrationtest.integrationtest.implementation.TestResource;
+import simplyrestful.api.framework.client.integrationtest.integrationtest.implementation.TestWebResource;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.Link;

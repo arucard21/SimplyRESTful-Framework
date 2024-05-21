@@ -27,12 +27,12 @@ testing {
         }
         e2eTest(JvmTestSuite) { 
 			configurations.e2eTestImplementation {
-				extendsFrom configurations.integrationTestImplementation
+				extendsFrom configurations.testImplementation
 			}
             targets { 
                 all {
                     testTask.configure {
-                        shouldRunAfter(integrationTest)
+                        shouldRunAfter(test)
                     }
                 }
             }            

@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.client;
+package simplyrestful.api.framework.client.e2etest;
 
 import java.net.URI;
 import java.time.ZoneOffset;
@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
+import simplyrestful.api.framework.client.SimplyRESTfulClient;
+import simplyrestful.api.framework.client.SimplyRESTfulClientFactory;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
 /**
