@@ -3,6 +3,9 @@ package simplyrestful.api.framework.webresource.api.implementation;
 import java.util.List;
 import java.util.stream.Stream;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Produces;
@@ -12,15 +15,13 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultStream;
 import simplyrestful.api.framework.resources.APIResource;
 
 public interface DefaultCollectionGetEventStream<T extends APIResource> extends DefaultStream<T> {
+	public static final String SSE_END_OF_COLLECTION_TOKEN = "end-of-collection";
+
 	/**
      * Retrieve the collection of resources as a stream of events (as server-sent events).
      * <p>
@@ -59,19 +60,17 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
 		    SseEventSink eventSink,
 		    @Context
 		    Sse sse){
-        try (SseEventSink sink = eventSink) {
-        	QueryParamUtils.configureFieldsDefault(requestContext, fields);
-            try (Stream<T> stream = stream(
-            		fields,
-                    query,
-                    QueryParamUtils.parseSort(sort))) {
-                stream.forEach(resourceItem -> {
-                    sink.send(sse.newEventBuilder()
-                            .data(resourceItem)
-                            .mediaType(resourceItem.customJsonMediaType())
-                            .build());
-                });
-            }
+    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
+        try (SseEventSink sink = eventSink; Stream<T> stream = stream(fields,query,QueryParamUtils.parseSort(sort))) {
+        	stream.forEach(resourceItem -> {
+				sink.send(sse.newEventBuilder()
+                        .data(resourceItem)
+                        .mediaType(resourceItem.customJsonMediaType())
+                        .build());
+            });
+        	sink.send(sse.newEventBuilder()
+        			.comment(SSE_END_OF_COLLECTION_TOKEN)
+        			.build());
         }
     }
 }
