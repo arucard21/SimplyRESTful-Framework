@@ -64,6 +64,7 @@ dependencies {
 	
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework", name: "jersey-test-framework-core", version: jerseyVersion
 	integrationTestImplementation group: "org.glassfish.jersey.test-framework.providers", name: "jersey-test-framework-provider-jetty", version: jerseyVersion
+	integrationTestImplementation group: 'org.glassfish.jersey.media', name: 'jersey-media-sse', version: jerseyVersion
 	integrationTestImplementation group: "jakarta.xml.bind", name: "jakarta.xml.bind-api", version: jakartaXmlBindVersion
 	integrationTestImplementation group: "io.swagger.core.v3", name: "swagger-jaxrs2-jakarta", version: swaggerVersion
 	integrationTestImplementation group: "ch.qos.logback", name: "logback-classic", version: logbackClassicVersion

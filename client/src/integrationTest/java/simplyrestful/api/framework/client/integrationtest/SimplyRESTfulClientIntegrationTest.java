@@ -96,6 +96,16 @@ public class SimplyRESTfulClientIntegrationTest extends JerseyTest {
     }
 
     @Test
+    public void streamResources_shouldReturnTestResources() {
+        List<TestResource> listOfResources = simplyRESTfulClient.streamResourcesFromCollection(List.of(), "", List.of(), null, null, 1000);
+        Assertions.assertNotNull(listOfResources);
+        Assertions.assertEquals(2, listOfResources.size());
+        Assertions.assertTrue(listOfResources.contains(TestResource.testInstance()));
+        Assertions.assertEquals(TestResource.ADDITIONAL_FIELD_TEST_VALUE, listOfResources.get(0).getAdditionalField());
+        Assertions.assertEquals(TestResource.ADDITIONAL_FIELD_TEST_VALUE, listOfResources.get(1).getAdditionalField());
+    }
+
+    @Test
     public void read_shouldReturnTestResource() {
         TestResource actual = simplyRESTfulClient.read(simplyRESTfulClient.createResourceUriFromUuid(TestResource.TEST_RESOURCE_ID));
         Assertions.assertEquals(TestResource.testInstance(), actual);

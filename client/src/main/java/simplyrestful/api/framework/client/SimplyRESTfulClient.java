@@ -3,11 +3,15 @@ package simplyrestful.api.framework.client;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,6 +22,7 @@ import io.swagger.v3.parser.OpenAPIV3Parser;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
@@ -28,6 +33,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.sse.SseEventSource;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
@@ -40,7 +46,7 @@ import simplyrestful.api.framework.resources.Link;
  * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
  */
 public class SimplyRESTfulClient<T extends APIResource> {
-	private static final String ERROR_TYPE_FOR_API_COLLECTION_INVALID = "The GenericType argument must be created for a parameterized type with APICollection as the base class and the APIResource child class as parameter type, i.e. new GenericType<APICollection<YourApiResource>>() {}";
+	public static final String ERROR_TYPE_FOR_API_COLLECTION_INVALID = "The GenericType argument must be created for a parameterized type with APICollection as the base class and the APIResource child class as parameter type, i.e. new GenericType<APICollection<YourApiResource>>() {}";
 	public static final String ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE = "Could not construct an instance of the provided resource class %s";
 	/**
 	 * Error message when the discovery process was not initiated before attempting to access the API.
@@ -349,8 +355,65 @@ public class SimplyRESTfulClient<T extends APIResource> {
         return resourceCollection.getItem();
     }
 
+	/**
+	 * Stream the API resources from the API using server-sent events.
+	 *
+	 * @param fields is a list that defines which fields should be retrieved.
+	 * @param query is a FIQL query that defines how the resources should be filtered.
+	 * @param sort is a list of field names on which the resources should be sorted.
+	 * @param additionalHeaders is the set of HTTP headers that should be added to the request.
+	 * @param additionalQueryParameters is the set of query parameters that should be added to the request
+	 * @return the entire collection resource that was retrieved, containing either
+	 *         resource identifiers or embedded resources.
+	 */
+	public List<T> streamResourcesFromCollection(
+	        List<String> fields,
+	        String query,
+	        List<SortOrder> sort,
+	        MultivaluedMap<String, String> additionalHeaders,
+	        MultivaluedMap<String, String> additionalQueryParameters,
+	        int timeoutInMillis) {
+	    WebTarget target = client.target(resourceUriBuilder.build(""));
+	    if (!fields.isEmpty()) {
+	        target = target.queryParam(QUERY_PARAM_FIELDS, fields.toArray());
+	    }
+	    if (!query.isBlank()) {
+	        target = target.queryParam(QUERY_PARAM_QUERY, query);
+	    }
+	    if (!sort.isEmpty()) {
+	        target = target.queryParam(QUERY_PARAM_SORT, sort.toArray());
+	    }
+	    configureAdditionalQueryParameters(target, additionalQueryParameters);
+	    target.register((ClientRequestFilter) requestContext -> {
+	    	if(additionalHeaders != null) {
+	    		additionalHeaders.forEach((headerName, headerValue) -> requestContext.getHeaders().add(headerName, headerValue));
+	    	}
+	    });
+	    List<T> resources = new ArrayList<>();
+	    try (SseEventSource source = SseEventSource.target(target).build()) {
+	    	ExecutorService resourceStreamingService = Executors.newSingleThreadExecutor();
+	    	source.register(event -> {
+	    		if(event.getComment() != null && event.getComment().equals("end-of-collection")) {
+	    			source.close();
+	    			resourceStreamingService.shutdown();
+	    			return;
+	    		}
+	    		resources.add(event.readData(getResourceClass()));
+	    	});
+	    	resourceStreamingService.submit(() -> {
+	    		source.open();
+	    	});
+	    	try {
+	    		resourceStreamingService.awaitTermination(timeoutInMillis, TimeUnit.MILLISECONDS);
+	    	} catch (InterruptedException e) {
+	    		throw new IllegalStateException("The streaming of API resources was interrupted", e);
+	    	}
+	    }
+	    return resources;
+	}
+
 	private void configureAdditionalQueryParameters(WebTarget target, MultivaluedMap<String, String> queryParameters) {
-        if (Objects.isNull(queryParameters)) {
+        if (queryParameters == null) {
             return;
         }
         for (Entry<String, List<String>> queryParameter : queryParameters.entrySet()) {
@@ -359,7 +422,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     private void configureHttpHeaders(Builder request, MultivaluedMap<String, String> headers) {
-        if (Objects.isNull(headers)) {
+        if (headers == null) {
             return;
         }
         headers.forEach((headerName, headerValue) -> request.header(headerName, headerValue));
