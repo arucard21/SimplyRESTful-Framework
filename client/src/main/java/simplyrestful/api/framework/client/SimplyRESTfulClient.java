@@ -50,6 +50,7 @@ import simplyrestful.api.framework.resources.Link;
  * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
  */
 public class SimplyRESTfulClient<T extends APIResource> {
+	public static final String ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE = "Could not construct an instance of the provided resource class %s";
 	/**
 	 * Error message when the discovery process was not initiated before attempting to access the API.
 	 */
@@ -115,8 +116,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
     	try {
 			return resourceClass.getDeclaredConstructor().newInstance().customJsonMediaType();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-			return null;
+			throw new IllegalArgumentException(String.format(ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE, resourceClass.getName()), e);
 		}
     }
 
