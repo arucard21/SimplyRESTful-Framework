@@ -27,7 +27,7 @@ testing {
         }
         e2eTest(JvmTestSuite) { 
 			configurations.e2eTestImplementation {
-				extendsFrom configurations.testImplementation
+				extendsFrom configurations.integrationTestImplementation
 			}
             targets { 
                 all {

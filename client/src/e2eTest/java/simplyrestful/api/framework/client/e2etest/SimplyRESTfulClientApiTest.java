@@ -19,7 +19,6 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.GenericType;
 import simplyrestful.api.framework.client.SimplyRESTfulClient;
-import simplyrestful.api.framework.client.SimplyRESTfulClientFactory;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
@@ -44,7 +43,7 @@ public class SimplyRESTfulClientApiTest {
 
     public static void configureSimplyRESTfulClient() {
         simplyRESTfulClient = Assertions.assertDoesNotThrow(
-                () -> new SimplyRESTfulClientFactory<ExampleResource>(client).newClient(baseUri, new GenericType<APICollection<ExampleResource>>() {}));
+                () -> new SimplyRESTfulClient<ExampleResource>(client, baseUri, new GenericType<APICollection<ExampleResource>>() {}));
         Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
     }
 
