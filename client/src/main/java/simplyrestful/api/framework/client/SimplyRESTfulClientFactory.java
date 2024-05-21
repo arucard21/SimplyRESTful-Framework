@@ -5,7 +5,8 @@ import java.net.URI;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.client.Client;
-
+import jakarta.ws.rs.core.GenericType;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
 
 /**
@@ -34,7 +35,7 @@ public class SimplyRESTfulClientFactory<T extends APIResource> {
 	 * @param resourceClass is the class of the resource used in the SimplyRESTful-based API that the client should access.
 	 * @return a new SimplyRESTful-based client.
 	 */
-	public SimplyRESTfulClient<T> newClient(URI baseApiUri, Class<T> resourceClass){
-		return new SimplyRESTfulClient<T>(client, baseApiUri, resourceClass);
+	public SimplyRESTfulClient<T> newClient(URI baseApiUri, GenericType<APICollection<T>> typeForAPICollection){
+		return new SimplyRESTfulClient<T>(client, baseApiUri, typeForAPICollection);
 	}
 }

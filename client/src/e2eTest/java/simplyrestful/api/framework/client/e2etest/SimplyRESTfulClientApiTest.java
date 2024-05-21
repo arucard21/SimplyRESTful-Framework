@@ -7,17 +7,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.GenericType;
 import simplyrestful.api.framework.client.SimplyRESTfulClient;
 import simplyrestful.api.framework.client.SimplyRESTfulClientFactory;
+import simplyrestful.api.framework.providers.ObjectMapperProvider;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
 /**
@@ -27,7 +31,10 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
 public class SimplyRESTfulClientApiTest {
     private static URI baseUri;
     private static SimplyRESTfulClient<ExampleResource> simplyRESTfulClient;
-    private static Client client = ClientBuilder.newClient();
+    private static Client client = ClientBuilder.newBuilder()
+    		.register(JacksonJsonProvider.class)
+    		.register(ObjectMapperProvider.class)
+    		.build();
 
     @BeforeAll
     public static void createClient() {
@@ -37,7 +44,7 @@ public class SimplyRESTfulClientApiTest {
 
     public static void configureSimplyRESTfulClient() {
         simplyRESTfulClient = Assertions.assertDoesNotThrow(
-                () -> new SimplyRESTfulClientFactory<ExampleResource>(client).newClient(baseUri, ExampleResource.class));
+                () -> new SimplyRESTfulClientFactory<ExampleResource>(client).newClient(baseUri, new GenericType<APICollection<ExampleResource>>() {}));
         Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
     }
 

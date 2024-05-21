@@ -4,9 +4,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.Application;
-
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.test.JerseyTest;
@@ -21,12 +18,17 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.GenericType;
 import simplyrestful.api.framework.client.SimplyRESTfulClient;
 import simplyrestful.api.framework.client.SimplyRESTfulClientFactory;
 import simplyrestful.api.framework.client.integrationtest.integrationtest.implementation.TestResource;
 import simplyrestful.api.framework.client.integrationtest.integrationtest.implementation.TestWebResource;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
@@ -54,8 +56,11 @@ public class SimplyRESTfulClientIntegrationTest extends JerseyTest {
     }
 
     public void configureSimplyRESTfulClient() {
-        simplyRESTfulClient = Assertions.assertDoesNotThrow(() -> new SimplyRESTfulClientFactory<TestResource>(client())
-                .newClient(getBaseUri(), TestResource.class));
+    	Client testClient = client();
+    	testClient.register(JacksonJsonProvider.class);
+    	testClient.register(ObjectMapperProvider.class);
+        simplyRESTfulClient = Assertions.assertDoesNotThrow(() -> new SimplyRESTfulClientFactory<TestResource>(testClient)
+                .newClient(getBaseUri(), new GenericType<APICollection<TestResource>>() {}));
         Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
         simplyRESTfulClient.discoverResourceUri(null);
     }

@@ -1,43 +1,33 @@
 package simplyrestful.api.framework.client;
 
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.parser.OpenAPIV3Parser;
-import jakarta.json.Json;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonNumber;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
-import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
@@ -50,6 +40,7 @@ import simplyrestful.api.framework.resources.Link;
  * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
  */
 public class SimplyRESTfulClient<T extends APIResource> {
+	private static final String ERROR_TYPE_FOR_API_COLLECTION_INVALID = "The GenericType argument must be created for a parameterized type with APICollection as the base class and the APIResource child class as parameter type, i.e. new GenericType<APICollection<YourApiResource>>() {}";
 	public static final String ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE = "Could not construct an instance of the provided resource class %s";
 	/**
 	 * Error message when the discovery process was not initiated before attempting to access the API.
@@ -96,27 +87,43 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	 */
 	public static final String QUERY_PARAM_SORT = "sort";
 
-    private final Class<T> resourceClass;
+    private final GenericType<APICollection<T>> typeForAPICollection;
     private final URI baseApiUri;
     private final MediaType resourceMediaType;
     private final Client client;
     private UriBuilder resourceUriBuilder;
     private int totalAmountOfLastRetrievedCollection;
 
-    public SimplyRESTfulClient(Client client, URI baseApiUri, Class<T> resourceClass) {
+	public SimplyRESTfulClient(Client client, URI baseApiUri, GenericType<APICollection<T>> typeForAPICollection) {
         this.baseApiUri = baseApiUri;
         this.client = client;
-        client.register(JacksonJsonProvider.class);
-        client.register(ObjectMapperProvider.class);
-        this.resourceClass = resourceClass;
+        if (! (typeForAPICollection.getType() instanceof ParameterizedType)) {
+        	throw new IllegalArgumentException(ERROR_TYPE_FOR_API_COLLECTION_INVALID);
+        }
+        this.typeForAPICollection = typeForAPICollection;
         this.resourceMediaType = detectResourceMediaType();
     }
 
-    private MediaType detectResourceMediaType() {
+	/**
+	 * Get the resource class based on the provided type for the API collection.
+	 *
+	 * This resource class should be a subclass of {@link APIResource}.
+	 *
+	 * This requires an unchecked cast because the resource class for T is unavailable at runtime so it cannot be checked.
+	 * But both the collection type and the resource class type use the same generic variable T so the cast should be safe enough.
+	 *
+	 * @return the actual class of the API resource
+	 */
+	@SuppressWarnings("unchecked")
+	private Class<T> getResourceClass() {
+		return (Class<T>) ((ParameterizedType) typeForAPICollection.getType()).getActualTypeArguments()[0];
+	}
+
+	private MediaType detectResourceMediaType() {
     	try {
-			return resourceClass.getDeclaredConstructor().newInstance().customJsonMediaType();
+			return getResourceClass().getDeclaredConstructor().newInstance().customJsonMediaType();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			throw new IllegalArgumentException(String.format(ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE, resourceClass.getName()), e);
+			throw new IllegalArgumentException(String.format(ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE, getResourceClass().getName()), e);
 		}
     }
 
@@ -286,6 +293,17 @@ public class SimplyRESTfulClient<T extends APIResource> {
     }
 
     /**
+	 * Retrieve the total amount of resources that were contained in the (filtered) collection that was last retrieved.
+	 *
+	 * Note that this is the total amount in the collection, not the total amount in the page that was returned.
+	 *
+	 * @return the total amount of resources in the collection that was last retrieved.
+	 */
+	public int getTotalAmountOfLastRetrievedCollection() {
+	    return this.totalAmountOfLastRetrievedCollection;
+	}
+
+	/**
      * Retrieve the resources from a Collection resource containing a page of API resources.
      *
      * @param pageStart is the offset at which the requested page starts.
@@ -326,34 +344,12 @@ public class SimplyRESTfulClient<T extends APIResource> {
         Builder request = target.request();
         request.accept(APICollection.MEDIA_TYPE_JSON);
         configureHttpHeaders(request, additionalHeaders);
-        String nonDeserialized = request.get(String.class);
-        JsonObject collectionJsonObject = Json.createReader(new StringReader(nonDeserialized)).readObject();
-		List<T> resources = Optional.ofNullable(collectionJsonObject.getJsonArray(COLLECTION_ITEM_KEY))
-				.map(JsonArray::stream)
-				.orElse(Stream.of())
-                .filter(Objects::nonNull)
-                .map(JsonValue::toString)
-                .map(resourceJson -> this.deserializeJson(resourceJson, resourceClass))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        this.totalAmountOfLastRetrievedCollection = Optional.ofNullable(collectionJsonObject.getJsonNumber(COLLECTION_TOTAL_KEY))
-        		.map(JsonNumber::intValue)
-        		.orElse(-1);
-        return resources;
+        APICollection<T> resourceCollection = request.get(typeForAPICollection);
+        this.totalAmountOfLastRetrievedCollection = resourceCollection.getTotal();
+        return resourceCollection.getItem();
     }
 
-    /**
-     * Retrieve the total amount of resources that were contained in the (filtered) collection that was last retrieved.
-     *
-     * Note that this is the total amount in the collection, not the total amount in the page that was returned.
-     *
-     * @return the total amount of resources in the collection that was last retrieved.
-     */
-    public int getTotalAmountOfLastRetrievedCollection() {
-        return this.totalAmountOfLastRetrievedCollection;
-    }
-
-    private void configureAdditionalQueryParameters(WebTarget target, MultivaluedMap<String, String> queryParameters) {
+	private void configureAdditionalQueryParameters(WebTarget target, MultivaluedMap<String, String> queryParameters) {
         if (Objects.isNull(queryParameters)) {
             return;
         }
@@ -367,18 +363,6 @@ public class SimplyRESTfulClient<T extends APIResource> {
             return;
         }
         headers.forEach((headerName, headerValue) -> request.header(headerName, headerValue));
-    }
-
-    private <S> S deserializeJson(String jsonString, Class<S> deserializationClass) {
-        try {
-            return getConfiguredObjectMapper().readValue(jsonString, deserializationClass);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private ObjectMapper getConfiguredObjectMapper() {
-        return new ObjectMapperProvider().getContext(ObjectMapper.class);
     }
 
     /**
@@ -429,7 +413,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
         Builder request = target.request();
         configureHttpHeaders(request, headers);
         request.accept(resourceMediaType);
-        return request.get(resourceClass);
+        return request.get(getResourceClass());
     }
 
     /**
