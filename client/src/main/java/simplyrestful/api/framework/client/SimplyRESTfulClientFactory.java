@@ -21,7 +21,7 @@ public class SimplyRESTfulClientFactory<T extends APIResource> {
 	/**
 	 * Create the factory.
 	 *
-	 * @param client is the JAX-RS client that should be used when creating the SimplyRESTful client.
+	 * @param client is the JAX-RS client that should be used when the SimplyRESTful client executes HTTP requests.
 	 */
 	@Inject
 	public SimplyRESTfulClientFactory(Client client) {
@@ -32,7 +32,9 @@ public class SimplyRESTfulClientFactory<T extends APIResource> {
 	 * Create a new SimplyRESTful client.
 	 *
 	 * @param baseApiUri is the base URI of the SimplyRESTful-based API that the client should access.
-	 * @param resourceClass is the class of the resource used in the SimplyRESTful-based API that the client should access.
+	 * @param typeForAPICollection is a GenericType object that indicates the typing for the collection of resources,
+	 * e.g. {@code new GenericType<APICollection<YourApiResource>>() {}}. Due to type erasure, it needs to be provided here
+	 * so the client knows the exact type for the collection containing API resources.
 	 * @return a new SimplyRESTful-based client.
 	 */
 	public SimplyRESTfulClient<T> newClient(URI baseApiUri, GenericType<APICollection<T>> typeForAPICollection){

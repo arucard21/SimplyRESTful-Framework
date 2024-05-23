@@ -46,8 +46,14 @@ import simplyrestful.api.framework.resources.Link;
  * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
  */
 public class SimplyRESTfulClient<T extends APIResource> {
+	/**
+	 * Error message when an incorrect GenericType is provided to the client
+	 */
 	public static final String ERROR_TYPE_FOR_API_COLLECTION_INVALID = "The GenericType argument must be created for a parameterized type with APICollection as the base class and the APIResource child class as parameter type, i.e. new GenericType<APICollection<YourApiResource>>() {}";
-	public static final String ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE = "Could not construct an instance of the provided resource class %s";
+	/**
+	 * Error message when media type of the resource cannot be discovered due to a problem with creating an instance of the resource class
+	 */
+	public static final String ERROR_DISCOVER_RESOURCE_MEDIA_TYPE_FAILED_TEMPLATE = "Could not construct an instance of the resource class %s";
 	/**
 	 * Error message when the discovery process was not initiated before attempting to access the API.
 	 */
@@ -100,6 +106,15 @@ public class SimplyRESTfulClient<T extends APIResource> {
     private UriBuilder resourceUriBuilder;
     private int totalAmountOfLastRetrievedCollection;
 
+    /**
+     * Create a new SimplyRESTful client.
+	 *
+	 * @param client is the JAX-RS client that should be used when the SimplyRESTful client executes HTTP requests.
+	 * @param baseApiUri is the base URI of the SimplyRESTful-based API that the client should access.
+	 * @param typeForAPICollection is a GenericType object that indicates the typing for the collection
+	 * of resources, e.g.  {@code new GenericType<APICollection<YourApiResource>>() {}}. is required for the
+	 * client to properly handle deserialization because of type erasure.
+     */
 	public SimplyRESTfulClient(Client client, URI baseApiUri, GenericType<APICollection<T>> typeForAPICollection) {
         this.baseApiUri = baseApiUri;
         this.client = client;
@@ -362,7 +377,8 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	 * @param query is a FIQL query that defines how the resources should be filtered.
 	 * @param sort is a list of field names on which the resources should be sorted.
 	 * @param additionalHeaders is the set of HTTP headers that should be added to the request.
-	 * @param additionalQueryParameters is the set of query parameters that should be added to the request
+	 * @param additionalQueryParameters is the set of query parameters that should be added to the request.
+	 * @param timeoutInMs is the max amount of time (in milliseconds) to wait for all resources to have been sent.
 	 * @return the entire collection resource that was retrieved, containing either
 	 *         resource identifiers or embedded resources.
 	 */
@@ -372,7 +388,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	        List<SortOrder> sort,
 	        MultivaluedMap<String, String> additionalHeaders,
 	        MultivaluedMap<String, String> additionalQueryParameters,
-	        int timeoutInMillis) {
+	        int timeoutInMs) {
 	    WebTarget target = client.target(resourceUriBuilder.build(""));
 	    if (!fields.isEmpty()) {
 	        target = target.queryParam(QUERY_PARAM_FIELDS, fields.toArray());
@@ -404,7 +420,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	    		source.open();
 	    	});
 	    	try {
-	    		resourceStreamingService.awaitTermination(timeoutInMillis, TimeUnit.MILLISECONDS);
+	    		resourceStreamingService.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
 	    	} catch (InterruptedException e) {
 	    		throw new IllegalStateException("The streaming of API resources was interrupted", e);
 	    	}
