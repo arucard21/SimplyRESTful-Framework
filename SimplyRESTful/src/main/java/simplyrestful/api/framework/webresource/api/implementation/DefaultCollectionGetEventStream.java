@@ -70,6 +70,8 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
             });
         	sink.send(sse.newEventBuilder()
         			.comment(SSE_END_OF_COLLECTION_TOKEN)
+        			.data(SSE_END_OF_COLLECTION_TOKEN)
+        			.mediaType(MediaType.TEXT_PLAIN_TYPE)
         			.build());
         }
     }
