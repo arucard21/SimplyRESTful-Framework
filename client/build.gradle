@@ -2,8 +2,10 @@ apply plugin: 'java-library'
 
 project.description = "A generic client that can be used with any SimplyRESTful API"
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
 
 testing {
 	suites { 
@@ -54,8 +56,6 @@ dependencies {
 
 	// dependencies shared by integrationTest and e2eTest
 	testImplementation project(":SimplyRESTful")
-	testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
-	testImplementation('org.junit.jupiter:junit-jupiter')
 	testImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
 	testImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
 	testImplementation group: "org.glassfish.jersey.core", name: "jersey-client", version: jerseyVersion

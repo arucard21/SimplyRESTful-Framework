@@ -2,13 +2,15 @@ apply plugin: "java-library"
 
 project.description = "A framework for creating a RESTful API"
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
 
 testing {
 	suites { 
     	test { 
-            useJUnitJupiter() 
+            useJUnitJupiter()
         }
         integrationTest(JvmTestSuite) {
         	dependencies {
@@ -45,8 +47,6 @@ dependencies {
 
     testImplementation group: "org.mockito", name: "mockito-core", version: mockitoVersion
     testImplementation group: "org.mockito", name: "mockito-junit-jupiter", version: mockitoVersion
-    testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
-	testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation group: "org.glassfish.jersey.containers", name: "jersey-container-servlet", version: jerseyVersion
     testImplementation group: "nl.jqno.equalsverifier", name: "equalsverifier", version: equalsVerifierVersion
     testImplementation group: "org.glassfish.jersey.media", name: "jersey-media-sse", version: jerseyVersion

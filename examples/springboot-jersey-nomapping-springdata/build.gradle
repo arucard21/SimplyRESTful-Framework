@@ -7,8 +7,10 @@ repositories {
 
 project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
 
 application{
 	mainClass = "example.jersey.nomapping.JerseyNoMappingApplication"

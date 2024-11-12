@@ -2,8 +2,10 @@ apply plugin: 'application'
 
 project.description = "Example project for a SimplyRESTful API using Apache CXF on Jetty"
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
 
 repositories {
     mavenCentral()

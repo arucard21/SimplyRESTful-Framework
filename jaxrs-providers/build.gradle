@@ -2,8 +2,10 @@ apply plugin: "java-library"
 
 project.description = "A collection of JAX-RS providers for use with SimplyRESTful server and client"
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
 
 repositories {
     mavenCentral()

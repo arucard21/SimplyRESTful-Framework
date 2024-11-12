@@ -2,8 +2,18 @@ apply plugin: "java-library"
 
 project.description = "The core API resources used in SimplyRESTful APIs"
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+testing {
+	suites { 
+    	test { 
+            useJUnitJupiter()
+        }
+    }
+}
 
 repositories {
     mavenCentral()
@@ -13,8 +23,6 @@ dependencies {
 	api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
 	api group: 'io.swagger.core.v3', name: 'swagger-annotations-jakarta', version: swaggerVersion
 
-    testImplementation(platform(group: "org.junit", name: "junit-bom", version: junitVersion))
-	testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation group: "org.glassfish.jersey.containers", name: "jersey-container-servlet", version: jerseyVersion
     testImplementation group: "nl.jqno.equalsverifier", name: "equalsverifier", version: equalsVerifierVersion
 }
