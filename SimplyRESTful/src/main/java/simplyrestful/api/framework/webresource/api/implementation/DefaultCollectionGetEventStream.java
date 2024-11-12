@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -36,6 +37,7 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
      * @param query     is a FIQL query that defines how the resources should be filtered.
      * @param sort      is a list of field names on which the resources should be sorted. This is only included for
      * 			convenience as it is already handled by the framework.
+	 * @throws IOException if an I/O error occurs while closing the outbound SSE stream (SseEventSink).
      */
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS+";qs=0.1")
@@ -59,7 +61,7 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
 		    @Context
 		    SseEventSink eventSink,
 		    @Context
-		    Sse sse){
+		    Sse sse) throws IOException{
     	QueryParamUtils.configureFieldsDefault(requestContext, fields);
         try (SseEventSink sink = eventSink; Stream<T> stream = stream(fields,query,QueryParamUtils.parseSort(sort))) {
         	stream.forEach(resourceItem -> {
