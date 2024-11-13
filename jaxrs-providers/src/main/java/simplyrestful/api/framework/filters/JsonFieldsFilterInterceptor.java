@@ -11,6 +11,7 @@ import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.WriterInterceptor;
 import jakarta.ws.rs.ext.WriterInterceptorContext;
 import simplyrestful.api.framework.outputstream.json.JsonFieldsFilterOutputStream;
+import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.utils.MediaTypeUtils;
 import simplyrestful.api.framework.utils.QueryParamUtils;
 
@@ -21,6 +22,10 @@ import simplyrestful.api.framework.utils.QueryParamUtils;
  * times with different values.
  *
  * Nested fields can be specified using a dot as separated (e.g. "topField.nestedField").
+ *
+ * If the API returns a body containing a "application/x.simplyrestful-collection-v1+json" media type, the filter will
+ * use a default "fields" value of "self,first,last,prev,next,total,item.self", only showing the self link of each
+ * resource in the collection.
  */
 @Provider
 public class JsonFieldsFilterInterceptor implements WriterInterceptor {
@@ -30,31 +35,29 @@ public class JsonFieldsFilterInterceptor implements WriterInterceptor {
 	@Override
 	public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
 		boolean isEventStream = context.getMediaType().isCompatible(MediaType.SERVER_SENT_EVENTS_TYPE);
-		if (isJson(context.getMediaType()) || isEventStream) {
-			String fieldsOverride = getFieldsOverride(context);
-			List<String> fieldsQueryParameters = fieldsOverride == null ? getFieldsQueryParameters() : List.of(fieldsOverride);
-			List<String> fields = QueryParamUtils.flattenQueryParameters(fieldsQueryParameters);
-			if (!fields.isEmpty() && !fields.contains(QueryParamUtils.FIELDS_VALUE_ALL)) {
-				context.setOutputStream(new JsonFieldsFilterOutputStream(context.getOutputStream(), fields));
+		if (!isJson(context.getMediaType()) && !isEventStream) {
+			context.proceed();
+			return;
+		}
+		List<String> fieldsQueryParameters = uriInfo.getQueryParameters().get(QueryParamUtils.QUERY_PARAM_FIELDS);
+		if(fieldsQueryParameters == null) {
+			if(isApiCollection(context.getMediaType())) {
+				fieldsQueryParameters = List.of(APICollection.FIELDS_VALUE_DEFAULT);
 			}
-        }
+			else {
+				context.proceed();
+				return;
+			}
+		}
+		List<String> fields = QueryParamUtils.flattenQueryParameters(fieldsQueryParameters);
+		if (!fields.isEmpty() && !fields.contains(QueryParamUtils.FIELDS_VALUE_ALL)) {
+			context.setOutputStream(new JsonFieldsFilterOutputStream(context.getOutputStream(), fields));
+		}
 		context.proceed();
 	}
 
-	private List<String> getFieldsQueryParameters() {
-		List<String> fieldsParameters = uriInfo.getQueryParameters().get(QueryParamUtils.QUERY_PARAM_FIELDS);
-		if(fieldsParameters != null) {
-			return fieldsParameters;
-		}
-		return List.of();
-	}
-
-	private String getFieldsOverride(WriterInterceptorContext context) {
-		Object fieldsOverride = context.getProperty(QueryParamUtils.FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY);
-		if (fieldsOverride == null) {
-			return null;
-		}
-		return String.valueOf(fieldsOverride);
+	private boolean isApiCollection(MediaType mediaType) {
+		return MediaType.valueOf(APICollection.MEDIA_TYPE_JSON).equals(mediaType);
 	}
 
 	/**

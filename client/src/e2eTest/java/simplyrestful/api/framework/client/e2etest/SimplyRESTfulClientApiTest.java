@@ -21,7 +21,7 @@ import jakarta.ws.rs.core.GenericType;
 import simplyrestful.api.framework.client.SimplyRESTfulClient;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
+import simplyrestful.api.framework.utils.QueryParamUtils;
 
 /**
  * This e2e test requires the example API from "examples/springboot-jersey-nomapping-springdata" to be running
@@ -61,7 +61,7 @@ public class SimplyRESTfulClientApiTest {
 
     @Test
     public void listResources_shouldReturnListOfResourcesWithAllFields_whenFieldsIsAll() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(DefaultCollectionGet.QUERY_PARAM_FIELDS_ALL), null, null);
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(QueryParamUtils.FIELDS_VALUE_ALL), null, null);
         Assertions.assertNotNull(listOfResources);
         Assertions.assertEquals(simplyRESTfulClient.getTotalAmountOfLastRetrievedCollection(), listOfResources.size());
         Assertions.assertNotNull(listOfResources.get(0));
@@ -95,7 +95,7 @@ public class SimplyRESTfulClientApiTest {
 
     @Test
     public void read_shouldReturnTheResource() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(DefaultCollectionGet.QUERY_PARAM_FIELDS_ALL), "", Collections.emptyList());
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(QueryParamUtils.FIELDS_VALUE_ALL), "", Collections.emptyList());
         ExampleResource resourceFromList = listOfResources.get(0);
         ExampleResource resourceFromOwnWebResource = simplyRESTfulClient.read(resourceFromList.getSelf().getHref());
         Assertions.assertEquals(resourceFromList.getSelf(), resourceFromOwnWebResource.getSelf());
@@ -112,7 +112,7 @@ public class SimplyRESTfulClientApiTest {
 
     @Test
     public void update_shouldUpdateTheResource() {
-        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(DefaultCollectionGet.QUERY_PARAM_FIELDS_ALL), "", Collections.emptyList());
+        List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(QueryParamUtils.FIELDS_VALUE_ALL), "", Collections.emptyList());
         String modifiedDescription = "modified description";
         String modifiedComplexAttributeName = "modified name of complex attribute";
         ExampleResource modifiedResource = listOfResources.get(0);

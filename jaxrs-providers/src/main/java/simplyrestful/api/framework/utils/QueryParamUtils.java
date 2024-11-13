@@ -4,38 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.ws.rs.container.ContainerRequestContext;
 import simplyrestful.api.framework.queryparams.SortOrder;
 
 public class QueryParamUtils {
-	public static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
 	public static final String QUERY_PARAM_FIELDS = "fields";
 	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
 	public static final String FIELDS_VALUE_ALL = "all";
-
-	/**
-	 * Set the default value for the list of fields as request property as fields override.
-	 *
-	 * The fields filter will then use this request property (as a servlet request attribute) to
-	 * filter the fields.
-	 *
-	 * This property is only set if the fields parameter was not provided by the user so it will not
-	 * override anything that the user provides.
-	 *
-	 * @param requestContext is a JAX-RS context object.
-	 * @param fieldsDefaults is the list of fields that should be used as default value.
-	 */
-    public static void configureFieldsDefault(ContainerRequestContext requestContext, List<String> fieldsDefaults) {
-    	if (!fieldsQueryParamProvided(requestContext)) {
-    		requestContext.setProperty(
-    				FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY,
-    				String.join(QUERY_PARAM_VALUE_DELIMITER, fieldsDefaults));
-    	}
-    }
-
-    public static boolean fieldsQueryParamProvided(ContainerRequestContext requestContext) {
-    	return requestContext.getUriInfo().getQueryParameters().containsKey(QUERY_PARAM_FIELDS);
-	}
 
     /**
      * Parse sort values as field name and sort order.

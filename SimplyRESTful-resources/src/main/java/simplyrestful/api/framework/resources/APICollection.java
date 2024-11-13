@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 public class APICollection<T extends APIResource> extends APIResource {
     public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-collection-v1+json";
     public static final String MEDIA_TYPE_PARAMETER_ITEM_TYPE = "item-type";
+    public static final String FIELDS_VALUE_DEFAULT = "self,first,last,prev,next,total,item.self";
 
     private int total;
     private Link first;

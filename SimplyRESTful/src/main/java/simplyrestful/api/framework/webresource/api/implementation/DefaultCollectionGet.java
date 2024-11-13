@@ -41,8 +41,6 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 
     public static final String QUERY_PARAM_PAGE_START_DEFAULT = "0";
     public static final String QUERY_PARAM_PAGE_SIZE_DEFAULT = "100";
-    public static final String QUERY_PARAM_FIELDS_DEFAULT = "self,first,last,prev,next,total,item.self";
-    public static final String QUERY_PARAM_FIELDS_ALL= "all";
     public static final String QUERY_PARAM_QUERY_DEFAULT = "";
     public static final String QUERY_PARAM_SORT_DEFAULT = "";
 
@@ -90,7 +88,7 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		    @Parameter(description = "The amount of resources shown on each page", required = false)
 		    int pageSize,
 		    @QueryParam(QUERY_PARAM_FIELDS)
-		    @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)
+		    @DefaultValue(APICollection.FIELDS_VALUE_DEFAULT)
 		    @Parameter(description = "The fields that should be retrieved", required = false)
 		    List<String> fields,
 		    @QueryParam(QUERY_PARAM_QUERY)

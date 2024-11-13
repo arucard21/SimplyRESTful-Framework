@@ -47,7 +47,7 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
     		@Context
     		ContainerRequestContext requestContext,
     		@QueryParam(DefaultCollectionGet.QUERY_PARAM_FIELDS)
-		    @DefaultValue(DefaultCollectionGet.QUERY_PARAM_FIELDS_DEFAULT)
+		    @DefaultValue(QueryParamUtils.FIELDS_VALUE_ALL)
 		    @Parameter(description = "The fields that should be retrieved", required = false)
 		    List<String> fields,
 		    @QueryParam(DefaultCollectionGet.QUERY_PARAM_QUERY)
