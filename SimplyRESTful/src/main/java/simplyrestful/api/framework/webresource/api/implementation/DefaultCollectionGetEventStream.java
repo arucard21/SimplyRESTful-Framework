@@ -11,7 +11,6 @@ import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.Sse;
@@ -44,8 +43,6 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
     @Operation(description = "Retrieve a filtered, sorted collection of resources as an event stream.")
     @ApiResponse(description = "An event stream containing your API resources.")
     default void streamAPIResources(
-    		@Context
-    		ContainerRequestContext requestContext,
     		@QueryParam(DefaultCollectionGet.QUERY_PARAM_FIELDS)
 		    @DefaultValue(QueryParamUtils.FIELDS_VALUE_ALL)
 		    @Parameter(description = "The fields that should be retrieved", required = false)

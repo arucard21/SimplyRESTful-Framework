@@ -60,7 +60,7 @@ public class DefaultWebResourceTest {
     @Test
     public void endpoint_shouldThrowNotFoundExceptionWhenResourceDoesNotExist_withGETonResource() {
         Assertions.assertThrows(NotFoundException.class,
-                () -> testEndpoint.getAPIResource(requestContext, resourceInfo, uriInfo, httpHeaders, UUID.randomUUID(), List.of(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
+                () -> testEndpoint.getAPIResource(UUID.randomUUID(), List.of(DefaultResourceGet.QUERY_PARAM_FIELDS_DEFAULT)));
     }
 
     @Test

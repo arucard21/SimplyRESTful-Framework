@@ -13,10 +13,7 @@ import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.api.crud.DefaultCount;
@@ -72,13 +69,7 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
     })
     default APICollection<T> listAPIResources(
     		@Context
-    		ContainerRequestContext requestContext,
-    		@Context
-		    ResourceInfo resourceInfo,
-		    @Context
 		    UriInfo uriInfo,
-		    @Context
-		    HttpHeaders httpHeaders,
 		    @QueryParam(QUERY_PARAM_PAGE_START)
 		    @DefaultValue(QUERY_PARAM_PAGE_START_DEFAULT)
 	        @Parameter(description = "The page to be shown", required = false)

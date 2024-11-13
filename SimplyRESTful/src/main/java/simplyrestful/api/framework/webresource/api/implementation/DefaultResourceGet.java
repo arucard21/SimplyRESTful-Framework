@@ -13,11 +13,6 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ResourceInfo;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.api.crud.DefaultRead;
 import simplyrestful.api.framework.resources.APIResource;
 
@@ -38,14 +33,6 @@ public interface DefaultResourceGet<T extends APIResource> extends DefaultRead<T
     @GET
     @Operation(description = "Retrieve an API resource")
     default T getAPIResource(
-    		@Context
-    		ContainerRequestContext requestContext,
-    		@Context
-    		ResourceInfo resourceInfo,
-    		@Context
-    		UriInfo uriInfo,
-    		@Context
-    		HttpHeaders httpHeaders,
     		@PathParam("id")
 		    @NotNull
 		    @Parameter(description = "The identifier for the resource", required = true)

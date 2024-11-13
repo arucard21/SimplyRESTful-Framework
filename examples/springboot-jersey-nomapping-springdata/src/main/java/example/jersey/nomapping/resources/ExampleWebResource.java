@@ -45,7 +45,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
@@ -213,13 +212,13 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	}
 
 	@Override
-	public APICollection<ExampleResource> listAPIResources(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
-		return DefaultWebResource.super.listAPIResources(requestContext, resourceInfo, uriInfo, httpHeaders, pageStart, pageSize, fields, query, sort);
+	public APICollection<ExampleResource> listAPIResources(UriInfo uriInfo, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
+		return DefaultWebResource.super.listAPIResources(uriInfo, pageStart, pageSize, fields, query, sort);
 	}
 
 	@Override
-	public ExampleResource getAPIResource(ContainerRequestContext requestContext, ResourceInfo resourceInfo, UriInfo uriInfo, HttpHeaders httpHeaders, @NotNull UUID id, List<String> fields) {
-		return DefaultWebResource.super.getAPIResource(requestContext, resourceInfo, uriInfo, httpHeaders, id, fields);
+	public ExampleResource getAPIResource(@NotNull UUID id, List<String> fields) {
+		return DefaultWebResource.super.getAPIResource(id, fields);
 	}
 
 	@Override
