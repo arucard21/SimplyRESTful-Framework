@@ -14,8 +14,7 @@ import jakarta.ws.rs.core.Configuration;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
-
-import simplyrestful.api.framework.MediaTypeUtils;
+import simplyrestful.api.framework.utils.MediaTypeUtils;
 
 /**
  *

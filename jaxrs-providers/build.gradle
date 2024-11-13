@@ -7,11 +7,21 @@ java {
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
+testing {
+	suites { 
+    	test { 
+            useJUnitJupiter()
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    api project(":SimplyRESTful-resources")
+    api project(":fields-filter-json")
     api group: "jakarta.ws.rs", name: "jakarta.ws.rs-api", version: jaxrsVersion
     api group: "jakarta.inject", name: "jakarta.inject-api", version: jakartaInjectVersion
     api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion

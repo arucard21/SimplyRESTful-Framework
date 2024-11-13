@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Produces;
@@ -14,18 +19,12 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultCount;
 import simplyrestful.api.framework.api.crud.DefaultList;
 import simplyrestful.api.framework.collection.APICollectionBuilder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.utils.QueryParamUtils;
 
 /**
  * Provide a default implementation for the collection resource.
@@ -102,7 +101,6 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 		    List<String> sort) {
-    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
     	MediaType collectionType = MediaType.valueOf(APICollection.MEDIA_TYPE_JSON);
 		List<T> resources = this.list(pageStart, pageSize, fields, query, QueryParamUtils.parseSort(sort));
 		if(!resources.isEmpty()) {

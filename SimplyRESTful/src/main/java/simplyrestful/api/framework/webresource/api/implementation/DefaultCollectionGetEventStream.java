@@ -16,9 +16,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
-import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultStream;
 import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.utils.QueryParamUtils;
 
 public interface DefaultCollectionGetEventStream<T extends APIResource> extends DefaultStream<T> {
 	public static final String SSE_END_OF_COLLECTION_TOKEN = "end-of-collection";
@@ -62,7 +62,6 @@ public interface DefaultCollectionGetEventStream<T extends APIResource> extends 
 		    SseEventSink eventSink,
 		    @Context
 		    Sse sse) throws IOException{
-    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
         try (SseEventSink sink = eventSink; Stream<T> stream = stream(fields,query,QueryParamUtils.parseSort(sort))) {
         	stream.forEach(resourceItem -> {
 				sink.send(sse.newEventBuilder()

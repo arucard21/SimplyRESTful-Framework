@@ -1,4 +1,4 @@
-package simplyrestful.api.framework.test;
+package simplyrestful.api.framework.test.utils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
+import simplyrestful.api.framework.utils.QueryParamUtils;
 
 public class QueryParamUtilsTest {
     @Test

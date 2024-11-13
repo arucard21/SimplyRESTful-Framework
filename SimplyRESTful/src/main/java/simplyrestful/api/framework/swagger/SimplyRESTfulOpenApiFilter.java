@@ -13,9 +13,9 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.ws.rs.core.MediaType;
-import simplyrestful.api.framework.MediaTypeUtils;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.utils.MediaTypeUtils;
 
 public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 	public static final String MEDIA_TYPE_PARAMETER_NAME_QS = "qs";

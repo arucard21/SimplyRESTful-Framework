@@ -1,4 +1,4 @@
-package simplyrestful.api.framework;
+package simplyrestful.api.framework.utils;
 
 import java.net.URI;
 import java.util.UUID;

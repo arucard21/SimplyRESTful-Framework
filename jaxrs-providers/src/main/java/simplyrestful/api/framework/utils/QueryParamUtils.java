@@ -1,17 +1,17 @@
-package simplyrestful.api.framework;
+package simplyrestful.api.framework.utils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
-
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
 public class QueryParamUtils {
 	public static final String FIELDS_OVERRIDE_REQUEST_CONTEXT_PROPERTY = "simplyrestful.fields.json.override";
+	public static final String QUERY_PARAM_FIELDS = "fields";
 	public static final String QUERY_PARAM_VALUE_DELIMITER = ",";
+	public static final String FIELDS_VALUE_ALL = "all";
 
 	/**
 	 * Set the default value for the list of fields as request property as fields override.
@@ -34,7 +34,7 @@ public class QueryParamUtils {
     }
 
     public static boolean fieldsQueryParamProvided(ContainerRequestContext requestContext) {
-    	return requestContext.getUriInfo().getQueryParameters().containsKey(DefaultCollectionGet.QUERY_PARAM_FIELDS);
+    	return requestContext.getUriInfo().getQueryParameters().containsKey(QUERY_PARAM_FIELDS);
 	}
 
     /**
@@ -62,6 +62,7 @@ public class QueryParamUtils {
     public static List<String> flattenQueryParameters(List<String> parameters){
     	return parameters.stream()
     		.flatMap(param -> Stream.of(param.split(QUERY_PARAM_VALUE_DELIMITER)))
+    		.map(String::trim)
     		.collect(Collectors.toList());
     }
 }

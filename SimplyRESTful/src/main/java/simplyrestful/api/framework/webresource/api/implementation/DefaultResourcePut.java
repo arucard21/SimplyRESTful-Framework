@@ -2,6 +2,8 @@ package simplyrestful.api.framework.webresource.api.implementation;
 
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -13,14 +15,11 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.api.crud.DefaultExists;
 import simplyrestful.api.framework.api.crud.DefaultUpdate;
 import simplyrestful.api.framework.resources.APIResource;
 import simplyrestful.api.framework.resources.Link;
+import simplyrestful.api.framework.utils.WebResourceUtils;
 
 public interface DefaultResourcePut<T extends APIResource> extends DefaultExists, DefaultUpdate<T> {
     public static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";

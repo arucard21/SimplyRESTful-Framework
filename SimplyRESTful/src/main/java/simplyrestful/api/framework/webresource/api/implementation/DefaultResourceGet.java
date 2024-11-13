@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -16,10 +18,6 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import simplyrestful.api.framework.QueryParamUtils;
 import simplyrestful.api.framework.api.crud.DefaultRead;
 import simplyrestful.api.framework.resources.APIResource;
 
@@ -56,7 +54,6 @@ public interface DefaultResourceGet<T extends APIResource> extends DefaultRead<T
 	        @DefaultValue(QUERY_PARAM_FIELDS_DEFAULT)
 	        @Parameter(description = "The fields that should be retrieved", required = false)
 	        List<String> fields) {
-    	QueryParamUtils.configureFieldsDefault(requestContext, fields);
     	return Optional.ofNullable(this.read(id)).orElseThrow(NotFoundException::new);
     }
 }

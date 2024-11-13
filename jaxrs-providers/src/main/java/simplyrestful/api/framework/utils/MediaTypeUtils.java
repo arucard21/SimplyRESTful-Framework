@@ -1,4 +1,4 @@
-package simplyrestful.api.framework;
+package simplyrestful.api.framework.utils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

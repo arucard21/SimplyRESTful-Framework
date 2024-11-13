@@ -51,11 +51,11 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.DefaultWebResource;
-import simplyrestful.api.framework.WebResourceUtils;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
+import simplyrestful.api.framework.utils.WebResourceUtils;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Named
