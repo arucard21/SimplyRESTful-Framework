@@ -1,0 +1,38 @@
+apply plugin: 'application'
+apply plugin: "org.springframework.boot"
+
+repositories {
+	mavenCentral()
+}
+
+project.description = "Example project for a SimplyRESTful API using Jersey with Spring Boot and directly stored with Spring Data"
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+application{
+	mainClass = "example.jersey.nomapping.JerseyNoMappingApplication"
+}
+
+bootRun {
+    environment "server.port", "8888"
+    environment "SIMPLYRESTFUL_URI_HTTP_HEADER", "xoriginalurl"
+}
+
+dependencies {
+	implementation project(':SimplyRESTful')
+	implementation project(':deploy-springboot-jersey')
+	implementation project(':springdata-paging-offset')
+	implementation project(':examples:examples-resources-jpa')
+	implementation group: "org.springframework.boot", name: "spring-boot-starter-data-jpa", version: springBootVersion
+	implementation group: "org.springframework.boot", name: "spring-boot-starter-validation", version: springBootVersion
+	implementation group: "org.springframework.boot", name: "spring-boot-starter-actuator", version: springBootVersion
+	implementation group: "org.springframework.boot", name: "spring-boot-starter-web", version: springBootVersion
+	implementation group: "com.h2database", name: "h2", version: h2Version
+	implementation group: "io.github.perplexhub", name: "rsql-jpa-spring-boot-starter", version: rsqlJpaVersion
+	implementation group: "org.eclipse.parsson", name: "parsson", version: parssonVersion
+	implementation group: "org.webjars", name: "swagger-ui", version: swaggerUiVersion
+	implementation group: "org.webjars", name: "webjars-locator-core", version: webjarsLocatorVersion
+}
