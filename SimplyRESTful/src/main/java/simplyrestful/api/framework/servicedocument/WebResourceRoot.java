@@ -1,8 +1,8 @@
 package simplyrestful.api.framework.servicedocument;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Named;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -15,7 +15,7 @@ import simplyrestful.api.framework.resources.Link;
 
 @Named
 @Path("")
-@Tag(name = "Service Document")
+@Hidden
 public class WebResourceRoot{
 	@Context
 	private UriInfo uriInfo;

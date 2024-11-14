@@ -6,9 +6,6 @@ import java.util.Map;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Produces;
@@ -61,12 +58,6 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
     @GET
     @Produces(APICollection.MEDIA_TYPE_JSON)
     @Operation(description = "Retrieve a filtered, sorted collection of API resources.")
-    @ApiResponse(responseCode = "200", description = "A pageable collection containing your API resources.", content = {
-	     @Content(
-		    mediaType = APICollection.MEDIA_TYPE_JSON,
-		    schema = @Schema(
-			    implementation = APICollection.class))
-    })
     default APICollection<T> listAPIResources(
     		@Context
 		    UriInfo uriInfo,

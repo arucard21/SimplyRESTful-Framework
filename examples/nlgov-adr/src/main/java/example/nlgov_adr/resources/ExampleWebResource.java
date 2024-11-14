@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -33,6 +32,11 @@ import cz.jirutka.rsql.parser.RSQLParserException;
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -45,6 +49,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
@@ -55,14 +60,13 @@ import simplyrestful.api.framework.resources.APICollection;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 import simplyrestful.api.framework.utils.WebResourceUtils;
-import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Named
 @Path("/resources")
 @Tag(name = "Example Resources")
 @Produces(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
 @Consumes(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
-public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
+public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
 	public static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
 	public static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
@@ -157,15 +161,6 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 			throw new BadRequestException("The FIQL query could not be parsed");
 		}
 	}
-    @Override
-    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
-	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query), map(sort))
-		.map(resource -> {
-		    simulateSlowDataRetrieval();
-		    return resource;
-		})
-		.map(this::ensureSelfLinkAndUUIDPresent);
-    }
 
 	@Override
 	public int count(String query) {
@@ -175,14 +170,6 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	@Override
 	public boolean exists(UUID resourceUUID) {
 		return repo.existsByUuid(resourceUUID);
-	}
-
-	private void simulateSlowDataRetrieval() {
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private Sort map(List<SortOrder> sort) {
@@ -211,26 +198,100 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 		return persistedResource;
 	}
 
+	@ApiResponse(
+    		responseCode = "200",
+    		description = "A pageable collection containing your Example resources.",
+    		content = {
+    				@Content(
+    						mediaType = APICollection.MEDIA_TYPE_JSON+";"+APICollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE+"=\""+ExampleResource.EXAMPLE_MEDIA_TYPE_JSON+"\"",
+    						schema = @Schema(ref = "#/components/schemas/APICollectionExampleResource"))},
+    		headers = {
+    				@Header(
+    						name = "API-Version",
+    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
+    						schema = @Schema(type = "string"))})
 	@Override
 	public APICollection<ExampleResource> listAPIResources(UriInfo uriInfo, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
 		return DefaultWebResource.super.listAPIResources(uriInfo, pageStart, pageSize, fields, query, sort);
 	}
 
+	@ApiResponse(
+    		responseCode = "200",
+    		description = "An API resource",
+    		content = {
+    				@Content(
+    						mediaType = ExampleResource.EXAMPLE_MEDIA_TYPE_JSON,
+    						schema = @Schema(implementation = ExampleResource.class))},
+    		headers = {
+    				@Header(
+    						name = "API-Version",
+    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
+    						schema = @Schema(type = "string"))})
 	@Override
 	public ExampleResource getAPIResource(@NotNull UUID id, List<String> fields) {
 		return DefaultWebResource.super.getAPIResource(id, fields);
 	}
 
+	@ApiResponse(
+    		responseCode = "201",
+    		description = "Provides the location of the newly created Example resource.",
+    		headers = {
+    				@Header(
+    						name = HttpHeaders.LOCATION,
+    						description = "Contains the URI to the newly created Example resource",
+    						schema = @Schema(type = "string", format = "uri")),
+    				@Header(
+    						name = "API-Version",
+    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
+    						schema = @Schema(type = "string"))})
+	@ApiResponse(
+    		responseCode = "409",
+    		description = "The self link in the Example resource conflicts with an existing Example resource so it was not created",
+    		headers = {
+    				@Header(
+    						name = "API-Version",
+    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
+    						schema = @Schema(type = "string"))})
 	@Override
 	public Response postAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
 		return DefaultWebResource.super.postAPIResource(resourceInfo, uriInfo, resource);
 	}
 
+
+	@ApiResponse(
+    		responseCode = "200",
+    		description = "An API resource",
+    		content = {
+    				@Content(
+    						mediaType = ExampleResource.EXAMPLE_MEDIA_TYPE_JSON,
+    						schema = @Schema(implementation = ExampleResource.class))},
+    		headers = {
+    				@Header(
+    						name = "API-Version",
+    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
+    						schema = @Schema(type = "string"))})
+	@ApiResponse(
+    		responseCode = "404",
+    		description = "The Example resource does not exist",
+    		headers = {
+    				@Header(
+    						name = "API-Version",
+    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
+    						schema = @Schema(type = "string"))})
+	@Operation(description = "Modify an existing API resource.")
 	@Override
 	public Response putAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
 		return DefaultWebResource.super.putAPIResource(resourceInfo, uriInfo, id, resource);
 	}
 
+	@ApiResponse(
+    		responseCode = "204",
+    		description = "The Example resource was deleted",
+    		headers = {
+    				@Header(
+    						name = "API-Version",
+    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
+    						schema = @Schema(type = "string"))})
 	@Override
 	public Response deleteAPIResource(@NotNull UUID id) {
 		return DefaultWebResource.super.deleteAPIResource(id);

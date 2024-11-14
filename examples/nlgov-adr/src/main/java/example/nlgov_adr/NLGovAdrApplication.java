@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.info.Info;
 @SpringBootApplication
 @EntityScan("example.resources.jpa")
 @OpenAPIDefinition( info = @Info(title = "test title", description = "test description", version = "1.0.0"))
-public class JerseyNoMappingApplication {
+public class NLGovAdrApplication {
     public static void main(String[] args) {
-        SpringApplication.run(JerseyNoMappingApplication.class, args);
+        SpringApplication.run(NLGovAdrApplication.class, args);
     }
 }

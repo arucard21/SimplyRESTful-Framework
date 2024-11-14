@@ -1,0 +1,15 @@
+scannerClass: io.swagger.v3.jaxrs2.integration.JaxrsApplicationScanner
+filterClass: simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter
+openAPI:
+  info:    
+    version: '1.0.0'
+    title: 'NLGov ADR API'
+    description: 'Example API conforming to NLGov REST API Design Rules (ADR)'
+    contact:
+      email: arucard21@gmail.com 
+  servers: 
+  - url: 'http://localhost:8080/v0'
+    description: 'Default server'
+  tags:
+  - name: 'Example Resources'
+    description: 'Operation for Example resources'
