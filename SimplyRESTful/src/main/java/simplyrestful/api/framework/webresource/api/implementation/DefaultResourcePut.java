@@ -72,6 +72,6 @@ public interface DefaultResourcePut<T extends APIResource> extends DefaultExists
                 }
     	}
     	this.update(resource, id);
-    	return Response.ok().build();
+    	return Response.noContent().build();
     }
 }
