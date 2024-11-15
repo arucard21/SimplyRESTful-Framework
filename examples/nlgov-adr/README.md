@@ -31,9 +31,8 @@ API-20   Yes
 API-48   Yes     
 API-51   No      CORS policy is invalid
 API-56   Yes     
-API-57   No      API-Version header not found
+API-57   Yes     
 
 Validation failed
 ```
 There is currently nothing configured for CORS in the API so it is expected to fail that test.
-The API-Version header is currently only documented in the OpenAPI Specification but it is not yet returned by the API. This can be easily fixed with a JAX-RS filter that adds this header to every response.

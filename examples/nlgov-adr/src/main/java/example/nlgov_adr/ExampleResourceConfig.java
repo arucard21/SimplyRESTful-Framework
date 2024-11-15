@@ -12,6 +12,7 @@ import jakarta.ws.rs.ApplicationPath;
 public class ExampleResourceConfig extends ResourceConfig {
     public ExampleResourceConfig() {
         register(ExampleWebResource.class);
+        register(ApiVersionFilter.class);
         property(ServletProperties.FILTER_FORWARD_ON_404, true);
     }
 }
