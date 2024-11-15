@@ -1,5 +1,5 @@
 scannerClass: io.swagger.v3.jaxrs2.integration.JaxrsApplicationScanner
-filterClass: simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter
+filterClass: example.nlgov_adr.AdrOpenApiFilter
 openAPI:
   info:    
     version: '1.0.0'
