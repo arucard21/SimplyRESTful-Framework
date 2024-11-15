@@ -5,9 +5,7 @@ import org.glassfish.jersey.servlet.ServletProperties;
 import org.springframework.context.annotation.Configuration;
 
 import example.nlgov_adr.resources.ExampleWebResource;
-import jakarta.ws.rs.ApplicationPath;
 
-@ApplicationPath("v0")
 @Configuration
 public class ExampleResourceConfig extends ResourceConfig {
     public ExampleResourceConfig() {
