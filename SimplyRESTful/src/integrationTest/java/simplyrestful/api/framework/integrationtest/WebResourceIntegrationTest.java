@@ -5,16 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Application;
-import jakarta.ws.rs.core.GenericType;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.Response.Status.Family;
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.sse.SseEventSource;
-
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -25,6 +15,15 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status.Family;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.sse.SseEventSource;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.integrationTest.implementation.TestResource;
 import simplyrestful.api.framework.integrationTest.implementation.TestWebResource;
@@ -203,7 +202,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.path(TestResource.TEST_RESOURCE_ID.toString())
     		.request()
     		.put(Entity.entity(testInstance, TestResource.MEDIA_TYPE_JSON));
-    	Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assertions.assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     @Test

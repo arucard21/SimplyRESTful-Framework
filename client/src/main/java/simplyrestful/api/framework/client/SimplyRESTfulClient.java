@@ -562,7 +562,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
         Builder request = target.request();
         configureHttpHeaders(request, headers);
         Response response = request.put(Entity.entity(resource, resourceMediaType));
-        if (!Objects.equals(response.getStatusInfo(), Status.OK)) {
+        if (!Objects.equals(response.getStatusInfo(), Status.NO_CONTENT)) {
             throw new WebApplicationException(response);
         }
     }
