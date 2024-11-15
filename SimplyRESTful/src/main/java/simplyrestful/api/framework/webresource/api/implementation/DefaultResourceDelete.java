@@ -3,15 +3,15 @@ package simplyrestful.api.framework.webresource.api.implementation;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import simplyrestful.api.framework.api.crud.DefaultDelete;
 import simplyrestful.api.framework.resources.APIResource;
 
@@ -25,6 +25,9 @@ public interface DefaultResourceDelete<T extends APIResource> extends DefaultDel
     @Path("/{id}")
     @DELETE
     @Operation(description = "Delete this API resource")
+    @ApiResponse(
+    		responseCode = "204",
+    		description = "The API resource is successfully deleted")
     default Response deleteAPIResource(
     		@PathParam("id")
     	    @NotNull

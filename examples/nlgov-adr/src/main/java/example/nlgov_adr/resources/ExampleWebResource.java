@@ -32,8 +32,6 @@ import cz.jirutka.rsql.parser.RSQLParserException;
 import example.resources.jpa.ExampleComplexAttribute;
 import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,7 +47,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
@@ -198,18 +195,28 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 		return persistedResource;
 	}
 
+	/**
+	 * Add information that is specific to this Web Resource to the OpenAPI Specification document.
+	 *
+	 * All JAX-RS methods are overridden here since that provides better auto-generated information for
+	 * the OpenAPI Specification document. In particular, it will correctly detect the API resource from
+	 * this Web Resource instead of the generic type used in the default implementation.
+	 *
+	 * The OpenAPI annotations get added to the previously defined ones on the parent class method. So
+	 * only the extra ones need to be added here.
+	 *
+	 * CAUTION: All JAX-RS annotations on the parent class method will be ignored if even 1 JAX-RS annotation
+	 * is added to this overridden method. So only add non-JAX-RS annotations, or copy all JAX-RS annotations
+	 * from the default implementation (and keep it in sync whenever that changes).
+	 */
+
 	@ApiResponse(
     		responseCode = "200",
     		description = "A pageable collection containing your Example resources.",
     		content = {
     				@Content(
     						mediaType = APICollection.MEDIA_TYPE_JSON+";"+APICollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE+"=\""+ExampleResource.EXAMPLE_MEDIA_TYPE_JSON+"\"",
-    						schema = @Schema(ref = "#/components/schemas/APICollectionExampleResource"))},
-    		headers = {
-    				@Header(
-    						name = "API-Version",
-    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
-    						schema = @Schema(type = "string"))})
+    						schema = @Schema(ref = "#/components/schemas/APICollectionExampleResource"))})
 	@Override
 	public APICollection<ExampleResource> listAPIResources(UriInfo uriInfo, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
 		return DefaultWebResource.super.listAPIResources(uriInfo, pageStart, pageSize, fields, query, sort);
@@ -217,81 +224,27 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 
 	@ApiResponse(
     		responseCode = "200",
-    		description = "An API resource",
+    		description = "Returns the requested API resource",
     		content = {
     				@Content(
     						mediaType = ExampleResource.EXAMPLE_MEDIA_TYPE_JSON,
-    						schema = @Schema(implementation = ExampleResource.class))},
-    		headers = {
-    				@Header(
-    						name = "API-Version",
-    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
-    						schema = @Schema(type = "string"))})
+    						schema = @Schema(implementation = ExampleResource.class))})
 	@Override
 	public ExampleResource getAPIResource(@NotNull UUID id, List<String> fields) {
 		return DefaultWebResource.super.getAPIResource(id, fields);
 	}
 
-	@ApiResponse(
-    		responseCode = "201",
-    		description = "Provides the location of the newly created Example resource.",
-    		headers = {
-    				@Header(
-    						name = HttpHeaders.LOCATION,
-    						description = "Contains the URI to the newly created Example resource",
-    						schema = @Schema(type = "string", format = "uri")),
-    				@Header(
-    						name = "API-Version",
-    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
-    						schema = @Schema(type = "string"))})
-	@ApiResponse(
-    		responseCode = "409",
-    		description = "The self link in the Example resource conflicts with an existing Example resource so it was not created",
-    		headers = {
-    				@Header(
-    						name = "API-Version",
-    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
-    						schema = @Schema(type = "string"))})
+
 	@Override
 	public Response postAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
 		return DefaultWebResource.super.postAPIResource(resourceInfo, uriInfo, resource);
 	}
 
-
-	@ApiResponse(
-    		responseCode = "200",
-    		description = "An API resource",
-    		content = {
-    				@Content(
-    						mediaType = ExampleResource.EXAMPLE_MEDIA_TYPE_JSON,
-    						schema = @Schema(implementation = ExampleResource.class))},
-    		headers = {
-    				@Header(
-    						name = "API-Version",
-    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
-    						schema = @Schema(type = "string"))})
-	@ApiResponse(
-    		responseCode = "404",
-    		description = "The Example resource does not exist",
-    		headers = {
-    				@Header(
-    						name = "API-Version",
-    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
-    						schema = @Schema(type = "string"))})
-	@Operation(description = "Modify an existing API resource.")
 	@Override
 	public Response putAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
 		return DefaultWebResource.super.putAPIResource(resourceInfo, uriInfo, id, resource);
 	}
 
-	@ApiResponse(
-    		responseCode = "204",
-    		description = "The Example resource was deleted",
-    		headers = {
-    				@Header(
-    						name = "API-Version",
-    						description = "Contains the full version number of the entire API since the URL contains only the major version number",
-    						schema = @Schema(type = "string"))})
 	@Override
 	public Response deleteAPIResource(@NotNull UUID id) {
 		return DefaultWebResource.super.deleteAPIResource(id);

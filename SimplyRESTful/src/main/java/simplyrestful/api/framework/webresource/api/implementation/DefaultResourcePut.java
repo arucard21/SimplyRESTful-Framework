@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -27,20 +28,25 @@ public interface DefaultResourcePut<T extends APIResource> extends DefaultExists
     public static final String ERROR_RESOURCE_WITH_ID_NOT_EXISTS = "A resource with the provided ID does not exist. Try to create the resource with a POST request to the collection URI.";
 
     /**
-     * Update a resource (or create it with the given identifier)
+     * Update a resource
      * <p>
-     * The resource may contain a self-link. This self-link must match the
-     * provided id. If a resource with that id does not exist yet, a "404 Not found"
-     * error is returned.
+     * The resource may contain a self-link. This self-link must match the id provided
+     * through the URL. If it does not match, a "400 Bad Request" error is returned.
      * </p>
      * @param id is the UUID part from the entire URI identifier of the resource.
      * @param resource is the updated resource.
-     * @return "200 OK" if the resource was created, "404 Not Found" if the resource
+     * @return "204 No Content" if the resource was updated, "400 Bad Request" if the resource
      * does not exist yet.
      */
     @Path("/{id}")
     @PUT
     @Operation(description = "Modify an existing API resource.")
+	@ApiResponse(
+    		responseCode = "204",
+    		description = "The API resource was successfully modified")
+	@ApiResponse(
+    		responseCode = "400",
+    		description = "The self-link in the API resource does not match the link through which the API was accessed, or the request is otherwise malformed.")
     default Response putAPIResource(
     		@Context
             ResourceInfo resourceInfo,
