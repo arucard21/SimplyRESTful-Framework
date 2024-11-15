@@ -19,7 +19,7 @@ application{
 bootRun {
     environment "server.port", "8888"
     environment "SIMPLYRESTFUL_URI_HTTP_HEADER", "xoriginalurl"
-    environment "API_VERSION" "0.0.1"
+    environment "API_VERSION", "0.0.1"
 }
 
 dependencies {
