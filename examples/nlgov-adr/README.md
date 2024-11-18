@@ -54,6 +54,7 @@ Validation failed
 
 ```
 All the core tests from the validator passed. 
+
 The TLS security tests fail. As mentioned before, the API is only running locally for this Proof-of-Concept and moving to a normal deployment scenario would easily make these tests pass.
 
 The following changes were needed to achieve these results.
@@ -65,66 +66,45 @@ The following changes were needed to achieve these results.
 
 An interesting difference between the linter and the validator, is that the Spectral linter validates the ADR rules according to [version 2.0.0](https://logius-standaarden.github.io/API-Design-Rules/#normative-design-rules) while the ADR-Validator checks the rules according to [ADR 1.0](https://gitdocumentatie.logius.nl/publicatie/api/adr/1.0/#normative-design-rules). This shouldn't matter much for the actual validation since ADR 2.0.0 contains all rules from ADR 1.0 and only adds to them. The main difference is that the naming syntax was changed from something like `API-00` to something like `/core/some-rule-name`. They are also grouped by functional and technical rules where only the technical rules can be tested by the linter or the validator.
 
-I'll list all rules below according to version 2.0.0 and add the corresponding rule from 1.0 where possible. I'll also include whether that rules is tested by the linter and the validator.
+I'll list all rules below according to version 2.0.0 and add the corresponding rule ID from 1.0 where possible. The rule description from version 1.0 and 2.0.0 are exactly the same. I'll also include whether that rules is tested by the linter and the validator.
 
 * Functional rules
-	* /core/naming-resources: Use nouns to name resources
-		* API-05: Use nouns to name resources
-	* /core/naming-collections: Use plural nouns to name collection resources
-		* API-54: Use plural nouns to name collection resources
-	* /core/interface-language: Define interfaces in Dutch unless there is an official English glossary available
-		* API-04: Define interfaces in Dutch unless there is an official English glossary available
-	* /core/hide-implementation: Hide irrelevant implementation details
-		* API-53: Hide irrelevant implementation details
-	* /core/http-safety: Adhere to HTTP safety and idempotency semantics for operations
-		* API-01: Adhere to HTTP safety and idempotency semantics for operations
-	* /core/stateless: Do not maintain session state on the server
-		* API-02: Do not maintain session state on the server
-	* /core/nested-child: Use nested URIs for child resources
-		* API-06: Use nested URIs for child resources
-	* /core/resource-operations: Model resource operations as a sub-resource or dedicated resource
-		* API-10: Model resource operations as a sub-resource or dedicated resource
-	* /core/doc-language: Publish documentation in Dutch unless there is existing documentation in English
-		* API-17: Publish documentation in Dutch unless there is existing documentation in English
-	* /core/deprecation-schedule: Include a deprecation schedule when deprecating features or versions
-		* API-18: Include a deprecation schedule when publishing API changes
-	* /core/transition-period: Schedule a fixed transition period for a new major API version
-		* API-19: Schedule a fixed transition period for a new major API version
-	* /core/changelog: Publish a changelog for API changes between versions
-		* API-55: Publish a changelog for API changes between versions
-	* /core/geospatial: Apply the geospatial module for geospatial data
-		* New in ADR 2.0.0
+	* /core/naming-resources: Use nouns to name resources (API-05)
+	* /core/naming-collections: Use plural nouns to name collection resources (API-54)
+	* /core/interface-language: Define interfaces in Dutch unless there is an official English glossary available (API-04)
+	* /core/hide-implementation: Hide irrelevant implementation details (API-53)
+	* /core/http-safety: Adhere to HTTP safety and idempotency semantics for operations (API-01)
+	* /core/stateless: Do not maintain session state on the server (API-02)
+	* /core/nested-child: Use nested URIs for child resources (API-06)
+	* /core/resource-operations: Model resource operations as a sub-resource or dedicated resource (API-10)
+	* /core/doc-language: Publish documentation in Dutch unless there is existing documentation in English (API-17)
+	* /core/deprecation-schedule: Include a deprecation schedule when deprecating features or versions (API-18)
+	* /core/transition-period: Schedule a fixed transition period for a new major API version (API-19)
+	* /core/changelog: Publish a changelog for API changes between versions (API-55)
+	* /core/geospatial: Apply the geospatial module for geospatial data (New in ADR 2.0.0)
 * Technical rules
-	* /core/no-trailing-slash: Leave off trailing slashes from URIs
-		* API-48: Leave off trailing slashes from URIs
+	* /core/no-trailing-slash: Leave off trailing slashes from URIs (API-48)
 		* Tested by Spectral linter ruleset
 		* Tested by ADR-Validator
-	* /core/http-methods: Only apply standard HTTP methods
-		* API-03: Only apply standard HTTP methods
+	* /core/http-methods: Only apply standard HTTP methods (API-03)
 		* Tested by Spectral linter ruleset
 		* Tested by ADR-Validator
-	* /core/doc-openapi: Use OpenAPI Specification for documentation
-		* API-16: Use OpenAPI Specification for documentation
+	* /core/doc-openapi: Use OpenAPI Specification for documentation (API-16)
 		* Tested by Spectral linter ruleset
 		* Tested by ADR-Validator
-	* /core/publish-openapi: Publish OAS document at a standard location in JSON-format
-		* API-51: Publish OAS document at a standard location in JSON-format
+	* /core/publish-openapi: Publish OAS document at a standard location in JSON-format (API-51)
 		* Not tested by Spectral linter ruleset
 		* Tested by ADR-Validator
-	* /core/uri-version: Include the major version number in the URI
-		* API-20: Include the major version number in the URI
+	* /core/uri-version: Include the major version number in the URI (API-20)
 		* Tested by Spectral linter ruleset
 		* Tested by ADR-Validator
-	* /core/semver: Adhere to the Semantic Versioning model when releasing API changes
-		* API-56: Adhere to the Semantic Versioning model when releasing API changes
+	* /core/semver: Adhere to the Semantic Versioning model when releasing API changes (API-56)
 		* Not tested by Spectral linter ruleset
 		* Tested by ADR-Validator
-	* /core/version-header: Return the full version number in a response header
-		* API-57: Return the full version number in a response header
+	* /core/version-header: Return the full version number in a response header (API-57)
 		* Tested by Spectral linter ruleset
 		* Tested by ADR-Validator
-	* /core/transport-security: Apply the transport security module
-		* New in ADR 2.0.0
+	* /core/transport-security: Apply the transport security module (New in ADR 2.0.0)
 		* Tested by Spectral linter ruleset.
 		* Tested by ADR-Validator with the `security-tls` ruleset (as opposed to the `core` ruleset)
 
