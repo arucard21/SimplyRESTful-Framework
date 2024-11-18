@@ -26,10 +26,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiCollection;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
-import simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter;
+import simplyrestful.api.framework.swagger.SimplyRestfulOpenApiFilter;
 
 public class OpenApiIntegrationTest extends JerseyTest {
     public static final String OPENAPI_PATH_JSON = "openapi.json";
@@ -67,17 +67,17 @@ public class OpenApiIntegrationTest extends JerseyTest {
 
     @Test
     public void openApi_shouldNotContainASchemaForTheAPIResourceParent() throws JsonMappingException, JsonProcessingException {
-        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APIResource.class.getSimpleName()));
+        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(ApiResource.class.getSimpleName()));
     }
 
     @Test
     public void openApi_shouldNotContainASchemaForTheAPICollectionParent() throws JsonMappingException, JsonProcessingException {
-        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()));
+        Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(ApiCollection.class.getSimpleName()));
     }
 
     @Test
     public void openApi_shouldNotContainASchemaForTheAPIResourceTypedAPICollection() throws JsonMappingException, JsonProcessingException {
-    	Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(APICollection.class.getSimpleName()+APIResource.class.getSimpleName()));
+    	Assertions.assertFalse(retrieveOpenAPI().getComponents().getSchemas().containsKey(ApiCollection.class.getSimpleName()+ApiResource.class.getSimpleName()));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class OpenApiIntegrationTest extends JerseyTest {
                 .map(MediaType::valueOf)
                 .flatMap(mediaType -> mediaType.getParameters().keySet().stream())
                 .collect(Collectors.toList());
-        Assertions.assertFalse(allMediaTypeParameterNames.contains(SimplyRESTfulOpenApiFilter.MEDIA_TYPE_PARAMETER_NAME_QS));
+        Assertions.assertFalse(allMediaTypeParameterNames.contains(SimplyRestfulOpenApiFilter.MEDIA_TYPE_PARAMETER_NAME_QS));
     }
 
     private OpenAPI retrieveOpenAPI() throws JsonMappingException, JsonProcessingException {

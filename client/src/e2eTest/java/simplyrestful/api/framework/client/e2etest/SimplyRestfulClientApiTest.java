@@ -18,18 +18,18 @@ import example.resources.jpa.ExampleResource;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.GenericType;
-import simplyrestful.api.framework.client.SimplyRESTfulClient;
+import simplyrestful.api.framework.client.SimplyRestfulClient;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.ApiCollection;
 import simplyrestful.api.framework.utils.QueryParamUtils;
 
 /**
  * This e2e test requires the example API from "examples/springboot-jersey-nomapping-springdata" to be running
  *
  */
-public class SimplyRESTfulClientApiTest {
+public class SimplyRestfulClientApiTest {
     private static URI baseUri;
-    private static SimplyRESTfulClient<ExampleResource> simplyRESTfulClient;
+    private static SimplyRestfulClient<ExampleResource> simplyRESTfulClient;
     private static Client client = ClientBuilder.newBuilder()
     		.register(JacksonJsonProvider.class)
     		.register(ObjectMapperProvider.class)
@@ -43,7 +43,7 @@ public class SimplyRESTfulClientApiTest {
 
     public static void configureSimplyRESTfulClient() {
         simplyRESTfulClient = Assertions.assertDoesNotThrow(
-                () -> new SimplyRESTfulClient<ExampleResource>(client, baseUri, new GenericType<APICollection<ExampleResource>>() {}));
+                () -> new SimplyRestfulClient<ExampleResource>(client, baseUri, new GenericType<ApiCollection<ExampleResource>>() {}));
         Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
     }
 

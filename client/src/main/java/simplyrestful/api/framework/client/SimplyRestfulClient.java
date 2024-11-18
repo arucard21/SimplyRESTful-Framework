@@ -35,9 +35,9 @@ import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.sse.SseEventSource;
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APIResource;
-import simplyrestful.api.framework.resources.APIServiceDocument;
+import simplyrestful.api.framework.resources.ApiCollection;
+import simplyrestful.api.framework.resources.ApiResource;
+import simplyrestful.api.framework.resources.ApiServiceDocument;
 import simplyrestful.api.framework.resources.Link;
 
 /**
@@ -45,7 +45,7 @@ import simplyrestful.api.framework.resources.Link;
  *
  * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
  */
-public class SimplyRESTfulClient<T extends APIResource> {
+public class SimplyRestfulClient<T extends ApiResource> {
 	/**
 	 * Error message when an incorrect GenericType is provided to the client
 	 */
@@ -99,7 +99,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	 */
 	public static final String QUERY_PARAM_SORT = "sort";
 
-    private final GenericType<APICollection<T>> typeForAPICollection;
+    private final GenericType<ApiCollection<T>> typeForAPICollection;
     private final URI baseApiUri;
     private final MediaType resourceMediaType;
     private final Client client;
@@ -115,7 +115,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	 * of resources, e.g.  {@code new GenericType<APICollection<YourApiResource>>() {}}. is required for the
 	 * client to properly handle deserialization because of type erasure.
      */
-	public SimplyRESTfulClient(Client client, URI baseApiUri, GenericType<APICollection<T>> typeForAPICollection) {
+	public SimplyRestfulClient(Client client, URI baseApiUri, GenericType<ApiCollection<T>> typeForAPICollection) {
         this.baseApiUri = baseApiUri;
         this.client = client;
         if (! (typeForAPICollection.getType() instanceof ParameterizedType)) {
@@ -128,7 +128,7 @@ public class SimplyRESTfulClient<T extends APIResource> {
 	/**
 	 * Get the resource class based on the provided type for the API collection.
 	 *
-	 * This resource class should be a subclass of {@link APIResource}.
+	 * This resource class should be a subclass of {@link ApiResource}.
 	 *
 	 * This requires an unchecked cast because the resource class for T is unavailable at runtime so it cannot be checked.
 	 * But both the collection type and the resource class type use the same generic variable T so the cast should be safe enough.
@@ -174,8 +174,8 @@ public class SimplyRESTfulClient<T extends APIResource> {
         }
         Builder serviceDocumentRequest = client.target(baseApiUri).request();
         configureHttpHeaders(serviceDocumentRequest, headers);
-        serviceDocumentRequest.accept(APIServiceDocument.MEDIA_TYPE_JSON);
-        APIServiceDocument serviceDocument = serviceDocumentRequest.get(APIServiceDocument.class);
+        serviceDocumentRequest.accept(ApiServiceDocument.MEDIA_TYPE_JSON);
+        ApiServiceDocument serviceDocument = serviceDocumentRequest.get(ApiServiceDocument.class);
         URI openApiDocumentUri = serviceDocument.getDescribedBy().getHref();
 
         Builder openApiDocumentRequest = client.target(openApiDocumentUri).request();
@@ -363,9 +363,9 @@ public class SimplyRESTfulClient<T extends APIResource> {
         }
         configureAdditionalQueryParameters(target, additionalQueryParameters);
         Builder request = target.request();
-        request.accept(APICollection.MEDIA_TYPE_JSON);
+        request.accept(ApiCollection.MEDIA_TYPE_JSON);
         configureHttpHeaders(request, additionalHeaders);
-        APICollection<T> resourceCollection = request.get(typeForAPICollection);
+        ApiCollection<T> resourceCollection = request.get(typeForAPICollection);
         this.totalAmountOfLastRetrievedCollection = resourceCollection.getTotal();
         return resourceCollection.getItem();
     }

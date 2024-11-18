@@ -22,9 +22,9 @@ import jakarta.servlet.Filter;
 @SpringBootApplication(exclude = WebMvcAutoConfiguration.class)
 @EntityScan("example.resources.jpa")
 @OpenAPIDefinition( info = @Info(title = "test title", description = "test description", version = "1.0.0"))
-public class NLGovAdrApplication {
+public class NlgovAdrApplication {
     public static void main(String[] args) {
-        SpringApplication.run(NLGovAdrApplication.class, args);
+        SpringApplication.run(NlgovAdrApplication.class, args);
     }
 
     @Bean

@@ -14,9 +14,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 import simplyrestful.api.framework.api.crud.DefaultRead;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultResourceGet<T extends APIResource> extends DefaultRead<T> {
+public interface DefaultResourceGet<T extends ApiResource> extends DefaultRead<T> {
 	public static final String QUERY_PARAM_FIELDS_DEFAULT = "all";
 
 	/**

@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 
-public class TestResource extends APIResource {
+public class TestResource extends ApiResource {
 	public static final String MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
 	public static final UUID TEST_RESOURCE_ID = UUID.randomUUID();
 	public static final String ADDITIONAL_FIELD_TEST_VALUE = "additional-field-value";

@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import jakarta.ws.rs.core.MediaType;
 
-public abstract class APIResource {
+public abstract class ApiResource {
 	private Link self;
 
 	public void setSelf(Link selfLink) {
@@ -35,7 +35,7 @@ public abstract class APIResource {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		APIResource other = (APIResource) obj;
+		ApiResource other = (ApiResource) obj;
 		return Objects.equals(self, other.self);
 	}
 }

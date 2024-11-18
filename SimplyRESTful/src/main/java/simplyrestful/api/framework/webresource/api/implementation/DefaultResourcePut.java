@@ -18,11 +18,11 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.api.crud.DefaultExists;
 import simplyrestful.api.framework.api.crud.DefaultUpdate;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.utils.WebResourceUtils;
 
-public interface DefaultResourcePut<T extends APIResource> extends DefaultExists, DefaultUpdate<T> {
+public interface DefaultResourcePut<T extends ApiResource> extends DefaultExists, DefaultUpdate<T> {
     public static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
     public static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
     public static final String ERROR_RESOURCE_WITH_ID_NOT_EXISTS = "A resource with the provided ID does not exist. Try to create the resource with a POST request to the collection URI.";

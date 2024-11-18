@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import jakarta.ws.rs.core.MediaType;
 
-public class APICollection<T extends APIResource> extends APIResource {
+public class ApiCollection<T extends ApiResource> extends ApiResource {
     public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-collection-v1+json";
     public static final String MEDIA_TYPE_PARAMETER_ITEM_TYPE = "item-type";
     public static final String FIELDS_VALUE_DEFAULT = "self,first,last,prev,next,total,item.self";
@@ -91,7 +91,7 @@ public class APICollection<T extends APIResource> extends APIResource {
 		if (getClass() != obj.getClass())
 			return false;
 		@SuppressWarnings("unchecked")
-		APICollection<T> other = (APICollection<T>) obj;
+		ApiCollection<T> other = (ApiCollection<T>) obj;
 		return Objects.equals(first, other.first) && Objects.equals(item, other.item)
 				&& Objects.equals(last, other.last) && Objects.equals(next, other.next)
 				&& Objects.equals(prev, other.prev) && total == other.total;

@@ -13,9 +13,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import simplyrestful.api.framework.api.crud.DefaultDelete;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultResourceDelete<T extends APIResource> extends DefaultDelete<T> {
+public interface DefaultResourceDelete<T extends ApiResource> extends DefaultDelete<T> {
 	/**
      * Delete a resource.
      *

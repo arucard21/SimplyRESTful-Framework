@@ -2,9 +2,9 @@ package simplyrestful.api.framework.api.crud;
 
 import java.util.UUID;
 
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultDelete<T extends APIResource> {
+public interface DefaultDelete<T extends ApiResource> {
     /**
      * Remove a resource from the data store.
      *

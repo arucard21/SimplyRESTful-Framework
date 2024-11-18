@@ -14,10 +14,10 @@ import jakarta.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 
 @Entity
-public class ExampleResource extends APIResource {
+public class ExampleResource extends ApiResource {
     public static final String EXAMPLE_MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
     public static final String EXAMPLE_PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1";
     @JsonIgnore

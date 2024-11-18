@@ -20,7 +20,7 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import simplyrestful.api.framework.integrationTest.implementation.TestWebResource;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.APIServiceDocument;
+import simplyrestful.api.framework.resources.ApiServiceDocument;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,9 +65,9 @@ public class WebResourceRootIntegrationTest extends JerseyTest {
 
     @Test
     public void webResource_shouldReturnServiceDocumentContainingLinkToOpenAPISpecification_whenGETReceivedOnRootURI() {
-	APIServiceDocument serviceDocument = target()
+	ApiServiceDocument serviceDocument = target()
 		.request()
-		.get(APIServiceDocument.class);
+		.get(ApiServiceDocument.class);
 	URI expected = UriBuilder.fromUri(getBaseUri()).path("openapi.json").build();
 	URI actual = serviceDocument.getDescribedBy().getHref();
 	Assertions.assertEquals(expected, actual);

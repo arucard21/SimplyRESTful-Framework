@@ -51,7 +51,7 @@ import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.queryparams.SortOrder;
-import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.ApiCollection;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 import simplyrestful.api.framework.utils.WebResourceUtils;
@@ -212,7 +212,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	}
 
 	@Override
-	public APICollection<ExampleResource> listAPIResources(UriInfo uriInfo, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
+	public ApiCollection<ExampleResource> listAPIResources(UriInfo uriInfo, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
 		return DefaultWebResource.super.listAPIResources(uriInfo, pageStart, pageSize, fields, query, sort);
 	}
 

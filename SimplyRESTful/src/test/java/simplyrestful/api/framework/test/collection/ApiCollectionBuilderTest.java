@@ -11,16 +11,16 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
-import simplyrestful.api.framework.collection.APICollectionBuilder;
-import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.collection.ApiCollectionBuilder;
+import simplyrestful.api.framework.resources.ApiCollection;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 
-public class APICollectionV2BuilderTest {
+public class ApiCollectionBuilderTest {
     protected static final int TEST_RESOURCES_SIZE = 1000;
     protected static final URI requestURI = URI.create("local://resources/testresources/");
     protected List<TestResource> testResourcesList;
-    private final MediaType customJson = new APICollection<TestResource>().customJsonMediaType(new TestResource().customJsonMediaType());
+    private final MediaType customJson = new ApiCollection<TestResource>().customJsonMediaType(new TestResource().customJsonMediaType());
 
     @BeforeEach
     public void createSourceData() {
@@ -34,9 +34,9 @@ public class APICollectionV2BuilderTest {
         }
     }
 
-    protected APICollection<TestResource> createExpectedCollection(int startOfFirst, int startOfLast, int startOfPrev,
+    protected ApiCollection<TestResource> createExpectedCollection(int startOfFirst, int startOfLast, int startOfPrev,
             int startOfNext, int sublistBegin, int sublistEnd) {
-        APICollection<TestResource> expected = new APICollection<TestResource>();
+        ApiCollection<TestResource> expected = new ApiCollection<TestResource>();
         expected.setSelf(new Link(requestURI, customJson));
         expected.setTotal(TEST_RESOURCES_SIZE);
         Link firstPage = startOfFirst == -1 ? null
@@ -59,7 +59,7 @@ public class APICollectionV2BuilderTest {
         return expected;
     }
 
-    protected class TestResource extends APIResource {
+    protected class TestResource extends ApiResource {
         private int number;
 
         @Override
@@ -81,9 +81,9 @@ public class APICollectionV2BuilderTest {
         int pageStart = 0;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(0, 100);
-        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
+        ApiCollection<TestResource> actual = ApiCollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
-        APICollection<TestResource> expected = createExpectedCollection(0, 900, -1, 100, 0, 100);
+        ApiCollection<TestResource> expected = createExpectedCollection(0, 900, -1, 100, 0, 100);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -92,9 +92,9 @@ public class APICollectionV2BuilderTest {
         int pageStart = 300;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(200, 300);
-        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
+        ApiCollection<TestResource> actual = ApiCollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
-        APICollection<TestResource> expected = createExpectedCollection(0, 900, 200, 400, 200, 300);
+        ApiCollection<TestResource> expected = createExpectedCollection(0, 900, 200, 400, 200, 300);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -103,9 +103,9 @@ public class APICollectionV2BuilderTest {
         int pageStart = 900;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(900, 1000);
-        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
+        ApiCollection<TestResource> actual = ApiCollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
-        APICollection<TestResource> expected = createExpectedCollection(0, 900, 800, -1, 900, 1000);
+        ApiCollection<TestResource> expected = createExpectedCollection(0, 900, 800, -1, 900, 1000);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -114,7 +114,7 @@ public class APICollectionV2BuilderTest {
         int pageStart = 4;
         int maxPageSize = 300;
         List<TestResource> resources = testResourcesList.subList(900, 1000);
-        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
+        ApiCollection<TestResource> actual = ApiCollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
         Assertions.assertEquals(100, actual.getItem().size());
     }
@@ -124,7 +124,7 @@ public class APICollectionV2BuilderTest {
         int pageStart = 1;
         int maxPageSize = 100;
         List<TestResource> resources = testResourcesList.subList(200, 300);
-        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
+        ApiCollection<TestResource> actual = ApiCollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
         Assertions.assertEquals(customJson, actual.getSelf().getType());
     }
@@ -134,7 +134,7 @@ public class APICollectionV2BuilderTest {
         int pageStart = 0;
         int maxPageSize = 100;
         List<TestResource> resources = Collections.emptyList();
-        APICollection<TestResource> actual = APICollectionBuilder.from(resources, requestURI)
+        ApiCollection<TestResource> actual = ApiCollectionBuilder.from(resources, requestURI)
                 .collectionSize(0).withNavigation(pageStart, maxPageSize).build(customJson);
         Assertions.assertEquals(0, actual.getItem().size());
     }

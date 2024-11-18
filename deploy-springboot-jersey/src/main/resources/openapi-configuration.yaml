@@ -1,2 +1,2 @@
 scannerClass: io.swagger.v3.jaxrs2.integration.JaxrsApplicationScanner
-filterClass: simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter
+filterClass: simplyrestful.api.framework.swagger.SimplyRestfulOpenApiFilter

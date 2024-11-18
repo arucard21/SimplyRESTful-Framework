@@ -18,11 +18,11 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.api.crud.DefaultCreate;
 import simplyrestful.api.framework.api.crud.DefaultExists;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.utils.WebResourceUtils;
 
-public interface DefaultCollectionPost<T extends APIResource> extends DefaultExists, DefaultCreate<T> {
+public interface DefaultCollectionPost<T extends ApiResource> extends DefaultExists, DefaultCreate<T> {
     public static final String ERROR_RESOURCE_WITH_ID_EXISTS = "A resource with the same ID already exists. Try to update the resource with a PUT request to the URI for that resource.";
 
     /**

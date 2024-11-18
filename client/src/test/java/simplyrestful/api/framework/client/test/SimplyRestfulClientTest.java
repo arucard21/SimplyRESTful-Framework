@@ -8,17 +8,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.GenericType;
-import simplyrestful.api.framework.client.SimplyRESTfulClient;
+import simplyrestful.api.framework.client.SimplyRestfulClient;
 import simplyrestful.api.framework.client.test.implementation.TestResource;
-import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.ApiCollection;
 
 @ExtendWith(MockitoExtension.class)
-public class SimplyRESTfulClientTest {
+public class SimplyRestfulClientTest {
 	@Mock
 	Client client;
 
 	@Test
 	public void clientFactory_shouldUseProvidedJaxrsClientInClientAndRegisterRequiredProviders() {
-		Assertions.assertDoesNotThrow(() -> new SimplyRESTfulClient<TestResource>(client, null, new GenericType<APICollection<TestResource>>() {}));
+		Assertions.assertDoesNotThrow(() -> new SimplyRestfulClient<TestResource>(client, null, new GenericType<ApiCollection<TestResource>>() {}));
 	}
 }

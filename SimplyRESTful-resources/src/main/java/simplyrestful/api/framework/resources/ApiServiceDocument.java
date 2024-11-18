@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import jakarta.ws.rs.core.MediaType;
 
-public class APIServiceDocument extends APIResource {
+public class ApiServiceDocument extends ApiResource {
 	public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-servicedocument-v1+json";
 	private Link describedBy;
 
@@ -37,7 +37,7 @@ public class APIServiceDocument extends APIResource {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		APIServiceDocument other = (APIServiceDocument) obj;
+		ApiServiceDocument other = (ApiServiceDocument) obj;
 		return Objects.equals(describedBy, other.describedBy);
 	}
 }

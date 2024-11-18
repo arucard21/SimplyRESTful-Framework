@@ -9,9 +9,9 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
-import simplyrestful.api.framework.swagger.SimplyRESTfulOpenApiFilter;
+import simplyrestful.api.framework.swagger.SimplyRestfulOpenApiFilter;
 
-public class AdrOpenApiFilter extends SimplyRESTfulOpenApiFilter {
+public class AdrOpenApiFilter extends SimplyRestfulOpenApiFilter {
 	/**
 	 * Add the API-Version HTTP header to every response, as required by the NLGov ADR.
 	 */

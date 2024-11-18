@@ -8,7 +8,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import simplyrestful.api.framework.resources.test.TestResource;
 
-public class APIResourceTest{
+public class ApiResourceTest{
 	public static final String TEST_RESOURCE_HREF_1 = "local://docs/resources/testresource/1";
 	public static final String TEST_RESOURCE_HREF_2 = "local://docs/resources/testresource/2";
 

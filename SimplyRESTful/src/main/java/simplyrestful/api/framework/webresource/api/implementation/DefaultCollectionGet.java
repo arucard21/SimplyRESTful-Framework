@@ -15,9 +15,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.api.crud.DefaultCount;
 import simplyrestful.api.framework.api.crud.DefaultList;
-import simplyrestful.api.framework.collection.APICollectionBuilder;
-import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.collection.ApiCollectionBuilder;
+import simplyrestful.api.framework.resources.ApiCollection;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.utils.QueryParamUtils;
 
 /**
@@ -26,7 +26,7 @@ import simplyrestful.api.framework.utils.QueryParamUtils;
  * If no preference is given for the type of collection resource, this will return the most recent version of the
  * collection resource in plain JSON format, using a custom JSON media type.
  */
-public interface DefaultCollectionGet<T extends APIResource> extends DefaultList<T>, DefaultCount {
+public interface DefaultCollectionGet<T extends ApiResource> extends DefaultList<T>, DefaultCount {
 	public static final String QUERY_PARAM_PAGE_START = "pageStart";
     public static final String QUERY_PARAM_PAGE_SIZE = "pageSize";
     public static final String QUERY_PARAM_FIELDS = "fields";
@@ -56,9 +56,9 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
      * @return the paginated collection of resources.
      */
     @GET
-    @Produces(APICollection.MEDIA_TYPE_JSON)
+    @Produces(ApiCollection.MEDIA_TYPE_JSON)
     @Operation(description = "Retrieve a filtered, sorted collection of API resources.")
-    default APICollection<T> listAPIResources(
+    default ApiCollection<T> listAPIResources(
     		@Context
 		    UriInfo uriInfo,
 		    @QueryParam(QUERY_PARAM_PAGE_START)
@@ -70,7 +70,7 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		    @Parameter(description = "The amount of resources shown on each page", required = false)
 		    int pageSize,
 		    @QueryParam(QUERY_PARAM_FIELDS)
-		    @DefaultValue(APICollection.FIELDS_VALUE_DEFAULT)
+		    @DefaultValue(ApiCollection.FIELDS_VALUE_DEFAULT)
 		    @Parameter(description = "The fields that should be retrieved", required = false)
 		    List<String> fields,
 		    @QueryParam(QUERY_PARAM_QUERY)
@@ -81,20 +81,20 @@ public interface DefaultCollectionGet<T extends APIResource> extends DefaultList
 		    @DefaultValue(QUERY_PARAM_SORT_DEFAULT)
 		    @Parameter(description = "The fields on which the resources should be sorted", required = false)
 		    List<String> sort) {
-    	MediaType collectionType = MediaType.valueOf(APICollection.MEDIA_TYPE_JSON);
+    	MediaType collectionType = MediaType.valueOf(ApiCollection.MEDIA_TYPE_JSON);
 		List<T> resources = this.list(pageStart, pageSize, fields, query, QueryParamUtils.parseSort(sort));
 		if(!resources.isEmpty()) {
 			MediaType resourceMediaType = resources.get(0).customJsonMediaType();
-			if(!collectionType.getParameters().containsKey(APICollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE)) {
+			if(!collectionType.getParameters().containsKey(ApiCollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE)) {
 				Map<String, String> mediaTypeParameters = new HashMap<>(collectionType.getParameters());
-				mediaTypeParameters.put(APICollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE, resourceMediaType.toString());
+				mediaTypeParameters.put(ApiCollection.MEDIA_TYPE_PARAMETER_ITEM_TYPE, resourceMediaType.toString());
 				collectionType = new MediaType(
 						collectionType.getType(),
 						collectionType.getSubtype(),
 						mediaTypeParameters);
 			}
 		}
-		return APICollectionBuilder.from(resources, uriInfo.getRequestUri())
+		return ApiCollectionBuilder.from(resources, uriInfo.getRequestUri())
 				.withNavigation(pageStart, pageSize)
 				.collectionSize(this.count(query))
 				.build(collectionType);

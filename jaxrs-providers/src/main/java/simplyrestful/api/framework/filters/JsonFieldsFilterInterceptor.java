@@ -11,7 +11,7 @@ import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.WriterInterceptor;
 import jakarta.ws.rs.ext.WriterInterceptorContext;
 import simplyrestful.api.framework.outputstream.json.JsonFieldsFilterOutputStream;
-import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.ApiCollection;
 import simplyrestful.api.framework.utils.MediaTypeUtils;
 import simplyrestful.api.framework.utils.QueryParamUtils;
 
@@ -42,7 +42,7 @@ public class JsonFieldsFilterInterceptor implements WriterInterceptor {
 		List<String> fieldsQueryParameters = uriInfo.getQueryParameters().get(QueryParamUtils.QUERY_PARAM_FIELDS);
 		if(fieldsQueryParameters == null) {
 			if(isApiCollection(context.getMediaType())) {
-				fieldsQueryParameters = List.of(APICollection.FIELDS_VALUE_DEFAULT);
+				fieldsQueryParameters = List.of(ApiCollection.FIELDS_VALUE_DEFAULT);
 			}
 			else {
 				context.proceed();
@@ -57,7 +57,7 @@ public class JsonFieldsFilterInterceptor implements WriterInterceptor {
 	}
 
 	private boolean isApiCollection(MediaType mediaType) {
-		return MediaType.valueOf(APICollection.MEDIA_TYPE_JSON).equals(mediaType);
+		return MediaType.valueOf(ApiCollection.MEDIA_TYPE_JSON).equals(mediaType);
 	}
 
 	/**

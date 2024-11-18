@@ -5,12 +5,12 @@ import java.util.List;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
-import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiCollection;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
-public class APICollectionBuilder<T extends APIResource> {
+public class ApiCollectionBuilder<T extends ApiResource> {
 	public static final int START_OF_FIRST_PAGE = 0;
     private final List<T> resources;
     private final URI requestURI;
@@ -25,11 +25,11 @@ public class APICollectionBuilder<T extends APIResource> {
      * @param requestURI is the request URI used to request this collection from the API.
      * @return the builder object.
      */
-	public static <T extends APIResource> APICollectionBuilder<T> from(List<T> resources, URI requestURI) {
-		return new APICollectionBuilder<T>(resources, requestURI);
+	public static <T extends ApiResource> ApiCollectionBuilder<T> from(List<T> resources, URI requestURI) {
+		return new ApiCollectionBuilder<T>(resources, requestURI);
 	}
 
-	private APICollectionBuilder(List<T> resources, URI requestURI) {
+	private ApiCollectionBuilder(List<T> resources, URI requestURI) {
 		this.resources = resources;
 		this.requestURI = requestURI;
 	}
@@ -43,7 +43,7 @@ public class APICollectionBuilder<T extends APIResource> {
      * @param pageSize is the maximum size of each page.
      * @return this builder object.
      */
-	public APICollectionBuilder<T> withNavigation(int pageStart, int pageSize) {
+	public ApiCollectionBuilder<T> withNavigation(int pageStart, int pageSize) {
 		this.pageStart = pageStart;
 		this.pageSize = pageSize;
 		return this;
@@ -58,13 +58,13 @@ public class APICollectionBuilder<T extends APIResource> {
      * @param collectionSize is the size of the entire collection
      * @return this build object.
      */
-	public APICollectionBuilder<T> collectionSize(int collectionSize) {
+	public ApiCollectionBuilder<T> collectionSize(int collectionSize) {
 		this.collectionSize = collectionSize;
 		return this;
 	}
 
-    public APICollection<T> build(MediaType type) {
-    	APICollection<T> collection = new APICollection<T>();
+    public ApiCollection<T> build(MediaType type) {
+    	ApiCollection<T> collection = new ApiCollection<T>();
     	collection.setSelf(new Link(requestURI, type));
     	collection.setItem(this.resources);
 
@@ -77,7 +77,7 @@ public class APICollectionBuilder<T extends APIResource> {
     	return collection;
     }
 
-    private void includeNavigation(APICollection<T> collection) {
+    private void includeNavigation(ApiCollection<T> collection) {
     	MediaType collectionType = collection.getSelf().getType();
 
 		collection.setFirst(createLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE, collectionType));

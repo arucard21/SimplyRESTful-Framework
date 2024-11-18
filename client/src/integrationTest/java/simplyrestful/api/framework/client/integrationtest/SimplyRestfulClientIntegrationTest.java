@@ -22,24 +22,24 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.GenericType;
-import simplyrestful.api.framework.client.SimplyRESTfulClient;
-import simplyrestful.api.framework.client.SimplyRESTfulClientFactory;
+import simplyrestful.api.framework.client.SimplyRestfulClient;
+import simplyrestful.api.framework.client.SimplyRestfulClientFactory;
 import simplyrestful.api.framework.client.integrationtest.integrationtest.implementation.TestResource;
 import simplyrestful.api.framework.client.integrationtest.integrationtest.implementation.TestWebResource;
 import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
-import simplyrestful.api.framework.resources.APICollection;
+import simplyrestful.api.framework.resources.ApiCollection;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
 @ExtendWith(MockitoExtension.class)
-public class SimplyRESTfulClientIntegrationTest extends JerseyTest {
+public class SimplyRestfulClientIntegrationTest extends JerseyTest {
     public static final UUID UUID_NIL = UUID.fromString("00000000-0000-0000-0000-000000000000");
     public static final URI INVALID_RESOURCE_URI_DIFFERENT_HOST = URI
             .create("http://invalid-host/testresources/" + UUID_NIL.toString());
     public static final URI INVALID_RESOURCE_URI_DIFFERENT_PATH = URI
             .create(TestWebResource.getBaseUri() + "/different/path/testresources/" + UUID_NIL.toString());
-    private SimplyRESTfulClient<TestResource> simplyRESTfulClient;
+    private SimplyRestfulClient<TestResource> simplyRESTfulClient;
 
     @BeforeEach
     @Override
@@ -59,8 +59,8 @@ public class SimplyRESTfulClientIntegrationTest extends JerseyTest {
     	Client testClient = client();
     	testClient.register(JacksonJsonProvider.class);
     	testClient.register(ObjectMapperProvider.class);
-        simplyRESTfulClient = Assertions.assertDoesNotThrow(() -> new SimplyRESTfulClientFactory<TestResource>(testClient)
-                .newClient(getBaseUri(), new GenericType<APICollection<TestResource>>() {}));
+        simplyRESTfulClient = Assertions.assertDoesNotThrow(() -> new SimplyRestfulClientFactory<TestResource>(testClient)
+                .newClient(getBaseUri(), new GenericType<ApiCollection<TestResource>>() {}));
         Assertions.assertNotNull(simplyRESTfulClient, "The SimplyRESTful client could not be created correctly");
         simplyRESTfulClient.discoverResourceUri(null);
     }

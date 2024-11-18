@@ -2,9 +2,9 @@ package simplyrestful.api.framework.api.crud;
 
 import java.util.UUID;
 
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultUpdate<T extends APIResource> {
+public interface DefaultUpdate<T extends ApiResource> {
     /**
      * Update the existing resource in the data store where it is stored.
      *

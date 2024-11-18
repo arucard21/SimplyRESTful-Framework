@@ -13,11 +13,11 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.ws.rs.core.MediaType;
-import simplyrestful.api.framework.resources.APICollection;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiCollection;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.utils.MediaTypeUtils;
 
-public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
+public class SimplyRestfulOpenApiFilter extends AbstractSpecFilter {
 	public static final String MEDIA_TYPE_PARAMETER_NAME_QS = "qs";
 
 	/**
@@ -55,14 +55,14 @@ public class SimplyRESTfulOpenApiFilter extends AbstractSpecFilter {
 	}
 
 	/**
-	 * Remove the schema that's detected for the {@link APICollection} or {@link APIResource} parent class.
+	 * Remove the schema that's detected for the {@link ApiCollection} or {@link ApiResource} parent class.
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
 			Map<String, List<String>> headers) {
-		String apiResourceSchemaName = APIResource.class.getSimpleName();
-		String apiCollectionParentSchemaName = APICollection.class.getSimpleName();
+		String apiResourceSchemaName = ApiResource.class.getSimpleName();
+		String apiCollectionParentSchemaName = ApiCollection.class.getSimpleName();
 		String apiCollectionSchemaName = apiCollectionParentSchemaName + apiResourceSchemaName;
 		String schemaName = schema.getName();
 		if (

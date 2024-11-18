@@ -16,10 +16,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
 import simplyrestful.api.framework.api.crud.DefaultStream;
-import simplyrestful.api.framework.resources.APIResource;
+import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.utils.QueryParamUtils;
 
-public interface DefaultCollectionGetEventStream<T extends APIResource> extends DefaultStream<T> {
+public interface DefaultCollectionGetEventStream<T extends ApiResource> extends DefaultStream<T> {
 	public static final String SSE_END_OF_COLLECTION_TOKEN = "end-of-collection";
 
 	/**
