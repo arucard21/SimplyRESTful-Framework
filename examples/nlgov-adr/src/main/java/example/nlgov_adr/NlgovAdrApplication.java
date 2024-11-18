@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -19,7 +18,7 @@ import jakarta.servlet.Filter;
 /**
  * Run the API server with the example endpoint and resource.
  */
-@SpringBootApplication(exclude = WebMvcAutoConfiguration.class)
+@SpringBootApplication
 @EntityScan("example.resources.jpa")
 @OpenAPIDefinition( info = @Info(title = "test title", description = "test description", version = "1.0.0"))
 public class NlgovAdrApplication {
