@@ -44,8 +44,6 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -69,11 +67,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 	public static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
 	private ExampleRepository repo;
 	@Context
-	ResourceInfo resourceInfo;
-	@Context
 	UriInfo uriInfo;
-	@Context
-	ContainerRequestContext requestContext;
 
 	@Inject
 	public ExampleWebResource(ExampleRepository repo) {
@@ -183,11 +177,11 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 		}
 		if (persistedResource.getSelf() == null) {
 			persistedResource.setSelf(new Link(
-					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)).path(persistedResource.getUUID().toString()).build(),
+					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, ExampleWebResource.class, null)).path(persistedResource.getUUID().toString()).build(),
 					MediaType.valueOf(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)));
 		}
 		if (persistedResource.getUUID() == null) {
-			UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo)
+			UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, ExampleWebResource.class, null)
 					.relativize(persistedResource.getSelf().getHref())
 					.getPath());
 			persistedResource.setUUID(id);
@@ -236,13 +230,13 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 
 
 	@Override
-	public Response postAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.postAPIResource(resourceInfo, uriInfo, resource);
+	public Response postAPIResource(UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.postAPIResource(uriInfo, resource);
 	}
 
 	@Override
-	public Response putAPIResource(ResourceInfo resourceInfo, UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.putAPIResource(resourceInfo, uriInfo, id, resource);
+	public Response putAPIResource(UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.putAPIResource(uriInfo, id, resource);
 	}
 
 	@Override

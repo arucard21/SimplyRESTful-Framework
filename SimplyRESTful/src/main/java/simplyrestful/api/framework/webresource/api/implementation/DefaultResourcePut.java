@@ -12,7 +12,6 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -47,7 +46,6 @@ public interface DefaultResourcePut<T extends ApiResource> extends ResourceExist
      * The resource may contain a self-link. This self-link must match the id provided
      * through the URL. If it does not match, a "400 Bad Request" error is returned.
      * </p>
-     * @param resourceInfo is a JAX-RS context object.
      * @param uriInfo is a JAX-RS context object.
      * @param id is the UUID part from the entire URI identifier of the resource.
      * @param resource is the updated resource.
@@ -65,8 +63,6 @@ public interface DefaultResourcePut<T extends ApiResource> extends ResourceExist
     		description = "The self-link in the API resource does not match the link through which the API was accessed, or the request is otherwise malformed.")
     default Response putAPIResource(
     		@Context
-            ResourceInfo resourceInfo,
-            @Context
             UriInfo uriInfo,
     		@PathParam("id")
     	    @NotNull
@@ -81,11 +77,11 @@ public interface DefaultResourcePut<T extends ApiResource> extends ResourceExist
     	}
     	if(resource.getSelf() == null) {
     	    resource.setSelf(new Link(
-    	                    WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, id),
+    	                    WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, id),
     	                    resource.customJsonMediaType()));
     	}
     	else {
-    	    UUID resourceIdFromSelf = WebResourceUtils.parseUuidFromResourceUri(resourceInfo, uriInfo, resource.getSelf().getHref());
+    	    UUID resourceIdFromSelf = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.getSelf().getHref());
     	    if (resourceIdFromSelf == null) {
                     throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
                 }

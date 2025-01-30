@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
@@ -36,7 +35,6 @@ public interface DefaultCollectionPost<T extends ApiResource> extends ResourceEx
     /**
      * Create a resource.
      *
-     * @param resourceInfo is a JAX-RS context object.
      * @param uriInfo is a JAX-RS context object.
      * @param resource is a resource that should be created.
      * @return a "201 Created" response for the resource that was created,
@@ -59,8 +57,6 @@ public interface DefaultCollectionPost<T extends ApiResource> extends ResourceEx
     		description = "The self-link in the API resource conflicts with an existing API resource so it could not be created")
 	default Response postAPIResource(
     		@Context
-            ResourceInfo resourceInfo,
-            @Context
             UriInfo uriInfo,
             @NotNull
             @Valid
@@ -68,7 +64,7 @@ public interface DefaultCollectionPost<T extends ApiResource> extends ResourceEx
             T resource) {
     	UUID resourceId;
     	if(resource.getSelf() != null) {
-    	    resourceId = WebResourceUtils.parseUuidFromResourceUri(resourceInfo, uriInfo, resource.getSelf().getHref());
+    	    resourceId = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.getSelf().getHref());
     	    if (this.exists(resourceId)) {
     	    	throw new ClientErrorException(ERROR_RESOURCE_WITH_ID_EXISTS, Response.Status.CONFLICT);
     	    }
@@ -76,7 +72,7 @@ public interface DefaultCollectionPost<T extends ApiResource> extends ResourceEx
     	else {
     	    resourceId = UUID.randomUUID();
     	    resource.setSelf(new Link(
-    	    		WebResourceUtils.getAbsoluteWebResourceURI(resourceInfo, uriInfo, resourceId),
+    	    		WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, resourceId),
     	    		resource.customJsonMediaType()));
     	}
     	T updatedResource = this.create(resource, resourceId);

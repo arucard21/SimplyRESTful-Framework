@@ -11,18 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.test.implementation.TestResource;
 import simplyrestful.api.framework.test.implementation.TestWebResource;
@@ -49,8 +46,6 @@ public class DefaultWebResourceTest {
     @Mock
     private ContainerRequestContext requestContext;
     @Mock
-    private ResourceInfo resourceInfo;
-    @Mock
     private UriInfo uriInfo;
     @Mock
     private HttpHeaders httpHeaders;
@@ -65,17 +60,13 @@ public class DefaultWebResourceTest {
 
     @Test
     public void endpoint_shouldThrowClientErrorExceptionWhenResourceAlreadyExists_withPOSTonResource() {
-        Mockito.doReturn(TestWebResource.class).when(resourceInfo).getResourceClass();
-        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
         Assertions.assertThrows(ClientErrorException.class,
-                () -> testEndpoint.postAPIResource(resourceInfo, uriInfo, TestResource.testInstance(TEST_BASE_URI)));
+                () -> testEndpoint.postAPIResource(uriInfo, TestResource.testInstance(TEST_BASE_URI)));
     }
 
     @Test
     public void endpoint_shouldThrowBadRequestWhenIDDoesNotMatchResource_withPUTonResource() {
-        Mockito.doReturn(TestWebResource.class).when(resourceInfo).getResourceClass();
-        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromUri(TEST_BASE_URI));
-        Assertions.assertThrows(BadRequestException.class, () -> testEndpoint.putAPIResource(resourceInfo, uriInfo,
+    	Assertions.assertThrows(BadRequestException.class, () -> testEndpoint.putAPIResource(uriInfo,
                 TestResource.TEST_RESOURCE_ID, TestResource.custom(TEST_BASE_URI, UUID.randomUUID())));
     }
 

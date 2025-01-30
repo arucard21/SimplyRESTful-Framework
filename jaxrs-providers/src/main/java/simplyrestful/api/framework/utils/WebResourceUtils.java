@@ -1,9 +1,10 @@
 package simplyrestful.api.framework.utils;
 
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
-import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.UriInfo;
 
 public interface WebResourceUtils {
@@ -20,7 +21,7 @@ public interface WebResourceUtils {
      *                    URI is requested.
      * @return the absolute URI for the resource on the requested endpoint.
      */
-    public static URI getAbsoluteWebResourceURI(UriInfo uriInfo, Class<?> webResource, UUID id) {
+    public static URI getAbsoluteWebResourceUri(UriInfo uriInfo, Class<?> webResource, UUID id) {
         if (id == null) {
             return uriInfo.getBaseUriBuilder().path(webResource).build();
         }
@@ -28,35 +29,42 @@ public interface WebResourceUtils {
     }
 
     /**
-     * Get the absolute URI for the web resource with the given ID.
+     * Get the absolute URI of the current request URI with the provided UUID appended to it.
      *
-     * Example:
-     * https://example.com/api/resource/00000000-0000-0000-0000-000000000000
+     * Any query parameter, matrix parameters, and fragments are removed from the request URI.
      *
-     * @param id is the ID of the resource provided on the endpoint.
-     * @return the absolute URI for the resource on the endpoint.
+     * @param uriInfo is a JAX-RS context object that contains the current request URI.
+     * @param id is the UUID of the resource (must not be null)
+     * @return the absolute URI of the current request URI with the provided UUID appended to it.
      */
-    public static URI getAbsoluteWebResourceURI(ResourceInfo resourceInfo, UriInfo uriInfo, UUID id) {
-        return getAbsoluteWebResourceURI(uriInfo, resourceInfo.getResourceClass(), id);
+    public static URI getAbsoluteWebResourceUri(UriInfo uriInfo, UUID id) {
+        return uriInfo.getRequestUriBuilder()
+        		.replaceQuery(null)
+        		.replaceMatrix(null)
+        		.fragment(null)
+        		.path(id.toString())
+        		.build();
     }
 
     /**
-     * Get the absolute base URI for this web resource.
+     * Get the absolute URI of the current request URI.
      *
-     * Example: https://example.com/api/resource/
+     * Any query parameter, matrix parameters, and fragments are removed from the request URI.
      *
-     * @return the absolute base URI for this resource
+     * @param uriInfo is a JAX-RS context object that contains the current request URI.
+     * @return the absolute URI of the current request URI.
      */
-    public static URI getAbsoluteWebResourceURI(ResourceInfo resourceInfo, UriInfo uriInfo) {
-        return getAbsoluteWebResourceURI(resourceInfo, uriInfo, null);
-    }
+	public static URI getAbsoluteWebResourceUri(UriInfo uriInfo) {
+		return uriInfo.getRequestUriBuilder()
+				.replaceQuery(null)
+				.replaceMatrix(null)
+				.fragment(null)
+				.build();
+	}
 
-    public static UUID parseUuidFromResourceUri(ResourceInfo resourceInfo, UriInfo uriInfo, URI resourceUri) {
-        URI relativizedResourceUri = getAbsoluteWebResourceURI(resourceInfo, uriInfo).relativize(resourceUri);
-        if (relativizedResourceUri.equals(resourceUri)) {
-            return null;
-        }
-        UUID resourceIdFromSelf = UUID.fromString(relativizedResourceUri.getPath());
-        return resourceIdFromSelf;
+    public static UUID parseUuidFromLastSegmentOfUri(URI resourceUri) {
+    	Path uriPath = Paths.get(resourceUri.getPath());
+    	String lastSegment = uriPath.getName(uriPath.getNameCount() - 1).toString();
+    	return UUID.fromString(lastSegment);
     }
 }
