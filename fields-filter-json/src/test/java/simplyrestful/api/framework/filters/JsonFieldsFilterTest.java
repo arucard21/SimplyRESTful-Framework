@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -111,7 +110,6 @@ public class JsonFieldsFilterTest {
         Assertions.assertEquals(filtered, actualJson);
     }
 
-    @Disabled("Broken when run with Gradle but works in IDE")
     @ParameterizedTest
     @MethodSource("getAllTestConfigurations")
     public void testFieldsFilterOutputStream(String originalJsonFile, String filteredJsonFile, List<String> fields) throws IOException {
@@ -122,8 +120,6 @@ public class JsonFieldsFilterTest {
     	){
     		Assertions.assertNotNull(originalJsonInputStream);
 
-    		// FIXME When this test is run in Gradle, some of the OpenAPI-based JSON files are empty when loaded. Those same files
-    		// are fine in the test above. Needs to be looked into further.
     		originalJsonInputStream.transferTo(jsonFieldsFilterOutputStream);
     		String filteredJsonString = byteOutputStream.toString(StandardCharsets.UTF_8);
     		JsonStructure filteredJsonStructure = Json.createReader(new StringReader(filteredJsonString)).read();

@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 import simplyrestful.api.framework.filters.JsonFieldsFilter;
@@ -20,10 +19,10 @@ import simplyrestful.api.framework.filters.JsonFieldsFilter;
  * output stream will do nothing and write the byte directly to the underlying output
  * stream without buffering it.
  *
- * Unlike the BufferedOutputStream, this output stream will not flush the buffer to the
- * underlying stream when it is filled. Instead, it will increase the buffer size until an
- * entire JSON object or array is written. Only then will the buffer be written to the
- * underlying stream and the buffer size will be reset.
+ * Unlike the BufferedOutputStream, this output stream cannot flush the buffer to the
+ * underlying stream when it is filled. It needs to continue until an entire JSON object
+ * or array is written. So this output stream will not work for JSON documents larger
+ * than the maximum buffer size, currently set at 1MiB.
  *
  */
 public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
@@ -46,7 +45,7 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 	/**
 	 * The initial size of the buffer for this OutputStream.
 	 */
-	public static final int INITIAL_BUFFER_SIZE = 8192;
+	public static final int MAX_BUFFER_SIZE = 1024*1024;
 
 	private final List<String> fields;
 
@@ -69,7 +68,7 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 	 * @param fields is the set of fields on which to filter.
 	 */
 	public JsonFieldsFilterOutputStream(OutputStream out, List<String> fields) {
-		super(out, INITIAL_BUFFER_SIZE);
+		super(out, MAX_BUFFER_SIZE);
 		this.fields = fields;
 	}
 
@@ -80,7 +79,6 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 			out.write(b);
 			return;
 		}
-		ensureBufferSize(1);
 		super.write(b);
 
 		updateNestingLevel(asByteArray(b), 1);
@@ -96,7 +94,6 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 			out.write(b, off, len);
 			return;
 		}
-		ensureBufferSize(len);
 		super.write(b, off, len);
 
 		updateNestingLevel(b, len);
@@ -127,14 +124,6 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 		return new byte[] { (byte) b };
 	}
 
-	private void ensureBufferSize(int amountToBeAdded) {
-		int estimatedBufferSize = count + amountToBeAdded;
-		if(estimatedBufferSize >= buf.length) {
-			int newBufferSize = estimatedBufferSize + INITIAL_BUFFER_SIZE;
-			buf = Arrays.copyOf(buf, newBufferSize);
-		}
-	}
-
 	private void updateNestingLevel(byte[] b, int len) {
 		String written = new String(b, 0, len, StandardCharsets.UTF_8);
 		long amountOfNestingStarts = written.chars()
@@ -159,7 +148,7 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 
 	private void reset() {
 		count = 0;
-		buf = new byte[INITIAL_BUFFER_SIZE];
+		buf = new byte[MAX_BUFFER_SIZE];
 		isJsonObject = false;
 		isJsonArray = false;
 		nestingLevel = 0;
