@@ -4,7 +4,12 @@ import java.util.UUID;
 
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultCreate<T extends ApiResource> {
+/**
+ * Interface for creating a new API resource.
+ *
+ * @param <T>is the API resource class used in the JAX-RS WebResource.
+ */
+public interface ResourceCreate<T extends ApiResource> {
     /**
      * Create the resource in the data store where it is stored.
      *

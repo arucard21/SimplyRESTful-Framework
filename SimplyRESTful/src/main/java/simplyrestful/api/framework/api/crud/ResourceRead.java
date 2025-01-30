@@ -4,7 +4,12 @@ import java.util.UUID;
 
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultRead<T extends ApiResource> {
+/**
+ * Interface for retrieving an API resource.
+ *
+ * @param <T>is the API resource class used in the JAX-RS WebResource.
+ */
+public interface ResourceRead<T extends ApiResource> {
     /**
      * Retrieve the resource from the data store where it is stored.
      *

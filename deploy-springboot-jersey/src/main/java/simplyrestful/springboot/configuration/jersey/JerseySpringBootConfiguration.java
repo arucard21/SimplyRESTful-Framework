@@ -19,6 +19,11 @@ import simplyrestful.api.framework.filters.UriCustomizer;
 import simplyrestful.api.framework.providers.ObjectMapperProvider;
 import simplyrestful.api.framework.servicedocument.WebResourceRoot;
 
+/**
+ * This class configures Jersey for SimplyRESTful using a Spring auto-configuration mechanism.
+ *
+ * It registers the required JAX-RS providers and endpoints, and enables the required Jersey features.
+ */
 @AutoConfiguration
 public class JerseySpringBootConfiguration implements ResourceConfigCustomizer {
     @Override

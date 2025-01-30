@@ -11,6 +11,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.Provider;
 
+/**
+ * A JAX-RS provider to provide a Jackson ObjectMapper configured as needed by SimplyRESTful.
+ */
 @Named
 @Provider
 @Produces(MediaType.WILDCARD)
@@ -18,6 +21,9 @@ import jakarta.ws.rs.ext.Provider;
 public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
     private final ObjectMapper mapper;
 
+    /**
+     * Create a new instance of this JAX-RS provider.
+     */
     public ObjectMapperProvider() {
         this.mapper = createMapper();
     }

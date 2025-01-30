@@ -13,20 +13,27 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
-import simplyrestful.api.framework.api.crud.DefaultRead;
+import simplyrestful.api.framework.api.crud.ResourceRead;
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultResourceGet<T extends ApiResource> extends DefaultRead<T> {
+/**
+ * Provide a default implementation for retrieving the API resource.
+ *
+ * @param <T> is the API resource class that used in the JAX-RS WebResource.
+ */
+public interface DefaultResourceGet<T extends ApiResource> extends ResourceRead<T> {
+	/**
+	 * The default value for the "fields" query parameter when retrieving an API resource.
+	 */
 	public static final String QUERY_PARAM_FIELDS_DEFAULT = "all";
 
 	/**
      * Retrieve a resource.
      *
-     * @param requestContext is a JAX-RS context object.
-     * @param resourceInfo is a JAX-RS context object.
-     * @param uriInfo is a JAX-RS context object.
-     * @param httpHeaders is a JAX-RS context object.
      * @param id is the UUID part from the entire URI identifier of the resource.
+     * @param fields is a list that defines which fields should be retrieved. This is only included for convenience as
+     * it is already handled by the framework. It can be used to filter on these fields in the backend as well, e.g. to
+     * improve performance.
      * @return the requested resource.
      */
     @Path("/{id}")

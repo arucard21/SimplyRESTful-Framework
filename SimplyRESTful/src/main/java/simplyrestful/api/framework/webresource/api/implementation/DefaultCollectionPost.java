@@ -16,18 +16,28 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import simplyrestful.api.framework.api.crud.DefaultCreate;
-import simplyrestful.api.framework.api.crud.DefaultExists;
+import simplyrestful.api.framework.api.crud.ResourceCreate;
+import simplyrestful.api.framework.api.crud.ResourceExists;
 import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.utils.WebResourceUtils;
 
-public interface DefaultCollectionPost<T extends ApiResource> extends DefaultExists, DefaultCreate<T> {
+/**
+ * Provide a default implementation for creating an API resource.
+ *
+ * @param <T> is the API resource class used in the JAX-RS WebResource.
+ */
+public interface DefaultCollectionPost<T extends ApiResource> extends ResourceExists, ResourceCreate<T> {
+	/**
+	 * The error message that is returned when trying to create an API resource with a self link that contains an ID that already exists.
+	 */
     public static final String ERROR_RESOURCE_WITH_ID_EXISTS = "A resource with the same ID already exists. Try to update the resource with a PUT request to the URI for that resource.";
 
     /**
      * Create a resource.
      *
+     * @param resourceInfo is a JAX-RS context object.
+     * @param uriInfo is a JAX-RS context object.
      * @param resource is a resource that should be created.
      * @return a "201 Created" response for the resource that was created,
      *         containing its URI identifier in the Location header, if the resource

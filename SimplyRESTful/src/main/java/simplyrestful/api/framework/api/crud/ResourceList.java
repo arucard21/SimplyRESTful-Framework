@@ -5,7 +5,12 @@ import java.util.List;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultList<T extends ApiResource> {
+/**
+ * Interface for retrieving a collection of API resources.
+ *
+ * @param <T>is the API resource class used in the JAX-RS WebResource, which is contained in the collection.
+ */
+public interface ResourceList<T extends ApiResource> {
     /**
      * Retrieve the paged collection of resources that have been requested.
      *

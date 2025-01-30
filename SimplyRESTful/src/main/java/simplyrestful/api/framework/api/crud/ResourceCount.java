@@ -1,6 +1,9 @@
 package simplyrestful.api.framework.api.crud;
 
-public interface DefaultCount {
+/**
+ * Interface for counting the amount of API resources in a filtered collection. 
+ */
+public interface ResourceCount {
     /**
      * Retrieve how many resources are available after filtering according to the provided query.
      *

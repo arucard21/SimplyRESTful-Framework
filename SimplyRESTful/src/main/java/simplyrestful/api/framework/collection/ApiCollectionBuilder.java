@@ -10,7 +10,15 @@ import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGet;
 
+/**
+ * A builder for the APICollectionV2 object.
+ *
+ * @param <T> is the type of resource that this collection will contain.
+ */
 public class ApiCollectionBuilder<T extends ApiResource> {
+	/**
+	 * The value indicating the offset for the first page of the collection.
+	 */
 	public static final int START_OF_FIRST_PAGE = 0;
     private final List<T> resources;
     private final URI requestURI;
@@ -63,6 +71,13 @@ public class ApiCollectionBuilder<T extends ApiResource> {
 		return this;
 	}
 
+	/**
+	 * Create the ApiCollection according to the builder.
+	 *
+	 * @param type is the media type for this collection, which can include the "item-type" media type parameter
+	 * indicating the media type of the API resource contained in the collection.
+	 * @return the ApiCollection created according to the builder.
+	 */
     public ApiCollection<T> build(MediaType type) {
     	ApiCollection<T> collection = new ApiCollection<T>();
     	collection.setSelf(new Link(requestURI, type));
@@ -111,6 +126,14 @@ public class ApiCollectionBuilder<T extends ApiResource> {
 		return numberOfPages * this.pageSize;
     }
 
+    /**
+     * Create a Link object for the provided URI and media type, updating the "pageStart" parameter in the URI with the provided value.
+     *
+     * @param requestURI is a URI containing the "pageStart" parameter.
+     * @param pageStart is the value to which the "pageStart" parameter in the URI should be updated.
+     * @param type is the media type of the resource at the provided URI, which should typically be an API collection.
+     * @return the created Link object.
+     */
     protected Link createLinkFromURIWithModifiedPageOffset(URI requestURI, int pageStart, MediaType type) {
 		URI modifiedUri = UriBuilder.fromUri(requestURI)
 			.replaceQueryParam(DefaultCollectionGet.QUERY_PARAM_PAGE_START, pageStart)

@@ -6,7 +6,12 @@ import java.util.stream.Stream;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultStream<T extends ApiResource> {
+/**
+ * Interface for retrieving API resources as a stream.
+ *
+ * @param <T>is the API resource class used in the JAX-RS WebResource.
+ */
+public interface ResourceStream<T extends ApiResource> {
     /**
      * Retrieve the stream of resources that have been requested.
      *

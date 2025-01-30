@@ -4,7 +4,12 @@ import java.util.UUID;
 
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultDelete<T extends ApiResource> {
+/**
+ * Interface for creating a new API resource.
+ *
+ * @param <T>is the API resource class used in the JAX-RS WebResource.
+ */
+public interface ResourceDelete<T extends ApiResource> {
     /**
      * Remove a resource from the data store.
      *

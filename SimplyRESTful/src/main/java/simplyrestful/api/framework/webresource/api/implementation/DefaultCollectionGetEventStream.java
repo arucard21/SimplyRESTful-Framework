@@ -15,11 +15,24 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
-import simplyrestful.api.framework.api.crud.DefaultStream;
+import simplyrestful.api.framework.api.crud.ResourceStream;
 import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.utils.QueryParamUtils;
 
-public interface DefaultCollectionGetEventStream<T extends ApiResource> extends DefaultStream<T> {
+/**
+ * Provide an alternative implementation for retrieving the collection resource through
+ * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">server-sent events (SSE)</a>.
+ *
+ * @param <T> is the API resource class that used in the JAX-RS WebResource, which will be contained in the collection resource.
+ */
+public interface DefaultCollectionGetEventStream<T extends ApiResource> extends ResourceStream<T> {
+	/**
+	 * A custom token sent after all items in the collection have been sent.
+	 *
+	 * This token allows the client to recognize that no future events should be expected in this
+	 * event stream and that it will be closed from our end. This allows clients to disconnect the
+	 * event stream cleanly on their end.
+	 */
 	public static final String SSE_END_OF_COLLECTION_TOKEN = "end-of-collection";
 
 	/**
@@ -27,15 +40,17 @@ public interface DefaultCollectionGetEventStream<T extends ApiResource> extends 
      * <p>
      * This uses
      * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">server-sent events (SSE)</a>
-     * to send each resource in the collection as an Event to the API consumer.
+     * to send each resource in the collection as an Event to the API consumer. After all items are sent, a final
+     * event message is sent with a custom token to indicate that the event stream can be closed.
      * </p>
-     * @param requestContext is a JAX-RS context object.
-     * @param fields    is a list that defines which fields should be retrieved. This is only included for convenience
-     * 			as it is already handled by the framework. It can be used to filter on these fields in the backend
-     * 			as well, e.g. to improve performance.
-     * @param query     is a FIQL query that defines how the resources should be filtered.
-     * @param sort      is a list of field names on which the resources should be sorted. This is only included for
-     * 			convenience as it is already handled by the framework.
+     * @param fields is a list that defines which fields should be retrieved. This is only included for convenience
+     * as it is already handled by the framework. It can be used to filter on these fields in the backend
+     * as well, e.g. to improve performance.
+     * @param query is a FIQL query that defines how the resources should be filtered.
+     * @param sort is a list of field names on which the resources should be sorted. This is only included for convenience
+     * as it is already handled by the framework.
+     * @param eventSink is a JAX-RS-provided event sink, which is used to send messages through the event stream.
+     * @param sse is a JAX-RS-provided class instance for creating server-sent-event messages.
 	 * @throws IOException if an I/O error occurs while closing the outbound SSE stream (SseEventSink).
      */
     @GET

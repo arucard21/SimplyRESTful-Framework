@@ -7,8 +7,6 @@ import jakarta.inject.Named;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.PreMatching;
-import jakarta.ws.rs.container.ResourceInfo;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriBuilder;
 
 /**
@@ -24,10 +22,11 @@ import jakarta.ws.rs.core.UriBuilder;
 @Named
 @PreMatching
 public class UriCustomizer implements ContainerRequestFilter {
+	/**
+	 * The name of the property or environment variable that contains the name of the HTTP header
+	 * that should contain the original request URI.
+	 */
 	public static final String CONFIGURATION_PROPERTY_NAME = "SIMPLYRESTFUL_URI_HTTP_HEADER";
-
-	@Context
-	ResourceInfo resourceInfo;
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {

@@ -14,11 +14,41 @@ import jakarta.json.Json;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 
+/**
+ * Filters a JSON document to only show a specific set of fields and their values.
+ */
 public class JsonFieldsFilter {
+	/**
+	 * The dot character which separates a parent field from a child field to allow specifying a nested field.
+	 */
 	public static final String FIELDS_NESTING_SEPARATOR = ".";
-	public static final String FIELDS_NESTING_SEPARATOR_INTERNAL = "\u001F";
+	/**
+	 * The characters that indicate an actual a dot character in the field name that is provided.
+	 */
 	public static final String FIELDS_ESCAPED_DOT = "\\.";
+	/**
+	 * An internal representation of the nesting separator to distinguish it from escaped dots.
+	 *
+	 * This is Unicode character for "Information Separator One".
+	 *
+	 * The replacement of the nesting separator dots with this internal representation is done after
+	 * the escaped dots are replaced with their placeholder. This ensures that dots within an escaped
+	 * dot are not considered as nesting separators.
+	 */
+	public static final String FIELDS_NESTING_SEPARATOR_INTERNAL = "\u001F";
+	/**
+	 * An internal representation of an escaped dot character to distinguish it from a nesting separator.
+	 *
+	 * This is the Unicode character for "Null".
+	 */
 	public static final String FIELDS_ESCAPED_DOT_PLACEHOLDER = "\u0000";
+	/**
+	 * The internal representation of an escaped dot, which is just a normal dot.
+	 *
+	 * This replaces the escaped dot placeholder after the nesting separator has been replaced with its
+	 * internal representation. This ensures that nested fields are separated by the character defined
+	 * internally for it, and that dots are shown as normal dots.
+	 */
 	public static final String FIELDS_ESCAPED_DOT_INTERNAL = ".";
 
     /**

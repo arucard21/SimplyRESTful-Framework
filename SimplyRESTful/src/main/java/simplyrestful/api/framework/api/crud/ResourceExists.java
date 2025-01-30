@@ -2,7 +2,10 @@ package simplyrestful.api.framework.api.crud;
 
 import java.util.UUID;
 
-public interface DefaultExists {
+/**
+ * Interface for checking if an API resource exists.
+ */
+public interface ResourceExists {
     /**
      * Check if a resource, identified by its resourceURI, exists.
      *

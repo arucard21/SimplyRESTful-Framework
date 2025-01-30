@@ -27,10 +27,25 @@ import simplyrestful.api.framework.filters.JsonFieldsFilter;
  *
  */
 public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
+	/**
+	 * The character that defines the start of a JSON object
+	 */
 	public static final char JSON_START_OBJECT_TOKEN = '{';
+	/**
+	 * The character that defines the end of a JSON object
+	 */
 	public static final char JSON_END_OBJECT_TOKEN = '}';
+	/**
+	 * The character that defines the start of a JSON array
+	 */
 	public static final char JSON_START_ARRAY_TOKEN = '[';
+	/**
+	 * The character that defines the end of a JSON array
+	 */
 	public static final char JSON_END_ARRAY_TOKEN = ']';
+	/**
+	 * The initial size of the buffer for this OutputStream.
+	 */
 	public static final int INITIAL_BUFFER_SIZE = 8192;
 
 	private final List<String> fields;
@@ -46,6 +61,13 @@ public class JsonFieldsFilterOutputStream extends BufferedOutputStream {
 	private boolean isJsonObject = false;
 	private boolean isJsonArray = false;
 
+	/**
+	 * Create a new BufferedOutputStream that filters any JSON object or array
+	 * written to the underlying OutputStream according to the provided fields.
+	 *
+	 * @param out is the underlying OutputStream.
+	 * @param fields is the set of fields on which to filter.
+	 */
 	public JsonFieldsFilterOutputStream(OutputStream out, List<String> fields) {
 		super(out, INITIAL_BUFFER_SIZE);
 		this.fields = fields;

@@ -4,7 +4,12 @@ import java.util.UUID;
 
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultUpdate<T extends ApiResource> {
+/**
+ * Interface for updating an API resource.
+ *
+ * @param <T>is the API resource class used in the JAX-RS WebResource.
+ */
+public interface ResourceUpdate<T extends ApiResource> {
     /**
      * Update the existing resource in the data store where it is stored.
      *

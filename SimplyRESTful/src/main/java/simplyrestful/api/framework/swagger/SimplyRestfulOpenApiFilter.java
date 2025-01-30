@@ -17,7 +17,20 @@ import simplyrestful.api.framework.resources.ApiCollection;
 import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.utils.MediaTypeUtils;
 
+/**
+ * A filter that cleans up the generated OpenAPI Specification document.
+ *
+ * Due to technical limitations, the generated OpenAPI Specification document
+ * still contains some details that are incorrect. This filter fixes those
+ * details (as much as possible).
+ */
 public class SimplyRestfulOpenApiFilter extends AbstractSpecFilter {
+	/**
+	 * The name of the media type parameter indicating the server-side preferences.
+	 *
+	 * This media type parameter is defined by JAX-RS. It is similar to the "q" parameter
+	 * for client-side preferences, which is defined for HTTP.
+	 */
 	public static final String MEDIA_TYPE_PARAMETER_NAME_QS = "qs";
 
 	/**

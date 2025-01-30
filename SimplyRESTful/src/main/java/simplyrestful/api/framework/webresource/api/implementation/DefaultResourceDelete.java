@@ -12,10 +12,15 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-import simplyrestful.api.framework.api.crud.DefaultDelete;
+import simplyrestful.api.framework.api.crud.ResourceDelete;
 import simplyrestful.api.framework.resources.ApiResource;
 
-public interface DefaultResourceDelete<T extends ApiResource> extends DefaultDelete<T> {
+/**
+ * Provide a default implementation for deleting the API resource.
+ *
+ * @param <T> is the API resource class that used in the JAX-RS WebResource.
+ */
+public interface DefaultResourceDelete<T extends ApiResource> extends ResourceDelete<T> {
 	/**
      * Delete a resource.
      *

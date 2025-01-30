@@ -16,15 +16,29 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import simplyrestful.api.framework.api.crud.DefaultExists;
-import simplyrestful.api.framework.api.crud.DefaultUpdate;
+import simplyrestful.api.framework.api.crud.ResourceExists;
+import simplyrestful.api.framework.api.crud.ResourceUpdate;
 import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.utils.WebResourceUtils;
 
-public interface DefaultResourcePut<T extends ApiResource> extends DefaultExists, DefaultUpdate<T> {
+/**
+ * Provide a default implementation for updating the API resource.
+ *
+ * @param <T> is the API resource class that used in the JAX-RS WebResource.
+ */
+public interface DefaultResourcePut<T extends ApiResource> extends ResourceExists, ResourceUpdate<T> {
+	/**
+	 * The error message that is returned when trying to update an API resource with a self link that does not match the ID in the request URI.
+	 */
     public static final String ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID = "The provided resource contains an self-link that does not match the ID used in the request";
+    /**
+     * The error message that is returned when trying to update an API resource with a self link URI that does not match the request URI (e.g. in the path preceding the ID or its host name).
+     */
     public static final String ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI = "The identifier of the resource does not correspond to the base URI of this Web Resource";
+    /**
+     * The error message that is returned when trying to update an API resource with an ID in the request URI that does not correspond to any existing resource.
+     */
     public static final String ERROR_RESOURCE_WITH_ID_NOT_EXISTS = "A resource with the provided ID does not exist. Try to create the resource with a POST request to the collection URI.";
 
     /**
@@ -33,6 +47,8 @@ public interface DefaultResourcePut<T extends ApiResource> extends DefaultExists
      * The resource may contain a self-link. This self-link must match the id provided
      * through the URL. If it does not match, a "400 Bad Request" error is returned.
      * </p>
+     * @param resourceInfo is a JAX-RS context object.
+     * @param uriInfo is a JAX-RS context object.
      * @param id is the UUID part from the entire URI identifier of the resource.
      * @param resource is the updated resource.
      * @return "204 No Content" if the resource was updated, "400 Bad Request" if the resource
