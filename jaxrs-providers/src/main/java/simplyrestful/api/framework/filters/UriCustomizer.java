@@ -8,6 +8,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.PreMatching;
 import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * Allows you to provide a custom URI as an HTTP header to override the auto-detected URI for the API.
@@ -20,6 +21,7 @@ import jakarta.ws.rs.core.UriBuilder;
  * that matches the HTTP header containing the URI that should be used by the API, e.g. "X-ORIGINAL-URL".
  */
 @Named
+@Provider
 @PreMatching
 public class UriCustomizer implements ContainerRequestFilter {
 	/**

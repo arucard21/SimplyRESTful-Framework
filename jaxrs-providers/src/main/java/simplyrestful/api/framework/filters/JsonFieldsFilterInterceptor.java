@@ -3,6 +3,7 @@ package simplyrestful.api.framework.filters;
 import java.io.IOException;
 import java.util.List;
 
+import jakarta.inject.Named;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -27,6 +28,7 @@ import simplyrestful.api.framework.utils.QueryParamUtils;
  * use a default "fields" value of "self,first,last,prev,next,total,item.self", only showing the self link of each
  * resource in the collection.
  */
+@Named
 @Provider
 public class JsonFieldsFilterInterceptor implements WriterInterceptor {
     @Context
