@@ -28,6 +28,7 @@ public class QueryParamUtils {
     public static List<SortOrder> parseSort(List<String> sortValues) {
     	return sortValues.stream()
     		.filter(sortValue -> !sortValue.isBlank())
+    		.flatMap(param -> Stream.of(param.split(QUERY_PARAM_VALUE_DELIMITER)))
     		.map(String::trim)
     		.map(SortOrder::from)
     		.collect(Collectors.toList());

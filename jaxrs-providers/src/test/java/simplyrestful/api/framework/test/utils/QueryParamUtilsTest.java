@@ -47,4 +47,19 @@ public class QueryParamUtilsTest {
         	.orElseThrow()
         	.isAscending());
     }
+
+    @Test
+    public void parseSort_shouldParseCombinedFieldsIntoSeparateFieldsAndKeepTheSameOrder() {
+	List<SortOrder> sortValues = QueryParamUtils.parseSort(List.of(
+                "self.type:asc,self.profile",
+                "description:desc"));
+        Assertions.assertEquals(3, sortValues.size());
+        Assertions.assertEquals("self.type", sortValues.get(0).getField());
+        Assertions.assertEquals(true, sortValues.get(0).isAscending());
+        Assertions.assertEquals("self.profile", sortValues.get(1).getField());
+        Assertions.assertEquals(true, sortValues.get(1).isAscending());
+        Assertions.assertEquals("description", sortValues.get(2).getField());
+        Assertions.assertEquals(false, sortValues.get(2).isAscending());
+
+    }
 }
