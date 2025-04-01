@@ -9,7 +9,7 @@ configure(allprojects){
     apply plugin: "eclipse"
 
     group = 'com.github.arucard21.simplyrestful'
-    version = '2.0.1'
+    version = '2.0.2'
 }
 
 // Publishing configuration for all library projects (excluding root and example projects)
