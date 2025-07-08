@@ -2,11 +2,6 @@ apply plugin: "java-library"
 
 project.description = "The core API resources used in SimplyRESTful APIs"
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
 testing {
 	suites { 
     	test { 

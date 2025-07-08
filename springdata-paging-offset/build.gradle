@@ -6,11 +6,6 @@ repositories {
 
 project.description = "An implementation of the Spring Data Pageable interface that provides offset-based pagination."
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
 testing {
 	suites { 
     	test { 

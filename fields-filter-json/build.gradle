@@ -6,11 +6,6 @@ repositories {
 
 project.description = "A utility to filter a JSON object so it contains only a specified set of fields."
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
 testing {
 	suites { 
     	test { 

@@ -2,11 +2,6 @@ apply plugin: "java-library"
 
 project.description = "A framework for creating a RESTful API"
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
 testing {
 	suites { 
     	test { 

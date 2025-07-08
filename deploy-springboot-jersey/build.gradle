@@ -2,11 +2,6 @@ apply plugin: "java-library"
 
 project.description = "Easily deploy your SimplyRESTful API using Jersey with Spring Boot"
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
 repositories {
     mavenCentral()
 }
