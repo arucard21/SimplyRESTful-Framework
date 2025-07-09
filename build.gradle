@@ -2,6 +2,7 @@ plugins{
     id "org.springframework.boot" apply false
     id "com.github.ben-manes.versions"
     id 'jvm-test-suite'
+    id 'org.jreleaser'
 }
 
 //Shared configuration for all projects (root, library and example projects) including ones with a custom build.gradle
@@ -9,7 +10,7 @@ configure(allprojects){
     apply plugin: "eclipse"
 
     group = 'com.github.arucard21.simplyrestful'
-    version = '2.0.2'
+    version = '2.1.0'
 }
 
 // Publishing configuration for all library projects (excluding root and example projects)
@@ -54,21 +55,28 @@ configure(subprojects - project(":examples").allprojects){
 				}
 			}
 		}
-
-		repositories{
-			maven{
-				def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            	def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            	url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            	credentials {
-            		username ossrhUsername
-            		password ossrhPassword
-        		}
+		repositories {
+			maven {
+				url = layout.buildDirectory.dir('staging-deploy')
 			}
 		}
 	}
 
-	signing {
-		sign publishing.publications.mavenJava
+	jreleaser {
+		signing {
+			active = 'ALWAYS'
+			armored = true
+		}
+		deploy {
+			maven {
+				mavenCentral {
+					sonatype {
+						active = 'ALWAYS'
+						url = 'https://central.sonatype.com/api/v1/publisher'
+						stagingRepository('target/staging-deploy')
+					}
+				}
+			}
+		}
 	}
 }

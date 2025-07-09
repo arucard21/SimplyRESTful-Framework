@@ -2,6 +2,7 @@ pluginManagement {
     plugins {
         id 'org.springframework.boot' version springBootVersion
         id "com.github.ben-manes.versions" version versionsPluginVersion
+        id 'org.jreleaser' version jreleaserPluginVersion
     }
 }
 
