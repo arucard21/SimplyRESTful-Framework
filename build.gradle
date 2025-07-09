@@ -7,22 +7,24 @@ plugins{
 
 //Shared configuration for all projects (root, library and example projects) including ones with a custom build.gradle
 configure(allprojects){
-    apply plugin: "eclipse"
+	apply plugin: 'java'
+	apply plugin: "eclipse"
 
-    group = 'com.github.arucard21.simplyrestful'
-    version = '2.1.0'
+	group = 'com.github.arucard21.simplyrestful'
+	version = '2.1.0'
+
+	java {
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
+	}
 }
 
 // Publishing configuration for all library projects (excluding root and example projects)
 configure(subprojects - project(":examples").allprojects){
-    apply plugin: 'java'
 	apply plugin: 'maven-publish'
 	apply plugin: 'signing'
 
 	java {
-    	sourceCompatibility = JavaVersion.VERSION_17
-		targetCompatibility = JavaVersion.VERSION_17
-		
     	withJavadocJar()
     	withSourcesJar()
 	}
