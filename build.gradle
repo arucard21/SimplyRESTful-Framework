@@ -75,7 +75,13 @@ configure(subprojects - project(":examples").allprojects){
 					sonatype {
 						active = 'ALWAYS'
 						url = 'https://central.sonatype.com/api/v1/publisher'
-						stagingRepository('target/staging-deploy')
+						stagingRepository('client/build/staging-deploy')
+						stagingRepository('deploy-springboot-jersey/build/staging-deploy')
+						stagingRepository('fields-filter-json/build/staging-deploy')
+						stagingRepository('jaxrs-providers/build/staging-deploy')
+						stagingRepository('SimplyRESTful/build/staging-deploy')
+						stagingRepository('SimplyRESTful-resources/build/staging-deploy')
+						stagingRepository('springdata-paging-offset/build/staging-deploy')
 					}
 				}
 			}
