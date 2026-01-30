@@ -14,14 +14,14 @@ This framework provides a default implementation of a JAX-RS Web Resource (somet
 * Add a dependency on [`SimplyRESTful`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/SimplyRESTful/) to your project
 
 ### Implement your API resource
-For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object) that extends [APIResource](/SimplyRESTful-resources/src/main/java/simplyrestful/api/framework/resources/APIResource.java) and provide it with a custom JSON media type.
+For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object) that extends [ApiResource](/SimplyRESTful-resources/src/main/java/simplyrestful/api/framework/resources/ApiResource.java) and provide it with a custom JSON media type.
 
 ```Java
-public class MyResource extends APIResource {  
+public class MyResource extends ApiResource {  
   public static final String MEDIA_TYPE_JSON = "application/x.myresource-v1+json";
 
   @Override
-  public MediaType getCustomJsonMediaType(){
+  public MediaType customJsonMediaType(){
   	return MediaType.valueOf(MEDIA_TYPE_JSON);
   }
 
@@ -29,10 +29,10 @@ public class MyResource extends APIResource {
 }
 ```
 ### Implement your Web Resource
-For each POJO, create a JAX-RS Web Resource (sometimes called an endpoint) that extends [DefaultWebResource](src/main/java/simplyrestful/api/framework/core/DefaultWebResource.java) and uses that POJO as its generic type T.
+For each POJO, create a JAX-RS Web Resource (sometimes called an endpoint) that implements [DefaultWebResource](src/main/java/simplyrestful/api/framework/DefaultWebResource.java) and uses that POJO as its generic type T.
 
 ```Java
-public class MyWebResource extends DefaultWebResource<MyResource>{
+public class MyWebResource implements DefaultWebResource<MyResource>{
   @Override
   public MyResource create(MyResource resource, UUID resourceUUID){/* Add your implementation*/}
 
@@ -46,7 +46,7 @@ public class MyWebResource extends DefaultWebResource<MyResource>{
   public MyResource delete(UUID resourceUUID){/* Add your implementation*/}
 
   @Override
-  public MyResource list(long pageNumber, long pageSize, List<String> fields, String query, List<SortOrder> sort){/* Add your implementation*/}
+  public List<MyResource> list(int pageStart, int pageSize, List<String> fields, String query, List<SortOrder> sort){/* Add your implementation*/}
 }
 ```
 In this Web Resource, you can now implement the `create()`, `read()`, `update()`, `delete()` and `list()` methods to connect to your backend as needed. Though you should mostly implement these methods as you would expect, there are some things to keep in mind.
@@ -80,7 +80,7 @@ register(AcceptHeaderOpenApiResource.class);
 // Example for Jersey (in ResourceConfig)
 register(UriCustomizer.class);
 ```
-* the [`WebResourceRoot`](src/main/java/simplyrestful/api/framework/core/servicedocument/WebResourceRoot.java) class (to provide the ServiceDocument at the root of your API).
+* the [`WebResourceRoot`](src/main/java/simplyrestful/api/framework/servicedocument/WebResourceRoot.java) class (to provide the ServiceDocument at the root of your API).
 ```Java
 // Example for Jersey (in ResourceConfig) with JAX-RS-managed lifecycle
 register(WebResourceRoot.class);

@@ -6,4 +6,4 @@ Contains some example APIs that use the SimplyRESTful framework.
 * [`springboot-jersey-nomapping-springdata`](/examples/springboot-jersey-nomapping-springdata): Uses the `deploy-springboot-jersey` library for deploying as well.
     * You can run this by executing the main class: `JerseyNoMappingApplication.java`.
 * [`nlgov-adr`](/examples/nlgov-adr): Shows how you can adhere to the NLGov REST API Design Rules (ADR).
-    * You can run this by executing the main class: `NLGovAdrApplication.java`. Or you can run it with Gradle: `./gradlew :examples:nlgov-adr:bootRun`.
+    * You can run this by executing the main class: `NlgovAdrApplication.java`. Or you can run it with Gradle: `./gradlew :examples:nlgov-adr:bootRun`.
