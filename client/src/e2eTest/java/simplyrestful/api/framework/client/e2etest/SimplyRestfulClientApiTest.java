@@ -65,7 +65,7 @@ public class SimplyRestfulClientApiTest {
         Assertions.assertNotNull(listOfResources);
         Assertions.assertEquals(simplyRESTfulClient.getTotalAmountOfLastRetrievedCollection(), listOfResources.size());
         Assertions.assertNotNull(listOfResources.get(0));
-        Assertions.assertNotNull(listOfResources.get(0).getSelf());
+        Assertions.assertNotNull(listOfResources.get(0).self());
         Assertions.assertNotNull(listOfResources.get(0).getDescription());
         Assertions.assertNotNull(listOfResources.get(0).getDateTime());
         Assertions.assertNotNull(listOfResources.get(0).getComplexAttribute());
@@ -85,10 +85,10 @@ public class SimplyRestfulClientApiTest {
         ExampleResource createdResource = simplyRESTfulClient.read(createdResourceLocation);
         Assertions.assertEquals(resource.getDescription(), createdResource.getDescription());
         Assertions.assertEquals(resource.getComplexAttribute().getName(), createdResource.getComplexAttribute().getName());
-        Assertions.assertNotNull(createdResource.getSelf());
-        Assertions.assertNotNull(createdResource.getSelf().getHref());
-        Assertions.assertFalse(createdResource.getSelf().getHref().toString().isBlank());
-        Assertions.assertEquals(createdResourceLocation, createdResource.getSelf().getHref());
+        Assertions.assertNotNull(createdResource.self());
+        Assertions.assertNotNull(createdResource.self().getHref());
+        Assertions.assertFalse(createdResource.self().getHref().toString().isBlank());
+        Assertions.assertEquals(createdResourceLocation, createdResource.self().getHref());
         Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.delete(createdResourceLocation));
         Assertions.assertFalse(simplyRESTfulClient.exists(createdResourceLocation));
     }
@@ -97,8 +97,8 @@ public class SimplyRestfulClientApiTest {
     public void read_shouldReturnTheResource() {
         List<ExampleResource> listOfResources = simplyRESTfulClient.listResources(Collections.singletonList(QueryParamUtils.FIELDS_VALUE_ALL), "", Collections.emptyList());
         ExampleResource resourceFromList = listOfResources.get(0);
-        ExampleResource resourceFromOwnWebResource = simplyRESTfulClient.read(resourceFromList.getSelf().getHref());
-        Assertions.assertEquals(resourceFromList.getSelf(), resourceFromOwnWebResource.getSelf());
+        ExampleResource resourceFromOwnWebResource = simplyRESTfulClient.read(resourceFromList.self().getHref());
+        Assertions.assertEquals(resourceFromList.self(), resourceFromOwnWebResource.self());
         Assertions.assertEquals(resourceFromList.getDescription(), resourceFromOwnWebResource.getDescription());
         Assertions.assertEquals(resourceFromList.getComplexAttribute().getName(), resourceFromOwnWebResource.getComplexAttribute().getName());
     }
@@ -106,7 +106,7 @@ public class SimplyRestfulClientApiTest {
     @Test
     public void exists_shouldReturnWhetherTheResourceExists() {
         List<ExampleResource> listOfResources = simplyRESTfulClient.listResources();
-        Assertions.assertTrue(simplyRESTfulClient.exists(listOfResources.get(0).getSelf().getHref()));
+        Assertions.assertTrue(simplyRESTfulClient.exists(listOfResources.get(0).self().getHref()));
         Assertions.assertFalse(simplyRESTfulClient.exists(simplyRESTfulClient.createResourceUriFromUuid(UUID.randomUUID())));
     }
 
@@ -121,7 +121,7 @@ public class SimplyRestfulClientApiTest {
         modifiedComplexAttribute.setName(modifiedComplexAttributeName);
         modifiedResource.setComplexAttribute(modifiedComplexAttribute);
         Assertions.assertDoesNotThrow(() -> simplyRESTfulClient.update(modifiedResource));
-        ExampleResource updatedResource = simplyRESTfulClient.read(modifiedResource.getSelf());
+        ExampleResource updatedResource = simplyRESTfulClient.read(modifiedResource.self());
         Assertions.assertEquals(modifiedDescription, updatedResource.getDescription());
         Assertions.assertEquals(modifiedComplexAttributeName, updatedResource.getComplexAttribute().getName());
     }

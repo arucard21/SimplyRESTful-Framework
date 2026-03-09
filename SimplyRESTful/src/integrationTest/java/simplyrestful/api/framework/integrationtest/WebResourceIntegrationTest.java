@@ -150,15 +150,15 @@ public class WebResourceIntegrationTest extends JerseyTest {
         try (SseEventSource eventSource = SseEventSource.target(target().path(WEB_RESOURCE_PATH)).build()) {
             eventSource.register(
                     event -> {
-                        receivedSelfLinks.add(event.readData(TestResource.class).getSelf().getHref().toString());
+                        receivedSelfLinks.add(event.readData(TestResource.class).self().getHref().toString());
                         },
                     error -> {
                         Assertions.fail("An error occurred while receiving events.");
                     },
                     () -> {
                         Assertions.assertEquals(2, receivedSelfLinks.size());
-                        Assertions.assertEquals(testInstance.getSelf().getHref(), receivedSelfLinks.get(0));
-                        Assertions.assertEquals(testInstanceWithRandomId.getSelf().getHref(), receivedSelfLinks.get(1));
+                        Assertions.assertEquals(testInstance.self().getHref(), receivedSelfLinks.get(0));
+                        Assertions.assertEquals(testInstanceWithRandomId.self().getHref(), receivedSelfLinks.get(1));
                     });
             eventSource.open();
             Thread.sleep(10); // wait to ensure all events have been received before closing the SseEventSource
@@ -256,7 +256,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.accept(MEDIA_TYPE_COLLECTION_V2_JSON_TYPE)
     		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
     		.get(new GenericType<ApiCollection<TestResource>>() {});
-    	Assertions.assertEquals(customUri, collection.getSelf().getHref());
+    	Assertions.assertEquals(customUri, collection.self().getHref());
     	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }
 
@@ -268,7 +268,7 @@ public class WebResourceIntegrationTest extends JerseyTest {
     		.request()
     		.header(HTTP_HEADER_NAME_CUSTOM_URI, customUri)
     		.get(ApiServiceDocument.class);
-    	Assertions.assertEquals(customUri, serviceDocument.getSelf().getHref());
+    	Assertions.assertEquals(customUri, serviceDocument.self().getHref());
     	System.clearProperty(UriCustomizer.CONFIGURATION_PROPERTY_NAME);
     }
 }

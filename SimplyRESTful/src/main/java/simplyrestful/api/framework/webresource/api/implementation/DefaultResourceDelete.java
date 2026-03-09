@@ -18,7 +18,7 @@ import simplyrestful.api.framework.resources.ApiResource;
 /**
  * Provide a default implementation for deleting the API resource.
  *
- * @param <T> is the API resource class that used in the JAX-RS WebResource.
+ * @param <T> is the API resource type used in the JAX-RS WebResource.
  */
 public interface DefaultResourceDelete<T extends ApiResource> extends ResourceDelete<T> {
 	/**

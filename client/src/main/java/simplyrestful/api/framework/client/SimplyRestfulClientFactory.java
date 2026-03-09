@@ -12,7 +12,7 @@ import simplyrestful.api.framework.resources.ApiResource;
 /**
  * A factory method for creating the SimplyRESTful client.
  *
- * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
+ * @param <T> is the type of the resource used in the SimplyRESTful API that you wish to access.
  */
 @Named
 public class SimplyRestfulClientFactory<T extends ApiResource> {

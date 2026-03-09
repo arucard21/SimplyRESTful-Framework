@@ -26,7 +26,7 @@ import simplyrestful.api.framework.utils.QueryParamUtils;
  * If no preference is given for the type of collection resource, this will return the most recent version of the
  * collection resource in plain JSON format, using a custom JSON media type.
  *
- * @param <T> is the API resource class used in the JAX-RS WebResource, which will be contained in the collection resource.
+ * @param <T> is the API resource type used in the JAX-RS WebResource, which will be contained in the collection resource.
  */
 public interface DefaultCollectionGet<T extends ApiResource> extends ResourceList<T>, ResourceCount {
 	/**

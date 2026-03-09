@@ -80,7 +80,7 @@ public class ApiCollectionBuilder<T extends ApiResource> {
 	 */
     public ApiCollection<T> build(MediaType type) {
     	ApiCollection<T> collection = new ApiCollection<T>();
-    	collection.setSelf(new Link(requestURI, type));
+    	collection.self(new Link(requestURI, type));
     	collection.setItem(this.resources);
 
     	if(this.collectionSize != null) {
@@ -93,7 +93,7 @@ public class ApiCollectionBuilder<T extends ApiResource> {
     }
 
     private void includeNavigation(ApiCollection<T> collection) {
-    	MediaType collectionType = collection.getSelf().getType();
+    	MediaType collectionType = collection.self().getType();
 
 		collection.setFirst(createLinkFromURIWithModifiedPageOffset(requestURI, START_OF_FIRST_PAGE, collectionType));
 		if (this.pageStart > 0) {

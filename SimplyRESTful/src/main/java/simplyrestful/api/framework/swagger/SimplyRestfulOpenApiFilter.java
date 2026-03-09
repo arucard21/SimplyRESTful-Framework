@@ -68,7 +68,7 @@ public class SimplyRestfulOpenApiFilter extends AbstractSpecFilter {
 	}
 
 	/**
-	 * Remove the schema that's detected for the {@link ApiCollection} or {@link ApiResource} parent class.
+	 * Remove the schema that's detected for the {@link ApiCollection} class or {@link ApiResource} interface.
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override

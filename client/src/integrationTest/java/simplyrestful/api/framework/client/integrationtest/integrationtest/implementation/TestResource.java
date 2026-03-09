@@ -4,16 +4,20 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
 import simplyrestful.api.framework.resources.ApiResource;
 import simplyrestful.api.framework.resources.Link;
 
-public class TestResource extends ApiResource {
+public class TestResource implements ApiResource {
 	public static final String MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
 	public static final UUID TEST_RESOURCE_ID = UUID.randomUUID();
 	public static final String ADDITIONAL_FIELD_TEST_VALUE = "additional-field-value";
 
+	private Link self;
 	private String additionalField;
 
 	public static URI getResourceUri(UUID id) {
@@ -22,10 +26,22 @@ public class TestResource extends ApiResource {
 
 	private TestResource(URI resourceUri, String additionalField) {
 		this.additionalField = additionalField;
-		this.setSelf(new Link(resourceUri, customJsonMediaType()));
+		this.self(new Link(resourceUri, customJsonMediaType()));
 	}
 
 	public TestResource() {
+	}
+
+	@Override
+	@JsonGetter("self")
+	public Link self() {
+		return self;
+	}
+
+	@Override
+	@JsonSetter("self")
+	public void self(Link self) {
+		this.self = self;
 	}
 
 	public static TestResource testInstance() {
@@ -55,21 +71,18 @@ public class TestResource extends ApiResource {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(additionalField);
-		return result;
+		return Objects.hash(self, additionalField);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		TestResource other = (TestResource) obj;
-		return Objects.equals(additionalField, other.additionalField);
+		return Objects.equals(self, other.self) && Objects.equals(additionalField, other.additionalField);
 	}
 }

@@ -15,9 +15,10 @@ import jakarta.ws.rs.core.MediaType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import simplyrestful.api.framework.resources.ApiResource;
+import simplyrestful.api.framework.resources.Link;
 
 @Entity
-public class ExampleResource extends ApiResource {
+public class ExampleResource implements ApiResource {
     public static final String EXAMPLE_MEDIA_TYPE_JSON = "application/x.testresource-v1+json";
     public static final String EXAMPLE_PROFILE_STRING = "https://arucard21.github.io/SimplyRESTful-Framework/ExampleResource/v1";
     @JsonIgnore
@@ -27,10 +28,22 @@ public class ExampleResource extends ApiResource {
     @JsonIgnore
     @Column(columnDefinition = "uuid") // necessary for h2 database, otherwise it will default to binary(16) which doesn't seem to work
     private UUID uuid;
+    @jakarta.persistence.Transient
+    private Link self;
     private String description;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private ExampleComplexAttribute complexAttribute;
     private ZonedDateTime dateTime;
+
+    @Override
+    public Link self() {
+        return self;
+    }
+
+    @Override
+    public void self(Link self) {
+        this.self = self;
+    }
 
     public Long getId() {
         return id;

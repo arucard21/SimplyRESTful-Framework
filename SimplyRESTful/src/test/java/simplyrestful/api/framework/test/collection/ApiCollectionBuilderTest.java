@@ -4,10 +4,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
@@ -29,7 +33,7 @@ public class ApiCollectionBuilderTest {
             TestResource testResource = new TestResource();
             testResource.setNumber(i);
             URI selfLink = UriBuilder.fromUri(requestURI).path(String.valueOf(i)).build();
-            testResource.setSelf(new Link(selfLink, null));
+            testResource.self(new Link(selfLink, null));
             testResourcesList.add(testResource);
         }
     }
@@ -37,7 +41,7 @@ public class ApiCollectionBuilderTest {
     protected ApiCollection<TestResource> createExpectedCollection(int startOfFirst, int startOfLast, int startOfPrev,
             int startOfNext, int sublistBegin, int sublistEnd) {
         ApiCollection<TestResource> expected = new ApiCollection<TestResource>();
-        expected.setSelf(new Link(requestURI, customJson));
+        expected.self(new Link(requestURI, customJson));
         expected.setTotal(TEST_RESOURCES_SIZE);
         Link firstPage = startOfFirst == -1 ? null
                 : new Link(UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfFirst).build(), customJson);
@@ -59,8 +63,21 @@ public class ApiCollectionBuilderTest {
         return expected;
     }
 
-    protected class TestResource extends ApiResource {
+    protected class TestResource implements ApiResource {
+        private Link self;
         private int number;
+
+        @Override
+        @JsonGetter("self")
+        public Link self() {
+            return self;
+        }
+
+        @Override
+        @JsonSetter("self")
+        public void self(Link self) {
+            this.self = self;
+        }
 
         @Override
         public MediaType customJsonMediaType() {
@@ -73,6 +90,23 @@ public class ApiCollectionBuilderTest {
 
         public void setNumber(int number) {
             this.number = number;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(self, number);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            TestResource other = (TestResource) obj;
+            return Objects.equals(self, other.self) && number == other.number;
         }
     }
 
@@ -126,7 +160,7 @@ public class ApiCollectionBuilderTest {
         List<TestResource> resources = testResourcesList.subList(200, 300);
         ApiCollection<TestResource> actual = ApiCollectionBuilder.from(resources, requestURI)
                 .collectionSize(TEST_RESOURCES_SIZE).withNavigation(pageStart, maxPageSize).build(customJson);
-        Assertions.assertEquals(customJson, actual.getSelf().getType());
+        Assertions.assertEquals(customJson, actual.self().getType());
     }
 
     @Test

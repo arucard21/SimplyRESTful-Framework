@@ -32,12 +32,12 @@ public class ApiCollectionTest {
 		for (int i = 0; i < 100; i++){
 			TestResource testResource = new TestResource();
 			URI selfLink = UriBuilder.fromUri(requestURI).path(String.valueOf(i)).build();
-			testResource.setSelf(new Link(selfLink.toString(), null));
+			testResource.self(new Link(selfLink.toString(), null));
 			testResourcesList.add(testResource);
 		}
 
 		testCollection = new ApiCollection<>();
-		testCollection.setSelf(new Link(TEST_COLLECTION_HREF_1, null));
+		testCollection.self(new Link(TEST_COLLECTION_HREF_1, null));
 		testCollection.setTotal(100);
 		testCollection.setFirst(new Link(TEST_COLLECTION_PAGE_BASE1+"1", null));
 		testCollection.setLast(new Link(TEST_COLLECTION_PAGE_BASE1+"10", null));
@@ -45,7 +45,7 @@ public class ApiCollectionTest {
 		testCollection.setNext(new Link(TEST_COLLECTION_PAGE_BASE1+"10", null));
 
 		testCollectionSame = new ApiCollection<>();
-		testCollectionSame.setSelf(new Link(TEST_COLLECTION_HREF_1, null));
+		testCollectionSame.self(new Link(TEST_COLLECTION_HREF_1, null));
 		testCollectionSame.setTotal(100);
 		testCollectionSame.setFirst(new Link(TEST_COLLECTION_PAGE_BASE1+"1", null));
 		testCollectionSame.setLast(new Link(TEST_COLLECTION_PAGE_BASE1+"10", null));
@@ -53,7 +53,7 @@ public class ApiCollectionTest {
 		testCollectionSame.setNext(new Link(TEST_COLLECTION_PAGE_BASE1+"10", null));
 
 		testCollectionDifferent = new ApiCollection<>();
-		testCollectionDifferent.setSelf(new Link(TEST_COLLECTION_HREF_2, null));
+		testCollectionDifferent.self(new Link(TEST_COLLECTION_HREF_2, null));
 		testCollectionDifferent.setTotal(50);
 		testCollectionDifferent.setFirst(new Link(TEST_COLLECTION_PAGE_BASE2+"1", null));
 		testCollectionDifferent.setLast(new Link(TEST_COLLECTION_PAGE_BASE2+"10", null));
@@ -89,10 +89,10 @@ public class ApiCollectionTest {
 	@Test
 	public void apiCollection_shouldNotBeEqual_whenOnlySelfLinkDiffers() throws Exception {
 		ApiCollection<TestResource> onlySelfLink1 = new ApiCollection<>();
-		onlySelfLink1.setSelf(new Link(TEST_COLLECTION_HREF_1, null));
+		onlySelfLink1.self(new Link(TEST_COLLECTION_HREF_1, null));
 
 		ApiCollection<TestResource> onlySelfLink2 = new ApiCollection<>();
-		onlySelfLink2.setSelf(new Link(TEST_COLLECTION_HREF_2, null));
+		onlySelfLink2.self(new Link(TEST_COLLECTION_HREF_2, null));
 
 		Assertions.assertNotEquals(onlySelfLink1, onlySelfLink2);
 	}

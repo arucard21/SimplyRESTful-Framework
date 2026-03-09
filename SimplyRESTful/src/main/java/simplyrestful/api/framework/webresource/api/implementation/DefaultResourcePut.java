@@ -24,7 +24,7 @@ import simplyrestful.api.framework.utils.WebResourceUtils;
 /**
  * Provide a default implementation for updating the API resource.
  *
- * @param <T> is the API resource class that used in the JAX-RS WebResource.
+ * @param <T> is the API resource type used in the JAX-RS WebResource.
  */
 public interface DefaultResourcePut<T extends ApiResource> extends ResourceExists, ResourceUpdate<T> {
 	/**
@@ -75,13 +75,13 @@ public interface DefaultResourcePut<T extends ApiResource> extends ResourceExist
     	if (!this.exists(id)) {
     	    throw new NotFoundException(ERROR_RESOURCE_WITH_ID_NOT_EXISTS);
     	}
-    	if(resource.getSelf() == null) {
-    	    resource.setSelf(new Link(
+    	if(resource.self() == null) {
+    	    resource.self(new Link(
     	                    WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, id),
     	                    resource.customJsonMediaType()));
     	}
     	else {
-    	    UUID resourceIdFromSelf = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.getSelf().getHref());
+    	    UUID resourceIdFromSelf = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
     	    if (resourceIdFromSelf == null) {
                     throw new BadRequestException(ERROR_SELF_LINK_URI_DOES_NOT_MATCH_API_BASE_URI);
                 }

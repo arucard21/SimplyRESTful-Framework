@@ -4,9 +4,30 @@ import java.util.Objects;
 
 import jakarta.ws.rs.core.MediaType;
 
-public class ApiServiceDocument extends ApiResource {
+public class ApiServiceDocument implements ApiResource {
 	public static final String MEDIA_TYPE_JSON = "application/x.simplyrestful-servicedocument-v1+json";
+	private Link self;
 	private Link describedBy;
+
+	// For JSON deserialization
+	public Link getSelf() {
+		return this.self();
+	}
+
+	// For JSON deserialization
+	public void setSelf(Link self) {
+		this.self(self);
+	}
+
+	@Override
+	public Link self() {
+		return self;
+	}
+
+	@Override
+	public void self(Link self) {
+		this.self = self;
+	}
 
 	@Override
 	public MediaType customJsonMediaType() {
@@ -23,21 +44,18 @@ public class ApiServiceDocument extends ApiResource {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(describedBy);
-		return result;
+		return Objects.hash(self, describedBy);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		ApiServiceDocument other = (ApiServiceDocument) obj;
-		return Objects.equals(describedBy, other.describedBy);
+		return Objects.equals(self, other.self) && Objects.equals(describedBy, other.describedBy);
 	}
 }

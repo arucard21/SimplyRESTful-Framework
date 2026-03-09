@@ -14,10 +14,10 @@ This framework provides a default implementation of a JAX-RS Web Resource (somet
 * Add a dependency on [`SimplyRESTful`](https://search.maven.org/artifact/com.github.arucard21.simplyrestful/SimplyRESTful/) to your project
 
 ### Implement your API resource
-For each of your API resources, create a [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object) that extends [ApiResource](/SimplyRESTful-resources/src/main/java/simplyrestful/api/framework/resources/ApiResource.java) and provide it with a custom JSON media type.
+For each of your API resources, create a class or record that implements [ApiResource](/SimplyRESTful-resources/src/main/java/simplyrestful/api/framework/resources/ApiResource.java) and provide it with a custom JSON media type.
 
 ```Java
-public class MyResource extends ApiResource {  
+public class MyResource implements ApiResource {  
   public static final String MEDIA_TYPE_JSON = "application/x.myresource-v1+json";
 
   @Override

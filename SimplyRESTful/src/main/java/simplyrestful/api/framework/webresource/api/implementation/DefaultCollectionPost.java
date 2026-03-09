@@ -24,7 +24,7 @@ import simplyrestful.api.framework.utils.WebResourceUtils;
 /**
  * Provide a default implementation for creating an API resource.
  *
- * @param <T> is the API resource class used in the JAX-RS WebResource.
+ * @param <T> is the API resource type used in the JAX-RS WebResource.
  */
 public interface DefaultCollectionPost<T extends ApiResource> extends ResourceExists, ResourceCreate<T> {
 	/**
@@ -63,19 +63,19 @@ public interface DefaultCollectionPost<T extends ApiResource> extends ResourceEx
             @Parameter(required = true)
             T resource) {
     	UUID resourceId;
-    	if(resource.getSelf() != null) {
-    	    resourceId = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.getSelf().getHref());
+    	if(resource.self() != null) {
+    	    resourceId = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
     	    if (this.exists(resourceId)) {
     	    	throw new ClientErrorException(ERROR_RESOURCE_WITH_ID_EXISTS, Response.Status.CONFLICT);
     	    }
     	}
     	else {
     	    resourceId = UUID.randomUUID();
-    	    resource.setSelf(new Link(
+    	    resource.self(new Link(
     	    		WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, resourceId),
     	    		resource.customJsonMediaType()));
     	}
     	T updatedResource = this.create(resource, resourceId);
-    	return Response.created(updatedResource.getSelf().getHref()).build();
+    	return Response.created(updatedResource.self().getHref()).build();
     }
 }

@@ -7,7 +7,7 @@ import simplyrestful.api.framework.resources.ApiResource;
 /**
  * Interface for updating an API resource.
  *
- * @param <T>is the API resource class used in the JAX-RS WebResource.
+ * @param <T>is the API resource type used in the JAX-RS WebResource.
  */
 public interface ResourceUpdate<T extends ApiResource> {
     /**

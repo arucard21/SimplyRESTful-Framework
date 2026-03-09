@@ -43,7 +43,7 @@ import simplyrestful.api.framework.resources.Link;
 /**
  * A client for any SimplyRESTful-based API.
  *
- * @param <T> is the class of the resource used in the SimplyRESTful API that you wish to access.
+ * @param <T> is the type of the resource used in the SimplyRESTful API that you wish to access.
  */
 public class SimplyRestfulClient<T extends ApiResource> {
 	/**
@@ -128,7 +128,7 @@ public class SimplyRestfulClient<T extends ApiResource> {
 	/**
 	 * Get the resource class based on the provided type for the API collection.
 	 *
-	 * This resource class should be a subclass of {@link ApiResource}.
+	 * This resource class should be an implementation of {@link ApiResource}.
 	 *
 	 * This requires an unchecked cast because the resource class for T is unavailable at runtime so it cannot be checked.
 	 * But both the collection type and the resource class type use the same generic variable T so the cast should be safe enough.
@@ -519,8 +519,8 @@ public class SimplyRestfulClient<T extends ApiResource> {
      */
     public URI create(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
-        if (resource.getSelf() != null) {
-            resource.setSelf(null);
+        if (resource.self() != null) {
+            resource.self(null);
         }
         WebTarget target = client.target(resourceUriBuilder.build(""));
         configureAdditionalQueryParameters(target, queryParameters);
@@ -553,7 +553,7 @@ public class SimplyRestfulClient<T extends ApiResource> {
      */
     public void update(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
-        URI resourceInstanceURI = resource.getSelf().getHref();
+        URI resourceInstanceURI = resource.self().getHref();
         if (!exists(resourceInstanceURI, headers, queryParameters)) {
             throw new IllegalArgumentException(ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST);
         }

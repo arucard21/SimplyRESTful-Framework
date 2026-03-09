@@ -8,7 +8,7 @@ import simplyrestful.api.framework.resources.ApiResource;
 /**
  * Interface for retrieving a collection of API resources.
  *
- * @param <T>is the API resource class used in the JAX-RS WebResource, which is contained in the collection.
+ * @param <T>is the API resource type used in the JAX-RS WebResource, which is contained in the collection.
  */
 public interface ResourceList<T extends ApiResource> {
     /**

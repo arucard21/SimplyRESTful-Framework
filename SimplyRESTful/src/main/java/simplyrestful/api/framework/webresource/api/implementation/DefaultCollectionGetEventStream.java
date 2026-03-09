@@ -23,7 +23,7 @@ import simplyrestful.api.framework.utils.QueryParamUtils;
  * Provide an alternative implementation for retrieving the collection resource through
  * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">server-sent events (SSE)</a>.
  *
- * @param <T> is the API resource class that used in the JAX-RS WebResource, which will be contained in the collection resource.
+ * @param <T> is the API resource type used in the JAX-RS WebResource, which will be contained in the collection resource.
  */
 public interface DefaultCollectionGetEventStream<T extends ApiResource> extends ResourceStream<T> {
 	/**

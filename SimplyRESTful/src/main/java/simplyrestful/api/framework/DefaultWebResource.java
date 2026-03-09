@@ -14,7 +14,7 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultResourc
  * functionality in a JAX-RS WebResource, rather than having to
  * include them one-by-one.
  *
- * @param <T>is the API resource class used in the JAX-RS WebResource.
+ * @param <T>is the API resource type used in the JAX-RS WebResource.
  */
 public interface DefaultWebResource<T extends ApiResource> extends
 	DefaultCollectionGet<T>,

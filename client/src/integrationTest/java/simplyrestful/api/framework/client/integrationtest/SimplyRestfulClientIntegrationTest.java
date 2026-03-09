@@ -177,14 +177,14 @@ public class SimplyRestfulClientIntegrationTest extends JerseyTest {
     @Test
     public void update_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentHostname() {
         TestResource invalidResource = new TestResource();
-        invalidResource.setSelf(new Link(INVALID_RESOURCE_URI_DIFFERENT_HOST, null));
+        invalidResource.self(new Link(INVALID_RESOURCE_URI_DIFFERENT_HOST, null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
     }
 
     @Test
     public void update_shouldThrowIllegalArgumentException_whenResourceContainsAResourceUriWithDifferentPath() {
         TestResource invalidResource = new TestResource();
-        invalidResource.setSelf(new Link(INVALID_RESOURCE_URI_DIFFERENT_PATH, null));
+        invalidResource.self(new Link(INVALID_RESOURCE_URI_DIFFERENT_PATH, null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> simplyRESTfulClient.update(invalidResource));
     }
 

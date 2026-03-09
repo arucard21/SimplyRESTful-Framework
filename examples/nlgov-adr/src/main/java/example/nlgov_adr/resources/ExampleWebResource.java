@@ -172,17 +172,17 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 	}
 
 	private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
-		if (persistedResource.getSelf() == null && persistedResource.getUUID() == null) {
+		if (persistedResource.self() == null && persistedResource.getUUID() == null) {
 			throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
 		}
-		if (persistedResource.getSelf() == null) {
-			persistedResource.setSelf(new Link(
+		if (persistedResource.self() == null) {
+			persistedResource.self(new Link(
 					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, ExampleWebResource.class, null)).path(persistedResource.getUUID().toString()).build(),
 					MediaType.valueOf(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)));
 		}
 		if (persistedResource.getUUID() == null) {
 			UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, ExampleWebResource.class, null)
-					.relativize(persistedResource.getSelf().getHref())
+					.relativize(persistedResource.self().getHref())
 					.getPath());
 			persistedResource.setUUID(id);
 		}
