@@ -13,14 +13,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import example.resources.jpa.ExampleResource;
-
 @Named
-public interface ExampleRepository extends PagingAndSortingRepository<ExampleResource, Long>, CrudRepository<ExampleResource, Long> {
-	Optional<ExampleResource> findByUuid(UUID uuid);
+public interface ExampleRepository extends PagingAndSortingRepository<ExampleResourceEntity, Long>, CrudRepository<ExampleResourceEntity, Long> {
+	Optional<ExampleResourceEntity> findByUuid(UUID uuid);
 	boolean existsByUuid(UUID uuid);
-	Page<ExampleResource> findAll(Specification<ExampleResource> spec, Pageable pageable);
-	Stream<ExampleResource> findAll(Specification<ExampleResource> spec);
-	Stream<ExampleResource> findAll(Specification<ExampleResource> spec, Sort sort);
-	long count(Specification<ExampleResource> spec);
+	Page<ExampleResourceEntity> findAll(Specification<ExampleResourceEntity> spec, Pageable pageable);
+	Stream<ExampleResourceEntity> findAll(Specification<ExampleResourceEntity> spec);
+	Stream<ExampleResourceEntity> findAll(Specification<ExampleResourceEntity> spec, Sort sort);
+	long count(Specification<ExampleResourceEntity> spec);
 }

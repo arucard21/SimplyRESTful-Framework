@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.info.Info;
  * Run the API server with the example endpoint and resource.
  */
 @SpringBootApplication
-@EntityScan("example.resources.jpa")
+@EntityScan("example.jersey.nomapping.resources")
 @OpenAPIDefinition( info = @Info(title = "test title", description = "test description", version = "1.0.0"))
 public class JerseyNoMappingApplication {
     public static void main(String[] args) {

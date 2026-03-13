@@ -30,8 +30,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
 import cz.jirutka.rsql.parser.RSQLParserException;
-import example.resources.jpa.ExampleComplexAttribute;
-import example.resources.jpa.ExampleResource;
 import io.github.perplexhub.rsql.RSQLJPASupport;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -43,27 +41,23 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.Response;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.ApiCollection;
-import simplyrestful.api.framework.resources.Link;
-import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 import simplyrestful.api.framework.utils.WebResourceUtils;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
+import simplyrestful.api.framework.springdata.paging.OffsetBasedPageRequest;
 
 @Named
 @Path("/resources")
 @Tag(name = "Example Resources")
-@Produces(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
-@Consumes(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)
-public class ExampleWebResource implements DefaultWebResource<ExampleResource>, DefaultCollectionGetEventStream<ExampleResource> {
+@Produces(ExampleResourceRecord.EXAMPLE_MEDIA_TYPE_JSON)
+@Consumes(ExampleResourceRecord.EXAMPLE_MEDIA_TYPE_JSON)
+public class ExampleWebResource implements DefaultWebResource<ExampleResourceRecord>, DefaultCollectionGetEventStream<ExampleResourceRecord> {
 	public static final String ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST = "The provided resources does not exist so it can not be updated";
 	public static final String ERROR_CREATE_RESOURCE_ALREADY_EXISTS = "The provided resources already exists so it can not be created";
-	public static final String ERROR_RESOURCE_NO_IDENTIFIER = "Resource contains no unique identifier at all, neither a UUID nor a self link.";
 	private ExampleRepository repo;
 	@Context
 	UriInfo uriInfo;
@@ -77,91 +71,85 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	private void addInitialTestData(ExampleRepository repo) {
 		if (repo.count() == 0) {
 			for (int i = 0; i < 3; i++) {
-				ExampleResource resource = new ExampleResource();
-				resource.setUUID(UUID.randomUUID());
-				resource.setDescription("This is test resource " + i);
-				ExampleComplexAttribute complexAttribute = new ExampleComplexAttribute();
+				ExampleResourceEntity entity = new ExampleResourceEntity();
+				entity.setUuid(UUID.randomUUID());
+				entity.setDescription("This is test resource " + i);
+				ExampleComplexAttributeEntity complexAttribute = new ExampleComplexAttributeEntity();
 				complexAttribute.setName("complex attribute of test resource " + i);
-				resource.setComplexAttribute(complexAttribute);
-				resource.setDateTime(ZonedDateTime.now(ZoneOffset.UTC));
-				repo.save(resource);
+				entity.setComplexAttribute(complexAttribute);
+				entity.setDateTime(ZonedDateTime.now(ZoneOffset.UTC));
+				repo.save(entity);
 			}
 		}
 	}
 
-	@Override
-	public ExampleResource create(ExampleResource resource) {
-		ensureSelfLinkAndUUIDPresent(resource);
-		UUID resourceId = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
-		Optional<ExampleResource> entity = repo.findByUuid(resourceId);
-		if (entity.isPresent()) {
-			throw new IllegalArgumentException(ERROR_CREATE_RESOURCE_ALREADY_EXISTS);
-		}
-		ExampleResource persistedEntity = repo.save(resource);
-		ensureSelfLinkAndUUIDPresent(persistedEntity);
-		return persistedEntity;
+	private ExampleResourceMapper mapper() {
+		return new ExampleResourceMapper(uriInfo);
 	}
 
 	@Override
-	public ExampleResource read(UUID resourceUUID) {
-		Optional<ExampleResource> entity = repo.findByUuid(resourceUUID);
-		if (entity.isPresent()) {
-			ExampleResource retrievedEntity = entity.get();
-			ensureSelfLinkAndUUIDPresent(retrievedEntity);
-			return retrievedEntity;
-		}
-		return null;
+	public ExampleResourceRecord create(ExampleResourceRecord resource) {
+		ExampleResourceEntity entity = mapper().toEntity(resource);
+		entity.setUuid(UUID.randomUUID());
+		ExampleResourceEntity persisted = repo.save(entity);
+		return mapper().toRecord(persisted);
 	}
 
 	@Override
-	public ExampleResource update(ExampleResource resource) {
-		ensureSelfLinkAndUUIDPresent(resource);
+	public ExampleResourceRecord read(UUID resourceUUID) {
+		Optional<ExampleResourceEntity> entity = repo.findByUuid(resourceUUID);
+		return entity.map(e -> mapper().toRecord(e)).orElse(null);
+	}
+
+	@Override
+	public ExampleResourceRecord update(ExampleResourceRecord resource) {
 		UUID resourceUUID = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
-		Optional<ExampleResource> entity = repo.findByUuid(resourceUUID);
-		if (entity.isPresent()) {
-			ExampleResource retrievedEntity = entity.get();
-			resource.setId(retrievedEntity.getId());
-			resource.setUUID(resourceUUID);
-			ExampleResource persistedEntity = repo.save(resource);
-			ensureSelfLinkAndUUIDPresent(persistedEntity);
-			return persistedEntity;
+		Optional<ExampleResourceEntity> existing = repo.findByUuid(resourceUUID);
+		if (existing.isPresent()) {
+			ExampleResourceEntity existingEntity = existing.get();
+			ExampleResourceEntity entity = mapper().toEntity(resource);
+			entity.setId(existingEntity.getId());
+			entity.setUuid(resourceUUID);
+			ExampleResourceEntity persisted = repo.save(entity);
+			return mapper().toRecord(persisted);
 		}
 		throw new IllegalArgumentException(ERROR_UPDATE_RESOURCE_DOES_NOT_EXIST);
 	}
 
 	@Override
-	public ExampleResource delete(UUID resourceUUID) {
-		ExampleResource previousValue = read(resourceUUID);
-		if (previousValue == null) {
+	public ExampleResourceRecord delete(UUID resourceUUID) {
+		Optional<ExampleResourceEntity> entity = repo.findByUuid(resourceUUID);
+		if (entity.isEmpty()) {
 			return null;
 		}
-		repo.delete(previousValue);
-		ensureSelfLinkAndUUIDPresent(previousValue);
-		return previousValue;
+		ExampleResourceEntity existingEntity = entity.get();
+		repo.delete(existingEntity);
+		return mapper().toRecord(existingEntity);
 	}
 
 	@Override
-	public List<ExampleResource> list(int pageStart, int pageSize, List<String> fields, String query,
+	public List<ExampleResourceRecord> list(int pageStart, int pageSize, List<String> fields, String query,
 			List<SortOrder> sort) {
 		try {
-			List<ExampleResource> retrievedPage = repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query),
+			List<ExampleResourceEntity> retrievedPage = repo.findAll(RSQLJPASupport.<ExampleResourceEntity>toSpecification(query),
 					new OffsetBasedPageRequest(pageStart, pageSize, map(sort))).getContent();
-			return retrievedPage.stream().map(resource -> ensureSelfLinkAndUUIDPresent(resource))
+			return retrievedPage.stream().map(entity -> mapper().toRecord(entity))
 					.collect(Collectors.toList());
 		}
 		catch(RSQLParserException e) {
 			throw new BadRequestException("The FIQL query could not be parsed");
 		}
 	}
-    @Override
-    public Stream<ExampleResource> stream(List<String> fields, String query, List<SortOrder> sort) {
-	return repo.findAll(RSQLJPASupport.<ExampleResource>toSpecification(query), map(sort))
-		.map(resource -> {
-		    simulateSlowDataRetrieval();
-		    return resource;
-		})
-		.map(this::ensureSelfLinkAndUUIDPresent);
-    }
+
+	@Override
+	public Stream<ExampleResourceRecord> stream(List<String> fields, String query, List<SortOrder> sort) {
+		return repo.findAll(RSQLJPASupport.<ExampleResourceEntity>toSpecification(query), map(sort))
+			.map(entity -> {
+			    simulateSlowDataRetrieval();
+			    return entity;
+			})
+			.map(entity -> mapper().toRecord(entity));
+	}
 
 	@Override
 	public int count(String query) {
@@ -189,41 +177,23 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 				: Order.desc(sortOrder.getField())).collect(Collectors.toList()));
 	}
 
-	private ExampleResource ensureSelfLinkAndUUIDPresent(ExampleResource persistedResource) {
-		if (persistedResource.self() == null && persistedResource.getUUID() == null) {
-			throw new IllegalStateException(ERROR_RESOURCE_NO_IDENTIFIER);
-		}
-		if (persistedResource.self() == null) {
-			persistedResource.self(new Link(
-					UriBuilder.fromUri(WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, ExampleWebResource.class, null)).path(persistedResource.getUUID().toString()).build(),
-					MediaType.valueOf(ExampleResource.EXAMPLE_MEDIA_TYPE_JSON)));
-		}
-		if (persistedResource.getUUID() == null) {
-			UUID id = UUID.fromString(WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, ExampleWebResource.class, null)
-					.relativize(persistedResource.self().getHref())
-					.getPath());
-			persistedResource.setUUID(id);
-		}
-		return persistedResource;
-	}
-
 	@Override
-	public ApiCollection<ExampleResource> listAPIResources(UriInfo uriInfo, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
+	public ApiCollection<ExampleResourceRecord> listAPIResources(UriInfo uriInfo, int pageStart, int pageSize, List<String> fields, String query, List<String> sort) {
 		return DefaultWebResource.super.listAPIResources(uriInfo, pageStart, pageSize, fields, query, sort);
 	}
 
 	@Override
-	public ExampleResource getAPIResource(@NotNull UUID id, List<String> fields) {
+	public ExampleResourceRecord getAPIResource(@NotNull UUID id, List<String> fields) {
 		return DefaultWebResource.super.getAPIResource(id, fields);
 	}
 
 	@Override
-	public Response postAPIResource(@NotNull @Valid ExampleResource resource) {
+	public Response postAPIResource(@NotNull @Valid ExampleResourceRecord resource) {
 		return DefaultWebResource.super.postAPIResource(resource);
 	}
 
 	@Override
-	public Response putAPIResource(@NotNull UUID id, @NotNull @Valid ExampleResource resource) {
+	public Response putAPIResource(@NotNull UUID id, @NotNull @Valid ExampleResourceRecord resource) {
 		return DefaultWebResource.super.putAPIResource(id, resource);
 	}
 
