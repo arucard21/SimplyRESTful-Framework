@@ -16,13 +16,6 @@ public interface ApiResource {
 	Link self();
 
 	/**
-	 * Set the self-link for this resource.
-	 *
-	 * @param selfLink is the self-link to set.
-	 */
-//	void self(Link selfLink);
-
-	/**
 	 * Provide the custom JSON media type representing this resource.
 	 *
 	 * @return the custom JSON media type for this resource.
