@@ -19,13 +19,13 @@ public class ApiResourceTest{
 	@BeforeEach
 	public void createTestResources(){
 		testResource = new TestResource();
-		testResource.self(new Link(TEST_RESOURCE_HREF_1, null));
+		testResource.setSelf(new Link(TEST_RESOURCE_HREF_1, null));
 
 		testResourceSame = new TestResource();
-		testResourceSame.self(new Link(TEST_RESOURCE_HREF_1, null));
+		testResourceSame.setSelf(new Link(TEST_RESOURCE_HREF_1, null));
 
 		testResourceDifferent = new TestResource();
-		testResourceDifferent.self(new Link(TEST_RESOURCE_HREF_2, null));
+		testResourceDifferent.setSelf(new Link(TEST_RESOURCE_HREF_2, null));
 	}
 
 	@Test

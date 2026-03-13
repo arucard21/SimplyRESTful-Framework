@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
+import java.net.URI;
 import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,17 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.api.crud.ResourceCreate;
 import simplyrestful.api.framework.api.crud.ResourceExists;
 import simplyrestful.api.framework.resources.ApiResource;
-import simplyrestful.api.framework.resources.Link;
-import simplyrestful.api.framework.utils.WebResourceUtils;
 
 /**
  * Provide a default implementation for creating an API resource.
@@ -28,22 +25,23 @@ import simplyrestful.api.framework.utils.WebResourceUtils;
  */
 public interface DefaultCollectionPost<T extends ApiResource> extends ResourceExists, ResourceCreate<T> {
 	/**
-	 * The error message that is returned when trying to create an API resource with a self link that contains an ID that already exists.
+	 * The error message that is returned when trying to create an API resource with a self link.
 	 */
-    public static final String ERROR_RESOURCE_WITH_ID_EXISTS = "A resource with the same ID already exists. Try to update the resource with a PUT request to the URI for that resource.";
+    public static final String ERROR_RESOURCE_SELF_LINK_NOT_ALLOWED = "The resource contains a self link which is not allowed when creating a new resource.";
+    public static final String ERROR_CREATED_RESOURCE_HAS_NO_SELF_LINK = "The created resource does not contain a self link with the absolute URL to itself.";
 
     /**
      * Create a resource.
      *
-     * @param uriInfo is a JAX-RS context object.
      * @param resource is a resource that should be created.
      * @return a "201 Created" response for the resource that was created,
      *         containing its URI identifier in the Location header, if the resource
-     *         was correctly created. A "409 Conflict" response is returned if the
-     *         resource contains an self-link that refers to an existing resource.
+     *         was correctly created. A "400 Bad Request" response is returned if the
+     *         resource contains a self-link. A "500 Internal Server Error" response
+     *         is returned if the created resource does not contain a self-link.
      */
     @POST
-    @Operation(description = "Create a new API resource which can already have a self-link containing a URI as identifier or one will be generated")
+    @Operation(description = "Create a new API resource which must not contain a self-link")
 	@ApiResponse(
     		responseCode = "201",
     		description = "Provides the location of the newly created API resource.",
@@ -53,29 +51,25 @@ public interface DefaultCollectionPost<T extends ApiResource> extends ResourceEx
     						description = "Contains the URI to the newly created API resource",
     						schema = @Schema(type = "string", format = "uri"))})
     @ApiResponse(
-    		responseCode = "409",
-    		description = "The self-link in the API resource conflicts with an existing API resource so it could not be created")
+    		responseCode = "400",
+    		description = "The API resource contains a self-link which is not allowed when creating a new resource.")
+    @ApiResponse(
+    		responseCode = "500",
+    		description = "The created resource does not contain a self-link.")
 	default Response postAPIResource(
-    		@Context
-            UriInfo uriInfo,
-            @NotNull
+    		@NotNull
             @Valid
             @Parameter(required = true)
             T resource) {
-    	UUID resourceId;
+    	UUID resourceId = null;
     	if(resource.self() != null) {
-    	    resourceId = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
-    	    if (this.exists(resourceId)) {
-    	    	throw new ClientErrorException(ERROR_RESOURCE_WITH_ID_EXISTS, Response.Status.CONFLICT);
-    	    }
-    	}
-    	else {
-    	    resourceId = UUID.randomUUID();
-    	    resource.self(new Link(
-    	    		WebResourceUtils.getAbsoluteWebResourceUri(uriInfo, resourceId),
-    	    		resource.customJsonMediaType()));
+    		throw new BadRequestException(ERROR_RESOURCE_SELF_LINK_NOT_ALLOWED);
     	}
     	T updatedResource = this.create(resource, resourceId);
-    	return Response.created(updatedResource.self().getHref()).build();
+    	if(updatedResource.self() == null || updatedResource.self().getHref() == null) {
+			throw new IllegalStateException(ERROR_CREATED_RESOURCE_HAS_NO_SELF_LINK);
+		}
+    	URI resourceLocation = updatedResource.self().getHref();
+    	return Response.created(resourceLocation).build();
     }
 }

@@ -520,7 +520,10 @@ public class SimplyRestfulClient<T extends ApiResource> {
     public URI create(T resource, MultivaluedMap<String, String> headers, MultivaluedMap<String, String> queryParameters) {
         discoverResourceUri(headers);
         if (resource.self() != null) {
-            resource.self(null);
+            throw new IllegalArgumentException("The provided resource contains a self-link. "
+            		+ "Please remove the self-link before creating the resource, "
+            		+ "as the server will assign the identifier for the created resource and "
+            		+ "return it in the Location header of the response.");
         }
         WebTarget target = client.target(resourceUriBuilder.build(""));
         configureAdditionalQueryParameters(target, queryParameters);

@@ -20,7 +20,7 @@ public interface ApiResource {
 	 *
 	 * @param selfLink is the self-link to set.
 	 */
-	void self(Link selfLink);
+//	void self(Link selfLink);
 
 	/**
 	 * Provide the custom JSON media type representing this resource.

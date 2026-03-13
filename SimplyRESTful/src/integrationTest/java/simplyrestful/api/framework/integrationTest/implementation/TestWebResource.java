@@ -9,9 +9,11 @@ import java.util.stream.Stream;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.queryparams.SortOrder;
+import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path("testresources")
@@ -19,9 +21,16 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
 @Consumes(TestResource.MEDIA_TYPE_JSON)
 public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource>{
 	public static final List<TestResource> TEST_RESOURCES = new ArrayList<>();
+	public static final UUID TEST_RESOURCE_ID = UUID.randomUUID();
+
+	@Context
+	UriInfo uriInfo;
 
 	@Override
 	public TestResource create(TestResource resource, UUID resourceUUID) {
+		resource.setSelf(new Link(
+				uriInfo.getBaseUriBuilder().path(TestWebResource.class).path(TEST_RESOURCE_ID.toString()).build(),
+    			resource.customJsonMediaType()));
 		return resource;
 	}
 

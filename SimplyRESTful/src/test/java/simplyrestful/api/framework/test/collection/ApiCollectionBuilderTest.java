@@ -33,7 +33,7 @@ public class ApiCollectionBuilderTest {
             TestResource testResource = new TestResource();
             testResource.setNumber(i);
             URI selfLink = UriBuilder.fromUri(requestURI).path(String.valueOf(i)).build();
-            testResource.self(new Link(selfLink, null));
+            testResource.setSelf(new Link(selfLink, null));
             testResourcesList.add(testResource);
         }
     }
@@ -41,7 +41,7 @@ public class ApiCollectionBuilderTest {
     protected ApiCollection<TestResource> createExpectedCollection(int startOfFirst, int startOfLast, int startOfPrev,
             int startOfNext, int sublistBegin, int sublistEnd) {
         ApiCollection<TestResource> expected = new ApiCollection<TestResource>();
-        expected.self(new Link(requestURI, customJson));
+        expected.setSelf(new Link(requestURI, customJson));
         expected.setTotal(TEST_RESOURCES_SIZE);
         Link firstPage = startOfFirst == -1 ? null
                 : new Link(UriBuilder.fromUri(requestURI).replaceQueryParam("pageStart", startOfFirst).build(), customJson);
@@ -73,9 +73,8 @@ public class ApiCollectionBuilderTest {
             return self;
         }
 
-        @Override
         @JsonSetter("self")
-        public void self(Link self) {
+        public void setSelf(Link self) {
             this.self = self;
         }
 

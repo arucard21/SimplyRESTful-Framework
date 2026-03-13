@@ -1,5 +1,6 @@
 package simplyrestful.api.framework.api.crud;
 
+import java.net.URI;
 import java.util.UUID;
 
 import simplyrestful.api.framework.resources.ApiResource;
@@ -13,11 +14,11 @@ public interface ResourceUpdate<T extends ApiResource> {
     /**
      * Update the existing resource in the data store where it is stored.
      *
-     * The provided resource may contain a self-link that identifies itself through a URI containing a UUID.
-     * For convenience, this UUID is also provided directly as resourceUUID parameter.
+     * The provided resource will contain a self-link that identifies itself through a URI containing a UUID.
+     * Since the UUID must always be the last segment of the self-link, it can be easily parsed from the self-link with the
+     * {@link simplyrestful.api.framework.utils.WebResourceUtils#parseUuidFromLastSegmentOfUri(URI resourceUri)} method.
      *
      * @param resource is the updated resource
-     * @param resourceUUID is the identifier of the resource that should be updated
      * @return the updated resource as persisted
      */
     public abstract T update(T resource, UUID resourceUUID);

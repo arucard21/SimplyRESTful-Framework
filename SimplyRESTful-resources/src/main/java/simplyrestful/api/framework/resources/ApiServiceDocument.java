@@ -9,24 +9,19 @@ public class ApiServiceDocument implements ApiResource {
 	private Link self;
 	private Link describedBy;
 
-	// For JSON deserialization
+	// For JSON serialization
 	public Link getSelf() {
 		return this.self();
 	}
 
 	// For JSON deserialization
 	public void setSelf(Link self) {
-		this.self(self);
+		this.self = self;
 	}
 
 	@Override
 	public Link self() {
 		return self;
-	}
-
-	@Override
-	public void self(Link self) {
-		this.self = self;
 	}
 
 	@Override

@@ -13,8 +13,10 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.UriBuilder;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.queryparams.SortOrder;
+import simplyrestful.api.framework.resources.Link;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
@@ -23,6 +25,7 @@ import simplyrestful.api.framework.webresource.api.implementation.DefaultCollect
 @Consumes(TestResource.MEDIA_TYPE_JSON)
 public class TestWebResource implements DefaultWebResource<TestResource>, DefaultCollectionGetEventStream<TestResource> {
     public static final String WEBRESOURCE_PATH = "testresources";
+    public static final UUID TEST_RESOURCE_ID = UUID.randomUUID();
     public static final UUID ERROR_READ_RESOURCE_ID = UUID.randomUUID();
     public static final UUID ERROR_UPDATE_RESOURCE_ID = UUID.randomUUID();
     private static URI baseUri;
@@ -38,6 +41,9 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
     @Override
     public TestResource create(TestResource resource, UUID resourceUUID) {
         // The provided resource is not actually stored anywhere in this test API.
+    	resource.self(new Link(
+    			UriBuilder.fromUri(baseUri).path(WEBRESOURCE_PATH).path(TEST_RESOURCE_ID.toString()).build(),
+    			resource.customJsonMediaType()));
         return resource;
     }
 

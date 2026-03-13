@@ -20,7 +20,7 @@ public class TestResource implements ApiResource {
 	private Link self;
 
 	private TestResource(URI resourceUri) {
-		this.self(new Link(resourceUri, this.customJsonMediaType()));
+		this.setSelf(new Link(resourceUri, this.customJsonMediaType()));
 	}
 
 	public TestResource() {
@@ -32,9 +32,8 @@ public class TestResource implements ApiResource {
 		return self;
 	}
 
-	@Override
 	@JsonSetter("self")
-	public void self(Link self) {
+	public void setSelf(Link self) {
 		this.self = self;
 	}
 

@@ -18,24 +18,19 @@ public class ApiCollection<T extends ApiResource> implements ApiResource {
 	private Link next;
 	private List<T> item;
 
-	// For JSON deserialization
+	// For JSON serialization
 	public Link getSelf() {
 		return this.self();
 	}
 
 	// For JSON deserialization
 	public void setSelf(Link self) {
-		this.self(self);
+		this.self = self;
 	}
 
 	@Override
 	public Link self() {
 		return self;
-	}
-
-	@Override
-	public void self(Link self) {
-		this.self = self;
 	}
 
 	public Link getFirst() {

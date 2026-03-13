@@ -15,9 +15,4 @@ public record TestRecordResource(Link self, MediaType customJsonMediaType) imple
 	public TestRecordResource(Link self) {
 		this(self, MEDIA_TYPE);
 	}
-
-	@Override
-	public void self(Link selfLink) {
-		throw new UnsupportedOperationException("Records are immutable");
-	}
 }

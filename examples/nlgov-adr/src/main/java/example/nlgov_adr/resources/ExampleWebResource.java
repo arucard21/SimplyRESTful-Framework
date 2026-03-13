@@ -230,13 +230,13 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource> {
 
 
 	@Override
-	public Response postAPIResource(UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.postAPIResource(uriInfo, resource);
+	public Response postAPIResource(@NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.postAPIResource(resource);
 	}
 
 	@Override
-	public Response putAPIResource(UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.putAPIResource(uriInfo, id, resource);
+	public Response putAPIResource(@NotNull UUID id, @NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.putAPIResource(id, resource);
 	}
 
 	@Override

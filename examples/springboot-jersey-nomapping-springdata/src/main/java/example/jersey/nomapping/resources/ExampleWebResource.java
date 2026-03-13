@@ -92,7 +92,8 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	@Override
 	public ExampleResource create(ExampleResource resource, UUID resourceUUID) {
 		ensureSelfLinkAndUUIDPresent(resource);
-		Optional<ExampleResource> entity = repo.findByUuid(resourceUUID);
+		UUID resourceId = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
+		Optional<ExampleResource> entity = repo.findByUuid(resourceId);
 		if (entity.isPresent()) {
 			throw new IllegalArgumentException(ERROR_CREATE_RESOURCE_ALREADY_EXISTS);
 		}
@@ -216,13 +217,13 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	}
 
 	@Override
-	public Response postAPIResource(UriInfo uriInfo, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.postAPIResource(uriInfo, resource);
+	public Response postAPIResource(@NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.postAPIResource(resource);
 	}
 
 	@Override
-	public Response putAPIResource(UriInfo uriInfo, @NotNull UUID id, @NotNull @Valid ExampleResource resource) {
-		return DefaultWebResource.super.putAPIResource(uriInfo, id, resource);
+	public Response putAPIResource(@NotNull UUID id, @NotNull @Valid ExampleResource resource) {
+		return DefaultWebResource.super.putAPIResource(id, resource);
 	}
 
 	@Override

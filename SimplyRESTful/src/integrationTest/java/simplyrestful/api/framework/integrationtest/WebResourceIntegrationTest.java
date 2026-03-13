@@ -187,12 +187,12 @@ public class WebResourceIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void webResource_shouldReturn409Conflict_whenPOSTReceivedWithExistingResource() {
+    public void webResource_shouldReturn400BadRequest_whenPOSTReceivedWithSelfLink() {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.request()
     		.post(Entity.entity(testInstance, TestResource.MEDIA_TYPE_JSON));
-    	Assertions.assertEquals(Status.CONFLICT.getStatusCode(), response.getStatus());
+    	Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -206,15 +206,24 @@ public class WebResourceIntegrationTest extends JerseyTest {
     }
 
     @Test
-    public void webResource_shouldThrow404NotFoundError_whenPUTReceivedWithNewResource() {
+    public void webResource_shouldThrow400BadRequest_whenPUTReceivedWithoutSelfLink() {
     	Response response = target()
     		.path(WEB_RESOURCE_PATH)
     		.path(UUID.randomUUID().toString())
     		.request()
     		.put(Entity.entity(new TestResource(), TestResource.MEDIA_TYPE_JSON));
-    	Assertions.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    	Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
+    @Test
+    public void webResource_shouldThrow404NotFound_whenPUTReceivedWithNewResource() {
+    	Response response = target()
+    		.path(WEB_RESOURCE_PATH)
+    		.path(UUID.randomUUID().toString())
+    		.request()
+    		.put(Entity.entity(TestResource.random(getBaseUri()), TestResource.MEDIA_TYPE_JSON));
+    	Assertions.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
 
     @Test
     public void webResource_shouldRemoveResource_whenDELETEReceived() {

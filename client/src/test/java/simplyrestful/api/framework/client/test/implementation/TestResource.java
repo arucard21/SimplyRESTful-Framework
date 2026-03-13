@@ -20,7 +20,6 @@ public class TestResource implements ApiResource {
 		return self;
 	}
 
-	@Override
 	@JsonSetter("self")
 	public void self(Link self) {
 		this.self = self;

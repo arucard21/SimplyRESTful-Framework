@@ -42,7 +42,7 @@ public class WebResourceRoot{
 		Link descriptionLink = new Link(uriInfo.getRequestUriBuilder().path("openapi.json").build(), MediaType.APPLICATION_JSON_TYPE);
 		serviceDocument.setDescribedBy(descriptionLink);
 		Link selfLink = new Link(uriInfo.getRequestUriBuilder().build(), serviceDocument.customJsonMediaType());
-		serviceDocument.self(selfLink);
+		serviceDocument.setSelf(selfLink);
 		return serviceDocument;
 	}
 }

@@ -15,8 +15,7 @@ public class TestResource implements ApiResource {
 		return self;
 	}
 
-	@Override
-	public void self(Link self) {
+	public void setSelf(Link self) {
 		this.self = self;
 	}
 

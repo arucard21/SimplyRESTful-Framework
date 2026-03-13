@@ -40,7 +40,6 @@ public class ExampleResource implements ApiResource {
         return self;
     }
 
-    @Override
     public void self(Link self) {
         this.self = self;
     }

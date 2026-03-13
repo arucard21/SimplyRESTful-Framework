@@ -11,16 +11,13 @@ import simplyrestful.api.framework.resources.ApiResource;
  */
 public interface ResourceCreate<T extends ApiResource> {
     /**
-     * Create the resource in the data store where it is stored.
+     * Create the resource.
      *
-     * The resource should contain a self-link that contains the unique ID for this
-     * resource.
+     * The resource returned by this method must contain the self link with the absolute URL to
+     * this resource which ends with the UUID identifier of this resource.
      *
-     * @param resource     is the resource that should be created, containing a
-     *                     self-link with its unique ID
-     * @param resourceUUID is the unique ID of the resource which should match the
-     *                     UUID used in the self-link
-     * @return the created resource as persisted
+     * @param resource is the resource that should be created which does not contain a self link.
+     * @return the created resource, containing a self-link with the absolute URL to itself.
      */
     public abstract T create(T resource, UUID resourceUUID);
 }

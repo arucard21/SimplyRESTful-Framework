@@ -11,7 +11,7 @@ configure(allprojects){
 	apply plugin: "eclipse"
 
 	group = 'com.github.arucard21.simplyrestful'
-	version = '2.2.0'
+	version = '2.3.0'
 
 	java {
 		sourceCompatibility = JavaVersion.VERSION_17

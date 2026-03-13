@@ -80,7 +80,7 @@ public class ApiCollectionBuilder<T extends ApiResource> {
 	 */
     public ApiCollection<T> build(MediaType type) {
     	ApiCollection<T> collection = new ApiCollection<T>();
-    	collection.self(new Link(requestURI, type));
+    	collection.setSelf(new Link(requestURI, type));
     	collection.setItem(this.resources);
 
     	if(this.collectionSize != null) {
