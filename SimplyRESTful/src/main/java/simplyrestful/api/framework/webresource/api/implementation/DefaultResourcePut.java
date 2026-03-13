@@ -88,7 +88,7 @@ public interface DefaultResourcePut<T extends ApiResource> extends ResourceExist
 		if (!resourceIdFromSelf.equals(id)) {
 			throw new BadRequestException(ERROR_SELF_LINK_ID_DOES_NOT_MATCH_PROVIDED_ID);
 		}
-    	this.update(resource, id);
+    	this.update(resource);
     	return Response.noContent().build();
     }
 }

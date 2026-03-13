@@ -1,7 +1,5 @@
 package simplyrestful.api.framework.api.crud;
 
-import java.util.UUID;
-
 import simplyrestful.api.framework.resources.ApiResource;
 
 /**
@@ -19,5 +17,5 @@ public interface ResourceCreate<T extends ApiResource> {
      * @param resource is the resource that should be created which does not contain a self link.
      * @return the created resource, containing a self-link with the absolute URL to itself.
      */
-    public abstract T create(T resource, UUID resourceUUID);
+    public abstract T create(T resource);
 }

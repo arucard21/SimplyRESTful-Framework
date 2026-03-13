@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.UriBuilder;
 import simplyrestful.api.framework.DefaultWebResource;
 import simplyrestful.api.framework.queryparams.SortOrder;
 import simplyrestful.api.framework.resources.Link;
+import simplyrestful.api.framework.utils.WebResourceUtils;
 import simplyrestful.api.framework.webresource.api.implementation.DefaultCollectionGetEventStream;
 
 @Path(TestWebResource.WEBRESOURCE_PATH)
@@ -39,7 +40,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
     }
 
     @Override
-    public TestResource create(TestResource resource, UUID resourceUUID) {
+    public TestResource create(TestResource resource) {
         // The provided resource is not actually stored anywhere in this test API.
     	resource.self(new Link(
     			UriBuilder.fromUri(baseUri).path(WEBRESOURCE_PATH).path(TEST_RESOURCE_ID.toString()).build(),
@@ -59,7 +60,8 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
     }
 
     @Override
-    public TestResource update(TestResource resource, UUID resourceUUID) {
+    public TestResource update(TestResource resource) {
+    	UUID resourceUUID = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
         if (Objects.equals(resourceUUID, ERROR_UPDATE_RESOURCE_ID)) {
             throw new InternalServerErrorException("Pretending that something went wrong on the server");
         }

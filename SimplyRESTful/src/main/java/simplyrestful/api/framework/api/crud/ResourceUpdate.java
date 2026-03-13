@@ -1,8 +1,6 @@
 package simplyrestful.api.framework.api.crud;
 
 import java.net.URI;
-import java.util.UUID;
-
 import simplyrestful.api.framework.resources.ApiResource;
 
 /**
@@ -21,5 +19,5 @@ public interface ResourceUpdate<T extends ApiResource> {
      * @param resource is the updated resource
      * @return the updated resource as persisted
      */
-    public abstract T update(T resource, UUID resourceUUID);
+    public abstract T update(T resource);
 }

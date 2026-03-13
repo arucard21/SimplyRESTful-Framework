@@ -21,7 +21,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 	public static final List<TestResource> TEST_RESOURCES = new ArrayList<>();
 
 	@Override
-	public TestResource create(TestResource resource, UUID resourceUUID) {
+	public TestResource create(TestResource resource) {
 		return resource;
 	}
 
@@ -34,7 +34,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 	}
 
 	@Override
-	public TestResource update(TestResource resource, UUID resourceUUID) {
+	public TestResource update(TestResource resource) {
 		return TEST_RESOURCES.get(0);
 	}
 

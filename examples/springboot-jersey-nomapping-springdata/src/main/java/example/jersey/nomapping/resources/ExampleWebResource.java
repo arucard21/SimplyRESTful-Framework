@@ -90,7 +90,7 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	}
 
 	@Override
-	public ExampleResource create(ExampleResource resource, UUID resourceUUID) {
+	public ExampleResource create(ExampleResource resource) {
 		ensureSelfLinkAndUUIDPresent(resource);
 		UUID resourceId = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
 		Optional<ExampleResource> entity = repo.findByUuid(resourceId);
@@ -114,8 +114,9 @@ public class ExampleWebResource implements DefaultWebResource<ExampleResource>, 
 	}
 
 	@Override
-	public ExampleResource update(ExampleResource resource, UUID resourceUUID) {
+	public ExampleResource update(ExampleResource resource) {
 		ensureSelfLinkAndUUIDPresent(resource);
+		UUID resourceUUID = WebResourceUtils.parseUuidFromLastSegmentOfUri(resource.self().getHref());
 		Optional<ExampleResource> entity = repo.findByUuid(resourceUUID);
 		if (entity.isPresent()) {
 			ExampleResource retrievedEntity = entity.get();

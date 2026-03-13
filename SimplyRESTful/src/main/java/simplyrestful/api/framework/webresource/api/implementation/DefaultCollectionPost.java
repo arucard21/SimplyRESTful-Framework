@@ -1,8 +1,6 @@
 package simplyrestful.api.framework.webresource.api.implementation;
 
 import java.net.URI;
-import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -61,11 +59,10 @@ public interface DefaultCollectionPost<T extends ApiResource> extends ResourceEx
             @Valid
             @Parameter(required = true)
             T resource) {
-    	UUID resourceId = null;
     	if(resource.self() != null) {
     		throw new BadRequestException(ERROR_RESOURCE_SELF_LINK_NOT_ALLOWED);
     	}
-    	T updatedResource = this.create(resource, resourceId);
+    	T updatedResource = this.create(resource);
     	if(updatedResource.self() == null || updatedResource.self().getHref() == null) {
 			throw new IllegalStateException(ERROR_CREATED_RESOURCE_HAS_NO_SELF_LINK);
 		}

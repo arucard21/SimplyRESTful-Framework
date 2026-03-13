@@ -27,7 +27,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 	UriInfo uriInfo;
 
 	@Override
-	public TestResource create(TestResource resource, UUID resourceUUID) {
+	public TestResource create(TestResource resource) {
 		resource.setSelf(new Link(
 				uriInfo.getBaseUriBuilder().path(TestWebResource.class).path(TEST_RESOURCE_ID.toString()).build(),
     			resource.customJsonMediaType()));
@@ -43,7 +43,7 @@ public class TestWebResource implements DefaultWebResource<TestResource>, Defaul
 	}
 
 	@Override
-	public TestResource update(TestResource resource, UUID resourceUUID) {
+	public TestResource update(TestResource resource) {
 		return TEST_RESOURCES.get(0);
 	}
 
