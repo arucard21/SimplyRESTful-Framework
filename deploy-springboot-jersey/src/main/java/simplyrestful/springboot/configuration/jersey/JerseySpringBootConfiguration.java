@@ -5,8 +5,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.jersey.ResourceConfigCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.jersey.autoconfigure.ResourceConfigCustomizer;
+import org.springframework.boot.tomcat.TomcatConnectorCustomizer;
 import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
@@ -42,7 +42,7 @@ public class JerseySpringBootConfiguration implements ResourceConfigCustomizer {
 
     @Bean
     @ConditionalOnMissingBean
-    TomcatConnectorCustomizer http2UpgradeProtocol() {
+	TomcatConnectorCustomizer http2UpgradeProtocol() {
         return (connector -> connector.addUpgradeProtocol(new Http2Protocol()));
     }
 }
