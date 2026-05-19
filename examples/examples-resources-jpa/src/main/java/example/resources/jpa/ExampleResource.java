@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Transient;
 import jakarta.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,7 +29,18 @@ public class ExampleResource implements ApiResource {
     @JsonIgnore
     @Column(columnDefinition = "uuid") // necessary for h2 database, otherwise it will default to binary(16) which doesn't seem to work
     private UUID uuid;
-    @jakarta.persistence.Transient
+    
+    @SuppressWarnings("unused") // for (de)serialization
+    public Link getSelf() {
+        return self;
+    }
+    
+    @SuppressWarnings("unused") // for (de)serialization
+    public void setSelf(Link self) {
+        this.self = self;
+    }
+    
+    @Transient
     private Link self;
     private String description;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
